@@ -476,6 +476,7 @@ class DebugUI:
     # destory all created windows
     self.destroy()
 
+    vim.command('bufdo bd')#clear all buffer
     # restore session
     vim.command('source ' + self.sessfile)
     os.system('rm -f ' + self.sessfile)
