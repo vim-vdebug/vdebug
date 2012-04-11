@@ -1,50 +1,4 @@
 # -*- c--oding: ko_KR.UTF-8 -*-
-# remote PHP debugger : remote debugger interface to DBGp protocol
-#
-# Copyright (c) 2003-2006 ActiveState Software Inc.
-#
-# The MIT License
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files
-# (the "Software"), to deal in the Software without restriction,
-# including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the
-# Software, and to permit persons to whom the Software is furnished
-# to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included
-# in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
-#
-# Authors:
-#    Seung Woo Shin <segv <at> sayclub.com>
-#    Sam Ghods <sam <at> box.net>
-
-"""
-	debugger.py -- DBGp client: a remote debugger interface to DBGp protocol
-
-    Usage:
-        Use with the debugger.vim vim plugin
-
-    This debugger is designed to be used with debugger.vim,
-	a vim plugin which provides a full debugging environment
-	right inside vim.
-
-	CHECK DEBUGGER.VIM FOR THE FULL DOCUMENTATION.
-
-    Example usage:
-        Place inside <source vim directory>/plugin/ along with
-		debugger.py.
-"""
 
 import os
 import sys
@@ -417,8 +371,8 @@ class HelpWindow(VimWindow):
         '  <F2>   step into                |   ,e  eval            \n' + \
         '  <F3>   step over                |                       \n' + \
         '  <F4>   step out                 |                       \n' + \
-        '  <F5>   run                      | [ Command Mode ]      \n' + \
-        '  <F6>   quit debugging           | :Bp toggle breakpoint \n' + \
+        '  <F5>   start debuging & run     | [ Command Mode ]      \n' + \
+        '  <F6>   stop debugging           | :Bp toggle breakpoint \n' + \
         '                                  | :Up stack up          \n' + \
         '  <F11>  get all context          | :Dn stack down        \n' + \
         '  <F12>  get property at cursor   |                       \n' + \
@@ -427,7 +381,7 @@ class HelpWindow(VimWindow):
 
 class DebugUI:
   """ DEBUGUI class """
-  def __init__(self, minibufexpl = 0):
+  def __init__(self):
     """ initialize object """
     self.watchwin = WatchWindow()
     self.stackwin = StackWindow()
@@ -439,15 +393,13 @@ class DebugUI:
     self.winbuf   = {}
     self.cursign  = None
     self.sessfile = "/tmp/debugger_vim_saved_session." + str(os.getpid())
-    self.minibufexpl = minibufexpl
 
   def debug_mode(self):
     """ change mode to debug """
     if self.mode == 1: # is debug mode ?
       return
     self.mode = 1
-    if self.minibufexpl == 1:
-      vim.command('CMiniBufExplorer')         # close minibufexplorer if it is open
+    vim.command('tabnew')
     # save session
     vim.command('mksession! ' + self.sessfile)
     for i in range(1, len(vim.windows)+1):
@@ -455,12 +407,12 @@ class DebugUI:
       self.winbuf[i] = vim.eval('bufnr("%")') # save buffer number, mksession does not do job perfectly
                                               # when buffer is not saved at all.
 
-    vim.command('silent topleft new')                # create srcview window (winnr=1)
+    vim.command('silent leftabove new')                # create srcview window (winnr=1)
     for i in range(2, len(vim.windows)+1):
       vim.command(str(i)+'wincmd w')
       vim.command('hide')
     self.create()
-    vim.command('1wincmd w') # goto srcview window(nr=1, top-left)
+    vim.command('2wincmd w') # goto srcview window(nr=1, top-left)
     self.cursign = '1'
 
     self.set_highlight()
@@ -476,9 +428,9 @@ class DebugUI:
     # destory all created windows
     self.destroy()
 
-    vim.command('bufdo bd')#clear all buffer
     # restore session
-    vim.command('source ' + self.sessfile)
+    "vim.command('source ' + self.sessfile)"
+    vim.command('tabc')
     os.system('rm -f ' + self.sessfile)
 
     self.set_highlight()
@@ -490,15 +442,12 @@ class DebugUI:
     self.mode    = 0
     self.cursign = None
 
-    if self.minibufexpl == 1:
-      vim.command('MiniBufExplorer')         # close minibufexplorer if it is open
-
   def create(self):
     """ create windows """
     self.watchwin.create('vertical belowright new')
-    self.helpwin.create('belowright new')
-    self.stackwin.create('belowright new')
-    self.tracewin.create('belowright new')
+    "self.helpwin.create('belowright new')"
+    self.stackwin.create('belowright 12new')
+    self.tracewin.create('rightbelow 1new')
 
   def set_highlight(self):
     """ set vim highlight of debugger sign """
@@ -507,12 +456,12 @@ class DebugUI:
 
   def destroy(self):
     """ destroy windows """
-    self.helpwin.destroy()
+    "self.helpwin.destroy()"
     self.watchwin.destroy()
     self.stackwin.destroy()
     self.tracewin.destroy()
   def go_srcview(self):
-    vim.command('1wincmd w')
+    vim.command('2wincmd w')
   def next_sign(self):
     if self.cursign == '1':
       return '2'
@@ -542,17 +491,18 @@ class DebugUI:
 
 class DbgProtocol:
   """ DBGp Procotol class """
-  def __init__(self, port = 9000):
-    self.port     = port
+  def __init__(self, port=9000):
+    self.port     = 9000
     self.sock     = None
     self.isconned = 0
   def isconnected(self):
     return self.isconned
   def accept(self):
-    print 'waiting for a new connection on port '+str(self.port)+' for 5 seconds...'
+    print 'waiting new connection (<C-d> to cancel)'
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
       serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+      serv.settimeout(None)
       serv.bind(('', self.port))
       serv.listen(5)
       (self.sock, address) = serv.accept()
@@ -662,31 +612,26 @@ class Debugger:
   #################################################################################################################
   # Internal functions
   #
-  def __init__(self, port = 9000, max_children = '32', max_data = '1024', max_depth = '1', minibufexpl = '0', debug = 0):
+  def __init__(self, port = 9000, debug = 0):
     """ initialize Debugger """
-    socket.setdefaulttimeout(5)
-    self.port       = port
-    self.debug      = debug
+    socket.setdefaulttimeout(10)
+    self.port      = port
+    self.debug     = debug
 
-    self.current    = None
-    self.file       = None
-    self.lasterror  = None
-    self.msgid      = 0
-    self.running    = 0
-    self.stacks     = []
-    self.curstack   = 0
-    self.laststack  = 0
-    self.bptsetlst  = {} 
+    self.current   = None
+    self.file      = None
+    self.lasterror = None
+    self.msgid     = 0
+    self.running   = 0
+    self.stacks    = []
+    self.curstack  = 0
+    self.laststack = 0
+    self.bptsetlst = {} 
 
-    self.status        = None
-    self.max_children  = max_children
-    self.max_data      = max_data
-    self.max_depth     = max_depth
+    self.protocol  = DbgProtocol(self.port)
 
-    self.protocol   = DbgProtocol(self.port)
-
-    self.ui         = DebugUI(minibufexpl)
-    self.breakpt    = BreakPoint()
+    self.ui        = DebugUI()
+    self.breakpt   = BreakPoint()
 
     vim.command('sign unplace *')
 
@@ -838,8 +783,6 @@ class Debugger:
     """handle <response command=step_out> tag
     <response command="step_out" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      if res.firstChild.hasAttribute('status'):
-        self.status = res.firstChild.getAttribute('status')
       return
     else:
       print res.toprettyxml()
@@ -847,8 +790,6 @@ class Debugger:
     """handle <response command=step_over> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      if res.firstChild.hasAttribute('status'):
-        self.status = res.firstChild.getAttribute('status')
       return
     else:
       print res.toprettyxml()
@@ -856,17 +797,13 @@ class Debugger:
     """handle <response command=step_into> tag
     <response command="step_into" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      if res.firstChild.hasAttribute('status'):
-        self.status = res.firstChild.getAttribute('status')
       return
     else:
       print res.toprettyxml()
   def handle_response_run(self, res):
     """handle <response command=run> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
-    if res.firstChild.hasAttribute('status'):
-      self.status = res.firstChild.getAttribute('status')
-      return
+    pass
   def handle_response_breakpoint_set(self, res):
     """handle <response command=breakpoint_set> tag
     <responsponse command="breakpoint_set" id="110180001" transaction_id="1"/>"""
@@ -881,15 +818,15 @@ class Debugger:
       #  pass
   def handle_response_eval(self, res):
     """handle <response command=eval> tag """
+    #self.ui.watchwin.write('')
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
+    #self.ui.watchwin.write('')
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
-    self.ui.watchwin.write_xml_childs(res)
-  def handle_response_feature_set(self, res):
-    """handle <response command=feature_set> tag """
+    #self.ui.watchwin.write('')
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_default(self, res):
     """handle <response command=context_get> tag """
@@ -922,8 +859,7 @@ class Debugger:
     """ start debugger or continue """
     if self.protocol.isconnected():
       self.command('run')
-      if self.status != 'stopped':
-        self.command('stack_get')
+      self.command('stack_get')
     else:
       self.clear()
       self.protocol.accept()
@@ -932,17 +868,12 @@ class Debugger:
 
       self.recv(1)
 
-      # set max data to get with eval results
-      self.command('feature_set', '-n max_children -v ' + self.max_children)
-      self.command('feature_set', '-n max_data -v ' + self.max_data)
-      self.command('feature_set', '-n max_depth -v ' + self.max_depth)
-
       self.command('step_into')
 
       flag = 0
       for bno in self.breakpt.list():
         msgid = self.send_command('breakpoint_set', \
-                                  '-t line -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)) + ' -s enabled', \
+                                  '-t line -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
                                   self.breakpt.getexp(bno))
         self.bptsetlst[msgid] = bno
         flag = 1
@@ -954,7 +885,6 @@ class Debugger:
   def quit(self):
     self.ui.normal_mode()
     self.clear()
-    #vim.command('MiniBufExplorer')
 
   def stop(self):
     self.clear()
@@ -1029,45 +959,19 @@ class Debugger:
 
 #################################################################################################################
 #
-# Try - Catch Wrapper 
+# Try - Catch Warpper 
 #
 #################################################################################################################
 
 
-def debugger_init(debug = 0):
+def debugger_init(port = 9000, debug = 0):
   global debugger
-
-  # get needed vim variables
-
-  # port that the engine will connect on
-  port = int(vim.eval('debuggerPort'))
-  if port == 0:
-    port = 9000
-
-  # the max_depth variable to set in the engine
-  max_children = vim.eval('debuggerMaxChildren')
-  if max_children == '':
-    max_children = '32'
-
-  max_data = vim.eval('debuggerMaxData')
-  if max_data == '':
-    max_data = '1024'
-
-  max_depth = vim.eval('debuggerMaxDepth')
-  if max_depth == '':
-    max_depth = '1'
-
-  minibufexpl = int(vim.eval('debuggerMiniBufExpl'))
-  if minibufexpl == 0:
-    minibufexpl = 0
-
-  debugger  = Debugger(port, max_children, max_data, max_depth, minibufexpl, debug)
+  debugger  = Debugger(port, debug)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
   try:
     debugger.command(msg, arg1, arg2)
-    if debugger.status != 'stopped':
-      debugger.command('stack_get')
+    debugger.command('stack_get')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
