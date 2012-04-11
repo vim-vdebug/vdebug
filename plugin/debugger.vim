@@ -5,7 +5,8 @@ map <F3> :python debugger_command('step_over')<cr>
 map <F4> :python debugger_command('step_out')<cr>
 
 nnoremap ,e :python debugger_watch_input("eval")<cr>A
-nnoremap ,E :python debugger_watch_input("exec")<cr>A
+nnoremap ,v :python debugger_watch_input("eval","var_dump( $var ,true)")<cr>A
+nnoremap ,p :python debugger_watch_input("eval","print_r( $var ,true)")<cr>A
 
 map <F5> :python debugger_run()<cr>
 map <F6> :python debugger_quit()<cr>
