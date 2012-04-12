@@ -134,7 +134,7 @@ else
   endif
 endif
 
-map <F1> :python debugger_resize()<cr>
+map <F1> :python debugger_mark()<cr>
 map <F2> :python debugger_command('step_into')<cr>
 map <F3> :python debugger_command('step_over')<cr>
 map <F4> :python debugger_command('step_out')<cr>
@@ -184,4 +184,4 @@ endif
 if !exists('g:debuggerMiniBufExpl')
   let g:debuggerMiniBufExpl = 0
 endif
-python debugger_init(1)
+python debugger_init(1,1)

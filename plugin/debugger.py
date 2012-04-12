@@ -137,6 +137,23 @@ class VimWindow:
       self.buffer.append(str(msg).split('\n'))
     self.command('normal G')
     #self.window.cursor = (len(self.buffer), 1)
+  def insert(self, msg):
+    """ insert into current position """
+    self.prepare()
+    if self.firstwrite == 1:
+      self.firstwrite = 0
+      self.buffer[:] = str(msg).split('\n')
+    else:
+      (row, rol) = vim.current.window.cursor
+      remaining_buffer = self.buffer[row:]
+      prev_row = row - 1
+      buf_copy = []
+      buf_copy = self.buffer[:]
+      buf_copy.insert(prev_row,str(msg).split('\n'))
+      self.buffer[:] = []
+      self.buffer.extend(buf_copy)
+    self.command('normal G')
+    #self.window.cursor = (len(self.buffer), 1)
   def create(self, method = 'new'):
     """ create window """
     vim.command('silent ' + method + ' ' + self.name)
@@ -227,8 +244,12 @@ class VimWindow:
 
   def write_xml(self, xml):
     self.write(self.xml_stringfy(xml))
-  def write_xml_childs(self, xml):
-    self.write(self.xml_stringfy_childs(xml))
+  def write_xml_childs(self, xml, insert = False):
+    if insert:
+      self.insert(self.xml_stringfy_childs(xml))
+    else:
+      self.write(self.xml_stringfy_childs(xml))
+    print "Completed!!!"
 
 class StackWindow(VimWindow):
   def __init__(self, name = 'STACK_WINDOW'):
@@ -262,6 +283,7 @@ class LogWindow(VimWindow):
 
 class TraceWindow(VimWindow):
   def __init__(self, name = 'TRACE_WINDOW'):
+    self.created = 0
     VimWindow.__init__(self, name)
   def xml_on_element(self, node):
     if node.nodeName != 'error':
@@ -271,6 +293,14 @@ class TraceWindow(VimWindow):
       if node.hasAttribute('code'):
         desc = ' : '+error_msg[int(node.getAttribute('code'))]
       return VimWindow.xml_on_element(self, node) + desc
+  def create(self,method="new"):
+    self.created = 1
+    VimWindow.create(self,method)
+
+  def write(self,message):
+    if self.created == 0:
+      self.create('rightbelow 1new')
+    VimWindow.write(self,message)
   def on_create(self):
     self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
 
@@ -364,18 +394,19 @@ class WatchWindow(VimWindow):
       return "'" + str(node.data) + "'"
     else:
       return str(node.data)
-  def write_xml_childs(self, xml):
+  def write_xml_childs(self, xml, insert = False):
     self.clean()
-    "self.write('<?')"
-    return VimWindow.write_xml_childs(self,xml)
+    return VimWindow.write_xml_childs(self,xml,insert)
   def on_command(self):
-    vim.command("let buf_pos = line('.')")
-    buf_pos = int(vim.eval('buf_pos')) - 1
-    line = self.buffer[buf_pos]
+    (row, rol) = vim.current.window.cursor
+    """vim.command("let buf_pos = line('.')")
+    buf_pos = int(vim.eval('buf_pos')) - 1"""
+    line = self.buffer[row-1]
     eqpos = line.find("=")
     if eqpos > -1:
       var = line[:eqpos].strip()
-      debugger_property(var)
+      """self.insert(var)"""
+      debugger_property(var,True)
     else:
       self.command("echohl Error | echo \"Cannot find variable under cursor\" | echohl None")
   def clean(self):
@@ -474,7 +505,7 @@ class DebugUI:
     "self.helpwin.create('belowright new')"
     self.stackwin.create('belowright 12new')
     self.cmdwin.create('rightbelow 4new')
-    self.tracewin.create('rightbelow 1new')
+    "self.tracewin.create('rightbelow 1new')"
 
   def set_highlight(self):
     """ set vim highlight of debugger sign """
@@ -486,7 +517,8 @@ class DebugUI:
     "self.helpwin.destroy()"
     self.watchwin.destroy()
     self.stackwin.destroy()
-    self.tracewin.destroy()
+    if self.tracewin.created == 1:
+      self.tracewin.destroy()
     self.cmdwin.destroy()
   def go_srcview(self):
     vim.command('2wincmd w')
@@ -640,7 +672,7 @@ class Debugger:
   #################################################################################################################
   # Internal functions
   #
-  def __init__(self, port = 9000, debug = 0):
+  def __init__(self, port = 9000, debug = 1):
     """ initialize Debugger """
     socket.setdefaulttimeout(10)
     self.port      = port
@@ -655,6 +687,7 @@ class Debugger:
     self.curstack  = 0
     self.laststack = 0
     self.bptsetlst = {} 
+    self.insertmode = False
 
     self.protocol  = DbgProtocol(self.port)
 
@@ -851,7 +884,7 @@ class Debugger:
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
     #self.ui.watchwin.write('')
-    self.ui.watchwin.write_xml_childs(res)
+    self.ui.watchwin.write_xml_childs(res,self.insertmode)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
     self.ui.stackwin.write(res.toxml())
@@ -954,7 +987,8 @@ class Debugger:
   def watch_input(self, mode, arg = ''):
     self.ui.cmdwin.input(mode, arg)
 
-  def property_get(self, name = ''):
+  def property_get(self, name = '',insert = False):
+    self.insertmode = insert
     if name == '':
       name = vim.eval('expand("<cword>")')
     self.ui.cmdwin.write('--> property_get: '+name)
@@ -1035,9 +1069,9 @@ def debugger_context():
     debugger.stop()
     print 'Connection closed, stop debugging'
 
-def debugger_property(name = ''):
+def debugger_property(name = '',insert = False):
   try:
-    debugger.property_get(name)
+    debugger.property_get(name,insert)
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
