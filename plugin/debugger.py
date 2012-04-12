@@ -142,7 +142,6 @@ class VimWindow:
     vim.command('silent ' + method + ' ' + self.name)
     #if self.name != 'LOG___WINDOW':
     vim.command("setlocal buftype=nofile")
-    vim.command("setlocal foldlevel=2")
     self.buffer = vim.current.buffer
     self.width  = int( vim.eval("winwidth(0)")  )
     self.height = int( vim.eval("winheight(0)") )
@@ -172,7 +171,6 @@ class VimWindow:
   def _xml_stringfy(self, node, level = 0, encoding = None):
     if node.nodeType   == node.ELEMENT_NODE:
       line = self.xml_on_element(node)
-
     elif node.nodeType == node.ATTRIBUTE_NODE:
       line = self.xml_on_attribute(node)
 
@@ -205,7 +203,6 @@ class VimWindow:
 
     if node.hasChildNodes():
       #print ''.ljust(level*4) + '{{{' + str(level+1)
-      #print ''.ljust(level*4) + line
       return self.fixup_childs(line, node, level)
     else:
       return self.fixup_single(line, node, level)
@@ -277,6 +274,34 @@ class TraceWindow(VimWindow):
   def on_create(self):
     self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
 
+class CmdWindow(VimWindow):
+  def __init__(self, name = 'CMD_WINDOW'):
+    VimWindow.__init__(self, name)
+  def input(self, mode, arg = ''):
+    line = self.buffer[-1]
+    if line[:len(mode)+1] == '=> '+mode+':':
+      self.buffer[-1] = line + arg
+    else:
+      self.buffer.append('=> '+mode+': '+arg)
+    self.command('normal G')
+  def get_command(self):
+    line = self.buffer[-1]
+    if line[0:8] == '=> exec:':
+      print "exec is not supported by xdebug yet."
+      return ('none', '')
+      #return ('exec', line[17:].strip(' '))
+    elif line[0:8] == '=> eval:':
+      return ('eval', line[17:].strip(' '))
+    elif line[0:16] == '=> property_get:':
+      return ('property_get', line[16:].strip(' '))
+    elif line[0:15] == '=> context_get:':
+      return ('context_get', line[15:].strip(' '))
+    else:
+      return ('none', '')
+  def on_create(self):
+    self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
+    self.command('inoremap <buffer> <cr> <esc>:python debugger.watch_execute()<cr>')
+
 class WatchWindow(VimWindow):
   def __init__(self, name = 'WATCH_WINDOW'):
     VimWindow.__init__(self, name)
@@ -299,29 +324,33 @@ class WatchWindow(VimWindow):
       if level == 0:
         line = ''.ljust(level*1) + str(line) + ';' + '\n'
         line += self.xml_stringfy_childs(node, level+1)
-        line += '/*}}}1*/\n'
+        line += '\n'
       else:
-        line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20) + ''.ljust(level*1) + '/*{{{' + str(level+1) + '*/' + '\n'
+        line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20) + ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
         line += str(self.xml_stringfy_childs(node, level+1))
-        line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level+1) + '*/\n'
+        line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level) + '*/\n'
     return line
   def xml_on_element(self, node):
     if node.nodeName == 'property':
       self.type = node.getAttribute('type')
+      classname = node.getAttribute('classname')
+      if classname != '':
+        vtype = classname
+      else:
+        vtype = self.type
 
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
-      if name == '':
-        name = 'EVAL_RESULT'
-      if fullname == '':
-        fullname = 'EVAL_RESULT'
+      if name == '' or fullname == '':
+        comment = "// Contents of "
+        return str('%-20s' % comment) 
 
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
       else:
-        return str('%-20s' % fullname) + ' = (' + self.type + ') '
+        return str('%-20s' % fullname) + ' = (' + self.type + ') '+classname
     elif node.nodeName == 'response':
-      return "$command = '" + node.getAttribute('command') + "'"
+      return "// Command = " + node.getAttribute('command')
     else:
       return VimWindow.xml_on_element(self, node)
 
@@ -335,32 +364,27 @@ class WatchWindow(VimWindow):
       return "'" + str(node.data) + "'"
     else:
       return str(node.data)
-  def on_create(self):
+  def write_xml_childs(self, xml):
+    self.clean()
+    "self.write('<?')"
+    return VimWindow.write_xml_childs(self,xml)
+  def on_command(self):
+    vim.command("let buf_pos = line('.')")
+    buf_pos = int(vim.eval('buf_pos')) - 1
+    line = self.buffer[buf_pos]
+    eqpos = line.find("=")
+    if eqpos > -1:
+      var = line[:eqpos].strip()
+      debugger_property(var)
+    else:
+      self.command("echohl Error | echo \"Cannot find variable under cursor\" | echohl None")
+  def clean(self):
+    VimWindow.clean(self)
     self.write('<?')
-    self.command('inoremap <buffer> <cr> <esc>:python debugger.watch_execute()<cr>')
+  def on_create(self):
     self.command('set noai nocin')
-    self.command('set nowrap fdm=marker fmr={{{,}}} ft=php fdl=1')
-  def input(self, mode, arg = ''):
-    line = self.buffer[-1]
-    if line[:len(mode)+1] == '/*{{{1*/ => '+mode+':':
-      self.buffer[-1] = line + arg
-    else:
-      self.buffer.append('/*{{{1*/ => '+mode+': '+arg)
-    self.command('normal G')
-  def get_command(self):
-    line = self.buffer[-1]
-    if line[0:17] == '/*{{{1*/ => exec:':
-      print "exec does not supported by xdebug now."
-      return ('none', '')
-      #return ('exec', line[17:].strip(' '))
-    elif line[0:17] == '/*{{{1*/ => eval:':
-      return ('eval', line[17:].strip(' '))
-    elif line[0:25] == '/*{{{1*/ => property_get:':
-      return ('property_get', line[25:].strip(' '))
-    elif line[0:24] == '/*{{{1*/ => context_get:':
-      return ('context_get', line[24:].strip(' '))
-    else:
-      return ('none', '')
+    self.command('set nowrap fdm=marker fmr={{{,}}} ft=php fdl=1 foldlevel=1')
+    self.command('noremap <buffer> <cr> <esc>:python debugger.ui.watchwin.on_command()<cr>')
 
 class HelpWindow(VimWindow):
   def __init__(self, name = 'HELP__WINDOW'):
@@ -387,6 +411,7 @@ class DebugUI:
     self.watchwin = WatchWindow()
     self.stackwin = StackWindow()
     self.tracewin = TraceWindow()
+    self.cmdwin   = CmdWindow()
     self.helpwin  = HelpWindow('HELP__WINDOW')
     self.mode     = 0 # normal mode
     self.file     = None
@@ -448,6 +473,7 @@ class DebugUI:
     self.watchwin.create('vertical belowright new')
     "self.helpwin.create('belowright new')"
     self.stackwin.create('belowright 12new')
+    self.cmdwin.create('rightbelow 4new')
     self.tracewin.create('rightbelow 1new')
 
   def set_highlight(self):
@@ -461,6 +487,7 @@ class DebugUI:
     self.watchwin.destroy()
     self.stackwin.destroy()
     self.tracewin.destroy()
+    self.cmdwin.destroy()
   def go_srcview(self):
     vim.command('2wincmd w')
   def next_sign(self):
@@ -827,7 +854,7 @@ class Debugger:
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
-    #self.ui.watchwin.write('')
+    self.ui.stackwin.write(res.toxml())
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_default(self, res):
     """handle <response command=context_get> tag """
@@ -925,17 +952,17 @@ class Debugger:
         self.recv()
 
   def watch_input(self, mode, arg = ''):
-    self.ui.watchwin.input(mode, arg)
+    self.ui.cmdwin.input(mode, arg)
 
   def property_get(self, name = ''):
     if name == '':
       name = vim.eval('expand("<cword>")')
-    self.ui.watchwin.write('--> property_get: '+name)
+    self.ui.cmdwin.write('--> property_get: '+name)
     self.command('property_get', '-n '+name)
     
   def watch_execute(self):
     """ execute command in watch window """
-    (cmd, expr) = self.ui.watchwin.get_command()
+    (cmd, expr) = self.ui.cmdwin.get_command()
     if cmd == 'exec':
       self.command('exec', '', expr)
       print cmd, '--', expr
@@ -1010,7 +1037,7 @@ def debugger_context():
 
 def debugger_property(name = ''):
   try:
-    debugger.property_get()
+    debugger.property_get(name)
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
