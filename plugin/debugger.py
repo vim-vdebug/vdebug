@@ -142,6 +142,7 @@ class VimWindow:
     vim.command('silent ' + method + ' ' + self.name)
     #if self.name != 'LOG___WINDOW':
     vim.command("setlocal buftype=nofile")
+    vim.command("setlocal foldlevel=2")
     self.buffer = vim.current.buffer
     self.width  = int( vim.eval("winwidth(0)")  )
     self.height = int( vim.eval("winheight(0)") )
