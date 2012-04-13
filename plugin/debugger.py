@@ -244,12 +244,8 @@ class VimWindow:
 
   def write_xml(self, xml):
     self.write(self.xml_stringfy(xml))
-  def write_xml_childs(self, xml, insert = False):
-    if insert:
-      self.insert(self.xml_stringfy_childs(xml))
-    else:
-      self.write(self.xml_stringfy_childs(xml))
-    print "Completed!!!"
+  def write_xml_childs(self, xml):
+    self.write(self.xml_stringfy_childs(xml))
 
 class StackWindow(VimWindow):
   def __init__(self, name = 'STACK_WINDOW'):
@@ -283,8 +279,8 @@ class LogWindow(VimWindow):
 
 class TraceWindow(VimWindow):
   def __init__(self, name = 'TRACE_WINDOW'):
-    self.created = 0
     VimWindow.__init__(self, name)
+    self.created = 0
   def xml_on_element(self, node):
     if node.nodeName != 'error':
       return VimWindow.xml_on_element(self, node)
@@ -297,10 +293,11 @@ class TraceWindow(VimWindow):
     self.created = 1
     VimWindow.create(self,method)
 
-  def write(self,message):
+  def write(self,msg):
     if self.created == 0:
       self.create('rightbelow 1new')
-    VimWindow.write(self,message)
+    VimWindow.write(self,msg)
+
   def on_create(self):
     self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
 
@@ -363,11 +360,12 @@ class WatchWindow(VimWindow):
   def xml_on_element(self, node):
     if node.nodeName == 'property':
       self.type = node.getAttribute('type')
+      extra = ""
       classname = node.getAttribute('classname')
       if classname != '':
-        vtype = classname
-      else:
-        vtype = self.type
+        extra = classname
+      if self.type == "array":
+        extra = "["+node.getAttribute('numchildren')+"]"
 
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
@@ -378,7 +376,7 @@ class WatchWindow(VimWindow):
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
       else:
-        return str('%-20s' % fullname) + ' = (' + self.type + ') '+classname
+        return str('%-20s' % fullname) + ' = (' + self.type + ') '+extra
     elif node.nodeName == 'response':
       return "// Command = " + node.getAttribute('command')
     else:
@@ -394,19 +392,16 @@ class WatchWindow(VimWindow):
       return "'" + str(node.data) + "'"
     else:
       return str(node.data)
-  def write_xml_childs(self, xml, insert = False):
+  def write_xml_childs(self, xml):
     self.clean()
-    return VimWindow.write_xml_childs(self,xml,insert)
+    return VimWindow.write_xml_childs(self,xml)
   def on_command(self):
     (row, rol) = vim.current.window.cursor
-    """vim.command("let buf_pos = line('.')")
-    buf_pos = int(vim.eval('buf_pos')) - 1"""
     line = self.buffer[row-1]
     eqpos = line.find("=")
     if eqpos > -1:
       var = line[:eqpos].strip()
-      """self.insert(var)"""
-      debugger_property(var,True)
+      debugger_property(var)
     else:
       self.command("echohl Error | echo \"Cannot find variable under cursor\" | echohl None")
   def clean(self):
@@ -687,7 +682,6 @@ class Debugger:
     self.curstack  = 0
     self.laststack = 0
     self.bptsetlst = {} 
-    self.insertmode = False
 
     self.protocol  = DbgProtocol(self.port)
 
@@ -814,6 +808,15 @@ class Debugger:
 #      print 'error code=', code
 #    print res
 
+  def handle_response_feature_set(self,res):
+    """<response command="feature_set"
+          feature="feature_name"
+          success="0|1"
+          transaction_id="transaction_id"/>"""
+    #featureName = res.firstChild.getAttribute('feature')
+    #featureSet = res.firstChild.getAttribute('success')
+    return
+
   def handle_response_stack_get(self, res):
     """handle <response command=stack_get> tag
     <response command="stack_get" transaction_id="1 ">
@@ -844,6 +847,7 @@ class Debugger:
     """handle <response command=step_out> tag
     <response command="step_out" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
+      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
@@ -851,6 +855,7 @@ class Debugger:
     """handle <response command=step_over> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
+      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
@@ -858,12 +863,14 @@ class Debugger:
     """handle <response command=step_into> tag
     <response command="step_into" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
+      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
   def handle_response_run(self, res):
     """handle <response command=run> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
+    #self.command('context_get')
     pass
   def handle_response_breakpoint_set(self, res):
     """handle <response command=breakpoint_set> tag
@@ -884,7 +891,7 @@ class Debugger:
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
     #self.ui.watchwin.write('')
-    self.ui.watchwin.write_xml_childs(res,self.insertmode)
+    self.ui.watchwin.write_xml_childs(res)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
     self.ui.stackwin.write(res.toxml())
@@ -929,6 +936,7 @@ class Debugger:
 
       self.recv(1)
 
+      self.set_max_depth(2)
       self.command('step_into')
 
       flag = 0
@@ -987,11 +995,13 @@ class Debugger:
   def watch_input(self, mode, arg = ''):
     self.ui.cmdwin.input(mode, arg)
 
-  def property_get(self, name = '',insert = False):
-    self.insertmode = insert
+  def set_max_depth(self,depth):
+    self.command('feature_set','-n max_depth -v '+str(depth))
+
+  def property_get(self, name = ''):
     if name == '':
       name = vim.eval('expand("<cword>")')
-    self.ui.cmdwin.write('--> property_get: '+name)
+    self.ui.cmdwin.write('=> property_get: '+name)
     self.command('property_get', '-n '+name)
     
   def watch_execute(self):
@@ -1026,8 +1036,11 @@ class Debugger:
 #################################################################################################################
 
 
-def debugger_init(port = 9000, debug = 0):
+def debugger_init():
   global debugger
+  port = vim.eval("g:debuggerPort")
+  debug = vim.eval("g:debuggerDebugMode")
+  print "Listening on port "+port
   debugger  = Debugger(port, debug)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
@@ -1069,9 +1082,22 @@ def debugger_context():
     debugger.stop()
     print 'Connection closed, stop debugging'
 
-def debugger_property(name = '',insert = False):
+def debugger_set_depth(depth):
   try:
-    debugger.property_get(name,insert)
+    depth = int(depth)
+    if depth > 0:
+      debugger.set_max_depth(depth)
+    else:
+      print "Invalid maximum depth"
+  except:
+    debugger.ui.tracewin.write(sys.exc_info())
+    debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
+    debugger.stop()
+    print 'Connection closed, stop debugging'
+
+def debugger_property(name = ''):
+  try:
+    debugger.property_get(name)
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))

@@ -164,6 +164,7 @@ hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 
 command! -nargs=? Bp python debugger_mark('<args>')
+command! -nargs=1 DebugDepth python debugger_set_depth('<args>')
 command! -nargs=0 Up python debugger_up()
 command! -nargs=0 Dn python debugger_down()
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
@@ -184,4 +185,10 @@ endif
 if !exists('g:debuggerMiniBufExpl')
   let g:debuggerMiniBufExpl = 0
 endif
-python debugger_init(1,1)
+if !exists('g:debuggerAutoContext')
+  let g:debuggerAutoContext = 1
+endif
+if !exists('g:debuggerDebugMode')
+  let g:debuggerDebugMode = 1
+endif
+python debugger_init()
