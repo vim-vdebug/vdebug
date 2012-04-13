@@ -847,7 +847,6 @@ class Debugger:
     """handle <response command=step_out> tag
     <response command="step_out" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
@@ -855,7 +854,6 @@ class Debugger:
     """handle <response command=step_over> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
@@ -863,14 +861,12 @@ class Debugger:
     """handle <response command=step_into> tag
     <response command="step_into" reason="ok" status="break" transaction_id="1 "/>"""
     if res.firstChild.hasAttribute('reason') and res.firstChild.getAttribute('reason') == 'ok':
-      #self.command('context_get')
       return
     else:
       print res.toprettyxml()
   def handle_response_run(self, res):
     """handle <response command=run> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
-    #self.command('context_get')
     pass
   def handle_response_breakpoint_set(self, res):
     """handle <response command=breakpoint_set> tag
