@@ -1036,7 +1036,7 @@ def debugger_init():
   global debugger
   port = vim.eval("g:debuggerPort")
   debug = vim.eval("g:debuggerDebugMode")
-  print "Listening on port "+port
+  #print "Listening on port "+port
   debugger  = Debugger(port, debug)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
