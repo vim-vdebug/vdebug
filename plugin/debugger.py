@@ -443,6 +443,7 @@ class DebugUI:
     self.file     = None
     self.line     = None
     self.winbuf   = {}
+    self.tabno    = None
     self.cursign  = None
     self.sessfile = "/tmp/debugger_vim_saved_session." + str(os.getpid())
 
@@ -452,6 +453,7 @@ class DebugUI:
       return
     self.mode = 1
     vim.command('tabnew')
+    self.tabno = vim.eval('tabpagenr()')
     # save session
     vim.command('mksession! ' + self.sessfile)
     for i in range(1, len(vim.windows)+1):
@@ -482,11 +484,15 @@ class DebugUI:
 
     # restore session
     "vim.command('source ' + self.sessfile)"
-    vim.command('tabc')
+    try:
+      vim.command('tabc '+self.tabno)
+    except vim.error as e:
+      # Tab has already been closed      
+      print "UI error: "+e.value
+
     os.system('rm -f ' + self.sessfile)
 
     self.set_highlight()
-
 
     self.winbuf.clear()
     self.file    = None
@@ -561,6 +567,7 @@ class DbgProtocol:
       serv.bind(('', self.port))
       serv.listen(5)
       (self.sock, address) = serv.accept()
+      self.sock.settimeout(None)
     except socket.timeout:
       serv.close()
       self.stop()
@@ -667,9 +674,9 @@ class Debugger:
   #################################################################################################################
   # Internal functions
   #
-  def __init__(self, port = 9000, debug = 1):
+  def __init__(self, port = 9000, debug = 0):
     """ initialize Debugger """
-    socket.setdefaulttimeout(10)
+    socket.setdefaulttimeout(100)
     self.port      = port
     self.debug     = debug
 
