@@ -275,7 +275,6 @@ class LogWindow(VimWindow):
     VimWindow.__init__(self, name)
   def on_create(self):
     self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
-    self.write('asdfasdf')
 
 class TraceWindow(VimWindow):
   def __init__(self, name = 'TRACE_WINDOW'):
@@ -486,9 +485,9 @@ class DebugUI:
     "vim.command('source ' + self.sessfile)"
     try:
       vim.command('tabc '+self.tabno)
-    except vim.error as e:
+    except vim.error:
       # Tab has already been closed      
-      print "UI error: "+e.value
+      print "UI error"
 
     os.system('rm -f ' + self.sessfile)
 
@@ -713,7 +712,7 @@ class Debugger:
     """ send message """
     self.protocol.send_msg(msg)
     # log message
-    if self.debug:
+    if self.debug == 1:
       self.ui.tracewin.write(str(self.msgid) + ' : send =====> ' + msg)
   def recv(self, count=10000):
     """ receive message until response is last transaction id or received count's message """
@@ -723,7 +722,8 @@ class Debugger:
       txt = self.protocol.recv_msg()
       res = xml.dom.minidom.parseString(txt)
       # log messages {{{
-      if self.debug:
+      if self.debug == 1:
+        print "Debugging to trace window"
         self.ui.tracewin.write( str(self.msgid) + ' : recv <===== {{{   ' + txt)
         self.ui.tracewin.write('}}}')
       # handle message
@@ -802,7 +802,6 @@ class Debugger:
   def handle_response_error(self, res):
     """ handle <error> tag """
     self.ui.tracewin.write_xml_childs(res)
-#    print 'ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 #    print res.toprettyxml()
 #    print '------------------------------------'
 #
