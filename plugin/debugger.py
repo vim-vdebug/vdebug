@@ -219,7 +219,6 @@ class VimWindow:
       line = 'unknown node type'
 
     if node.hasChildNodes():
-      #print ''.ljust(level*4) + '{{{' + str(level+1)
       return self.fixup_childs(line, node, level)
     else:
       return self.fixup_single(line, node, level)
@@ -305,28 +304,37 @@ class CmdWindow(VimWindow):
     VimWindow.__init__(self, name)
   def input(self, mode, arg = ''):
     line = self.buffer[-1]
-    if line[:len(mode)+1] == '=> '+mode+':':
+    if line[:len(mode)+1] == '{'+mode+'}':
       self.buffer[-1] = line + arg
     else:
-      self.buffer.append('=> '+mode+': '+arg)
+      if len(self.buffer) == 0:
+        self.buffer[0] = '{'+mode+'} '+arg
+      else:
+        self.buffer.append('{'+mode+'} '+arg)
     self.command('normal G')
-  def get_command(self):
-    line = self.buffer[-1]
-    if line[0:8] == '=> exec:':
+  def get_command(self,latest = True):
+    if latest == True:
+      line = self.buffer[-1]
+    else:
+      (lnum, rol) = vim.current.window.cursor
+      line = self.buffer[lnum-1]
+
+    if line[0:6] == '{exec}':
       print "exec is not supported by xdebug yet."
       return ('none', '')
       #return ('exec', line[17:].strip(' '))
-    elif line[0:8] == '=> eval:':
-      return ('eval', line[17:].strip(' '))
-    elif line[0:16] == '=> property_get:':
-      return ('property_get', line[16:].strip(' '))
-    elif line[0:15] == '=> context_get:':
-      return ('context_get', line[15:].strip(' '))
+    elif line[0:6] == '{eval}':
+      return ('eval', line[6:].strip(' '))
+    elif line[0:16] == '{property_get}':
+      return ('property_get', line[15:].strip(' '))
+    elif line[0:13] == '{context_get}':
+      return ('context_get', line[13:].strip(' '))
     else:
       return ('none', '')
   def on_create(self):
     self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
-    self.command('inoremap <buffer> <cr> <esc>:python debugger.watch_execute()<cr>')
+    self.command('inoremap <buffer> <cr> <esc>:python debugger.watch_execute(False)<cr>')
+    self.command('nnoremap <buffer> <cr> <esc>:python debugger.watch_execute(False)<cr>')
 
 class WatchWindow(VimWindow):
   def __init__(self, name = 'WATCH_WINDOW'):
@@ -369,8 +377,11 @@ class WatchWindow(VimWindow):
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
       if name == '' or fullname == '':
-        comment = "// Contents of "
-        return str('%-20s' % comment) 
+        if node.parentNode.getAttribute('command') == 'eval':
+          return '$eval = '
+        else:
+          comment = "// Contents of "
+          return str('%-20s' % comment) 
 
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
@@ -484,9 +495,9 @@ class DebugUI:
     # restore session
     "vim.command('source ' + self.sessfile)"
     try:
-      vim.command('tabc '+self.tabno)
+      vim.command('tabc! '+self.tabno)
     except vim.error:
-      # Tab has already been closed      
+      # Tab has already been closed?
       print "UI error"
 
     os.system('rm -f ' + self.sessfile)
@@ -888,7 +899,7 @@ class Debugger:
       #  pass
   def handle_response_eval(self, res):
     """handle <response command=eval> tag """
-    #self.ui.watchwin.write('')
+    self.ui.stackwin.write(res.toxml())
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
@@ -898,6 +909,16 @@ class Debugger:
     """handle <response command=context_get> tag """
     self.ui.stackwin.write(res.toxml())
     self.ui.watchwin.write_xml_childs(res)
+  def handle_response_status(self, res):
+    if res.firstChild.hasAttribute('status'):
+      status = res.firstChild.getAttribute('status')
+      if status == 'stopping':
+          raise DBGPStoppingException("Debugger is shutting down")
+      elif status == 'stopped':
+          raise DBGPStoppedException("Debugger session has ended")
+      return
+    else:
+      print res.toprettyxml()
   def handle_response_default(self, res):
     """handle <response command=context_get> tag """
     print res.toprettyxml()
@@ -929,6 +950,7 @@ class Debugger:
     """ start debugger or continue """
     if self.protocol.isconnected():
       self.command('run')
+      self.command('status')
       self.command('stack_get')
     else:
       self.clear()
@@ -1003,12 +1025,12 @@ class Debugger:
   def property_get(self, name = ''):
     if name == '':
       name = vim.eval('expand("<cword>")')
-    self.ui.cmdwin.write('=> property_get: '+name)
+    self.ui.cmdwin.write('{property_get} '+name)
     self.command('property_get', '-n '+name)
     
-  def watch_execute(self):
+  def watch_execute(self,latest = True):
     """ execute command in watch window """
-    (cmd, expr) = self.ui.cmdwin.get_command()
+    (cmd, expr) = self.ui.cmdwin.get_command(latest)
     if cmd == 'exec':
       self.command('exec', '', expr)
       print cmd, '--', expr
@@ -1049,6 +1071,14 @@ def debugger_command(msg, arg1 = '', arg2 = ''):
   try:
     debugger.command(msg, arg1, arg2)
     debugger.command('stack_get')
+  except DBGPStoppedException:
+    debugger.stop()
+    print 'Debugger has shut down', sys.exc_info()
+  except DBGPStoppingException:
+    debugger.stop()
+    print 'Debugger is shutting down', sys.exc_info()
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1058,6 +1088,14 @@ def debugger_command(msg, arg1 = '', arg2 = ''):
 def debugger_run():
   try:
     debugger.run()
+  except DBGPStoppedException:
+    debugger.stop()
+    print 'Debugger has shut down'
+  except DBGPStoppingException:
+    debugger.stop()
+    print 'Debugger is shutting down'
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1069,6 +1107,8 @@ def debugger_watch_input(cmd, arg = ''):
     if arg == '<cword>':
       arg = vim.eval('expand("<cword>")')
     debugger.watch_input(cmd, arg)
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write( sys.exc_info() )
     debugger.ui.tracewin.write( "".join(traceback.format_tb(sys.exc_info()[2])) )
@@ -1078,6 +1118,8 @@ def debugger_watch_input(cmd, arg = ''):
 def debugger_context():
   try:
     debugger.command('context_get')
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1091,6 +1133,8 @@ def debugger_set_depth(depth):
       debugger.set_max_depth(depth)
     else:
       print "Invalid maximum depth"
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1100,6 +1144,8 @@ def debugger_set_depth(depth):
 def debugger_property(name = ''):
   try:
     debugger.property_get(name)
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1109,6 +1155,8 @@ def debugger_property(name = ''):
 def debugger_mark(exp = ''):
   try:
     debugger.mark(exp)
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1118,6 +1166,8 @@ def debugger_mark(exp = ''):
 def debugger_up():
   try:
     debugger.up()
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
     debugger.ui.tracewin.write(sys.exc_info())
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
@@ -1150,6 +1200,13 @@ def debugger_resize():
     vim.command("wincmd |")
   if mode == 2:
     vim.command("wincmd _")
+
+class DBGPStoppingException(Exception):
+    pass
+
+class DBGPStoppedException(Exception):
+    pass
+
 
 error_msg = { \
     # 000 Command parsing errors
