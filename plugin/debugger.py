@@ -573,7 +573,7 @@ class DbgProtocol:
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
       serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-      serv.settimeout(None)
+      serv.settimeout(30)
       serv.bind(('', self.port))
       serv.listen(5)
       (self.sock, address) = serv.accept()
