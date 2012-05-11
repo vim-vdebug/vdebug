@@ -189,6 +189,6 @@ if !exists('g:debuggerAutoContext')
   let g:debuggerAutoContext = 1
 endif
 if !exists('g:debuggerDebugMode')
-  let g:debuggerDebugMode = 0
+  let g:debuggerDebugMode = 1
 endif
 python debugger_init()

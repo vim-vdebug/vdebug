@@ -218,10 +218,11 @@ class VimWindow:
     else:
       line = 'unknown node type'
 
-    if node.hasChildNodes():
-      return self.fixup_childs(line, node, level)
-    else:
-      return self.fixup_single(line, node, level)
+    if len(line) > 0:
+        if node.hasChildNodes():
+          return self.fixup_childs(line, node, level)
+        else:
+          return self.fixup_single(line, node, level)
 
     return line
 
@@ -307,10 +308,7 @@ class CmdWindow(VimWindow):
     if line[:len(mode)+1] == '{'+mode+'}':
       self.buffer[-1] = line + arg
     else:
-      if len(self.buffer) == 0:
-        self.buffer[0] = '{'+mode+'} '+arg
-      else:
-        self.buffer.append('{'+mode+'} '+arg)
+      self.buffer.append('{'+mode+'} '+arg)
     self.command('normal G')
   def get_command(self,latest = True):
     if latest == True:
@@ -376,13 +374,8 @@ class WatchWindow(VimWindow):
 
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
-      if name == '' or fullname == '':
-        """if node.parentNode.getAttribute('command') == 'eval':
-          return '$eval = '
-        else:
-          comment = "// Contents of "
-          return str('%-20s' % comment) """
-        pass
+      if name == 'CLASSNAME':
+          return ''
 
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
