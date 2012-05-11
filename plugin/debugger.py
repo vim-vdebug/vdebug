@@ -377,11 +377,12 @@ class WatchWindow(VimWindow):
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
       if name == '' or fullname == '':
-        if node.parentNode.getAttribute('command') == 'eval':
+        """if node.parentNode.getAttribute('command') == 'eval':
           return '$eval = '
         else:
           comment = "// Contents of "
-          return str('%-20s' % comment) 
+          return str('%-20s' % comment) """
+        pass
 
       if self.type == 'uninitialized':
         return str(('%-20s' % name) + " = /* uninitialized */'';")
@@ -569,7 +570,7 @@ class DbgProtocol:
   def isconnected(self):
     return self.isconned
   def accept(self):
-    print 'waiting new connection (<C-d> to cancel)'
+    print 'Waiting for a connection (you have 30 seconds...)'
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
       serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -899,7 +900,8 @@ class Debugger:
       #  pass
   def handle_response_eval(self, res):
     """handle <response command=eval> tag """
-    self.ui.stackwin.write(res.toxml())
+    if self.debug == 1:
+      self.ui.tracewin.write(res.toxml())
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
@@ -907,7 +909,8 @@ class Debugger:
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
-    self.ui.stackwin.write(res.toxml())
+    if self.debug == 1:
+      self.ui.tracewin.write(res.toxml())
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_status(self, res):
     if res.firstChild.hasAttribute('status'):
@@ -921,7 +924,8 @@ class Debugger:
       print res.toprettyxml()
   def handle_response_default(self, res):
     """handle <response command=context_get> tag """
-    print res.toprettyxml()
+    if self.debug == 1:
+      self.ui.tracewin.write(res.toprettyxml())
   #
   #
   #################################################################################################################
@@ -1062,9 +1066,9 @@ class Debugger:
 
 def debugger_init():
   global debugger
-  port = vim.eval("g:debuggerPort")
-  debug = vim.eval("g:debuggerDebugMode")
-  #print "Listening on port "+port
+  port = int(vim.eval("g:debuggerPort"))
+  debug = int(vim.eval("g:debuggerDebugMode"))
+  print "Listening on port "+str(port)+", debug mode = "+str(debug)
   debugger  = Debugger(port, debug)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
