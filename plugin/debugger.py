@@ -7,6 +7,7 @@ import socket
 import base64
 import traceback
 import xml.dom.minidom
+import re
 
 #######################################################################################################################
 #                                                                                                                     #
@@ -219,10 +220,10 @@ class VimWindow:
       line = 'unknown node type'
 
     if len(line) > 0:
-        if node.hasChildNodes():
-          return self.fixup_childs(line, node, level)
-        else:
-          return self.fixup_single(line, node, level)
+      if node.hasChildNodes():
+        return self.fixup_childs(line, node, level)
+      else:
+        return self.fixup_single(line, node, level)
 
     return line
 
@@ -274,7 +275,7 @@ class LogWindow(VimWindow):
   def __init__(self, name = 'LOG___WINDOW'):
     VimWindow.__init__(self, name)
   def on_create(self):
-    self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
+    self.command('setlocal wrap fdm=marker fmr={{{,}}} fdl=0')
 
 class TraceWindow(VimWindow):
   def __init__(self, name = 'TRACE_WINDOW'):
@@ -298,7 +299,7 @@ class TraceWindow(VimWindow):
     VimWindow.write(self,msg)
 
   def on_create(self):
-    self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
+    self.command('set wrap fdm=marker fmr={{{,}}} fdl=0')
 
 class CmdWindow(VimWindow):
   def __init__(self, name = 'CMD_WINDOW'):
@@ -316,23 +317,24 @@ class CmdWindow(VimWindow):
     else:
       (lnum, rol) = vim.current.window.cursor
       line = self.buffer[lnum-1]
-
-    if line[0:6] == '{exec}':
-      print "exec is not supported by xdebug yet."
-      return ('none', '')
-      #return ('exec', line[17:].strip(' '))
-    elif line[0:6] == '{eval}':
-      return ('eval', line[6:].strip(' '))
-    elif line[0:16] == '{property_get}':
-      return ('property_get', line[15:].strip(' '))
-    elif line[0:13] == '{context_get}':
-      return ('context_get', line[13:].strip(' '))
+    if line[0] == '#':
+      raise CmdInvalidError({"message":"Line is a comment, not a command"})
+    allowed_cmds = ["eval","property_get","context_get","context_class","context_global"]
+    matches = re.match('^\{([^}]+)\}\s*(.*)$',line)
+    if matches:
+      if matches.group(1) in allowed_cmds:
+        return (matches.group(1),matches.group(2))
+      else:
+        raise CmdInvalidError({"message":"Not a command: "+matches.group(1)})
     else:
-      return ('none', '')
+      raise CmdInvalidError({"message":"Unrecognised format for command line"})
   def on_create(self):
-    self.command('set nowrap fdm=marker fmr={{{,}}} fdl=0')
+    self.command('set nowrap number fdm=marker fmr={{{,}}} fdl=0')
     self.command('inoremap <buffer> <cr> <esc>:python debugger.watch_execute(False)<cr>')
     self.command('nnoremap <buffer> <cr> <esc>:python debugger.watch_execute(False)<cr>')
+    self.write("# Choice of commands: \n\
+# {context_get}, {property_get} <property>, {eval} <expr>, \
+{context_global}, {context_class}\n#")
 
 class WatchWindow(VimWindow):
   def __init__(self, name = 'WATCH_WINDOW'):
@@ -347,14 +349,14 @@ class WatchWindow(VimWindow):
       line = str(''.ljust(level*1) + line)
       encoding = node.getAttribute('encoding')
       if encoding == 'base64':
-        line += "'" + base64.decodestring(str(node.firstChild.data)) + "';\n"
+        line += " '" + base64.decodestring(str(node.firstChild.data)) + "';\n"
       elif encoding == '':
-        line += str(node.firstChild.data) + ';\n'
+        line += " "+str(node.firstChild.data) + ';\n'
       else:
         line += '(e:'+encoding+') ' + str(node.firstChild.data) + ';\n'
     else:
       if level == 0:
-        line = ''.ljust(level*1) + str(line) + ';' + '\n'
+        line = str(line) + ';' + '\n'
         line += self.xml_stringfy_childs(node, level+1)
         line += '\n'
       else:
@@ -368,23 +370,46 @@ class WatchWindow(VimWindow):
       extra = ""
       classname = node.getAttribute('classname')
       if classname != '':
-        extra = classname
+        extra = " "+classname
       if self.type == "array":
-        extra = "["+node.getAttribute('numchildren')+"]"
+        extra = " ["+node.getAttribute('numchildren')+"]"
 
       name      = node.getAttribute('name')
       fullname  = node.getAttribute('fullname')
       if name == 'CLASSNAME':
-          return ''
+        return ''
+      elif debugger.lastcmd == "eval":
+        name = self.get_eval_name(node,"")
+        fullname = name
 
       if self.type == 'uninitialized':
-        return str(('%-20s' % name) + " = /* uninitialized */'';")
+        return str(('%-20s' % name) + " = /* uninitialized */;")
+      elif self.type == 'null':
+        return str(('%-20s' % name) + " = (null);")
       else:
-        return str('%-20s' % fullname) + ' = (' + self.type + ') '+extra
+        return str('%-20s' % fullname) + ' = (' + self.type + extra+')'
     elif node.nodeName == 'response':
-      return "// Command = " + node.getAttribute('command')
+      line = "// Command = " + node.getAttribute('command')
+      if debugger.lastcmd == 'eval':
+          line += "\n// Evaluating: "+debugger.lastarg
+      return line
     else:
       return VimWindow.xml_on_element(self, node)
+
+  def get_eval_name(self, node, name):
+    if node.parentNode.nodeName == "response":
+      return self.get_eval_arg()+name
+    else:
+      if node.parentNode.getAttribute('type') == 'object':
+        return self.get_eval_name(node.parentNode,"->"+node.getAttribute('name')+name)
+      else:
+        return self.get_eval_name(node.parentNode,"["+node.getAttribute('name')+"]"+name)
+
+  def get_eval_arg(self):
+    arg = debugger.lastarg
+    if arg.endswith(';'):
+      return arg[:-1]
+    return arg
 
   def xml_on_text(self, node):
     if self.type == 'string':
@@ -563,7 +588,7 @@ class DbgProtocol:
   def isconnected(self):
     return self.isconned
   def accept(self):
-    print 'Waiting for a connection (you have 30 seconds...)'
+    print 'Waiting for a connection (this message will self-destruct in 30 seconds...)'
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
       serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -693,6 +718,8 @@ class Debugger:
     self.curstack  = 0
     self.laststack = 0
     self.bptsetlst = {} 
+    self.lastcmd = None
+    self.lastarg = None
 
     self.protocol  = DbgProtocol(self.port)
 
@@ -731,7 +758,7 @@ class Debugger:
         print "Debugging to trace window"
         self.ui.tracewin.write( str(self.msgid) + ' : recv <===== {{{   ' + txt)
         self.ui.tracewin.write('}}}')
-      # handle message
+      # handle message }}}
       self.handle_msg(res)
       # exit, if response's transaction id == last transaction id
       try:
@@ -741,11 +768,14 @@ class Debugger:
         pass
   def send_command(self, cmd, arg1 = '', arg2 = ''):
     """ send command (do not receive response) """
+    self.lastcmd = cmd
     self.msgid = self.msgid + 1
     line = cmd + ' -i ' + str(self.msgid)
     if arg1 != '':
       line = line + ' ' + arg1
+      self.lastarg = arg1
     if arg2 != '':
+      self.lastarg = arg2
       line = line + ' -- ' + base64.encodestring(arg2)[0:-1]
     self.send(line)
     return self.msgid
@@ -909,9 +939,9 @@ class Debugger:
     if res.firstChild.hasAttribute('status'):
       status = res.firstChild.getAttribute('status')
       if status == 'stopping':
-          raise DBGPStoppingException("Debugger is shutting down")
+          raise DBGPStoppingError("Debugger is shutting down")
       elif status == 'stopped':
-          raise DBGPStoppedException("Debugger session has ended")
+          raise DBGPStoppedError("Debugger session has ended")
       return
     else:
       print res.toprettyxml()
@@ -1027,21 +1057,31 @@ class Debugger:
     
   def watch_execute(self,latest = True):
     """ execute command in watch window """
-    (cmd, expr) = self.ui.cmdwin.get_command(latest)
+    try:
+      (cmd, expr) = self.ui.cmdwin.get_command(latest)
+    except CmdInvalidError, e:
+      msg = str(e.args[0]['message'])
+      vim.command('echohl Error | echo "'+msg+'" |echohl None')
+      return
+
     if cmd == 'exec':
       self.command('exec', '', expr)
       print cmd, '--', expr
     elif cmd == 'eval':
       self.command('eval', '', expr)
-      print cmd, '--', expr
+      print "Evaluating expression: ", expr
     elif cmd == 'property_get':
       self.command('property_get', '-d %d -n %s' % (self.curstack,  expr))
-      print cmd, '-n ', expr
+      print "Getting property: ", expr
     elif cmd == 'context_get':
       self.command('context_get', ('-d %d' % self.curstack))
-      print cmd
-    else:
-      print "no commands", cmd, expr
+      print "Getting current context with depth ",str(self.curstack)
+    elif cmd == 'context_global':
+      self.command('context_get', ('-d %d -c 1' % self.curstack))
+      print "Getting global variables in current context"
+    elif cmd == 'context_class':
+      self.command('context_get', ('-d %d -c 2' % self.curstack))
+      print "Getting current context with class variables"
 
 
   #
@@ -1068,10 +1108,10 @@ def debugger_command(msg, arg1 = '', arg2 = ''):
   try:
     debugger.command(msg, arg1, arg2)
     debugger.command('stack_get')
-  except DBGPStoppedException:
+  except DBGPStoppedError:
     debugger.stop()
     print 'Debugger has shut down', sys.exc_info()
-  except DBGPStoppingException:
+  except DBGPStoppingError:
     debugger.stop()
     print 'Debugger is shutting down', sys.exc_info()
   except EOFError:
@@ -1085,10 +1125,10 @@ def debugger_command(msg, arg1 = '', arg2 = ''):
 def debugger_run():
   try:
     debugger.run()
-  except DBGPStoppedException:
+  except DBGPStoppedError:
     debugger.stop()
     print 'Debugger has shut down'
-  except DBGPStoppingException:
+  except DBGPStoppingError:
     debugger.stop()
     print 'Debugger is shutting down'
   except EOFError:
@@ -1198,12 +1238,14 @@ def debugger_resize():
   if mode == 2:
     vim.command("wincmd _")
 
-class DBGPStoppingException(Exception):
+class DBGPStoppingError(Exception):
     pass
 
-class DBGPStoppedException(Exception):
+class DBGPStoppedError(Exception):
     pass
 
+class CmdInvalidError(Exception):
+  pass
 
 error_msg = { \
     # 000 Command parsing errors
