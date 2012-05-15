@@ -157,8 +157,8 @@ map <F9> :python debugger_command('step_out')<cr>
 
 map <F11> :python debugger_context()<cr>
 map <F12> :python debugger_property()<cr>
-map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
-map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
+"map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
+"map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
 
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
@@ -189,6 +189,6 @@ if !exists('g:debuggerAutoContext')
   let g:debuggerAutoContext = 1
 endif
 if !exists('g:debuggerDebugMode')
-  let g:debuggerDebugMode = 0
+  let g:debuggerDebugMode = 1
 endif
 python debugger_init()

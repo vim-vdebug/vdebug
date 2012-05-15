@@ -103,33 +103,34 @@ class VimWindow:
   def getwinnr(self):
     return int(vim.eval("bufwinnr('"+self.name+"')"))
 
-  def xml_on_element(self, node):
+  def xml_on_element(self, node,insert):
     line = str(node.nodeName)
     if node.hasAttributes():
       for (n,v) in node.attributes.items():
         line += str(' %s=%s' % (n,v))
     return line
-  def xml_on_attribute(self, node):
+  def xml_on_attribute(self, node,insert):
     return str(node.nodeName)
-  def xml_on_entity(self, node):
+  def xml_on_entity(self, node,insert):
     return 'entity node'
-  def xml_on_comment(self, node):
+  def xml_on_comment(self, node,insert):
     return 'comment node'
-  def xml_on_document(self, node):
+  def xml_on_document(self, node,insert):
     return '#document'
-  def xml_on_document_type(self, node):
+  def xml_on_document_type(self, node,insert):
     return 'document type node'
-  def xml_on_notation(self, node):
+  def xml_on_notation(self, node,insert):
     return 'notation node'
-  def xml_on_text(self, node):
+  def xml_on_text(self, node,insert):
     return node.data
-  def xml_on_processing_instruction(self, node):
+  def xml_on_processing_instruction(self, node,insert):
     return 'processing instruction'
-  def xml_on_cdata_section(self, node):
+  def xml_on_cdata_section(self, node,insert):
     return node.data
 
   def write(self, msg):
     """ append last """
+    print "Writing"
     self.prepare()
     if self.firstwrite == 1:
       self.firstwrite = 0
@@ -138,23 +139,22 @@ class VimWindow:
       self.buffer.append(str(msg).split('\n'))
     self.command('normal G')
     #self.window.cursor = (len(self.buffer), 1)
-  def insert(self, msg):
-    """ insert into current position """
+  def insert(self, msg, allowEmpty = False):
+    """ insert into current position in buffer"""
+    if len(msg) == 0 and allowEmpty == False:
+      return
     self.prepare()
     if self.firstwrite == 1:
       self.firstwrite = 0
       self.buffer[:] = str(msg).split('\n')
     else:
       (row, rol) = vim.current.window.cursor
-      remaining_buffer = self.buffer[row:]
-      prev_row = row - 1
-      buf_copy = []
-      buf_copy = self.buffer[:]
-      buf_copy.insert(prev_row,str(msg).split('\n'))
-      self.buffer[:] = []
-      self.buffer.extend(buf_copy)
-    self.command('normal G')
-    #self.window.cursor = (len(self.buffer), 1)
+      print "Current line: ",row
+      remaining_buffer = str(msg).split('\n')
+      remaining_buffer.extend(self.buffer[row:])
+      del self.buffer[row:]
+      for line in remaining_buffer:
+        self.buffer.append(line)
   def create(self, method = 'new'):
     """ create window """
     vim.command('silent ' + method + ' ' + self.name)
@@ -186,74 +186,82 @@ class VimWindow:
       vim.command(str(winnr) + 'wincmd w')
     vim.command(cmd)
 
-  def _xml_stringfy(self, node, level = 0, encoding = None):
+  def _xml_stringfy(self, node, insert, level = 0, encoding = None):
+    print "node: " + node.nodeName + ", insert: " + str(insert)
     if node.nodeType   == node.ELEMENT_NODE:
-      line = self.xml_on_element(node)
+      line = self.xml_on_element(node,insert)
     elif node.nodeType == node.ATTRIBUTE_NODE:
-      line = self.xml_on_attribute(node)
+      line = self.xml_on_attribute(node,insert)
 
     elif node.nodeType == node.ENTITY_NODE:
-      line = self.xml_on_entity(node)
+      line = self.xml_on_entity(node,insert)
 
     elif node.nodeType == node.COMMENT_NODE:
-      line = self.xml_on_comment(node)
+      line = self.xml_on_comment(node,insert)
 
     elif node.nodeType == node.DOCUMENT_NODE:
-      line = self.xml_on_document(node)
+      line = self.xml_on_document(node,insert)
 
     elif node.nodeType == node.DOCUMENT_TYPE_NODE:
-      line = self.xml_on_document_type(node)
+      line = self.xml_on_document_type(node,insert)
 
     elif node.nodeType == node.NOTATION_NODE:
-      line = self.xml_on_notation(node)
+      line = self.xml_on_notation(node,insert)
 
     elif node.nodeType == node.PROCESSING_INSTRUCTION_NODE:
-      line = self.xml_on_processing_instruction(node)
+      line = self.xml_on_processing_instruction(node,insert)
 
     elif node.nodeType == node.CDATA_SECTION_NODE:
-      line = self.xml_on_cdata_section(node)
+      line = self.xml_on_cdata_section(node,insert)
 
     elif node.nodeType == node.TEXT_NODE:
-      line = self.xml_on_text(node)
+      line = self.xml_on_text(node,insert)
 
     else:
       line = 'unknown node type'
 
-    if len(line) > 0:
-      if node.hasChildNodes():
-        return self.fixup_childs(line, node, level)
-      else:
-        return self.fixup_single(line, node, level)
+    if node.hasChildNodes():
+      return self.fixup_childs(line, node, insert, level)
+    elif len(line) > 0:
+      return self.fixup_single(line, node, insert, level)
 
     return line
 
-  def fixup_childs(self, line, node, level):
+  def fixup_childs(self, line, node, insert, level):
     line = ''.ljust(level*4) + line +  '\n'
-    line += self.xml_stringfy_childs(node, level+1)
+    line += self.xml_stringfy_childs(node, insert, level+1)
     return line
-  def fixup_single(self, line, node, level):
+  def fixup_single(self, line, node, insert, level):
     return ''.ljust(level*4) + line + '\n'
 
-  def xml_stringfy(self, xml):
-    return self._xml_stringfy(xml)
-  def xml_stringfy_childs(self, node, level = 0):
+  def xml_stringfy(self, xml, insert = False):
+    return self._xml_stringfy(xml,insert)
+  def xml_stringfy_childs(self, node, insert = False, level = 0):
     line = ''
     for cnode in node.childNodes:
       line = str(line)
-      line += str(self._xml_stringfy(cnode, level))
+      line += str(self._xml_stringfy(cnode, insert, level))
     return line
 
   def write_xml(self, xml):
     self.write(self.xml_stringfy(xml))
   def write_xml_childs(self, xml):
     self.write(self.xml_stringfy_childs(xml))
+  def insert_xml(self, xml):
+    string = self.xml_stringfy(xml,True)
+    print string
+    self.insert(string)
+  def insert_xml_childs(self, xml):
+    string = self.xml_stringfy_childs(xml,True)
+    print "String: "+string
+    self.insert(string)
 
 class StackWindow(VimWindow):
   def __init__(self, name = 'STACK_WINDOW'):
     VimWindow.__init__(self, name)
-  def xml_on_element(self, node):
+  def xml_on_element(self, node, insert):
     if node.nodeName != 'stack':
-      return VimWindow.xml_on_element(self, node)
+      return VimWindow.xml_on_element(self, node, insert)
     else:
       if node.getAttribute('where') != '{main}':
         fmark = '()'
@@ -281,14 +289,14 @@ class TraceWindow(VimWindow):
   def __init__(self, name = 'TRACE_WINDOW'):
     VimWindow.__init__(self, name)
     self.created = 0
-  def xml_on_element(self, node):
+  def xml_on_element(self, node, insert):
     if node.nodeName != 'error':
-      return VimWindow.xml_on_element(self, node)
+      return VimWindow.xml_on_element(self, node, insert)
     else:
       desc = ''
       if node.hasAttribute('code'):
         desc = ' : '+error_msg[int(node.getAttribute('code'))]
-      return VimWindow.xml_on_element(self, node) + desc
+      return VimWindow.xml_on_element(self, node, insert) + desc
   def create(self,method="new"):
     self.created = 1
     VimWindow.create(self,method)
@@ -310,7 +318,6 @@ class CmdWindow(VimWindow):
       self.buffer[-1] = line + arg
     else:
       self.buffer.append('{'+mode+'} '+arg)
-    self.command('normal G')
   def get_command(self,latest = True):
     if latest == True:
       line = self.buffer[-1]
@@ -339,9 +346,9 @@ class CmdWindow(VimWindow):
 class WatchWindow(VimWindow):
   def __init__(self, name = 'WATCH_WINDOW'):
     VimWindow.__init__(self, name)
-  def fixup_single(self, line, node, level):
+  def fixup_single(self, line, node, insert, level):
     return ''.ljust(level*1) + line + '\n'
-  def fixup_childs(self, line, node, level):
+  def fixup_childs(self, line, node, insert, level):
     global z
     if len(node.childNodes)      == 1              and \
        (node.firstChild.nodeType == node.TEXT_NODE  or \
@@ -357,14 +364,14 @@ class WatchWindow(VimWindow):
     else:
       if level == 0:
         line = str(line) + ';' + '\n'
-        line += self.xml_stringfy_childs(node, level+1)
+        line += self.xml_stringfy_childs(node, insert, level+1)
         line += '\n'
       else:
         line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20) + ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
-        line += str(self.xml_stringfy_childs(node, level+1))
+        line += str(self.xml_stringfy_childs(node, insert, level+1))
         line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level) + '*/\n'
     return line
-  def xml_on_element(self, node):
+  def xml_on_element(self, node, insert):
     if node.nodeName == 'property':
       self.type = node.getAttribute('type')
       extra = ""
@@ -389,12 +396,15 @@ class WatchWindow(VimWindow):
       else:
         return str('%-20s' % fullname) + ' = (' + self.type + extra+')'
     elif node.nodeName == 'response':
-      line = "// Command = " + node.getAttribute('command')
-      if debugger.lastcmd == 'eval':
-          line += "\n// Evaluating: "+debugger.lastarg
-      return line
+      if insert == True:
+        return ''
+      else:
+        line = "// Command = " + node.getAttribute('command')
+        if debugger.lastcmd == 'eval':
+            line += "\n// Evaluating: "+debugger.lastarg
+        return line
     else:
-      return VimWindow.xml_on_element(self, node)
+      return VimWindow.xml_on_element(self, node, insert)
 
   def get_eval_name(self, node, name):
     if node.parentNode.nodeName == "response":
@@ -411,19 +421,20 @@ class WatchWindow(VimWindow):
       return arg[:-1]
     return arg
 
-  def xml_on_text(self, node):
-    if self.type == 'string':
-      return "'" + str(node.data) + "'"
-    else:
-      return str(node.data)
-  def xml_on_cdata_section(self, node):
-    if self.type == 'string':
-      return "'" + str(node.data) + "'"
-    else:
-      return str(node.data)
-  def write_xml_childs(self, xml):
+  def write_xml_childs(self,xml):
     self.clean()
-    return VimWindow.write_xml_childs(self,xml)
+    VimWindow.write_xml_childs(self,xml)
+
+  def xml_on_text(self, node, insert):
+    if self.type == 'string':
+      return "'" + str(node.data) + "'"
+    else:
+      return str(node.data)
+  def xml_on_cdata_section(self, node, insert):
+    if self.type == 'string':
+      return "'" + str(node.data) + "'"
+    else:
+      return str(node.data)
   def on_command(self):
     (row, rol) = vim.current.window.cursor
     line = self.buffer[row-1]
@@ -929,7 +940,8 @@ class Debugger:
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
     #self.ui.watchwin.write('')
-    self.ui.watchwin.write_xml_childs(res)
+    print "handle_response_property_get()"
+    self.ui.watchwin.insert_xml_childs(res)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
     if self.debug == 1:
