@@ -8,6 +8,7 @@ import base64
 import traceback
 import xml.dom.minidom
 import re
+import unicodedata
 
 #######################################################################################################################
 #                                                                                                                     #
@@ -130,7 +131,8 @@ class VimWindow:
 
   def write(self, msg):
     """ append last """
-    print "Writing"
+    if type(msg) is unicode:
+      msg = unicodedata.normalize('NFKD',msg).encode('ascii','ignore')
     self.prepare()
     if self.firstwrite == 1:
       self.firstwrite = 0
@@ -139,7 +141,7 @@ class VimWindow:
       self.buffer.append(str(msg).split('\n'))
     self.command('normal G')
     #self.window.cursor = (len(self.buffer), 1)
-  def insert(self, msg, allowEmpty = False):
+  def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
     """ insert into current position in buffer"""
     if len(msg) == 0 and allowEmpty == False:
       return
@@ -148,11 +150,15 @@ class VimWindow:
       self.firstwrite = 0
       self.buffer[:] = str(msg).split('\n')
     else:
-      (row, rol) = vim.current.window.cursor
-      print "Current line: ",row
+      if lineno == None:
+        (lineno, rol) = vim.current.window.cursor
       remaining_buffer = str(msg).split('\n')
-      remaining_buffer.extend(self.buffer[row:])
-      del self.buffer[row:]
+      if overwrite:
+        lfrom = lineno + 1
+      else:
+        lfrom = lineno
+      remaining_buffer.extend(self.buffer[lfrom:])
+      del self.buffer[lineno:]
       for line in remaining_buffer:
         self.buffer.append(line)
   def create(self, method = 'new'):
@@ -187,7 +193,6 @@ class VimWindow:
     vim.command(cmd)
 
   def _xml_stringfy(self, node, insert, level = 0, encoding = None):
-    print "node: " + node.nodeName + ", insert: " + str(insert)
     if node.nodeType   == node.ELEMENT_NODE:
       line = self.xml_on_element(node,insert)
     elif node.nodeType == node.ATTRIBUTE_NODE:
@@ -239,22 +244,30 @@ class VimWindow:
   def xml_stringfy_childs(self, node, insert = False, level = 0):
     line = ''
     for cnode in node.childNodes:
-      line = str(line)
-      line += str(self._xml_stringfy(cnode, insert, level))
+      line += self._xml_stringfy(cnode, insert, level)
     return line
 
   def write_xml(self, xml):
     self.write(self.xml_stringfy(xml))
   def write_xml_childs(self, xml):
     self.write(self.xml_stringfy_childs(xml))
-  def insert_xml(self, xml):
-    string = self.xml_stringfy(xml,True)
-    print string
-    self.insert(string)
-  def insert_xml_childs(self, xml):
-    string = self.xml_stringfy_childs(xml,True)
-    print "String: "+string
-    self.insert(string)
+  def insert_xml(self, xml,lineno):
+    level = self.determine_current_level(lineno)
+    string = self.xml_stringfy(xml,True,level+1)
+    self.insert(string.strip("\n"),lineno,True)
+  def insert_xml_childs(self, xml,lineno):
+    level = self.count_left_spaces(lineno)
+    string = self.xml_stringfy_childs(xml,True,level+1)
+    self.insert(string.strip("\n"),lineno,True)
+  def count_left_spaces(self,lineno):
+    line = self.buffer[lineno]
+    matches = re.match("^(\s)*",line)
+    if matches:
+      spaces = matches.group(1)
+      return len(spaces)
+    else:
+      return 0
+
 
 class StackWindow(VimWindow):
   def __init__(self, name = 'STACK_WINDOW'):
@@ -326,7 +339,7 @@ class CmdWindow(VimWindow):
       line = self.buffer[lnum-1]
     if line[0] == '#':
       raise CmdInvalidError({"message":"Line is a comment, not a command"})
-    allowed_cmds = ["eval","property_get","context_get","context_class","context_global"]
+    allowed_cmds = ["eval","property_get","property_insert","context_get","context_class","context_global"]
     matches = re.match('^\{([^}]+)\}\s*(.*)$',line)
     if matches:
       if matches.group(1) in allowed_cmds:
@@ -346,43 +359,62 @@ class CmdWindow(VimWindow):
 class WatchWindow(VimWindow):
   def __init__(self, name = 'WATCH_WINDOW'):
     VimWindow.__init__(self, name)
+    self.cline = None
   def fixup_single(self, line, node, insert, level):
-    return ''.ljust(level*1) + line + '\n'
+    line = ''.ljust(level*1) + line
+    if len(line.strip()) > 0:
+      line += "\n"
+    return line
   def fixup_childs(self, line, node, insert, level):
     global z
     if len(node.childNodes)      == 1              and \
        (node.firstChild.nodeType == node.TEXT_NODE  or \
        node.firstChild.nodeType  == node.CDATA_SECTION_NODE):
       line = str(''.ljust(level*1) + line)
+      if node.getAttribute('name') == 'CLASSNAME':
+        return ""
       encoding = node.getAttribute('encoding')
       if encoding == 'base64':
-        line += " '" + base64.decodestring(str(node.firstChild.data)) + "';\n"
+        line += " '" + base64.decodestring(str(node.firstChild.data)).decode('utf-8') + "'"
       elif encoding == '':
-        line += " "+str(node.firstChild.data) + ';\n'
+        line += " "+str(node.firstChild.data).decode('utf-8')
       else:
-        line += '(e:'+encoding+') ' + str(node.firstChild.data) + ';\n'
+        line += '(e:'+encoding+') ' + str(node.firstChild.data).decode(encoding)
+      if len(line.strip()) > 0:
+        line += ';\n'
     else:
       if level == 0:
-        line = str(line) + ';' + '\n'
+        if len(line.strip()) > 0:
+          line += ';' + '\n'
         line += self.xml_stringfy_childs(node, insert, level+1)
-        line += '\n'
+        if len(line.strip()) > 0:
+          line += '\n'
       else:
-        line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20) + ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
-        line += str(self.xml_stringfy_childs(node, insert, level+1))
-        line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level) + '*/\n'
+        fold = False
+        if len(line.strip()) > 0:
+          fold = True
+          line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20)
+        child_str = self.xml_stringfy_childs(node, insert, level+1)
+        if len(child_str) > 0:
+          if fold:
+            line += ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
+          line += child_str
+          if fold:
+            line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level) + '*/'
+        line += '\n'
     return line
   def xml_on_element(self, node, insert):
     if node.nodeName == 'property':
       self.type = node.getAttribute('type')
       extra = ""
-      classname = node.getAttribute('classname')
+      classname = node.getAttribute('classname').decode('utf-8')
       if classname != '':
         extra = " "+classname
       if self.type == "array":
         extra = " ["+node.getAttribute('numchildren')+"]"
 
-      name      = node.getAttribute('name')
-      fullname  = node.getAttribute('fullname')
+      name      = node.getAttribute('name').decode('utf-8')
+      fullname  = node.getAttribute('fullname').decode('utf-8')
       if name == 'CLASSNAME':
         return ''
       elif debugger.lastcmd == "eval":
@@ -390,9 +422,9 @@ class WatchWindow(VimWindow):
         fullname = name
 
       if self.type == 'uninitialized':
-        return str(('%-20s' % name) + " = /* uninitialized */;")
+        return str(('%-20s' % fullname) + " = /* uninitialized */;")
       elif self.type == 'null':
-        return str(('%-20s' % name) + " = (null);")
+        return str(('%-20s' % fullname) + " = (null);")
       else:
         return str('%-20s' % fullname) + ' = (' + self.type + extra+')'
     elif node.nodeName == 'response':
@@ -411,9 +443,9 @@ class WatchWindow(VimWindow):
       return self.get_eval_arg()+name
     else:
       if node.parentNode.getAttribute('type') == 'object':
-        return self.get_eval_name(node.parentNode,"->"+node.getAttribute('name')+name)
+        return self.get_eval_name(node.parentNode,"->"+node.getAttribute('name').decode('utf-8')+name)
       else:
-        return self.get_eval_name(node.parentNode,"["+node.getAttribute('name')+"]"+name)
+        return self.get_eval_name(node.parentNode,"["+node.getAttribute('name').decode('utf-8')+"]"+name)
 
   def get_eval_arg(self):
     arg = debugger.lastarg
@@ -435,22 +467,41 @@ class WatchWindow(VimWindow):
       return "'" + str(node.data) + "'"
     else:
       return str(node.data)
-  def on_command(self):
+  def line_needs_children(self,lineno):
+    line = self.buffer[lineno]
+    match = re.search(r'\((array \[([0-9])+\]|object)',line,re.M|re.I)
+    if match:
+      if match.group(1) == 'object':
+        if "{{{" in line:
+          return False
+        else:
+          return True
+      else:
+        if int(match.group(2)) > 0:
+          nlcnt = self.count_left_spaces(lineno+1) 
+          clcnt = self.count_left_spaces(lineno)
+          if nlcnt <= clcnt:
+            return True
+    return False
+  def expand(self):
     (row, rol) = vim.current.window.cursor
-    line = self.buffer[row-1]
-    eqpos = line.find("=")
-    if eqpos > -1:
-      var = line[:eqpos].strip()
-      debugger_property(var)
-    else:
-      self.command("echohl Error | echo \"Cannot find variable under cursor\" | echohl None")
+    if self.line_needs_children(row-1):
+      line = self.buffer[row-1]
+      self.cline = row-1
+      eqpos = line.find("=")
+      if eqpos > -1:
+        var = line[:eqpos].strip()
+        debugger.property_insert(var)
+      else:
+        self.command("echohl Error | echo \"Cannot find variable under cursor\" | echohl None")
+
   def clean(self):
     VimWindow.clean(self)
     self.write('<?')
   def on_create(self):
     self.command('set noai nocin')
     self.command('set nowrap fdm=marker fmr={{{,}}} ft=php fdl=1 foldlevel=1')
-    self.command('noremap <buffer> <cr> <esc>:python debugger.ui.watchwin.on_command()<cr>')
+    self.command('noremap <buffer> <cr> <esc>:python debugger.ui.watchwin.expand()<cr>')
 
 class HelpWindow(VimWindow):
   def __init__(self, name = 'HELP__WINDOW'):
@@ -763,10 +814,9 @@ class Debugger:
       count = count - 1
       # recv message and convert to XML object
       txt = self.protocol.recv_msg()
-      res = xml.dom.minidom.parseString(txt)
+      res = xml.dom.minidom.parseString(txt.decode('utf-8'))
       # log messages {{{
       if self.debug == 1:
-        print "Debugging to trace window"
         self.ui.tracewin.write( str(self.msgid) + ' : recv <===== {{{   ' + txt)
         self.ui.tracewin.write('}}}')
       # handle message }}}
@@ -851,13 +901,13 @@ class Debugger:
 #    print res.toprettyxml()
 #    print '------------------------------------'
 #
-#    errors  = res.getElementsByTagName('error')
+    errors  = res.getElementsByTagName('error')
 #    #print 'list: ', len(errors), errors
 #    if len(errors)>0:
 #      return
-#    for error in errors:
-#      code = error.getAttribute('code')
-#      print 'error code=', code
+    for error in errors:
+      code = int(error.getAttribute('code'))
+      vim.command('echohl Error | echo "'+error_msg[code].replace('"','')+'" | echohl None')
 #    print res
 
   def handle_response_feature_set(self,res):
@@ -939,9 +989,11 @@ class Debugger:
     self.ui.watchwin.write_xml_childs(res)
   def handle_response_property_get(self, res):
     """handle <response command=property_get> tag """
-    #self.ui.watchwin.write('')
-    print "handle_response_property_get()"
-    self.ui.watchwin.insert_xml_childs(res)
+    cmd = self.ui.cmdwin.get_command()
+    if cmd[0] == "property_get":
+      self.ui.watchwin.write_xml_childs(res)
+    else:
+      self.ui.watchwin.insert_xml_childs(res,self.ui.watchwin.cline)
   def handle_response_context_get(self, res):
     """handle <response command=context_get> tag """
     if self.debug == 1:
@@ -1067,6 +1119,12 @@ class Debugger:
     self.ui.cmdwin.write('{property_get} '+name)
     self.command('property_get', '-n '+name)
     
+  def property_insert(self, name = ''):
+    if name == '':
+      name = vim.eval('expand("<cword>")')
+    self.ui.cmdwin.write('{property_insert} '+name)
+    self.command('property_get', '-d 0 -n '+name)
+
   def watch_execute(self,latest = True):
     """ execute command in watch window """
     try:
@@ -1164,8 +1222,20 @@ def debugger_watch_input(cmd, arg = ''):
     debugger.stop()
     print 'Connection closed, stop debugging'
 
+def debugger_globals():
+  try:
+    debugger.ui.cmdwin.write('{context_global}')
+    debugger.watch_execute()
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
+  except:
+    debugger.ui.tracewin.write(sys.exc_info())
+    debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
+    debugger.stop()
+    print 'Connection closed, stop debugging'
 def debugger_context():
   try:
+    debugger.ui.cmdwin.write('{context_get}')
     debugger.command('context_get')
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')

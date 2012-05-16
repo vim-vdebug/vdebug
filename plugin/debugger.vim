@@ -145,8 +145,6 @@ map <Leader>do :python debugger_command('step_over')<cr>
 map <Leader>dt :python debugger_command('step_out')<cr>
 
 nnoremap ,e :python debugger_watch_input("eval")<cr>A
-nnoremap ,p :python debugger_watch_input("eval","print_r( $var ,true);")<cr>A
-nnoremap ,v :python debugger_watch_input("eval","var_dump( $var ,true);")<cr>A
 
 map <F5> :python debugger_run()<cr>
 map <F6> :python debugger_quit()<cr>
@@ -155,6 +153,7 @@ map <F7> :python debugger_command('step_into')<cr>
 map <F8> :python debugger_command('step_over')<cr>
 map <F9> :python debugger_command('step_out')<cr>
 
+map <F10> :python debugger_globals()<cr>
 map <F11> :python debugger_context()<cr>
 map <F12> :python debugger_property()<cr>
 "map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
