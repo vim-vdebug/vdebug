@@ -144,7 +144,8 @@ map <Leader>di :python debugger_command('step_into')<cr>
 map <Leader>do :python debugger_command('step_over')<cr>
 map <Leader>dt :python debugger_command('step_out')<cr>
 
-nnoremap ,e :python debugger_watch_input("eval")<cr>A
+nnoremap <Leader>e :python debugger_watch_input("eval")<cr>A
+vnoremap <Leader>e :python debugger_visual_eval()<cr>A
 
 map <F5> :python debugger_run()<cr>
 map <F6> :python debugger_quit()<cr>
@@ -191,3 +192,12 @@ if !exists('g:debuggerDebugMode')
   let g:debuggerDebugMode = 1
 endif
 python debugger_init()
+
+function! xdebug:get_visual_selection()
+  let [lnum1, col1] = getpos("'<")[1:2]
+  let [lnum2, col2] = getpos("'>")[1:2]
+  let lines = getline(lnum1, lnum2)
+  let lines[-1] = lines[-1][: col2 - 2]
+  let lines[0] = lines[0][col1 - 1:]
+  return join(lines, "\n")
+endfunction

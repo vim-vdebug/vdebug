@@ -1109,6 +1109,7 @@ class Debugger:
 
   def watch_input(self, mode, arg = ''):
     self.ui.cmdwin.input(mode, arg)
+    self.ui.cmdwin.command('normal G')
 
   def set_max_depth(self,depth):
     self.command('feature_set','-n max_depth -v '+str(depth))
@@ -1208,6 +1209,10 @@ def debugger_run():
     debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
     debugger.stop()
     print 'Connection closed, stop debugging', sys.exc_info()
+
+def debugger_visual_eval():
+    selection = vim.eval("xdebug:get_visual_selection()")
+    debugger_watch_input('eval',selection)
 
 def debugger_watch_input(cmd, arg = ''):
   try:
