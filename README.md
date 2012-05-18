@@ -11,16 +11,18 @@ is a bit buggy, limited is many ways and not maintained anymore.
 
 * Open the whole debugger session in a new tab, so that your carefully configured windows don't get messed up. When you end the session the whole tab closes.
 * The watch window now clears each time a new request is made, so that it doesn't get confusing.
-* Better code folding in the watch window
-* You can now show all globals in the current context, and class variables (i.e. static variables)
-* Better information and error messages
-* Improved formatting for eval results in watch window
-* The default depth of data to retrieve is now configurable, so that you can look deeper into arrays/objects
-* Hit `<CR>` (return key) on an array or object in the watch window, and a new request is made to view deeper into the tree. You can go as deep as possible. Then hit `<F11>` to show the whole context again.
+* Do a quick eval on expressions in visual selection.
+* If the maximum depth is reached on an array or object in the watch window, hit `<CR>` (return key) and the contents will be inserted inline.
+* Better code folding in the watch window.
+* You can now show all globals in the current context, and class variables (i.e. static variables).
+* Better information and error messages.
+* Improved formatting for eval results in watch window.
+* Fixed some problems with unicode.
+* The default depth of data to retrieve is now configurable, so that you can look deeper into arrays/objects.
 * A new "command" window shows the list of commands made to the debugger, and you can hit `<CR>` on any of them to re-run it. You can also type in commands and `<CR>` will execute them.
 * When the debugger session ends, no longer do you get an ugly exception. Instead, you get a nice message telling you that it's closed.
 * Windows are better arranged (I think).
-* Toggle variable for debug mode.
+* Toggle variable for putting it in debug/verbose mode.
 
 
 # Installation
@@ -48,6 +50,12 @@ Add this to your `~/.vimrc` file:
 
 ```vim
 Bundle 'joonty/vim-xdebug.git'
+```
+
+Then, from the command line, run:
+
+```bash
+vim +BundleInstall +qall
 ```
 
 # Quick guide
