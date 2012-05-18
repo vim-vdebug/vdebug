@@ -363,6 +363,10 @@ class WatchWindow(VimWindow):
   def fixup_single(self, line, node, insert, level):
     line = ''.ljust(level*1) + line
     if len(line.strip()) > 0:
+      line += ";"
+      numchildren = node.getAttribute('children').decode('utf-8')
+      if len(numchildren) and int(numchildren) == 1:
+        line += " #>> press <CR> to expand"
       line += "\n"
     return line
   def fixup_childs(self, line, node, insert, level):
@@ -385,7 +389,7 @@ class WatchWindow(VimWindow):
     else:
       if level == 0:
         if len(line.strip()) > 0:
-          line += ';' + '\n'
+          line += ';\n'
         line += self.xml_stringfy_childs(node, insert, level+1)
         if len(line.strip()) > 0:
           line += '\n'
@@ -393,14 +397,19 @@ class WatchWindow(VimWindow):
         fold = False
         if len(line.strip()) > 0:
           fold = True
-          line = (''.ljust(level*1) + str(line) + ';').ljust(self.width-20)
+          line = (''.ljust(level*1) + str(line) + ';')
         child_str = self.xml_stringfy_childs(node, insert, level+1)
-        if len(child_str) > 0:
+        if len(child_str.strip()) > 0:
           if fold:
-            line += ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
+            line = line.ljust(self.width-20) + ''.ljust(level*1) + '/*{{{' + str(level) + '*/' + '\n'
           line += child_str
           if fold:
             line += (''.ljust(level*1) + ''.ljust(level*1)).ljust(self.width-20) + ''.ljust(level*1) + '/*}}}' + str(level) + '*/'
+        else:
+          numchildren = node.getAttribute('children').decode('utf-8')
+          if len(numchildren) > 0 and int(numchildren) == 1:
+            line += " #>> press <CR> to expand"
+
         line += '\n'
     return line
   def xml_on_element(self, node, insert):
@@ -424,7 +433,7 @@ class WatchWindow(VimWindow):
       if self.type == 'uninitialized':
         return str(('%-20s' % fullname) + " = /* uninitialized */;")
       elif self.type == 'null':
-        return str(('%-20s' % fullname) + " = (null);")
+        return str(('%-20s' % fullname) + " = (null)")
       else:
         return str('%-20s' % fullname) + ' = (' + self.type + extra+')'
     elif node.nodeName == 'response':
