@@ -728,17 +728,57 @@ class BreakPoint:
     self.breakpt  = {}
     self.revmap   = {}
     self.startbno = 10000
+    self.types = ['line','exception','watch','call','return','conditional']
     self.maxbno   = self.startbno
+  def isType(self,type):
+    if type in self.types:
+      return True
+    else:
+      return False
   def clear(self):
     """ clear of breakpoint number """
     self.breakpt.clear()
     self.revmap.clear()
     self.maxbno = self.startbno
-  def add(self, file, line, exp = ''):
+  def parseArgs(self,args):
+    args = args.strip()
+    if len(args):
+      argWords = args.split()
+      print argWords
+      if len(argWords) > 1:
+        exprWords = argWords[1:]
+        expr = " ".join(exprWords)
+      else:
+        expr = ""
+      if self.isType(argWords[0]):
+        type = argWords[0]
+      else:
+        type = "line"
+      return (type,expr)
+    else:
+      return ('line','')
+  def add(self, file, line, args = ''):
     """ add break point at file:line """
     self.maxbno = self.maxbno + 1
-    type = 'line' if len(exp) == 0 else 'conditional'
-    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'id':None, 'type':type }
+    parsedArgs = self.parseArgs(args)
+    print parsedArgs
+    type = parsedArgs[0]
+    extra = ''
+    exp = ''
+    if type == 'line' or type == "conditional":
+      exp = parsedArgs[1]
+    else:
+      if len(parsedArgs) == 0:
+        raise BreakpointError("Breakpoint of type "+type+" requires an argument")
+      file = None
+      line = None
+      if type == "exception":
+        extra = "-x "+parsedArgs[1]
+      elif type == "return" or type == "call":
+        extra = "-m "+parsedArgs[1]
+      elif type == "watch":
+        exp = parsedArgs[1]
+    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'extra':extra, 'origargs': args, 'id':None, 'type':type }
     return self.maxbno
   def remove(self, bno):
     """ remove break point numbered with bno """
@@ -764,6 +804,17 @@ class BreakPoint:
   def gettype(self, bno):
     """ get Debug Server's breakpoint numbered with bno """
     return self.breakpt[bno]['type']
+  def getcmd(self,bno):
+    bpt = self.breakpt[bno]
+    cmd = '-t '+bpt['type']
+    if bpt['file']:
+      cmd += ' -f '+bpt['file']
+    if bpt['line']:
+      cmd += ' -n '+bpt['line']
+    cmd += ' '+bpt['extra']
+    print cmd
+    return cmd
+
   def setid(self, bno, id):
     """ get Debug Server's breakpoint numbered with bno """
     self.breakpt[bno]['id'] = id
@@ -1075,7 +1126,7 @@ class Debugger:
       flag = 0
       for bno in self.breakpt.list():
         msgid = self.send_command('breakpoint_set', \
-                                  '-t ' + self.breakpt.gettype(bno) + ' -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
+                                  self.breakpt.getcmd(bno), \
                                   self.breakpt.getexp(bno))
         self.bptsetlst[msgid] = bno
         flag = 1
@@ -1103,7 +1154,7 @@ class Debugger:
       self.ui.stackwin.highlight_stack(self.curstack)
       self.ui.set_srcview(self.stacks[self.curstack]['file'], self.stacks[self.curstack]['line'])
 
-  def mark(self, exp = ''):
+  def mark(self, args = ''):
     (row, rol) = vim.current.window.cursor
     file       = vim.current.buffer.name
 
@@ -1116,11 +1167,13 @@ class Debugger:
         self.send_command('breakpoint_remove', '-d ' + str(id))
         self.recv()
     else:
-      bno = self.breakpt.add(file, row, exp)
-      vim.command('sign place ' + str(bno) + ' name=breakpt line=' + str(row) + ' file=' + file)
+      bno = self.breakpt.add( file, row, args)
+      type = self.breakpt.gettype(bno)
+      if type == "line" or type == "conditional":
+        vim.command('sign place ' + str(bno) + ' name=breakpt line=' + str(row) + ' file=' + file)
       if self.protocol.isconnected():
         msgid = self.send_command('breakpoint_set', \
-                                  '-t ' + self.breakpt.gettype(bno) + ' -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
+                                  self.breakpt.getcmd(bno), \
                                   self.breakpt.getexp(bno))
         self.bptsetlst[msgid] = bno
         self.recv()
@@ -1297,9 +1350,9 @@ def debugger_property(name = ''):
     debugger.stop()
     print 'Connection closed, stop debugging', sys.exc_info()
 
-def debugger_mark(exp = ''):
+def debugger_mark(args = ''):
   try:
-    debugger.mark(exp)
+    debugger.mark(args)
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
@@ -1355,6 +1408,8 @@ class DBGPStoppedError(Exception):
 class CmdInvalidError(Exception):
   pass
 
+class BreakpointError(Exception):
+  pass
 error_msg = { \
     # 000 Command parsing errors
     0   : """no error""",                                                                                                                                                      \
