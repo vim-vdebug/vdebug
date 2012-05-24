@@ -174,10 +174,10 @@ if !exists('g:debuggerPort')
   let g:debuggerPort = 9000
 endif
 if !exists('g:debuggerMaxChildren')
-  let g:debuggerMaxChildren = 32
+  let g:debuggerMaxChildren = 64
 endif
 if !exists('g:debuggerMaxData')
-  let g:debuggerMaxData = 1024
+  let g:debuggerMaxData = 2048
 endif
 if !exists('g:debuggerMaxDepth')
   let g:debuggerMaxDepth = 1
@@ -189,7 +189,7 @@ if !exists('g:debuggerAutoContext')
   let g:debuggerAutoContext = 1
 endif
 if !exists('g:debuggerDebugMode')
-  let g:debuggerDebugMode = 0
+  let g:debuggerDebugMode = 1
 endif
 python debugger_init()
 

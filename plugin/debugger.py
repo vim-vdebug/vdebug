@@ -737,7 +737,8 @@ class BreakPoint:
   def add(self, file, line, exp = ''):
     """ add break point at file:line """
     self.maxbno = self.maxbno + 1
-    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'id':None }
+    type = 'line' if len(exp) == 0 else 'conditional'
+    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'id':None, 'type':type }
     return self.maxbno
   def remove(self, bno):
     """ remove break point numbered with bno """
@@ -760,6 +761,9 @@ class BreakPoint:
   def getid(self, bno):
     """ get Debug Server's breakpoint numbered with bno """
     return self.breakpt[bno]['id']
+  def gettype(self, bno):
+    """ get Debug Server's breakpoint numbered with bno """
+    return self.breakpt[bno]['type']
   def setid(self, bno, id):
     """ get Debug Server's breakpoint numbered with bno """
     self.breakpt[bno]['id'] = id
@@ -774,11 +778,12 @@ class Debugger:
   #################################################################################################################
   # Internal functions
   #
-  def __init__(self, port = 9000, debug = 0):
+  def __init__(self, port = 9000, debug = 0, autoContext = 0):
     """ initialize Debugger """
     socket.setdefaulttimeout(100)
     self.port      = port
     self.debug     = debug
+    self.autoContext = autoContext
 
     self.current   = None
     self.file      = None
@@ -979,6 +984,8 @@ class Debugger:
     """handle <response command=run> tag
     <response command="step_over" reason="ok" status="break" transaction_id="1 "/>"""
     pass
+  def handle_response_breakpoint_remove(self, res):
+      pass
   def handle_response_breakpoint_set(self, res):
     """handle <response command=breakpoint_set> tag
     <responsponse command="breakpoint_set" id="110180001" transaction_id="1"/>"""
@@ -1052,6 +1059,8 @@ class Debugger:
       self.command('run')
       self.command('status')
       self.command('stack_get')
+      if self.autoContext:
+        self.command('context_get', ('-d %d' % self.curstack))
     else:
       self.clear()
       self.protocol.accept()
@@ -1066,7 +1075,7 @@ class Debugger:
       flag = 0
       for bno in self.breakpt.list():
         msgid = self.send_command('breakpoint_set', \
-                                  '-t line -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
+                                  '-t ' + self.breakpt.gettype(bno) + ' -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
                                   self.breakpt.getexp(bno))
         self.bptsetlst[msgid] = bno
         flag = 1
@@ -1111,7 +1120,7 @@ class Debugger:
       vim.command('sign place ' + str(bno) + ' name=breakpt line=' + str(row) + ' file=' + file)
       if self.protocol.isconnected():
         msgid = self.send_command('breakpoint_set', \
-                                  '-t line -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
+                                  '-t ' + self.breakpt.gettype(bno) + ' -f ' + self.breakpt.getfile(bno) + ' -n ' + str(self.breakpt.getline(bno)), \
                                   self.breakpt.getexp(bno))
         self.bptsetlst[msgid] = bno
         self.recv()
@@ -1181,13 +1190,16 @@ def debugger_init():
   global debugger
   port = int(vim.eval("g:debuggerPort"))
   debug = int(vim.eval("g:debuggerDebugMode"))
+  autoContext = int(vim.eval("g:debuggerAutoContext"))
   #print "Listening on port "+str(port)+", debug mode = "+str(debug)
-  debugger  = Debugger(port, debug)
+  debugger  = Debugger(port, debug, autoContext)
 
 def debugger_command(msg, arg1 = '', arg2 = ''):
   try:
     debugger.command(msg, arg1, arg2)
     debugger.command('stack_get')
+    if debugger.autoContext:
+      debugger.command('context_get')
   except DBGPStoppedError:
     debugger.stop()
     print 'Debugger has shut down', sys.exc_info()
