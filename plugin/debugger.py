@@ -1215,7 +1215,7 @@ class Debugger:
 
   def remove_breakpoint(self,bno):
     bp = self.breakpt.breakpt[bno]
-    if bp['id'] is not None:
+    if bp['id'] is not None and self.protocol.isconnected():
       self.send_command('breakpoint_remove',"-d "+str(bp['id']))
     if bp['type'] == "line" or bp['type'] == "conditional":
       vim.command('sign unplace ' + str(bno))
