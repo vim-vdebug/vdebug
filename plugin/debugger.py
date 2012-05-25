@@ -767,25 +767,27 @@ class BreakPoint:
     extra = ''
     exp = ''
     if type == 'line' or type == "conditional":
+      if file is None:
+        raise BreakpointError("Invalid file: cannot place breakpoint")
       exp = parsedArgs[1]
     else:
       if len(parsedArgs) == 0:
         raise BreakpointError("Breakpoint of type "+type+" requires an argument")
       file = None
       line = None
-      if type == "exception":
-        extra = "-x "+parsedArgs[1]
-      elif type == "return" or type == "call":
-        extra = "-m "+parsedArgs[1]
-      elif type == "watch":
+      if type == "watch":
         exp = parsedArgs[1]
-    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'extra':extra, 'origargs': args, 'id':None, 'type':type }
+      else:
+        extra = parsedArgs[1]
+    self.breakpt[self.maxbno] = { 'file':file, 'line':line, 'exp':exp, 'extra':extra, 'id':None, 'type':type }
     return self.maxbno
   def remove(self, bno):
     """ remove break point numbered with bno """
     del self.breakpt[bno]
   def find(self, file, line):
     """ find break point and return bno(breakpoint number) """
+    if file is None or line is None:
+      return None
     for bno in self.breakpt.keys():
       if self.breakpt[bno]['file'] == file and self.breakpt[bno]['line'] == line:
         return bno
@@ -808,11 +810,15 @@ class BreakPoint:
   def getcmd(self,bno):
     bpt = self.breakpt[bno]
     cmd = '-t '+bpt['type']
+    type = bpt['type']
     if bpt['file']:
       cmd += ' -f '+bpt['file']
     if bpt['line']:
       cmd += ' -n '+str(bpt['line'])
-    cmd += ' '+bpt['extra']
+    if type == "exception":
+      cmd += " -x "+bpt['extra']
+    elif type == "return" or type == "call":
+      cmd += " -m "+bpt['extra']
     #print cmd
     return cmd
 
@@ -822,6 +828,22 @@ class BreakPoint:
   def list(self):
     """ return list of breakpoint number """
     return self.breakpt.keys()
+  def show(self):
+    if len(self.breakpt) == 0:
+      print "No breakpoints set\n"
+      return
+    print_str = "Breakpoints:\n"
+    for bno in self.list():
+      bp = self.breakpt[bno]
+      print_str += "[" + str(bno) + "] " + bp['type'] + ": "
+      if bp['type'] == 'line' or bp['type'] == 'conditional':
+        print_str += bp['file'] + ":" + str(bp['line'])
+      if bp['extra'] is not None:
+        print_str += bp['extra']
+      if len(bp['exp']) > 0:
+        print_str += " (condition: "+bp['exp']+")"
+      print_str += "\n"
+    print print_str
 
 class Debugger:
   """ Main Debugger class """
@@ -1188,13 +1210,13 @@ class Debugger:
         self.remove_breakpoint(bno)
 
   def remove_breakpoint(self,bno):
-    bp = self.breakpt[bno]
-    if bp.id is not None:
-      self.send_command('breakpoint_remove',"-d "+str(bp.id))
-    if bp.type == "line" or bp.type == "conditional":
+    bp = self.breakpt.breakpt[bno]
+    if bp['id'] is not None:
+      self.send_command('breakpoint_remove',"-d "+str(bp['id']))
+    if bp['type'] == "line" or bp['type'] == "conditional":
       vim.command('sign unplace ' + str(bno))
     self.breakpt.remove(bno)
-    print "Removed breakpoint "+str(bno)
+    print "Removed "+bp['type']+" breakpoint "+str(bno)
 
   def watch_input(self, mode, arg = ''):
     self.ui.cmdwin.input(mode, arg)
@@ -1371,6 +1393,9 @@ def debugger_property(name = ''):
 def debugger_mark(args = ''):
   try:
     debugger.mark(args)
+  except BreakpointError, e:
+    msg = str(e.args[0])
+    vim.command('echohl Error | echo "'+msg+'" |echohl None')
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
@@ -1379,13 +1404,27 @@ def debugger_mark(args = ''):
     debugger.stop()
     print 'Connection closed, stop debugging', sys.exc_info()
 
+def debugger_list_breakpoints():
+  try:
+    if debugger.breakpt:
+      debugger.breakpt.show()
+  except BreakpointError, e:
+    msg = str(e.args[0])
+    vim.command('echohl Error | echo "'+msg+'" |echohl None')
+
 def debugger_remove_breakpoint(bno = ''):
   try:
     if len(bno):
-      bno = int(bno)
+      try:
+        bno = int(bno)
+      except ValueError:
+        bno = None
     else:
       bno = None
     debugger.unmark(bno)
+  except BreakpointError, e:
+    msg = str(e.args[0])
+    vim.command('echohl Error | echo "'+msg+'" |echohl None')
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:
