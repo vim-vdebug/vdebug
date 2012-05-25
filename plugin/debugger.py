@@ -744,15 +744,16 @@ class BreakPoint:
     args = args.strip()
     if len(args):
       argWords = args.split()
-      print argWords
-      if len(argWords) > 1:
-        exprWords = argWords[1:]
-        expr = " ".join(exprWords)
-      else:
-        expr = ""
+      #print argWords
+      expr = ""
       if self.isType(argWords[0]):
+        if len(argWords) > 1:
+          exprWords = argWords[1:]
+          expr = " ".join(exprWords)
         type = argWords[0]
       else:
+        if len(argWords) > 0:
+          expr = " ".join(argWords)
         type = "line"
       return (type,expr)
     else:
@@ -761,7 +762,7 @@ class BreakPoint:
     """ add break point at file:line """
     self.maxbno = self.maxbno + 1
     parsedArgs = self.parseArgs(args)
-    print parsedArgs
+    #print parsedArgs
     type = parsedArgs[0]
     extra = ''
     exp = ''
@@ -810,9 +811,9 @@ class BreakPoint:
     if bpt['file']:
       cmd += ' -f '+bpt['file']
     if bpt['line']:
-      cmd += ' -n '+bpt['line']
+      cmd += ' -n '+str(bpt['line'])
     cmd += ' '+bpt['extra']
-    print cmd
+    #print cmd
     return cmd
 
   def setid(self, bno, id):
@@ -1178,6 +1179,23 @@ class Debugger:
         self.bptsetlst[msgid] = bno
         self.recv()
 
+  def unmark(self, bno = None):
+    if bno is None:
+      for bno in self.breakpt.list():
+        self.remove_breakpoint(bno)
+    else:
+      if bno in self.breakpt.breakpt:
+        self.remove_breakpoint(bno)
+
+  def remove_breakpoint(self,bno):
+    bp = self.breakpt[bno]
+    if bp.id is not None:
+      self.send_command('breakpoint_remove',"-d "+str(bp.id))
+    if bp.type == "line" or bp.type == "conditional":
+      vim.command('sign unplace ' + str(bno))
+    self.breakpt.remove(bno)
+    print "Removed breakpoint "+str(bno)
+
   def watch_input(self, mode, arg = ''):
     self.ui.cmdwin.input(mode, arg)
     self.ui.cmdwin.command('normal G')
@@ -1353,6 +1371,21 @@ def debugger_property(name = ''):
 def debugger_mark(args = ''):
   try:
     debugger.mark(args)
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
+  except:
+    debugger.ui.tracewin.write(sys.exc_info())
+    debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
+    debugger.stop()
+    print 'Connection closed, stop debugging', sys.exc_info()
+
+def debugger_remove_breakpoint(bno = ''):
+  try:
+    if len(bno):
+      bno = int(bno)
+    else:
+      bno = None
+    debugger.unmark(bno)
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:

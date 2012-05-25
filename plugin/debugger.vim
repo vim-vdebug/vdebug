@@ -164,6 +164,7 @@ hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 
 command! -nargs=? Bp python debugger_mark('<args>')
+command! -nargs=? BpRm python debugger_remove_breakpoint('<args>')
 command! -nargs=1 DebugDepth python debugger_set_depth('<args>')
 command! -nargs=0 Up python debugger_up()
 command! -nargs=0 Dn python debugger_down()
