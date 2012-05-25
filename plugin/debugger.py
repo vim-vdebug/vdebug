@@ -628,6 +628,9 @@ class DebugUI:
       return '2'
     else:
       return '1'
+  def rm_cursign(self):
+    vim.command('sign unplace ' + self.cursign)
+
   def set_srcview(self, file, line):
     """ set srcview windows to file:line and replace current sign """
 
@@ -1130,6 +1133,7 @@ class Debugger:
   def run(self):
     """ start debugger or continue """
     if self.protocol.isconnected():
+      self.ui.rm_cursign()
       self.command('run')
       self.command('status')
       self.command('stack_get')
