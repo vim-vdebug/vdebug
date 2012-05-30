@@ -253,15 +253,15 @@ class VimWindow:
     self.write(self.xml_stringfy_childs(xml))
   def insert_xml(self, xml,lineno):
     level = self.determine_current_level(lineno)
-    string = self.xml_stringfy(xml,True,level+1)
+    string = self.xml_stringfy(xml,True,level-1)
     self.insert(string.strip("\n"),lineno,True)
   def insert_xml_childs(self, xml,lineno):
     level = self.count_left_spaces(lineno)
-    string = self.xml_stringfy_childs(xml,True,level+1)
+    string = self.xml_stringfy_childs(xml,True,level-1)
     self.insert(string.strip("\n"),lineno,True)
   def count_left_spaces(self,lineno):
     line = self.buffer[lineno]
-    matches = re.match("^(\s)*",line)
+    matches = re.match("^(\s*)",line)
     if matches:
       spaces = matches.group(1)
       return len(spaces)
@@ -339,7 +339,7 @@ class CmdWindow(VimWindow):
       line = self.buffer[lnum-1]
     if line[0] == '#':
       raise CmdInvalidError({"message":"Line is a comment, not a command"})
-    allowed_cmds = ["eval","property_get","property_insert","context_get","context_class","context_global"]
+    allowed_cmds = ["eval","property_get","property_insert","context_get","context_class","context_global","context_names"]
     matches = re.match('^\{([^}]+)\}\s*(.*)$',line)
     if matches:
       if matches.group(1) in allowed_cmds:
@@ -379,7 +379,8 @@ class WatchWindow(VimWindow):
         return ""
       encoding = node.getAttribute('encoding')
       if encoding == 'base64':
-        line += " '" + base64.decodestring(str(node.firstChild.data)).decode('utf-8') + "'"
+        s = base64.decodestring(str(node.firstChild.data)).decode('utf-8') 
+        line += " '" + s.replace("'","\\'") + "'"
       elif encoding == '':
         line += " "+str(node.firstChild.data).decode('utf-8')
       else:
@@ -478,7 +479,7 @@ class WatchWindow(VimWindow):
       return str(node.data)
   def line_needs_children(self,lineno):
     line = self.buffer[lineno]
-    match = re.search(r'\((array \[([0-9])+\]|object)',line,re.M|re.I)
+    match = re.search(r'\((array \[([0-9]+)\]|object)',line,re.M|re.I)
     if match:
       if match.group(1) == 'object':
         if "{{{" in line:
@@ -1268,7 +1269,8 @@ class Debugger:
     elif cmd == 'context_class':
       self.command('context_get', ('-d %d -c 2' % self.curstack))
       print "Getting current context with class variables"
-
+    elif cmd == 'context_names':
+      self.command('context_names',('-d %d' % self.curstack))
 
   #
   #
@@ -1360,6 +1362,18 @@ def debugger_context():
   try:
     debugger.ui.cmdwin.write('{context_get}')
     debugger.command('context_get')
+  except EOFError:
+    vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
+  except:
+    debugger.ui.tracewin.write(sys.exc_info())
+    debugger.ui.tracewin.write("".join(traceback.format_tb( sys.exc_info()[2])))
+    debugger.stop()
+    print 'Connection closed, stop debugging'
+
+def debugger_cmd(cmd):
+  try:
+    debugger.ui.cmdwin.write('{'+cmd+'}')
+    debugger.watch_execute(True)
   except EOFError:
     vim.command('echohl Error | echo "Debugger socket closed" | echohl None')
   except:

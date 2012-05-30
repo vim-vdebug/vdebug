@@ -150,15 +150,9 @@ vnoremap <Leader>e :python debugger_visual_eval()<cr>A
 map <F5> :python debugger_run()<cr>
 map <F6> :python debugger_quit()<cr>
 
-map <F7> :python debugger_command('step_into')<cr>
-map <F8> :python debugger_command('step_over')<cr>
-map <F9> :python debugger_command('step_out')<cr>
-
 map <F10> :python debugger_globals()<cr>
 map <F11> :python debugger_context()<cr>
 map <F12> :python debugger_property()<cr>
-"map <F11> :python debugger_watch_input("context_get")<cr>A<cr>
-"map <F12> :python debugger_watch_input("property_get", '<cword>')<cr>A<cr>
 
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
@@ -199,7 +193,7 @@ function! xdebug:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
   let lines = getline(lnum1, lnum2)
-  let lines[-1] = lines[-1][: col2 - 2]
+  let lines[-1] = lines[-1][: col2 - 1]
   let lines[0] = lines[0][col1 - 1:]
   return join(lines, "\n")
 endfunction
