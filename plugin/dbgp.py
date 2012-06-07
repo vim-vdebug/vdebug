@@ -1,4 +1,5 @@
 import socket
+import xml.etree.ElementTree as ET
 
 """This module provides classes for speaking with debuggers that use the DBGP protocol.
 
@@ -121,6 +122,28 @@ class Connection:
         """
         self.sock.send(cmd + '\0')
 
+class Response:
+    """Contains response data from a command made to the debugger."""
+
+    def __init__(self,response,cmd,cmd_args):
+        self.response = response
+        self.cmd = cmd
+        self.cmd_args = cmd_args
+        self.xml = None
+
+    def get_cmd(self):
+        return self.cmd
+
+    def get_cmd_args(self):
+        return self.cmd_args
+
+    def as_string(self):
+        return self.response
+
+    def as_xml(self):
+        self.xml = ET.fromstring(self.response)
+        return self.xml
+
 class Protocol:
     """Interface for DBGP commands.
 
@@ -141,28 +164,36 @@ class Protocol:
         connection -- The Connection object to use
         """
         self.conn = connection
-        if self.conn.isconnected == 0:
+        if self.conn.isconnected() == 0:
             self.conn.open()
-        self.init_msg = self.conn.recv_msg()
+        self.__parse_init_msg(self.conn.recv_msg())
+        
+    def __parse_init_msg(self,msg):
+        xml = ET.fromstring(msg)
+        print "Tag:",xml.tag
 
     def send_cmd(self,cmd,args = ''):
         """Send a command to the debugger.
 
-        This method automatically adds a unique transaction ID to the command,
-        which is required by the debugger.
+        This method automatically adds a unique transaction
+        ID to the command which is required by the debugger.
+
+        Returns a Response object, which contains the
+        response message and command.
 
         cmd -- the command name, e.g. 'status'
-        args -- arguments for the command, which is optional for certain commands (default '')
+        args -- arguments for the command, which is optional 
+                for certain commands (default '')
         """
         args = args.strip()
-        cmd = cmd.strip()
+        send = cmd.strip()
         self.transID += 1
-        cmd += ' -i '+ str(self.transID)
+        send += ' -i '+ str(self.transID)
         if len(args) > 0:
-            cmd += ' ' + args
-        print "Command: ",cmd
-        self.conn.send_msg(cmd)
-        return self.conn.recv_msg()
+            send += ' ' + args
+        self.conn.send_msg(send)
+        msg = self.conn.recv_msg()
+        return Response(msg,cmd,args)
 
     def status(self):
         """Get the debugger status."""
