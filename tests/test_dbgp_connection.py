@@ -88,5 +88,4 @@ class ConnectionTest(unittest.TestCase):
         cmd = 'this is a cmd'
         self.conn.send_msg(cmd)
         sent = self.conn.sock.get_last_sent()
-        print sent
         assert sent == cmd+'\0'
