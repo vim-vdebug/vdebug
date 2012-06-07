@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../plugin')
 import unittest
-from dbgp import Protocol
+from dbgp import Protocol, ResponseError
 from mock import MagicMock, patch
 
 class ProtocolTest(unittest.TestCase):      
@@ -26,6 +26,13 @@ class ProtocolTest(unittest.TestCase):
             self.c.isconnected.return_value = 1
             self.p = Protocol(self.c)
 
+    def test_init_msg_parsed(self):
+        """Test that the init message from the debugger is
+        parsed successfully"""
+        assert self.p.language == "PHP"
+        assert self.p.version == "1.0"
+        assert self.p.idekey == "netbeans-xdebug"
+
     def test_status_send_adds_trans_id(self):
         """Test that the status command sends the right
         format command and adds a transaction ID"""
@@ -37,4 +44,32 @@ class ProtocolTest(unittest.TestCase):
         """Test that the status command receives a message from the protocol."""
         self.p.conn.recv_msg.return_value = "status_ret"
         status_res = self.p.status()
-        assert status_res.as_string() == "status_ret"
+        assert str(status_res) == "status_ret"
+
+    def test_feature_get_retval(self):
+        """Test that the feature_get command receives a message from the protocol."""
+        self.p.conn.recv_msg.return_value = """<?xml
+        version="1.0" encoding="iso-8859-1"?>\n<response
+        xmlns="urn:debugger_protocol_v1"
+        xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+        command="feature_get" transaction_id="2"
+        feature_name="encoding"
+        supported="1"><![CDATA[iso-8859-1]]></response>"""
+        res = self.p.feature_get('encoding')
+        self.assertEqual(str(res),"iso-8859-1")
+        self.assertEqual(res.is_supported(),1)
+
+class ProtocolInvalidTest(unittest.TestCase):
+
+    init_msg = """<?xml version="1.0"
+        encoding="iso-8859-1"?>\n<invalid
+        xmlns="urn:debugger_protocol_v1">\n</invalid>"""
+
+    def test_invalid_response_raises_error(self):
+        with patch('dbgp.Connection') as c:
+            c = c.return_value
+            c.recv_msg.return_value = self.init_msg
+            c.isconnected.return_value = 1
+            re = "Invalid XML response from debugger"
+            self.assertRaisesRegexp(ResponseError,re,Protocol,c)
+
