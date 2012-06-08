@@ -122,6 +122,61 @@ class Connection:
         """
         self.sock.send(cmd + '\0')
 
+""" Response objects """
+
+class Response:
+    """Contains response data from a command made to the debugger."""
+
+    def __init__(self,response,cmd,cmd_args):
+        self.response = response
+        self.cmd = cmd
+        self.cmd_args = cmd_args
+        self.xml = None
+
+    def get_cmd(self):
+        """Get the command that created this response."""
+        return self.cmd
+
+    def get_cmd_args(self):
+        """Get the arguments to the command."""
+        return self.cmd_args
+
+    def as_string(self):
+        """Return the full response as a string.
+        
+        There is a __str__ method, which will render the
+        whole object as a string and should be used for
+        displaying.
+        """
+        return self.response
+
+    def as_xml(self):
+        """Get the response as element tree XML.
+
+        Returns an xml.etree.ElementTree.Element object.
+        """
+        if self.xml == None:
+            self.xml = ET.fromstring(self.response)
+        return self.xml
+
+    def __str__(self):
+        return self.as_string()
+
+class FeatureGetResponse(Response):
+    """Response object specifically for the feature_get command."""
+
+    def is_supported(self):
+        """Whether the feature is supported or not."""
+        xml = self.as_xml()
+        return int(xml.get('supported'))
+
+    def __str__(self):
+        if self.is_supported():
+            xml = self.as_xml()
+            return xml.text
+        else:
+            return "* Feature not supported *"
+
 class Protocol:
     """Interface for DBGP commands.
 
@@ -132,7 +187,7 @@ class Protocol:
     conn = None
     transID = 0
 
-    def __init__(self,connection):
+    def __init__(self,connection,exp_idekey = None):
         """Create a new Protocol using a Connection object.
 
         The Connection object specifies the debugger connection,
@@ -143,6 +198,7 @@ class Protocol:
         """
         self.language = None
         self.protocol = None
+        self.exp_idekey = exp_idekey
         self.idekey = None
         self.conn = connection
         if self.conn.isconnected() == 0:
@@ -153,12 +209,16 @@ class Protocol:
         """Parse the init message from the debugger"""
         xml = ET.fromstring(msg)
         self.language = xml.get("language")
-        if self.language == None:
+        if self.language is None:
             raise ResponseError(
                 "Invalid XML response from debugger",
                 msg)
-        self.version = xml.get("protocol_version")
+
         self.idekey = xml.get("idekey")
+        if self.exp_idekey is not None:
+            if self.idekey != self.exp_idekey:
+                raise WrongIDEKeyException()
+        self.version = xml.get("protocol_version")
 
     def send_cmd(self,cmd,args = '',res_cls = Response):
         """Send a command to the debugger.
@@ -219,61 +279,6 @@ class Protocol:
                 '-n ' + str(name) + ' -v ' + str(value))
 
 
-""" Response objects """
-
-class Response:
-    """Contains response data from a command made to the debugger."""
-
-    def __init__(self,response,cmd,cmd_args):
-        self.response = response
-        self.cmd = cmd
-        self.cmd_args = cmd_args
-        self.xml = None
-
-    def get_cmd(self):
-        """Get the command that created this response."""
-        return self.cmd
-
-    def get_cmd_args(self):
-        """Get the arguments to the command."""
-        return self.cmd_args
-
-    def as_string(self):
-        """Return the full response as a string.
-        
-        There is a __str__ method, which will render the
-        whole object as a string and should be used for
-        displaying.
-        """
-        return self.response
-
-    def as_xml(self):
-        """Get the response as element tree XML.
-
-        Returns an xml.etree.ElementTree.Element object.
-        """
-        if self.xml == None:
-            self.xml = ET.fromstring(self.response)
-        return self.xml
-
-    def __str__(self):
-        return self.as_string()
-
-class FeatureGetResponse(Response):
-    """Response object specifically for the feature_get command."""
-
-    def is_supported(self):
-        """Whether the feature is supported or not."""
-        xml = self.as_xml()
-        return int(xml.get('supported'))
-
-    def __str__(self):
-        if self.is_supported():
-            xml = self.as_xml()
-            return xml.text
-        else:
-            return "* Feature not supported *"
-
 """ Errors/Exceptions """
 
 class DBGPError(Exception):
@@ -284,3 +289,9 @@ class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
     pass
+
+class WrongIDEKeyException(Exception):
+    """An exception raised when the debugger session key is
+    different to the expected one."""
+    pass
+
