@@ -1,7 +1,7 @@
 import sys
-sys.path.append('../plugin')
+sys.path.append('../plugin/python')
 import unittest
-from dbgp import Connection
+import dbgp.connection
 
 class SocketMockError():
     pass
@@ -43,7 +43,7 @@ class SocketMock():
 class ConnectionTest(unittest.TestCase):      
 
     def setUp(self):
-        self.conn = Connection('', 0)
+        self.conn = dbgp.connection.Connection('', 0)
         self.conn.sock = SocketMock()
 
     """
