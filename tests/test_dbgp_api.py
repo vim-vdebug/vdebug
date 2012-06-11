@@ -2,19 +2,19 @@ import sys
 sys.path.append('../plugin/python/')
 import unittest
 import dbgp.connection
-import dbgp.interface
+import dbgp.api
 import dbgp.response
 from mock import MagicMock, patch
 
-class InterfaceTest(unittest.TestCase):      
-    """Test the Interface class in the dbgp module."""
+class ApiTest(unittest.TestCase):      
+    """Test the Api class in the dbgp module."""
 
     init_msg = """<?xml version="1.0"
         encoding="iso-8859-1"?>\n<init
-        xmlns="urn:debugger_interface_v1"
+        xmlns="urn:debugger_api_v1"
         xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
         fileuri="file:///usr/local/bin/cake" language="PHP"
-        interface_version="1.0" appid="30130"
+        api_version="1.0" appid="30130"
         idekey="netbeans-xdebug"><engine
         version="2.2.0"><![CDATA[Xdebug]]></engine><author><![CDATA[Derick
         Rethans]]></author><url><![CDATA[http://xdebug.org]]></url><copyright><![CDATA[Copyright
@@ -26,7 +26,7 @@ class InterfaceTest(unittest.TestCase):
             self.c = c.return_value
             self.c.recv_msg.return_value = self.init_msg
             self.c.isconnected.return_value = 1
-            self.p = dbgp.interface.Interface(self.c)
+            self.p = dbgp.api.Api(self.c)
 
     def test_init_msg_parsed(self):
         """Test that the init message from the debugger is
@@ -43,7 +43,7 @@ class InterfaceTest(unittest.TestCase):
         self.p.conn.send_msg.assert_called_once_with('status -i 1')
 
     def test_status_retval(self):
-        """Test that the status command receives a message from the interface."""
+        """Test that the status command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="status"
@@ -56,7 +56,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "starting"
 
     def test_run_retval(self):
-        """Test that the run command receives a message from the interface."""
+        """Test that the run command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="run"
@@ -69,7 +69,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "running"
 
     def test_step_into_retval(self):
-        """Test that the step_into command receives a message from the interface."""
+        """Test that the step_into command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
@@ -82,7 +82,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "break"
 
     def test_step_over_retval(self):
-        """Test that the step_over command receives a message from the interface."""
+        """Test that the step_over command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
@@ -95,7 +95,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "break"
 
     def test_step_out_retval(self):
-        """Test that the step_out command receives a message from the interface."""
+        """Test that the step_out command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
@@ -108,7 +108,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "break"
 
     def test_stop_retval(self):
-        """Test that the stop command receives a message from the interface."""
+        """Test that the stop command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="stop"
@@ -121,7 +121,7 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "stopping"
 
     def test_detatch_retval(self):
-        """Test that the detatch command receives a message from the interface."""
+        """Test that the detatch command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="detatch"
@@ -134,10 +134,10 @@ class InterfaceTest(unittest.TestCase):
         assert str(status_res) == "stopped"
 
     def test_feature_get_retval(self):
-        """Test that the feature_get command receives a message from the interface."""
+        """Test that the feature_get command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n<response
-            xmlns="urn:debugger_interface_v1"
+            xmlns="urn:debugger_api_v1"
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
             command="feature_get" transaction_id="2"
             feature_name="encoding"
@@ -146,14 +146,14 @@ class InterfaceTest(unittest.TestCase):
         self.assertEqual(str(res),"iso-8859-1")
         self.assertEqual(res.is_supported(),1)
 
-class interfaceInvalidInitTest(unittest.TestCase):
+class apiInvalidInitTest(unittest.TestCase):
 
     init_msg = """<?xml version="1.0"
         encoding="iso-8859-1"?>\n<init
-        xmlns="urn:debugger_interface_v1"
+        xmlns="urn:debugger_api_v1"
         xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
         fileuri="file:///usr/local/bin/cake" language="PHP"
-        interface_version="1.0" appid="30130"
+        api_version="1.0" appid="30130"
         idekey="netbeans-xdebug"><engine
         version="2.2.0"><![CDATA[Xdebug]]></engine><author><![CDATA[Derick
         Rethans]]></author><url><![CDATA[http://xdebug.org]]></url><copyright><![CDATA[Copyright
@@ -162,7 +162,7 @@ class interfaceInvalidInitTest(unittest.TestCase):
 
     invalid_init_msg = """<?xml version="1.0"
         encoding="iso-8859-1"?>\n<invalid
-        xmlns="urn:debugger_interface_v1">\n</invalid>"""
+        xmlns="urn:debugger_api_v1">\n</invalid>"""
 
     def test_invalid_response_raises_error(self):
         with patch('dbgp.connection.Connection') as c:
@@ -170,12 +170,12 @@ class interfaceInvalidInitTest(unittest.TestCase):
             c.recv_msg.return_value = self.invalid_init_msg
             c.isconnected.return_value = 1
             re = "Invalid XML response from debugger"
-            self.assertRaisesRegexp(dbgp.response.ResponseError,re,dbgp.interface.Interface,c)
+            self.assertRaisesRegexp(dbgp.response.ResponseError,re,dbgp.api.Api,c)
 
     def test_wrong_idekey_raises_exception(self):
         with patch('dbgp.connection.Connection') as c:
             c = c.return_value
             c.recv_msg.return_value = self.init_msg
             c.isconnected.return_value = 1
-            self.assertRaises(dbgp.interface.WrongIDEKeyException,dbgp.interface.Interface,c,'other-ide-key')
+            self.assertRaises(dbgp.api.WrongIDEKeyException,dbgp.api.Api,c,'other-ide-key')
 

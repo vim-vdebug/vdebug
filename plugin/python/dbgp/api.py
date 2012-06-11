@@ -1,8 +1,8 @@
 import dbgp.response
 import xml.etree.ElementTree as ET
 
-class Interface:
-    """Interface for DBGP commands.
+class Api:
+    """Api for DBGP commands.
 
     Uses a Connection object to read and write with the debugger,
     and builds commands and returns the results.
@@ -12,10 +12,10 @@ class Interface:
     transID = 0
 
     def __init__(self,connection,exp_idekey = None):
-        """Create a new Interface using a Connection object.
+        """Create a new Api using a Connection object.
 
         The Connection object specifies the debugger connection,
-        and the Protocol provides a OO interface to interacting
+        and the Protocol provides a OO api to interacting
         with it.
 
         connection -- The Connection object to use
@@ -42,7 +42,7 @@ class Interface:
         if self.exp_idekey is not None:
             if self.idekey != self.exp_idekey:
                 raise WrongIDEKeyException()
-        self.version = xml.get("interface_version")
+        self.version = xml.get("api_version")
 
     def send_cmd(self,cmd,args = '',
             res_cls = dbgp.response.Response):
