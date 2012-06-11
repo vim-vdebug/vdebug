@@ -1,3 +1,4 @@
+import vimwin
 
 class Ui():
     """Ui layer which manages the Vim windows.
@@ -10,4 +11,5 @@ class Ui():
         self.__close()
 
     def __open(self):
-
+        self.mainwin = vimwin.Window()
+        self.tracewin = vimwin.TraceWindow()
