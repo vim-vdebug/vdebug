@@ -147,8 +147,8 @@ map <Leader>dt :python debugger_command('step_out')<cr>
 nnoremap <Leader>e :python debugger_watch_input("eval")<cr>A
 vnoremap <Leader>e :python debugger_visual_eval()<cr>A
 
-map <F5> :python debugger.dbg.open()<cr>
-map <F6> :python debugger_quit()<cr>
+map <F5> :python vdebug.open()<cr>
+map <F6> :python vdebug.close()<cr>
 
 map <F10> :python debugger_globals()<cr>
 map <F11> :python debugger_context()<cr>
@@ -187,7 +187,6 @@ endif
 if !exists('g:debuggerDebugMode')
   let g:debuggerDebugMode = 0
 endif
-python debugger_init()
 
 function! xdebug:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
