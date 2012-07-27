@@ -48,10 +48,9 @@ class Connection:
             serv.listen(5)
             (self.sock, address) = serv.accept()
             self.sock.settimeout(None)
-        except socket.timeout, e:
+        except socket.timeout:
             serv.close()
-            self.stop()
-            raise e
+            raise TimeoutError,"Timeout waiting for connection"
 
         print 'Found connection from', address
         self.isconned = 1
@@ -119,4 +118,5 @@ class Connection:
         """
         self.sock.send(cmd + '\0')
 
-
+class TimeoutError(Exception):
+    pass

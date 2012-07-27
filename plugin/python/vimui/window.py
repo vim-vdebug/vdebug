@@ -1,12 +1,32 @@
 import vim
 
-class Window:
-    name = "DEBUG_WINDOW"
+class SourceWindow:
 
-    def __init__(self):
+    def __init__(self,ui,winno):
+        self.winno = str(winno)
+
+    def focus(self):
+        vim.command(self.winno+"wincmd w")
+
+    def command(self,cmd,silent = True):
+        self.focus()
+        prepend = "silent " if silent else ""
+        command_str = prepend + self.winno + "wincmd " + cmd
+        print "Executing command: '"+command_str+"'"
+        vim.command(command_str)
+
+    def set_file(self,file):
+        self.focus()
+        vim.command("silent edit " + file)
+
+class Window:
+    name = "WINDOW"
+
+    def __init__(self,ui,method):
         self.firstwrite = 0
         self.buffer = None
-        self.create()
+        self.ui = ui
+        self.create(method)
 
     def __del__(self):
         self.destroy()
@@ -22,7 +42,6 @@ class Window:
         """if type(msg) is unicode:
           msg =
           unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
-        self.prepare()
         if self.firstwrite == 1:
             self.firstwrite = 0
             self.buffer[:] = str(msg).split('\n')
@@ -35,7 +54,6 @@ class Window:
         """ insert into current position in buffer"""
         if len(msg) == 0 and allowEmpty == False:
             return
-        self.prepare()
         if self.firstwrite == 1:
             self.firstwrite = 0
             self.buffer[:] = str(msg).split('\n')
@@ -74,13 +92,11 @@ class Window:
 
     def clean(self):
         """ clean all datas in buffer """
-        self.prepare()
         self.buffer[:] = []
         self.firstwrite = 1
 
     def command(self, cmd):
         """ go to my window & execute command """
-        self.prepare()
         winnr = self.getwinnr()
         if winnr != int(vim.eval("winnr()")):
             vim.command(str(winnr) + 'wincmd w')
@@ -88,3 +104,12 @@ class Window:
 
 class TraceWindow(Window):
     name = "TRACE_WINDOW"
+
+class DebugWindow(Window):
+    name = "DEBUG_WINDOW"
+
+class StackWindow(Window):
+    name = "STACK_WINDOW"
+
+class WatchWindow(Window):
+    name = "WATCH_WINDOW"
