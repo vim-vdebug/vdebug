@@ -10,6 +10,7 @@ class Connection:
     """
 
     sock = None
+    address = None
     isconned = 0
 
     def __init__(self, host = '', port = 9000, timeout = 30):
@@ -46,13 +47,12 @@ class Connection:
             serv.settimeout(self.timeout)
             serv.bind((self.host, self.port))
             serv.listen(5)
-            (self.sock, address) = serv.accept()
+            (self.sock, self.address) = serv.accept()
             self.sock.settimeout(None)
         except socket.timeout:
             serv.close()
             raise TimeoutError,"Timeout waiting for connection"
 
-        print 'Found connection from', address
         self.isconned = 1
         serv.close()
 
