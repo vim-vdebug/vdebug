@@ -7,24 +7,27 @@ sys.path.append(dir)
 
 import dbgp.connection
 import dbgp.api
-import vimui.ui
-import vimui.window
+import ui.vim.interface
 
 class Debugger:
     def __init__(self):
-        self.ui = vimui.ui.Ui()
+        self.ui = ui.vim.interface.Ui()
 
     def open(self,server='',port=9000,timeout=30):
         try:
             self.listen(server,port,timeout)
             self.ui.open()
+            addr = str(self.api.conn.address)
+            self.ui.say("Found connection from "+addr)
+            stat_response = self.api.status()
+            self.ui.watchwin.write(stat_response.as_string())
         except dbgp.connection.TimeoutError:
+            self.close()
             self.ui.say("No connection was made")
+        except:
+            self.ui.error("An error occured: "+str(sys.exc_info()[0]))
             self.close()
-        except Exception, e:
-            self.ui.say("An error occured: "+str(sys.exc_info()[0]))
-            self.close()
-            raise e
+            raise
 
     def listen(self,server,port,timeout):
         connection = dbgp.connection.Connection(server,port,timeout)
