@@ -104,6 +104,7 @@ class Api:
         self.protocol = None
         self.exp_idekey = exp_idekey
         self.idekey = None
+        self.startfile = None
         self.conn = connection
         if self.conn.isconnected() == 0:
             self.conn.open()
@@ -123,6 +124,7 @@ class Api:
             if self.idekey != self.exp_idekey:
                 raise WrongIDEKeyException()
         self.version = xml.get("api_version")
+        self.startfile = xml.get("fileuri")
 
     def send_cmd(self,cmd,args = '',
             res_cls = Response):
@@ -218,6 +220,11 @@ class Api:
 
         The script is terminated immediately."""
         return self.send_cmd('stop','',StatusResponse)
+
+    def stack_get(self):
+        """Get the stack information.
+        """
+        return self.send_cmd('stack_get','',StatusResponse)
 
     def detach(self):
         """Tell the debugger to detach itself from this

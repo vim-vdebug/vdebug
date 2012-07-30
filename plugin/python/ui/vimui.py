@@ -7,6 +7,8 @@ class Ui(ui.interface.Ui):
     """
 
     def open(self):
+        if self.is_open:
+            return
         self.is_open = True
         vim.command('silent tabnew')
         
@@ -14,22 +16,23 @@ class Ui(ui.interface.Ui):
 
         self.tabnr = vim.eval("tabpagenr()")
 
+        logwin = LogWindow(self,'rightbelow 4new')
+        log.Log.set_logger(log.WindowLogger(\
+                log.Logger.DEBUG,\
+                logwin))
+
         self.watchwin = WatchWindow(self,'vertical belowright new')
         self.watchwin.create()
 
         self.stackwin = StackWindow(self,'belowright 6new')
         self.stackwin.create()
 
-        logwin = LogWindow(self,'rightbelow 4new')
-        log.Log.set_logger(log.WindowLogger(\
-                log.Logger.DEBUG,\
-                logwin))
-        
+        self.statuswin = StatusWindow(self,'belowright 3new')
+        self.statuswin.create()
+        self.statuswin.set_status("Monkey")
+
         winnr = self.__get_srcwinno_by_name(srcwin_name)
         self.sourcewin = SourceWindow(self,winnr)
-        log.Log("Monkeys",log.Logger.DEBUG)
-        log.Log("Monkeys are cool",log.Logger.INFO)
-        log.Log("Monkeys are very cool",log.Logger.ERROR)
 
     def __get_srcwin_name(self):
         return vim.windows[0].buffer.name
@@ -54,8 +57,13 @@ class Ui(ui.interface.Ui):
         if not self.is_open:
             return
         self.is_open = False
+
+        if self.sourcewin:
+            self.sourcewin.clear_signs()
+
         self.watchwin.destroy()
         self.stackwin.destroy()
+        self.statuswin.destroy()
 
         log.Log.shutdown()
 
@@ -65,6 +73,9 @@ class Ui(ui.interface.Ui):
         self.stackwin = None
 
 class SourceWindow(ui.interface.Window):
+
+    file = None
+    pointer_sign_id = '6145'
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -80,15 +91,30 @@ class SourceWindow(ui.interface.Window):
         vim.command(command_str)
 
     def set_file(self,file):
+        if file.startswith("file://"):
+            file = file[7:]
+        self.file = file
+        log.Log("Setting source file: "+file,log.Logger.DEBUG)
         self.focus()
         vim.command("silent edit " + file)
+
+    def clear_signs(self):
+        vim.command('sign unplace *')
+
+    def place_pointer(self,line):
+        log.Log("Placing sign on line "+str(line))
+        vim.command('sign unplace '+self.pointer_sign_id)
+        vim.command('sign place '+self.pointer_sign_id+\
+                ' name=current line='+str(line)+\
+                ' file='+self.file)
+
 
 class Window(ui.interface.Window):
     name = "WINDOW"
     open_cmd = "new"
 
     def __init__(self,ui,open_cmd):
-        self.firstwrite = 0
+        self.firstwrite = 1
         self.buffer = None
         self.ui = ui
         self.open_cmd = open_cmd
@@ -101,8 +127,7 @@ class Window(ui.interface.Window):
         """if type(msg) is unicode:
           msg =
           unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
-        if self.firstwrite == 1:
-            self.firstwrite = 0
+        if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
             self.buffer.append(str(msg).split('\n'))
@@ -113,8 +138,7 @@ class Window(ui.interface.Window):
         """ insert into current position in buffer"""
         if len(msg) == 0 and allowEmpty == False:
             return
-        if self.firstwrite == 1:
-            self.firstwrite = 0
+        if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
             if lineno == None:
@@ -126,8 +150,18 @@ class Window(ui.interface.Window):
                 lfrom = lineno
             remaining_buffer.extend(self.buffer[lfrom:])
             del self.buffer[lineno:]
-            for line in remaining_buffer:
-                self.buffer.append(line)
+            if self.buffer_empty():
+                self.buffer[:] = remaining_buffer
+            else:
+                for line in remaining_buffer:
+                    self.buffer.append(line)
+
+    def buffer_empty(self):
+        if len(self.buffer) == 1 \
+                and len(self.buffer[0]) == 0:
+            return True
+        else:
+            return False
 
     def create(self):
         """ create window """
@@ -170,4 +204,13 @@ class StackWindow(Window):
 
 class WatchWindow(Window):
     name = "WATCH_WINDOW"
+
+class StatusWindow(Window):
+    name = "STATUS_WINDOW"
+
+    def on_create(self):
+        self.write("Status: \n<F5> Run")
+
+    def set_status(self,status):
+        self.insert("Status: "+str(status),0,True)
 

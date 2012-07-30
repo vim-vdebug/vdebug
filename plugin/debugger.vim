@@ -147,7 +147,7 @@ map <Leader>dt :python debugger_command('step_out')<cr>
 nnoremap <Leader>e :python debugger_watch_input("eval")<cr>A
 vnoremap <Leader>e :python debugger_visual_eval()<cr>A
 
-map <F5> :python vdebug.open()<cr>
+map <F5> :python vdebug.run()<cr>
 map <F6> :python vdebug.close()<cr>
 
 map <F10> :python debugger_globals()<cr>
