@@ -9,6 +9,7 @@ import dbgp
 import log
 import ui.vimui
 import vim
+import breakpoint
 
 class Debugger:
     """ Class that stitches together all the debugger components.
@@ -20,6 +21,7 @@ class Debugger:
     def __init__(self):
         self.ui = ui.vimui.Ui()
         self.api = None
+        self.breakpoints = breakpoint.Store()
 
     def open(self,server='',port=9000,timeout=30):
         """ Open the connection and debugging UI.
@@ -33,6 +35,7 @@ class Debugger:
         log.Log("Found connection from " + addr,log.Logger.INFO)
         self.ui.sourcewin.set_file(self.api.startfile)
         self.ui.sourcewin.place_pointer(1)
+        self.breakpoints.link_api(self.api)
 
     def is_alive(self):
         if self.api is not None and \
@@ -59,10 +62,25 @@ class Debugger:
         except vim.error, e:
             self.ui.error(e)
         except:
-            self.ui.error("An error occured: "+str(sys.exc_info()[0]))
+            self.ui.error("An error occured: "+\
+                    str(sys.exc_info()[0]))
             self.close()
             raise
 
+    def add_breakpoint(self,args):
+        try:
+            bp = breakpoint.Breakpoint.parse(self.ui,args)
+            if bp.type == "line":
+                id = self.breakpoints.find_breakpoint(\
+                        bp.get_file(),\
+                        bp.get_line())
+                if id is not None:
+                    self.breakpoints.remove_breakpoint_by_id(id)
+                    return
+            self.breakpoints.add_breakpoint(bp)
+        except breakpoint.WrongWindowError:
+            self.ui.say("Breakpoints must be assigned in the " + \
+                    "source code window")
 
     def listen(self,server,port,timeout):
         """ Open the dbgp API with connection.
@@ -83,6 +101,7 @@ class Debugger:
         """
         try:
             if self.is_alive():
+                self.breakpoints.unlink_api()
                 self.api.stop()
                 self.api.conn.close()
             self.api = None
