@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import socket
+import log
 
 """ Response objects for the DBGP module."""
 
@@ -146,8 +147,12 @@ class Api:
         send += ' -i '+ str(self.transID)
         if len(args) > 0:
             send += ' ' + args
+        log.Log("Command: "+send,\
+                log.Logger.DEBUG)
         self.conn.send_msg(send)
         msg = self.conn.recv_msg()
+        log.Log("Response: "+msg,\
+                log.Logger.DEBUG)
         return res_cls(msg,cmd,args)
 
     def status(self):
@@ -233,6 +238,9 @@ class Api:
         The script is not terminated, but runs as normal
         from this point."""
         return self.send_cmd('detach','',StatusResponse)
+
+    def breakpoint_set(self,cmd_args):
+        return self.send_cmd('breakpoint_set',cmd_args,Response)
 
 
 class WrongIDEKeyException(Exception):
