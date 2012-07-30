@@ -37,6 +37,9 @@ class Debugger:
         self.ui.sourcewin.place_pointer(1)
         self.breakpoints.link_api(self.api)
 
+    def do(self,command):
+        pass
+
     def is_alive(self):
         if self.api is not None and \
             self.api.conn.isconnected():
@@ -113,5 +116,10 @@ class Debugger:
         """
         self.close_connection()
         self.ui.close()
+
+class Runner:
+    def __init__(self,api,ui):
+        self.api = api
+        self.ui = ui
 
 vdebug = Debugger()
