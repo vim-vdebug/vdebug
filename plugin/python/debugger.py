@@ -12,6 +12,55 @@ import vim
 import breakpoint
 
 class Debugger:
+
+    def __init__(self):
+        self.runner = Runner()
+
+    def handle_timeout(self):
+        self.runner.close()
+        self.runner.ui.say("No connection was made")
+
+    def handle_socket_end(self):
+        self.runner.ui.say("Connection to the debugger has been broken")
+
+    def run(self):
+        try:
+            self.runner.run()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.runner.ui.error(e)
+        except:
+            self.runner.ui.error("An error occured: "+\
+                    str(sys.exc_info()[0]))
+            self.runner.close()
+            raise
+
+    def add_breakpoint(self,args = None):
+        try:
+            self.runner.add_breakpoint(args)
+        except breakpoint.WrongWindowError:
+            self.ui.say("Breakpoints must be assigned in the " + \
+                    "source code window")
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.runner.ui.error(e)
+        except:
+            self.runner.ui.error("An error occured: "+\
+                    str(sys.exc_info()[0]))
+            self.runner.close()
+            raise
+
+    def close(self):
+        self.runner.close()
+
+    
+class Runner:
     """ Class that stitches together all the debugger components.
 
     This instantiates the connection and debugger UI, and provides
@@ -47,43 +96,25 @@ class Debugger:
         return False
 
     def run(self):
-        try:
-            if not self.is_alive():
-                self.open()
-                status = self.api.status()
-                self.ui.statuswin.set_status(status)
-            else:
-                self.api.run()
-                status = self.api.status()
-                self.ui.statuswin.set_status(status)
-
-        except dbgp.TimeoutError:
-            self.close()
-            self.ui.say("No connection was made")
-        except EOFError:
-            self.ui.say("Connection to the debugger has been broken")
-        except vim.error, e:
-            self.ui.error(e)
-        except:
-            self.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0]))
-            self.close()
-            raise
+        if not self.is_alive():
+            self.open()
+            status = self.api.status()
+            self.ui.statuswin.set_status(status)
+        else:
+            self.api.run()
+            status = self.api.status()
+            self.ui.statuswin.set_status(status)
 
     def add_breakpoint(self,args):
-        try:
-            bp = breakpoint.Breakpoint.parse(self.ui,args)
-            if bp.type == "line":
-                id = self.breakpoints.find_breakpoint(\
-                        bp.get_file(),\
-                        bp.get_line())
-                if id is not None:
-                    self.breakpoints.remove_breakpoint_by_id(id)
-                    return
-            self.breakpoints.add_breakpoint(bp)
-        except breakpoint.WrongWindowError:
-            self.ui.say("Breakpoints must be assigned in the " + \
-                    "source code window")
+        bp = breakpoint.Breakpoint.parse(self.ui,args)
+        if bp.type == "line":
+            id = self.breakpoints.find_breakpoint(\
+                    bp.get_file(),\
+                    bp.get_line())
+            if id is not None:
+                self.breakpoints.remove_breakpoint_by_id(id)
+                return
+        self.breakpoints.add_breakpoint(bp)
 
     def listen(self,server,port,timeout):
         """ Open the dbgp API with connection.
@@ -116,10 +147,5 @@ class Debugger:
         """
         self.close_connection()
         self.ui.close()
-
-class Runner:
-    def __init__(self,api,ui):
-        self.api = api
-        self.ui = ui
 
 vdebug = Debugger()
