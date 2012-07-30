@@ -76,6 +76,7 @@ class SourceWindow(ui.interface.Window):
 
     file = None
     pointer_sign_id = '6145'
+    breakpoint_sign_id = '6146'
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -101,8 +102,18 @@ class SourceWindow(ui.interface.Window):
     def clear_signs(self):
         vim.command('sign unplace *')
 
+    def place_breakpoint(self,sign_id,line):
+        log.Log("Placing breakpoint sign on line "+str(line))
+        vim.command('sign place '+str(sign_id)+\
+                ' name=breakpt line='+str(line)+\
+                ' file='+self.file)
+
+    def remove_breakpoint(self,sign_id,line):
+        log.Log("Removing breakpoint sign on line "+str(line))
+        vim.command('sign unplace '+str(sign_id))
+
     def place_pointer(self,line):
-        log.Log("Placing sign on line "+str(line))
+        log.Log("Placing pointer sign on line "+str(line))
         vim.command('sign unplace '+self.pointer_sign_id)
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
