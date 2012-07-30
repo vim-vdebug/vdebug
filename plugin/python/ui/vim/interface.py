@@ -1,15 +1,11 @@
-import vimui.window
+import ui.vim.window
+import ui.interface
 import vim
+import log
 
-class Ui():
+class Ui(ui.interface.Ui):
     """Ui layer which manages the Vim windows.
     """
-
-    def __init__(self):
-        self.is_open = False
-
-    def __del__(self):
-        self.close()
 
     def open(self):
         self.is_open = True
@@ -18,13 +14,14 @@ class Ui():
         srcwin_name = self.__get_srcwin_name()
 
         self.tabnr = vim.eval("tabpagenr()")
-        self.watchwin = vimui.window.WatchWindow(self,'vertical belowright new')
-        self.stackwin = vimui.window.StackWindow(self,'belowright 6new')
-        self.tracewin = vimui.window.TraceWindow(self,'rightbelow 4new')
+        self.watchwin = ui.vim.window.WatchWindow(self,'vertical belowright new')
+        self.stackwin = ui.vim.window.StackWindow(self,'belowright 6new')
+        logwin = ui.vim.window.LogWindow(self,'rightbelow 4new')
+        log.Log.set_logger(log.WindowLogger(logwin))
         
         winnr = self.__get_srcwinno_by_name(srcwin_name)
-        self.mainwin = vimui.window.SourceWindow(self,winnr)
-        
+        self.sourcewin = ui.vim.window.SourceWindow(self,winnr)
+        log.Log("Monkeys")
 
     def __get_srcwin_name(self):
         return vim.windows[0].buffer.name
@@ -39,7 +36,11 @@ class Ui():
         return i
 
     def say(self,string):
-        vim.command('echo "'+string+'"')
+        """ Vim picks up Python prints, so just print """
+        print string
+
+    def error(self,string):
+        vim.command('echohl Error | echo "'+string+'" | echohl None')
 
     def close(self):
         if not self.is_open:
@@ -47,10 +48,10 @@ class Ui():
         self.is_open = False
         self.watchwin.destroy()
         self.stackwin.destroy()
-        self.tracewin.destroy()
 
-        vim.command('silent '+self.tabnr+'tabc')
+        log.Log.shutdown()
+
+        vim.command('silent! '+self.tabnr+'tabc!')
 
         self.watchwin = None
         self.stackwin = None
-        self.tracewin = None
