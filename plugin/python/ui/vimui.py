@@ -1,7 +1,70 @@
-import ui.window
+import ui.interface
 import vim
+import log
 
-class SourceWindow(ui.window.Window):
+class Ui(ui.interface.Ui):
+    """Ui layer which manages the Vim windows.
+    """
+
+    def open(self):
+        self.is_open = True
+        vim.command('silent tabnew')
+        
+        srcwin_name = self.__get_srcwin_name()
+
+        self.tabnr = vim.eval("tabpagenr()")
+
+        self.watchwin = WatchWindow(self,'vertical belowright new')
+        self.watchwin.create()
+
+        self.stackwin = StackWindow(self,'belowright 6new')
+        self.stackwin.create()
+
+        logwin = LogWindow(self,'rightbelow 4new')
+        log.Log.set_logger(log.WindowLogger(\
+                log.Logger.DEBUG,\
+                logwin))
+        
+        winnr = self.__get_srcwinno_by_name(srcwin_name)
+        self.sourcewin = SourceWindow(self,winnr)
+        log.Log("Monkeys",log.Logger.DEBUG)
+        log.Log("Monkeys are cool",log.Logger.INFO)
+        log.Log("Monkeys are very cool",log.Logger.ERROR)
+
+    def __get_srcwin_name(self):
+        return vim.windows[0].buffer.name
+
+    def __get_srcwinno_by_name(self,name):
+        i = 1
+        for w in vim.windows:
+            if w.buffer.name == name:
+                break
+            else:
+                i += 1
+        return i
+
+    def say(self,string):
+        """ Vim picks up Python prints, so just print """
+        print string
+
+    def error(self,string):
+        vim.command('echohl Error | echo "'+string+'" | echohl None')
+
+    def close(self):
+        if not self.is_open:
+            return
+        self.is_open = False
+        self.watchwin.destroy()
+        self.stackwin.destroy()
+
+        log.Log.shutdown()
+
+        vim.command('silent! '+self.tabnr+'tabc!')
+
+        self.watchwin = None
+        self.stackwin = None
+
+class SourceWindow(ui.interface.Window):
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -20,14 +83,15 @@ class SourceWindow(ui.window.Window):
         self.focus()
         vim.command("silent edit " + file)
 
-class Window(ui.window.Window):
+class Window(ui.interface.Window):
     name = "WINDOW"
+    open_cmd = "new"
 
-    def __init__(self,ui,method):
+    def __init__(self,ui,open_cmd):
         self.firstwrite = 0
         self.buffer = None
         self.ui = ui
-        self.create(method)
+        self.open_cmd = open_cmd
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
@@ -65,14 +129,15 @@ class Window(ui.window.Window):
             for line in remaining_buffer:
                 self.buffer.append(line)
 
-    def create(self, method = 'new'):
+    def create(self):
         """ create window """
-        vim.command('silent ' + method + ' ' + self.name)
+        vim.command('silent ' + self.open_cmd + ' ' + self.name)
         #if self.name != 'LOG___WINDOW':
         vim.command("setlocal buftype=nofile")
         self.buffer = vim.current.buffer
         self.width  = int( vim.eval("winwidth(0)")  )
         self.height = int( vim.eval("winheight(0)") )
+        self.is_open = True
         self.on_create()
 
     def destroy(self):
@@ -105,3 +170,4 @@ class StackWindow(Window):
 
 class WatchWindow(Window):
     name = "WATCH_WINDOW"
+

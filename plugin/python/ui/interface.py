@@ -23,3 +23,36 @@ class Ui():
 
     def log(self):
         pass
+
+class Window:
+    """Abstract for UI windows
+    """
+    name = "WINDOW"
+    is_open = False
+
+    def __del__(self):
+        self.destroy()
+
+    def on_create(self):
+        """ Callback for after the window is created """
+        pass
+
+    def create(self):
+        """ Create the window """
+        pass
+
+    def write(self, msg):
+        """ Write string in the window """
+        pass
+
+    def insert(self, msg, position = None):
+        """ Insert a string somewhere in the window """
+        pass
+
+    def destroy(self):
+        """ Close window """
+        pass
+
+    def clean(self):
+        """ clean all data in buffer """
+        pass
