@@ -5,8 +5,7 @@ import inspect
 dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 sys.path.append(dir)
 
-import dbgp.connection
-import dbgp.api
+import dbgp
 import vimui.ui
 import vimui.window
 
@@ -18,7 +17,7 @@ class Debugger:
         try:
             self.listen(server,port,timeout)
             self.ui.open()
-        except dbgp.connection.TimeoutError:
+        except dbgp.TimeoutError:
             self.ui.say("No connection was made")
             self.close()
         except Exception, e:
@@ -27,8 +26,8 @@ class Debugger:
             raise e
 
     def listen(self,server,port,timeout):
-        connection = dbgp.connection.Connection(server,port,timeout)
-        self.api = dbgp.api.Api(connection)
+        connection = dbgp.Connection(server,port,timeout)
+        self.api = dbgp.Api(connection)
 
     def close(self):
         if self.api is not None:
