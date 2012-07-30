@@ -1,6 +1,7 @@
+import ui.window
 import vim
 
-class SourceWindow:
+class SourceWindow(ui.window.Window):
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -12,14 +13,14 @@ class SourceWindow:
         self.focus()
         prepend = "silent " if silent else ""
         command_str = prepend + self.winno + "wincmd " + cmd
-        print "Executing command: '"+command_str+"'"
+        #print "Executing command: '"+command_str+"'"
         vim.command(command_str)
 
     def set_file(self,file):
         self.focus()
         vim.command("silent edit " + file)
 
-class Window:
+class Window(ui.window.Window):
     name = "WINDOW"
 
     def __init__(self,ui,method):
@@ -27,12 +28,6 @@ class Window:
         self.buffer = None
         self.ui = ui
         self.create(method)
-
-    def __del__(self):
-        self.destroy()
-
-    def on_create(self):
-        pass
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
@@ -102,11 +97,8 @@ class Window:
             vim.command(str(winnr) + 'wincmd w')
         vim.command(cmd)
 
-class TraceWindow(Window):
-    name = "TRACE_WINDOW"
-
-class DebugWindow(Window):
-    name = "DEBUG_WINDOW"
+class LogWindow(Window):
+    name = "LOG_WINDOW"
 
 class StackWindow(Window):
     name = "STACK_WINDOW"
