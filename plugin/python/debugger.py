@@ -5,34 +5,22 @@ import inspect
 dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 sys.path.append(dir)
 
-<<<<<<< HEAD
 import dbgp
-import vimui.ui
-import vimui.window
-=======
-import dbgp.connection
-import dbgp.api
-import ui.vim.interface
->>>>>>> c84e819fb989abf0b4e830c44fd64f28c422ec0c
+import ui.vimui
 
 class Debugger:
     def __init__(self):
-        self.ui = ui.vim.interface.Ui()
+        self.ui = ui.vimui.Ui()
 
     def open(self,server='',port=9000,timeout=30):
         try:
             self.listen(server,port,timeout)
             self.ui.open()
-<<<<<<< HEAD
-        except dbgp.TimeoutError:
-            self.ui.say("No connection was made")
-=======
             addr = str(self.api.conn.address)
             self.ui.say("Found connection from "+addr)
             stat_response = self.api.status()
             self.ui.watchwin.write(stat_response.as_string())
-        except dbgp.connection.TimeoutError:
->>>>>>> c84e819fb989abf0b4e830c44fd64f28c422ec0c
+        except dbgp.TimeoutError:
             self.close()
             self.ui.say("No connection was made")
         except:
