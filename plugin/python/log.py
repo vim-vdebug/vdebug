@@ -28,9 +28,7 @@ class Logger:
 
     def format(self,string,level):
         """ Format the error message in a standard way """
-        return "- [" + level + "] " + \
-                "{" + self.time() + "} " + \
-                string
+        return "- [%s] {%s} %s" %(level, self.time(), str(string))
 
 
 class WindowLogger(Logger):

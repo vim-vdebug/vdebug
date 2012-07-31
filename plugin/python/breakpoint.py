@@ -13,8 +13,8 @@ class Store:
                 " breakpoints with the debugger",\
                 log.Logger.DEBUG)
         for id, bp in self.breakpoints.iteritems():
-            self.api.breakpoint_set(bp.get_cmd())
-
+            res = self.api.breakpoint_set(bp.get_cmd())
+            bp.set_debugger_id(res.get_id())
 
     def unlink_api(self):
         self.api = None
@@ -26,7 +26,8 @@ class Store:
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
         if self.api is not None:
-            self.api.breakpoint_set(breakpoint.get_cmd())
+            res = self.api.breakpoint_set(breakpoint.get_cmd())
+            breakpoint.set_debugger_id(res.get_id())
 
     def remove_breakpoint(self,breakpoint):
         self.remove_breakpoint_by_id(\
@@ -37,6 +38,10 @@ class Store:
         log.Log("Removing breakpoint "+\
                 str(self.breakpoints[id]),\
                 log.Logger.DEBUG)
+        if self.api is not None:
+            dbg_id = self.breakpoints[id].get_debugger_id()
+            if dbg_id is not None:
+                self.api.breakpoint_remove(dbg_id)
         self.breakpoints[id].on_remove()
         del self.breakpoints[id]
 
@@ -67,6 +72,7 @@ class Breakpoint:
     """
     type = None
     id = 11000
+    dbg_id = None
 
     def __init__(self,ui):
         self.id = Breakpoint.id
@@ -76,6 +82,12 @@ class Breakpoint:
     def get_id(self):
         return self.id
 
+    def set_debugger_id(self,dbg_id):
+        self.dbg_id = dbg_id
+
+    def get_debugger_id(self):
+        return self.dbg_id
+
     def on_add(self):
         pass
 
@@ -84,6 +96,8 @@ class Breakpoint:
 
     @classmethod
     def parse(self,ui,args):
+        if args is None:
+            args = ""
         args = args.strip()
         if len(args) == 0:
             """ Line breakpoint """
@@ -117,6 +131,10 @@ class Breakpoint:
                     raise BreakpointError, "Call breakpoints " +\
                             "require a function name to be specified"
                 return CallBreakpoint(ui,arg_parts[0])
+            else:
+                raise BreakpointError, "Unknown breakpoint type, " +\
+                        "please choose one of: conditional, exception,"+\
+                        "call or return"
 
     def get_cmd(self):
         pass

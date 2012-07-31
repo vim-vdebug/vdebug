@@ -1,6 +1,7 @@
 import ui.interface
 import vim
 import log
+import base64
 
 class Ui(ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -16,20 +17,20 @@ class Ui(ui.interface.Ui):
 
         self.tabnr = vim.eval("tabpagenr()")
 
-        logwin = LogWindow(self,'rightbelow 4new')
-        log.Log.set_logger(log.WindowLogger(\
-                log.Logger.DEBUG,\
-                logwin))
-
         self.watchwin = WatchWindow(self,'vertical belowright new')
         self.watchwin.create()
 
-        self.stackwin = StackWindow(self,'belowright 6new')
+        self.stackwin = StackWindow(self,'belowright new')
         self.stackwin.create()
 
-        self.statuswin = StatusWindow(self,'belowright 3new')
+        self.statuswin = StatusWindow(self,'belowright new')
         self.statuswin.create()
-        self.statuswin.set_status("Monkey")
+        self.statuswin.set_status("loading")
+
+        logwin = LogWindow(self,'rightbelow new')
+        log.Log.set_logger(log.WindowLogger(\
+                log.Logger.DEBUG,\
+                logwin))
 
         winnr = self.__get_srcwinno_by_name(srcwin_name)
         self.sourcewin = SourceWindow(self,winnr)
@@ -63,10 +64,12 @@ class Ui(ui.interface.Ui):
 
     def say(self,string):
         """ Vim picks up Python prints, so just print """
-        print string
+        print str(string)
+        log.Log(string,log.Logger.INFO)
 
     def error(self,string):
-        vim.command('echohl Error | echo "'+string+'" | echohl None')
+        vim.command('echohl Error | echo "'+str(string)+'" | echohl None')
+        log.Log(string,log.Logger.ERROR)
 
     def close(self):
         if not self.is_open:
@@ -86,6 +89,7 @@ class Ui(ui.interface.Ui):
 
         self.watchwin = None
         self.stackwin = None
+        self.statuswin = None
 
 class SourceWindow(ui.interface.Window):
 
@@ -120,11 +124,13 @@ class SourceWindow(ui.interface.Window):
 
     def place_pointer(self,line):
         log.Log("Placing pointer sign on line "+str(line))
-        vim.command('sign unplace '+self.pointer_sign_id)
+        self.remove_pointer()
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
                 ' file='+self.file)
 
+    def remove_pointer(self):
+        vim.command('sign unplace %s' % self.pointer_sign_id)
 
 class Window(ui.interface.Window):
     name = "WINDOW"
@@ -139,7 +145,7 @@ class Window(ui.interface.Window):
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
 
-    def write(self, msg):
+    def write(self, msg, return_focus = True, after = "normal G"):
         """ append last """
         """if type(msg) is unicode:
           msg =
@@ -148,7 +154,10 @@ class Window(ui.interface.Window):
             self.buffer[:] = str(msg).split('\n')
         else:
             self.buffer.append(str(msg).split('\n'))
-        self.command('normal G')
+        if return_focus:
+            prev_win = vim.eval('winnr()')
+        self.command(after)
+        vim.command('%swincmd W' % prev_win)
         #self.window.cursor = (len(self.buffer), 1)
 
     def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
@@ -213,6 +222,9 @@ class Window(ui.interface.Window):
             vim.command(str(winnr) + 'wincmd w')
         vim.command(cmd)
 
+    def accept_renderer(self,renderer):
+        self.write(renderer.render())
+
 class LogWindow(Window):
     name = "LOG_WINDOW"
 
@@ -222,6 +234,9 @@ class StackWindow(Window):
 class WatchWindow(Window):
     name = "WATCH_WINDOW"
 
+    def write(self, msg, return_focus = True):
+        Window.write(self, msg, after="normal gg")
+
 class StatusWindow(Window):
     name = "STATUS_WINDOW"
 
@@ -230,4 +245,77 @@ class StatusWindow(Window):
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
+
+class ResponseRenderer:
+    def __init__(self,response):
+        self.response = response
+
+    def render(self):
+        pass
+
+class StackGetResponseRenderer(ResponseRenderer):
+    def render(self):
+        stack = self.response.get_stack()
+        string = ""
+        for s in stack:
+            file = s.get('filename')[7:]
+            line = "[%(num)s] %(where)s\t\t%(file)s:%(line)s" \
+                    %{'num':s.get('level'),'where':s.get('where'),\
+                    'file':file,'line':s.get('lineno')}
+            string += line + "\n"
+        return string
+
+class ContextGetResponseRenderer(ResponseRenderer):
+    def render(self):
+        context = self.response.get_context()
+        string = ""
+        for c in context:
+            if c == context[-1]:
+                string += self.__parse_node(c,final_child = True)
+            else:
+                string += self.__parse_node(c)
+        return string
+
+    def __parse_node(self,node,depth = 0, final_child = False):
+        line = node.get('fullname')
+        type = node.get('type')
+        children = node.get('children')
+        has_children = False if children is None else True
+
+        if type == "uninitialized":
+            isset = False
+            type = "*uninitialized*"
+        else:
+            isset = True
+
+        if node.get('encoding') == 'base64':
+            value = base64.decodestring(node.text)
+        elif isset and not has_children:
+            value = node.text
+
+        line += " = (%s)" % type
+
+        if has_children:
+            line += " [%s]\n" % node.get('numchildren')
+            line += "".rjust(depth*2) + "\\\n"
+            child_nodes = node.getchildren()
+            if len(child_nodes):
+                for child in child_nodes:
+                    if child == child_nodes[-1]:
+                        line += self.__parse_node(child,depth + 1,True)
+                    else:
+                        line += self.__parse_node(child,depth + 1)
+            else:
+                line += "".rjust((depth+1)*2) + " *truncated*\n"
+        else:
+            if isset:
+                line += " %s" % value
+
+            line += "\n"
+            line += "".rjust(depth*2)
+            if not final_child:
+                line += "|"
+            line += "\n"
+
+        return "".rjust(depth*2) + "o  " + line
 

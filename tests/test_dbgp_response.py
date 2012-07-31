@@ -38,16 +38,13 @@ class ResponseTest(unittest.TestCase):
         self.assertIsInstance(res.as_xml(),xml.etree.ElementTree.Element)
 
     def test_error_tag_raises_exception(self):
-        """Test that the presence of an <error> raises an
-        exception."""
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response command="command_name"
-                      transaction_id="transaction_id">
-                <error code="1" apperr="123">
-                    <message>An error message</message>
-                </error>
-            </response>"""
-        re = "An error message"
+            <response xmlns="urn:debugger_protocol_v1" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="stack_get" transaction_id="4"><error
+            code="5"><message><![CDATA[command is not available]]>
+            </message></error></response>"""
+        re = "command is not available"
         self.assertRaisesRegexp(dbgp.DBGPError,re,dbgp.Response,response,"","")
 
 class StatusResponseTest(unittest.TestCase): 
@@ -80,3 +77,19 @@ class FeatureResponseTest(unittest.TestCase):
             feature_name="max_depth" supported="0"><![CDATA[0]]></response>"""
         res = dbgp.FeatureGetResponse(response,"","")
         assert res.is_supported() == 0
+
+class StackGetTest(unittest.TestCase): 
+    """Test the behaviour of the StackGetResponse class."""
+    def test_string_is_status_text(self):
+        response = """<?xml version="1.0" encoding="iso-8859-1"?>
+            <response xmlns="urn:debugger_protocol_v1" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="stack_get" transaction_id="8">
+                <stack where="{main}" level="0" type="file"
+                filename="file:///usr/local/bin/cake" lineno="4">
+                </stack>
+            </response>"""
+        res = dbgp.StackGetResponse(response,"","")
+        stack = res.get_stack()
+        assert stack[0].get('filename') == "file:///usr/local/bin/cake"
+        assert len(stack) == 1
