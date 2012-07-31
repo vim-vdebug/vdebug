@@ -64,6 +64,33 @@ class ConditionalBreakpointTest(unittest.TestCase):
         exp_cmd = "-t conditional -f %s -n %i -- %s" %(file, line, b64cond)
         assert bp.get_cmd() == exp_cmd
 
+class ExceptionBreakpointTest(unittest.TestCase):
+    def test_get_cmd(self):
+        """ Test that the dbgp command is correct."""
+        ui = None
+        exception = "ExampleException"
+        bp = breakpoint.ExceptionBreakpoint(ui,exception)
+        exp_cmd = "-t exception -x %s" % exception
+        assert bp.get_cmd() == exp_cmd
+
+class CallBreakpointTest(unittest.TestCase):
+    def test_get_cmd(self):
+        """ Test that the dbgp command is correct."""
+        ui = None
+        function = "myfunction"
+        bp = breakpoint.CallBreakpoint(ui,function)
+        exp_cmd = "-t call -m %s" % function
+        assert bp.get_cmd() == exp_cmd
+
+class ReturnBreakpointTest(unittest.TestCase):
+    def test_get_cmd(self):
+        """ Test that the dbgp command is correct."""
+        ui = None
+        function = "myfunction"
+        bp = breakpoint.ReturnBreakpoint(ui,function)
+        exp_cmd = "-t return -m %s" % function
+        assert bp.get_cmd() == exp_cmd
+
 
 class BreakpointTest(unittest.TestCase):
 
@@ -99,4 +126,61 @@ class BreakpointTest(unittest.TestCase):
         self.assertRaisesRegexp(breakpoint.BreakpointError,\
                 re, breakpoint.Breakpoint.parse, ui, args)
 
-        
+    def test_parse_with_exception_breakpoint(self):
+        """ Test that a ExceptionBreakpoint is created."""
+        ui = Mock()
+        ret = breakpoint.Breakpoint.parse(ui,"exception ExampleException")
+        self.assertIsInstance(ret,breakpoint.ExceptionBreakpoint)
+        assert ret.exception == "ExampleException"
+
+    def test_parse_with_exception_raises_error(self):
+        """ Test that an exception is raised with invalid exception args."""
+        ui = Mock()
+        args = "exception"
+        re = "Exception breakpoints require an exception name "+\
+                "to be specified"
+        self.assertRaisesRegexp(breakpoint.BreakpointError,\
+                re, breakpoint.Breakpoint.parse, ui, args)
+
+
+    def test_parse_with_call_breakpoint(self):
+        """ Test that a CallBreakpoint is created."""
+        ui = Mock()
+        ret = breakpoint.Breakpoint.parse(ui,"call myfunction")
+        self.assertIsInstance(ret,breakpoint.CallBreakpoint)
+        assert ret.function == "myfunction"
+
+    def test_parse_with_call_raises_error(self):
+        """ Test that an exception is raised with invalid call args."""
+        ui = Mock()
+        args = "call"
+        re = "Call breakpoints require a function name "+\
+                "to be specified"
+        self.assertRaisesRegexp(breakpoint.BreakpointError,\
+                re, breakpoint.Breakpoint.parse, ui, args)
+
+    def test_parse_with_return_breakpoint(self):
+        """ Test that a ReturnBreakpoint is created."""
+        ui = Mock()
+        ret = breakpoint.Breakpoint.parse(ui,"return myfunction")
+        self.assertIsInstance(ret,breakpoint.ReturnBreakpoint)
+        assert ret.function == "myfunction"
+
+    def test_parse_with_return_raises_error(self):
+        """ Test that an exception is raised with invalid return args."""
+        ui = Mock()
+        args = "return"
+        re = "Return breakpoints require a function name "+\
+                "to be specified"
+        self.assertRaisesRegexp(breakpoint.BreakpointError,\
+                re, breakpoint.Breakpoint.parse, ui, args)
+
+    def test_parse_with_call_raises_error(self):
+        """ Test that an exception is raised with invalid call args."""
+        ui = Mock()
+        args = "call"
+        re = "Call breakpoints require a function name "+\
+                "to be specified"
+        self.assertRaisesRegexp(breakpoint.BreakpointError,\
+                re, breakpoint.Breakpoint.parse, ui, args)
+
