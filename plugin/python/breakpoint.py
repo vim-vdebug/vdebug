@@ -103,11 +103,20 @@ class Breakpoint:
                 cond = " ".join(arg_parts)
                 return ConditionalBreakpoint(ui,file,row,cond)
             elif type == 'exception':
-                pass
+                if len(arg_parts) == 0:
+                    raise BreakpointError, "Exception breakpoints " +\
+                            "require an exception name to be specified"
+                return ExceptionBreakpoint(ui,arg_parts[0])
             elif type == 'return':
-                pass
+                if len(arg_parts) == 0:
+                    raise BreakpointError, "Return breakpoints " +\
+                            "require a function name to be specified"
+                return ReturnBreakpoint(ui,arg_parts[0])
             elif type == 'call':
-                pass
+                if len(arg_parts) == 0:
+                    raise BreakpointError, "Call breakpoints " +\
+                            "require a function name to be specified"
+                return CallBreakpoint(ui,arg_parts[0])
 
     def get_cmd(self):
         pass
@@ -155,3 +164,30 @@ class ConditionalBreakpoint(LineBreakpoint):
         cmd = LineBreakpoint.get_cmd(self)
         cmd += " -- " + base64.encodestring(self.condition)
         return cmd
+
+class ExceptionBreakpoint(Breakpoint):
+    type = "exception"
+
+    def __init__(self,ui,exception):
+        Breakpoint.__init__(self,ui)
+        self.exception = exception
+
+    def get_cmd(self):
+        cmd = "-t " + self.type
+        cmd += " -x " + self.exception
+        return cmd
+
+class CallBreakpoint(Breakpoint):
+    type = "call"
+
+    def __init__(self,ui,function):
+        Breakpoint.__init__(self,ui)
+        self.function = function
+
+    def get_cmd(self):
+        cmd = "-t " + self.type
+        cmd += " -m " + self.function
+        return cmd
+
+class ReturnBreakpoint(CallBreakpoint):
+    type = "return"
