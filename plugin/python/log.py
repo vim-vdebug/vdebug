@@ -60,29 +60,33 @@ class FileLogger(Logger):
 
 class Log:
 
-    logger = None
+    loggers = {}
 
     def __init__(self,string,level = Logger.INFO):
         Log.log(string,level)
 
     @classmethod
     def log(cls, string, level = Logger.INFO):
-        cls.get_logger().log(string,level)
-
-    @classmethod
-    def get_logger(cls):
-        if cls.logger is None:
-            raise LogError, "No Logger object has been \
-assigned"
-        return cls.logger
+        for k, l in cls.loggers.iteritems():
+            l.log(string,level)
 
     @classmethod
     def set_logger(cls, logger):
-        cls.logger = logger
+        cls.loggers[logger.__class__.__name__] = logger
+
+    @classmethod
+    def remove_logger(cls, type):
+        if type in cls.loggers.iteritems():
+            cls.loggers[type].shutdown()
+            del cls.loggers[type]
+            return True
+        return False
 
     @classmethod
     def shutdown(cls):
-        cls.get_logger().shutdown()
+        for k, l in cls.loggers.iteritems():
+            l.shutdown()
+        cls.loggers = {}
 
 class LogError(Exception):
     pass

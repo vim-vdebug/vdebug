@@ -134,7 +134,7 @@ else
   endif
 endif
 
-map <F1> :python vdebug.add_breakpoint('<args>')<cr>
+map <F1> :python vdebug.set_breakpoint('<args>')<cr>
 map <F2> :python debugger_command('step_into')<cr>
 map <F3> :python debugger_command('step_over')<cr>
 map <F4> :python debugger_command('step_out')<cr>
@@ -157,7 +157,7 @@ map <F12> :python debugger_property()<cr>
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 
-command! -nargs=? Bp python vdebug.add_breakpoint('<args>')
+command! -nargs=? Bp python vdebug.set_breakpoint('<args>')
 command! -nargs=? BpRm python debugger_remove_breakpoint('<args>')
 command! -nargs=? BpLs python debugger_list_breakpoints()
 command! -nargs=1 DebugDepth python debugger_set_depth('<args>')

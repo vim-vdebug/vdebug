@@ -49,3 +49,34 @@ class ResponseTest(unittest.TestCase):
             </response>"""
         re = "An error message"
         self.assertRaisesRegexp(dbgp.DBGPError,re,dbgp.Response,response,"","")
+
+class StatusResponseTest(unittest.TestCase): 
+    """Test the behaviour of the StatusResponse class."""
+    def test_string_is_status_text(self):
+        response = """<?xml version="1.0" encoding="iso-8859-1"?>
+            <response xmlns="urn:debugger_protocol_v1"
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
+            command="status" transaction_id="1" status="starting" 
+            reason="ok"></response>"""
+        res = dbgp.StatusResponse(response,"","")
+        assert str(res) == "starting"
+
+class FeatureResponseTest(unittest.TestCase): 
+    """Test the behaviour of the FeatureResponse class."""
+    def test_feature_is_supported(self):
+        response = """<?xml version="1.0" encoding="iso-8859-1"?>
+            <response xmlns="urn:debugger_protocol_v1" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
+            command="feature_get" transaction_id="2" 
+            feature_name="max_depth" supported="1"><![CDATA[1]]></response>"""
+        res = dbgp.FeatureGetResponse(response,"","")
+        assert res.is_supported() == 1
+
+    def test_feature_is_not_supported(self):
+        response = """<?xml version="1.0" encoding="iso-8859-1"?>
+            <response xmlns="urn:debugger_protocol_v1" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
+            command="feature_get" transaction_id="2" 
+            feature_name="max_depth" supported="0"><![CDATA[0]]></response>"""
+        res = dbgp.FeatureGetResponse(response,"","")
+        assert res.is_supported() == 0

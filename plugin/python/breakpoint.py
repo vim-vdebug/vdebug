@@ -1,5 +1,4 @@
 import base64
-import vim
 import log
 
 class Store:
@@ -57,7 +56,15 @@ class Store:
         return found
 
 
+class BreakpointError(Exception):
+    pass
+
 class Breakpoint:
+    """ Abstract factory for creating a breakpoint object.
+
+    Use the class method parse to create a concrete subclass
+    of a specific type.
+    """
     type = None
     id = 11000
 
@@ -80,13 +87,27 @@ class Breakpoint:
         args = args.strip()
         if len(args) == 0:
             """ Line breakpoint """
-            (row, col) = vim.current.window.cursor
-            file       = vim.current.buffer.name
-            if file != ui.sourcewin.file:
-                raise WrongWindowError
+            row = ui.get_current_row()
+            file = ui.get_current_file()
             return LineBreakpoint(ui,file,row)
         else:
-            print "not yet implemented"
+            arg_parts = args.split(' ')
+            type = arg_parts.pop(0)
+            type.lower()
+            if type == 'conditional':
+                row = ui.get_current_row()
+                file = ui.get_current_file()
+                if len(arg_parts) == 0:
+                    raise BreakpointError, "Conditional breakpoints " +\
+                            "require a condition to be specified"
+                cond = " ".join(arg_parts)
+                return ConditionalBreakpoint(ui,file,row,cond)
+            elif type == 'exception':
+                pass
+            elif type == 'return':
+                pass
+            elif type == 'call':
+                pass
 
     def get_cmd(self):
         pass
@@ -103,14 +124,13 @@ class LineBreakpoint(Breakpoint):
         self.line = line
 
     def on_add(self):
-        self.ui.sourcewin.place_breakpoint(\
+        self.ui.place_breakpoint(\
                 self.id,\
+                self.file,\
                 self.line)
     
     def on_remove(self):
-        self.ui.sourcewin.remove_breakpoint(\
-                self.id,\
-                self.line)
+        self.ui.remove_breakpoint(self.id)
 
     def get_line(self):
         return self.line
@@ -135,6 +155,3 @@ class ConditionalBreakpoint(LineBreakpoint):
         cmd = LineBreakpoint.get_cmd(self)
         cmd += " -- " + base64.encodestring(self.condition)
         return cmd
-
-class WrongWindowError(Exception):
-    pass
