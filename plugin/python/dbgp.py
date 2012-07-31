@@ -6,6 +6,7 @@ import log
 
 class Response:
     """Contains response data from a command made to the debugger."""
+    ns = '{urn:debugger_protocol_v1}'
 
     def __init__(self,response,cmd,cmd_args):
         self.response = response
@@ -19,13 +20,13 @@ class Response:
         """Parse an error message which has been returned
         in the response, then raise it as a DBGPError."""
         xml = self.as_xml()
-        err_el = xml.find('error')
+        err_el = xml.find('%serror' % self.ns)
         code = err_el.get("code")
         if code is None:
             raise ResponseError(
                     "Missing error code in response",
                     self.response)
-        msg_el = err_el.find('message')
+        msg_el = err_el.find('%smessage' % self.ns)
         if msg_el is None:
             raise ResponseError(
                     "Missing error message in response",
@@ -66,6 +67,27 @@ class StatusResponse(Response):
 
     def __str__(self):
         return self.as_xml().get('status')
+
+class StackGetResponse(Response):
+    """Response object used by the stack_get command."""
+
+    def get_stack(self):
+        return self.as_xml().getchildren()
+
+class ContextGetResponse(Response):
+    """Response object used by the context_get command."""
+
+    def get_context(self):
+        return self.as_xml().getchildren()
+
+class BreakpointSetResponse(Response):
+    """Response object returned by the breakpoint_set command."""
+
+    def get_id(self):
+        return int(self.as_xml().get('id'))
+
+    def __str__(self):
+        return self.as_xml().get('id')
 
 class FeatureGetResponse(Response):
     """Response object specifically for the feature_get command."""
@@ -193,7 +215,7 @@ class Api:
     def run(self):
         """Tell the debugger to start or resume
         execution."""
-        return self.send_cmd('run','',StatusResponse)
+        return self.send_cmd('run','',Response)
 
     def step_into(self):
         """Tell the debugger to step to the next
@@ -202,7 +224,7 @@ class Api:
         If there's a function call, the debugger engine
         will break on the first statement in the function.
         """
-        return self.send_cmd('step_into','',StatusResponse)
+        return self.send_cmd('step_into','',Response)
 
     def step_over(self):
         """Tell the debugger to step to the next
@@ -211,25 +233,30 @@ class Api:
         If there's a function call, the debugger engine
         will stop at the next statement after the function call.
         """
-        return self.send_cmd('step_over','',StatusResponse)
+        return self.send_cmd('step_over','',Response)
 
     def step_out(self):
         """Tell the debugger to step out of the statement.
         
         The debugger will step out of the current scope.
         """
-        return self.send_cmd('step_out','',StatusResponse)
+        return self.send_cmd('step_out','',Response)
 
     def stop(self):
         """Tell the debugger to stop execution.
 
         The script is terminated immediately."""
-        return self.send_cmd('stop','',StatusResponse)
+        return self.send_cmd('stop','',Response)
 
     def stack_get(self):
         """Get the stack information.
         """
-        return self.send_cmd('stack_get','',StatusResponse)
+        return self.send_cmd('stack_get','',StackGetResponse)
+
+    def context_get(self):
+        """Get the context variables.
+        """
+        return self.send_cmd('context_get','',ContextGetResponse)
 
     def detach(self):
         """Tell the debugger to detach itself from this
@@ -237,11 +264,21 @@ class Api:
 
         The script is not terminated, but runs as normal
         from this point."""
-        return self.send_cmd('detach','',StatusResponse)
+        return self.send_cmd('detach','',Response)
 
     def breakpoint_set(self,cmd_args):
-        return self.send_cmd('breakpoint_set',cmd_args,Response)
+        """Set a breakpoint.
 
+        The breakpoint type is defined by the arguments, see the
+        Breakpoint class for more detail."""
+        return self.send_cmd('breakpoint_set',cmd_args,\
+                BreakpointSetResponse)
+
+    def breakpoint_remove(self,id):
+        """Remove a breakpoint by ID.
+
+        The ID is that returned in the response from breakpoint_set."""
+        return self.send_cmd('breakpoint_remove','-d %i' % id,Response)
 
 class WrongIDEKeyException(Exception):
     """An exception raised when the debugger session key is

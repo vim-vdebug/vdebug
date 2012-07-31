@@ -24,7 +24,7 @@ class DebuggerInterface:
         self.runner.ui.say("No connection was made")
 
     def handle_socket_end(self):
-        self.runner.ui.say("Connection to the debugger has been broken")
+        self.runner.ui.say("Connection to the debugger has been closed")
 
     def run(self):
         try:
@@ -38,15 +38,12 @@ class DebuggerInterface:
         except:
             self.runner.ui.error("An error occured: "+\
                     str(sys.exc_info()[0]))
-            self.runner.close()
+            #self.runner.close()
             raise
 
-    def set_breakpoint(self,args = None):
+    def step_over(self):
         try:
-            self.runner.set_breakpoint(args)
-        except breakpoint.WrongWindowError:
-            self.ui.say("Breakpoints must be assigned in the " + \
-                    "source code window")
+            self.runner.step_over()
         except dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
@@ -56,7 +53,25 @@ class DebuggerInterface:
         except:
             self.runner.ui.error("An error occured: "+\
                     str(sys.exc_info()[0]))
-            self.runner.close()
+            #self.runner.close()
+            raise
+
+
+    def set_breakpoint(self,args = None):
+        try:
+            self.runner.set_breakpoint(args)
+        except breakpoint.BreakpointError, e:
+            self.runner.ui.error(e)
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.runner.ui.error(e)
+        except:
+            self.runner.ui.error("An error occured: "+\
+                    str(sys.exc_info()[0]))
+            #self.runner.close()
             raise
 
     def close(self):
@@ -85,9 +100,34 @@ class Runner:
         self.ui.open()
         addr = str(self.api.conn.address)
         log.Log("Found connection from " + addr,log.Logger.INFO)
-        self.ui.sourcewin.set_file(self.api.startfile)
-        self.ui.sourcewin.place_pointer(1)
-        self.breakpoints.link_api(self.api)
+        self.api.step_into()
+        self.refresh()
+
+    def refresh(self):
+        if not self.is_alive():
+            self.ui.error("Cannot update: no connection")
+        else:
+            status = self.api.status()
+
+            if str(status) in ("stopping","stopped"):
+                self.ui.statuswin.set_status("stopped")
+                self.ui.say("Debugging session has ended")
+            else:
+                self.ui.statuswin.set_status(status)
+                stack_res = self.update_stack()
+                stack = stack_res.get_stack()
+
+                filename = stack[0].get('filename')
+                lineno = stack[0].get('lineno')
+
+                self.ui.sourcewin.set_file(filename)
+                self.ui.sourcewin.place_pointer(lineno)
+
+                self.ui.watchwin.clean()
+                context_res = self.api.context_get()
+                rend = ui.vimui.ContextGetResponseRenderer(context_res)
+                self.ui.watchwin.accept_renderer(rend)
+
 
     def is_alive(self):
         if self.api is not None and \
@@ -98,12 +138,18 @@ class Runner:
     def run(self):
         if not self.is_alive():
             self.open()
-            status = self.api.status()
-            self.ui.statuswin.set_status(status)
         else:
+            self.ui.sourcewin.remove_pointer()
             self.api.run()
-            status = self.api.status()
-            self.ui.statuswin.set_status(status)
+            self.refresh()
+
+    def step_over(self):
+        if not self.is_alive():
+            self.open()
+        else:
+            self.ui.sourcewin.remove_pointer()
+            self.api.step_over()
+            self.refresh()
 
     def set_breakpoint(self,args):
         bp = breakpoint.Breakpoint.parse(self.ui,args)
@@ -129,6 +175,17 @@ class Runner:
         else:
             connection = dbgp.Connection(server,port,timeout)
             self.api = dbgp.Api(connection)
+
+    def update_stack(self):
+        pass
+        if not self.is_alive():
+            self.ui.error("Cannot update the stack: no connection")
+        else:
+            self.ui.stackwin.clean()
+            res = self.api.stack_get()
+            renderer = ui.vimui.StackGetResponseRenderer(res)
+            self.ui.stackwin.accept_renderer(renderer)
+            return res
 
     def close_connection(self):
         """ Close the connection to the debugger.

@@ -134,9 +134,9 @@ else
   endif
 endif
 
-map <F1> :python vdebug.set_breakpoint('<args>')<cr>
+map <F1> :python vdebug.set_breakpoint()<cr>
 map <F2> :python debugger_command('step_into')<cr>
-map <F3> :python debugger_command('step_over')<cr>
+map <F3> :python vdebug.step_over()<cr>
 map <F4> :python debugger_command('step_out')<cr>
 
 map <Leader>dr :python debugger_resize()<cr>
