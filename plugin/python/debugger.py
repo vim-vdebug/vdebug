@@ -11,8 +11,11 @@ import ui.vimui
 import vim
 import breakpoint
 
-class Debugger:
+class DebuggerInterface:
+    """ Acts as an interface, mainly to the Runner class.
 
+    Exceptions are caught and handled here.
+    """
     def __init__(self):
         self.runner = Runner()
 
@@ -38,9 +41,9 @@ class Debugger:
             self.runner.close()
             raise
 
-    def add_breakpoint(self,args = None):
+    def set_breakpoint(self,args = None):
         try:
-            self.runner.add_breakpoint(args)
+            self.runner.set_breakpoint(args)
         except breakpoint.WrongWindowError:
             self.ui.say("Breakpoints must be assigned in the " + \
                     "source code window")
@@ -86,9 +89,6 @@ class Runner:
         self.ui.sourcewin.place_pointer(1)
         self.breakpoints.link_api(self.api)
 
-    def do(self,command):
-        pass
-
     def is_alive(self):
         if self.api is not None and \
             self.api.conn.isconnected():
@@ -105,7 +105,7 @@ class Runner:
             status = self.api.status()
             self.ui.statuswin.set_status(status)
 
-    def add_breakpoint(self,args):
+    def set_breakpoint(self,args):
         bp = breakpoint.Breakpoint.parse(self.ui,args)
         if bp.type == "line":
             id = self.breakpoints.find_breakpoint(\
@@ -148,4 +148,4 @@ class Runner:
         self.close_connection()
         self.ui.close()
 
-vdebug = Debugger()
+vdebug = DebuggerInterface()

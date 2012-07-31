@@ -34,6 +34,21 @@ class Ui(ui.interface.Ui):
         winnr = self.__get_srcwinno_by_name(srcwin_name)
         self.sourcewin = SourceWindow(self,winnr)
 
+    def get_current_file(self):
+        return vim.current.buffer.name
+
+    def get_current_row(self):
+        return vim.current.window.cursor[0]
+
+    def place_breakpoint(self,sign_id,file,line):
+        vim.command('sign place '+str(sign_id)+\
+                ' name=breakpt line='+str(line)+\
+                ' file='+file)
+
+    def remove_breakpoint(self,sign_id):
+        log.Log("Removing breakpoint sign ID %i " % sign_id)
+        vim.command('sign unplace '+str(sign_id))
+
     def __get_srcwin_name(self):
         return vim.windows[0].buffer.name
 
@@ -102,15 +117,6 @@ class SourceWindow(ui.interface.Window):
     def clear_signs(self):
         vim.command('sign unplace *')
 
-    def place_breakpoint(self,sign_id,line):
-        log.Log("Placing breakpoint sign on line "+str(line))
-        vim.command('sign place '+str(sign_id)+\
-                ' name=breakpt line='+str(line)+\
-                ' file='+self.file)
-
-    def remove_breakpoint(self,sign_id,line):
-        log.Log("Removing breakpoint sign on line "+str(line))
-        vim.command('sign unplace '+str(sign_id))
 
     def place_pointer(self,line):
         log.Log("Placing pointer sign on line "+str(line))
