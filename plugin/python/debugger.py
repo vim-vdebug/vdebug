@@ -1,3 +1,4 @@
+# coding=utf-8
 import sys
 import os
 import inspect
@@ -29,6 +30,21 @@ class DebuggerInterface:
     def run(self):
         try:
             self.runner.run()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.runner.ui.error(e)
+        except:
+            self.runner.ui.error("An error occured: "+\
+                    str(sys.exc_info()[0]))
+            #self.runner.close()
+            raise
+
+    def handle_watch_toggle(self):
+        try:
+            self.runner.handle_watch_toggle()
         except dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
@@ -100,6 +116,7 @@ class Runner:
         self.ui.open()
         addr = str(self.api.conn.address)
         log.Log("Found connection from " + addr,log.Logger.INFO)
+        self.breakpoints.link_api(self.api)
         self.api.step_into()
         self.refresh()
 
@@ -161,6 +178,23 @@ class Runner:
                 self.breakpoints.remove_breakpoint_by_id(id)
                 return
         self.breakpoints.add_breakpoint(bp)
+
+    def handle_watch_toggle(self):
+        """ Return the number of lines that a property block reaches to."""
+        lineno = vim.current.window.cursor[0]
+        log.Log("Carriage return on line "+str(lineno))
+        line = self.ui.watchwin.buffer[lineno-1]
+        index = line.find("▸")
+        if index > 0:
+            self.handle_open(line,index)
+        
+    def handle_open(self,line,pointer_index):
+        eq_index = line.find('=')
+        name = line[pointer_index:eq_index]
+        res = self.api.property_get(name)
+        context_res = res.get_context()
+        rend = ui.vimui.ContextGetResponseRenderer(context_res)
+        self.ui.watchwin.accept_renderer(rend)
 
     def listen(self,server,port,timeout):
         """ Open the dbgp API with connection.
