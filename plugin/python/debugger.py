@@ -182,8 +182,8 @@ class Runner:
 
     def handle_watch_toggle(self):
         """ Return the number of lines that a property block reaches to."""
-        #if vim.current.buffer.name != self.ui.watchwin.name:
-        #    return
+        if self.ui.watchwin.name not in vim.current.buffer.name:
+            return
         log.Log("Current buffer name: "+vim.current.buffer.name)
         lineno = vim.current.window.cursor[0]
         log.Log("Carriage return on line "+str(lineno))
