@@ -1,3 +1,4 @@
+# coding=utf-8
 import ui.interface
 import vim
 import log
@@ -137,7 +138,6 @@ class Window(ui.interface.Window):
     open_cmd = "new"
 
     def __init__(self,ui,open_cmd):
-        self.firstwrite = 1
         self.buffer = None
         self.ui = ui
         self.open_cmd = open_cmd
@@ -145,17 +145,25 @@ class Window(ui.interface.Window):
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
 
+    def lock(self):
+        self.command('setlocal nomodifiable')
+
+    def unlock(self):
+        self.command('setlocal modifiable')
+
     def write(self, msg, return_focus = True, after = "normal G"):
         """ append last """
         """if type(msg) is unicode:
           msg =
           unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
+        self.unlock()
         if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
             self.buffer.append(str(msg).split('\n'))
         if return_focus:
             prev_win = vim.eval('winnr()')
+        self.lock()
         self.command(after)
         vim.command('%swincmd W' % prev_win)
         #self.window.cursor = (len(self.buffer), 1)
@@ -164,6 +172,7 @@ class Window(ui.interface.Window):
         """ insert into current position in buffer"""
         if len(msg) == 0 and allowEmpty == False:
             return
+        self.unlock()
         if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
@@ -181,6 +190,7 @@ class Window(ui.interface.Window):
             else:
                 for line in remaining_buffer:
                     self.buffer.append(line)
+        self.lock()
 
     def buffer_empty(self):
         if len(self.buffer) == 1 \
@@ -193,7 +203,7 @@ class Window(ui.interface.Window):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
         #if self.name != 'LOG___WINDOW':
-        vim.command("setlocal buftype=nofile")
+        vim.command("setlocal buftype=nofile nomodifiable")
         self.buffer = vim.current.buffer
         self.width  = int( vim.eval("winwidth(0)")  )
         self.height = int( vim.eval("winheight(0)") )
@@ -208,12 +218,12 @@ class Window(ui.interface.Window):
         #  self.command('hide')
         #else:
         self.command('bwipeout ' + self.name)
-        self.firstwrite = 1
 
     def clean(self):
         """ clean all datas in buffer """
+        self.unlock()
         self.buffer[:] = []
-        self.firstwrite = 1
+        self.lock()
 
     def command(self, cmd):
         """ go to my window & execute command """
@@ -265,57 +275,126 @@ class StackGetResponseRenderer(ResponseRenderer):
             string += line + "\n"
         return string
 
+class ContextProperty:
+
+    def __init__(self,node,parent = None,depth = 0):
+        self.parent = parent
+        self.display_name = node.get('fullname')
+        self.type = node.get('type')
+        self.encoding = node.get('encoding')
+        self.depth = depth
+        self.size = node.get('size')
+        self.value = ""
+        self.is_last_child = False
+
+        children = node.get('children')
+        self.num_declared_children = children
+        self.has_children = False if children is None else True
+        self.children = []
+
+        if self.encoding == 'base64':
+            if node.text is None:
+                self.value = ""
+            else:
+                self.value = base64.decodestring(node.text)
+        elif not self.is_uninitialized() \
+                and not self.has_children:
+            self.value = node.text
+
+        self.num_crs = self.value.count('\n')
+
+        if self.has_children:
+            idx = 0
+            for c in node.getchildren():
+                idx += 1
+                p = ContextProperty(c,self,depth+1)
+                self.children.append(p)
+                if idx == self.num_declared_children:
+                    p.mark_as_last_child()
+
+    def mark_as_last_child(self):
+        self.is_last_child = True
+
+    def is_uninitialized(self):
+        if self.type == 'uninitialized':
+            return True
+        else:
+            return False
+
+    def marker(self):
+        char = "⬦"
+        if self.has_children:
+            if self.child_count() == 0:
+                char = "▸"
+            else:
+                char = "▾"
+        return char
+
+    def child_count(self):
+        return len(self.children)
+
+    def type_and_size(self):
+        size = None
+        if self.has_children:
+            size = self.num_declared_children
+        elif self.size is not None:
+            size = self.size
+
+        if size is None:
+            return self.type
+        else:
+            return "%s [%s]" %(self.type,size)
+
+
 class ContextGetResponseRenderer(ResponseRenderer):
+
+    def __init__(self,response):
+        ResponseRenderer.__init__(self,response)
+
     def render(self):
         context = self.response.get_context()
         string = ""
+        properties = []
         for c in context:
-            if c == context[-1]:
-                string += self.__parse_node(c,final_child = True)
-            else:
-                string += self.__parse_node(c)
+            self.__create_properties(ContextProperty(c),properties)
+        
+        log.Log(properties)
+
+        for idx, prop in enumerate(properties):
+            final = False
+            try:
+                next_prop = properties[idx+1]
+            except IndexError:
+                final = True
+                next_prop = None
+            string += self.__render_property(prop,next_prop,final)
+
         return string
 
-    def __parse_node(self,node,depth = 0, final_child = False):
-        line = node.get('fullname')
-        type = node.get('type')
-        children = node.get('children')
-        has_children = False if children is None else True
+    def __create_properties(self,property,properties):
+        properties.append(property)
+        for p in property.children:
+            self.__create_properties(p,properties)
 
-        if type == "uninitialized":
-            isset = False
-            type = "*uninitialized*"
-        else:
-            isset = True
+    def __render_property(self,p,next_p,last = False):
+        line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
+                %{'indent':"".rjust(p.depth * 2),\
+                'marker':p.marker(),'name':p.display_name,\
+                'type':p.type_and_size(),'value':p.value}
 
-        if node.get('encoding') == 'base64':
-            value = base64.decodestring(node.text)
-        elif isset and not has_children:
-            value = node.text
-
-        line += " = (%s)" % type
-
-        if has_children:
-            line += " [%s]\n" % node.get('numchildren')
-            line += "".rjust(depth*2) + "\\\n"
-            child_nodes = node.getchildren()
-            if len(child_nodes):
-                for child in child_nodes:
-                    if child == child_nodes[-1]:
-                        line += self.__parse_node(child,depth + 1,True)
-                    else:
-                        line += self.__parse_node(child,depth + 1)
+        if next_p:
+            depth = p.depth
+            next_depth = next_p.depth
+            if depth == next_depth:
+                next_sep = "|"
+                num_spaces = depth * 2
+            elif depth > next_depth:
+                next_sep = "/"
+                num_spaces = (depth * 2) - 1
             else:
-                line += "".rjust((depth+1)*2) + " *truncated*\n"
-        else:
-            if isset:
-                line += " %s" % value
+                next_sep = "\\"
+                num_spaces = (depth * 2) + 1
 
-            line += "\n"
-            line += "".rjust(depth*2)
-            if not final_child:
-                line += "|"
-            line += "\n"
+            line += "".rjust(num_spaces) + " " + next_sep + "\n"
 
-        return "".rjust(depth*2) + "o  " + line
-
+        return line

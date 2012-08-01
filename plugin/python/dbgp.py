@@ -258,6 +258,11 @@ class Api:
         """
         return self.send_cmd('context_get','',ContextGetResponse)
 
+    def property_get(self,name):
+        """Get a property.
+        """
+        return self.send_cmd('property_get','-n '+name,ContextGetResponse)
+
     def detach(self):
         """Tell the debugger to detach itself from this
         client.
