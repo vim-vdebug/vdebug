@@ -156,16 +156,17 @@ class Window(ui.interface.Window):
         """if type(msg) is unicode:
           msg =
           unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
+        if return_focus:
+            prev_win = vim.eval('winnr()')
         self.unlock()
         if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
             self.buffer.append(str(msg).split('\n'))
-        if return_focus:
-            prev_win = vim.eval('winnr()')
         self.lock()
         self.command(after)
-        vim.command('%swincmd W' % prev_win)
+        if return_focus:
+            vim.command('%swincmd W' % prev_win)
         #self.window.cursor = (len(self.buffer), 1)
 
     def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
@@ -289,7 +290,11 @@ class ContextProperty:
 
         children = node.get('children')
         self.num_declared_children = children
-        self.has_children = False if children is None else True
+        if children is None:
+            children = 0
+        else:
+            children = int(children)
+        self.has_children = True if children > 0 else False
         self.children = []
 
         if self.encoding == 'base64':
@@ -300,6 +305,9 @@ class ContextProperty:
         elif not self.is_uninitialized() \
                 and not self.has_children:
             self.value = node.text
+
+        if self.value is None:
+            self.value = ""
 
         self.num_crs = self.value.count('\n')
 
@@ -351,7 +359,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __init__(self,response):
         ResponseRenderer.__init__(self,response)
 
-    def render(self):
+    def render(self,indent = 0):
         context = self.response.get_context()
         string = ""
         properties = []
@@ -367,7 +375,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
             except IndexError:
                 final = True
                 next_prop = None
-            string += self.__render_property(prop,next_prop,final)
+            string += self.__render_property(prop,next_prop,final,indent)
 
         return string
 
@@ -376,14 +384,14 @@ class ContextGetResponseRenderer(ResponseRenderer):
         for p in property.children:
             self.__create_properties(p,properties)
 
-    def __render_property(self,p,next_p,last = False):
+    def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
-                %{'indent':"".rjust(p.depth * 2),\
+                %{'indent':"".rjust((p.depth * 2)+indent),\
                 'marker':p.marker(),'name':p.display_name,\
                 'type':p.type_and_size(),'value':p.value}
 
+        depth = p.depth
         if next_p:
-            depth = p.depth
             next_depth = next_p.depth
             if depth == next_depth:
                 next_sep = "|"
@@ -395,6 +403,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 next_sep = "\\"
                 num_spaces = (depth * 2) + 1
 
-            line += "".rjust(num_spaces) + " " + next_sep + "\n"
+            line += "".rjust(num_spaces+indent) + " " + next_sep + "\n"
+        elif indent > 0 and last:
+            line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
 
         return line
