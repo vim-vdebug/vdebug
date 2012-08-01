@@ -129,6 +129,7 @@ class Runner:
             if str(status) in ("stopping","stopped"):
                 self.ui.statuswin.set_status("stopped")
                 self.ui.say("Debugging session has ended")
+                self.close_connection()
             else:
                 self.ui.statuswin.set_status(status)
                 stack_res = self.update_stack()
@@ -181,20 +182,24 @@ class Runner:
 
     def handle_watch_toggle(self):
         """ Return the number of lines that a property block reaches to."""
+        #if vim.current.buffer.name != self.ui.watchwin.name:
+        #    return
+        log.Log("Current buffer name: "+vim.current.buffer.name)
         lineno = vim.current.window.cursor[0]
         log.Log("Carriage return on line "+str(lineno))
         line = self.ui.watchwin.buffer[lineno-1]
         index = line.find("▸")
         if index > 0:
-            self.handle_open(line,index)
+            self.handle_open(lineno,line,index)
         
-    def handle_open(self,line,pointer_index):
+    def handle_open(self,lineno,line,pointer_index):
         eq_index = line.find('=')
-        name = line[pointer_index:eq_index]
-        res = self.api.property_get(name)
-        context_res = res.get_context()
+        name = line[pointer_index+4:eq_index-1]
+        context_res = self.api.property_get(name)
         rend = ui.vimui.ContextGetResponseRenderer(context_res)
-        self.ui.watchwin.accept_renderer(rend)
+        output = rend.render(pointer_index - 1)
+        log.Log(output)
+        self.ui.watchwin.insert(output.rstrip(),lineno-1,True)
 
     def listen(self,server,port,timeout):
         """ Open the dbgp API with connection.
