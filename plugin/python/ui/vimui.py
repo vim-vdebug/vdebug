@@ -21,20 +21,22 @@ class Ui(ui.interface.Ui):
         self.watchwin = WatchWindow(self,'vertical belowright new')
         self.watchwin.create()
 
-        self.stackwin = StackWindow(self,'belowright new')
+        self.stackwin = StackWindow(self,'belowright 8new')
         self.stackwin.create()
 
-        self.statuswin = StatusWindow(self,'belowright new')
+        self.statuswin = StatusWindow(self,'belowright 5new')
         self.statuswin.create()
         self.statuswin.set_status("loading")
 
-        logwin = LogWindow(self,'rightbelow new')
+        logwin = LogWindow(self,'rightbelow 6new')
         log.Log.set_logger(log.WindowLogger(\
                 log.Logger.DEBUG,\
                 logwin))
 
         winnr = self.__get_srcwinno_by_name(srcwin_name)
         self.sourcewin = SourceWindow(self,winnr)
+        self.sourcewin.focus()
+
 
     def get_current_file(self):
         return vim.current.buffer.name
@@ -115,7 +117,7 @@ class SourceWindow(ui.interface.Window):
         if file.startswith("file://"):
             file = file[7:]
         self.file = file
-        log.Log("Setting source file: "+file,log.Logger.DEBUG)
+        log.Log("Setting source file: "+file,log.Logger.INFO)
         self.focus()
         vim.command("silent edit " + file)
 
@@ -124,7 +126,8 @@ class SourceWindow(ui.interface.Window):
 
 
     def place_pointer(self,line):
-        log.Log("Placing pointer sign on line "+str(line))
+        log.Log("Placing pointer sign on line "+str(line),\
+                log.Logger.INFO)
         self.remove_pointer()
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
@@ -204,7 +207,8 @@ class Window(ui.interface.Window):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
         #if self.name != 'LOG___WINDOW':
-        vim.command("setlocal buftype=nofile nomodifiable")
+        vim.command("setlocal buftype=nofile nomodifiable "+ \
+                "winfixheight winfixwidth")
         self.buffer = vim.current.buffer
         self.width  = int( vim.eval("winwidth(0)")  )
         self.height = int( vim.eval("winheight(0)") )
@@ -237,22 +241,28 @@ class Window(ui.interface.Window):
         self.write(renderer.render())
 
 class LogWindow(Window):
-    name = "LOG_WINDOW"
+    name = "Log"
+    def write(self, msg, return_focus = True):
+        Window.write(self, msg,return_focus=True)
 
 class StackWindow(Window):
-    name = "STACK_WINDOW"
+    name = "Stack"
+    def write(self, msg, return_focus = True):
+        Window.write(self, msg, after="normal gg")
 
 class WatchWindow(Window):
-    name = "WATCH_WINDOW"
+    name = "Watch"
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
 
 class StatusWindow(Window):
-    name = "STATUS_WINDOW"
+    name = "Status"
 
     def on_create(self):
-        self.write("Status: \n<F5> Run")
+        self.write("Status: \n\nPress <F5> to start "+\
+                "debugging, <F6> to stop/close.\nType "+\
+                ":help vim-debugger for more information.")
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
@@ -310,6 +320,8 @@ class ContextProperty:
             self.value = ""
 
         self.num_crs = self.value.count('\n')
+        if self.type == "string":
+            self.value = '"%s"' % self.value.replace('"','\\"')
 
         if self.has_children:
             idx = 0
@@ -366,7 +378,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
         for c in context:
             self.__create_properties(ContextProperty(c),properties)
         
-        log.Log(properties)
+        num_props = len(properties)
+        log.Log("Writing %i properties to the context window" % num_props,\
+                log.Logger.INFO )
 
         for idx, prop in enumerate(properties):
             final = False

@@ -9,9 +9,9 @@ class Store:
 
     def link_api(self,api):
         self.api = api
-        log.Log("Registering "+str(len(self.breakpoints))+\
-                " breakpoints with the debugger",\
-                log.Logger.DEBUG)
+        num_bps = len(self.breakpoints)
+        if num_bps > 0:
+            log.Log("Registering %i breakpoints with the debugger" % num_bps)
         for id, bp in self.breakpoints.iteritems():
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
@@ -20,9 +20,8 @@ class Store:
         self.api = None
 
     def add_breakpoint(self,breakpoint):
-        log.Log("Adding breakpoint "+\
-                str(breakpoint),\
-                log.Logger.DEBUG)
+        log.Log("Adding " + str(breakpoint),\
+                log.Logger.INFO)
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
         if self.api is not None:
@@ -140,7 +139,7 @@ class Breakpoint:
         pass
 
     def __str__(self):
-        return "["+self.type+"] "+str(self.id)
+        return "%s breakpoint [%i]" %(self.type,self.id)
 
 class LineBreakpoint(Breakpoint):
     type = "line"

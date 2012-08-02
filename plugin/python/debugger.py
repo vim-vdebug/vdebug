@@ -20,12 +20,16 @@ class DebuggerInterface:
     def __init__(self):
         self.runner = Runner()
 
+    def __del__(self):
+        self.runner.close()
+
     def handle_timeout(self):
         self.runner.close()
         self.runner.ui.say("No connection was made")
 
     def handle_socket_end(self):
         self.runner.ui.say("Connection to the debugger has been closed")
+        self.runner.ui.statuswin.set_status("stopped")
 
     def run(self):
         try:
@@ -158,6 +162,7 @@ class Runner:
             self.open()
         else:
             self.ui.sourcewin.remove_pointer()
+            self.ui.statuswin.set_status("running")
             self.api.run()
             self.refresh()
 
