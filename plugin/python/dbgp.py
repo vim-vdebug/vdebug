@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import socket
 import log
+import base64
 
 """ Response objects for the DBGP module."""
 
@@ -76,9 +77,19 @@ class StackGetResponse(Response):
 
 class ContextGetResponse(Response):
     """Response object used by the context_get command."""
+    properties = []
 
     def get_context(self):
+        for c in self.as_xml().getchildren():
+            self.__create_properties(ContextProperty(c))
+
         return self.as_xml().getchildren()
+
+    def __create_properties(self,property):
+        self.properties.append(property)
+        for p in property.children:
+            self.__create_properties(p)
+
 
 class BreakpointSetResponse(Response):
     """Response object returned by the breakpoint_set command."""
@@ -409,11 +420,99 @@ class Connection:
         """
         self.sock.send(cmd + '\0')
 
-class TimeoutError(Exception):
-    pass
+class ContextProperty:
+
+    def __init__(self,node,parent = None,depth = 0):
+        self.parent = parent
+        self.__determine_type(node)
+        self.__determine_displayname(node)
+        self.encoding = node.get('encoding')
+        self.depth = depth
+        self.size = node.get('size')
+        self.value = ""
+        self.is_last_child = False
+
+        self.__determine_children(node)
+
+        if self.encoding == 'base64':
+            if node.text is None:
+                self.value = ""
+            else:
+                self.value = base64.decodestring(node.text)
+        elif not self.is_uninitialized() \
+                and not self.has_children:
+            self.value = node.text
+
+        if self.value is None:
+            self.value = ""
+
+        self.num_crs = self.value.count('\n')
+        if self.type == "string":
+            self.value = '`%s`' % self.value.replace('`','\\`')
+
+        self.__init_children(node)
+
+    def __determine_type(self,node):
+        type = node.get('classname')
+        if type is None:
+            type = node.get('type')
+        self.type = type
+
+    def __determine_displayname(self,node):
+        display_name = node.get('fullname')
+        if display_name == '::':
+            display_name = self.type
+        self.display_name = display_name
+
+    def __determine_children(self,node):
+        children = node.get('children')
+        self.num_declared_children = children
+        if children is None:
+            children = 0
+        else:
+            children = int(children)
+        self.has_children = True if children > 0 else False
+        self.children = []
+
+    def __init_children(self,node):
+        if self.has_children:
+            idx = 0
+            for c in node.getchildren():
+                idx += 1
+                p = ContextProperty(c,self,self.depth+1)
+                self.children.append(p)
+                if idx == self.num_declared_children:
+                    p.mark_as_last_child()
+
+    def mark_as_last_child(self):
+        self.is_last_child = True
+
+    def is_uninitialized(self):
+        if self.type == 'uninitialized':
+            return True
+        else:
+            return False
+
+    def child_count(self):
+        return len(self.children)
+
+    def type_and_size(self):
+        size = None
+        if self.has_children:
+            size = self.num_declared_children
+        elif self.size is not None:
+            size = self.size
+
+        if size is None:
+            return self.type
+        else:
+            return "%s [%s]" %(self.type,size)
 
 
 """ Errors/Exceptions """
+class TimeoutError(Exception):
+    pass
+
 
 class DBGPError(Exception):
     """Raised when the debugger returns an error message."""
