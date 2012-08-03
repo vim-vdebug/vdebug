@@ -32,6 +32,16 @@ class DebuggerInterface:
         self.runner.ui.say("Connection to the debugger has been closed")
         self.runner.ui.statuswin.set_status("stopped")
 
+    def handle_vim_error(self,e):
+        self.runner.ui.error("A Vim error occured: "+\
+                str(e)+\
+                "\n"+ traceback.format_exc())
+
+    def handle_general_exception(self):
+        self.runner.ui.error("An error occured: "+\
+                str(sys.exc_info()[0])+\
+                "\n"+ traceback.format_exc())
+
     def run(self):
         try:
             self.runner.run()
@@ -40,33 +50,23 @@ class DebuggerInterface:
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
-            self.runner.ui.error(str(e)+"\nTraceback: "+\
-                    traceback.format_exc())
+            self.handle_vim_error(e)
         except:
-            self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0])+\
-                    "\nTraceback: "+\
-                    traceback.format_exc())
-            #self.runner.close()
-            raise
+            self.handle_general_exception()
 
-    def handle_watch_toggle(self):
+    def handle_return_keypress(self):
         try:
-            self.runner.handle_watch_toggle()
+            return self.runner.handle_return_keypress()
         except dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
+            self.handle_vim_error(e)
             self.runner.ui.error(str(e)+"\nTraceback: "+\
                     traceback.format_exc())
         except:
-            self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0])+\
-                    "\nTraceback: "+\
-                    traceback.format_exc())
-            #self.runner.close()
-            raise
+            self.handle_general_exception()
 
     def step_over(self):
         try:
@@ -76,13 +76,9 @@ class DebuggerInterface:
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
-            self.runner.ui.error(e)
+            self.handle_vim_error(e)
         except:
-            self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0]))
-            #self.runner.close()
-            raise
-
+            self.handle_general_exception()
 
     def set_breakpoint(self,args = None):
         try:
@@ -94,12 +90,9 @@ class DebuggerInterface:
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
-            self.runner.ui.error(e)
+            self.handle_vim_error(e)
         except:
-            self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0]))
-            #self.runner.close()
-            raise
+            self.handle_general_exception()
 
     def close(self):
         self.runner.close()
@@ -168,8 +161,8 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
-            self.ui.sourcewin.remove_pointer()
             self.ui.statuswin.set_status("running")
+            self.ui.sourcewin.remove_pointer()
             self.api.run()
             self.refresh()
 
@@ -177,6 +170,7 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
+            self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
             self.api.step_over()
             self.refresh()
@@ -192,17 +186,27 @@ class Runner:
                 return
         self.breakpoints.add_breakpoint(bp)
 
-    def handle_watch_toggle(self):
-        """ Return the number of lines that a property block reaches to."""
-        if self.ui.watchwin.name not in vim.current.buffer.name:
-            return
-        log.Log("Current buffer name: "+vim.current.buffer.name)
+    def handle_return_keypress(self):
+        """ Handle what happens when the user hits return."""
+        if not self.is_alive():
+            return True
         lineno = vim.current.window.cursor[0]
-        log.Log("Carriage return on line "+str(lineno))
-        line = self.ui.watchwin.buffer[lineno-1]
-        index = line.find("▸")
-        if index > 0:
-            self.handle_open(lineno,line,index)
+        if self.ui.watchwin.name in vim.current.buffer.name:
+            log.Log("Carriage return on line "+str(lineno))
+            line = self.ui.watchwin.buffer[lineno-1]
+            index = line.find("▸")
+            if index > 0:
+                self.handle_property_get(lineno,line,index)
+        if self.ui.stackwin.name in vim.current.buffer.name:
+            line = self.ui.stackwin.buffer[lineno-1]
+            filename_pos = line.find("\t\t")
+            file_and_line = line[filename_pos:]
+            line_pos = file_and_line.find(":")
+            file = file_and_line[:line_pos]
+            lineno = file_and_line[line_pos+1:]
+            self.ui.sourcewin.set_file(file)
+            self.ui.sourcewin.set_line(lineno)
+
         
     def handle_open(self,lineno,line,pointer_index):
         eq_index = line.find('=')
@@ -210,7 +214,6 @@ class Runner:
         context_res = self.api.property_get(name)
         rend = ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
-        log.Log(output)
         self.ui.watchwin.insert(output.rstrip(),lineno-1,True)
 
     def listen(self,server,port,timeout):

@@ -2,7 +2,6 @@
 import ui.interface
 import vim
 import log
-import base64
 
 class Ui(ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -21,7 +20,7 @@ class Ui(ui.interface.Ui):
         self.watchwin = WatchWindow(self,'vertical belowright new')
         self.watchwin.create()
 
-        self.stackwin = StackWindow(self,'belowright 8new')
+        self.stackwin = StackWindow(self,'belowright 5new')
         self.stackwin.create()
 
         self.statuswin = StatusWindow(self,'belowright 5new')
@@ -71,7 +70,9 @@ class Ui(ui.interface.Ui):
         log.Log(string,log.Logger.INFO)
 
     def error(self,string):
-        vim.command('echohl Error | echo "'+str(string)+'" | echohl None')
+        vim.command('echohl Error | echo "'+\
+                str(string).replace('"','\\"')+\
+                '" | echohl None')
         log.Log(string,log.Logger.ERROR)
 
     def close(self):
@@ -120,6 +121,10 @@ class SourceWindow(ui.interface.Window):
         log.Log("Setting source file: "+file,log.Logger.INFO)
         self.focus()
         vim.command("silent edit " + file)
+
+    def set_line(self,lineno):
+        self.focus()
+        vim.command("normal %sgg" % str(lineno))
 
     def clear_signs(self):
         vim.command('sign unplace *')
@@ -244,16 +249,35 @@ class Window(ui.interface.Window):
 
 class LogWindow(Window):
     name = "Log"
+
+    def on_create(self):
+        self.command('setlocal syntax=debugger_log')
+
     def write(self, msg, return_focus = True):
         Window.write(self, msg,return_focus=True)
 
 class StackWindow(Window):
     name = "Stack"
+
+    def on_create(self):
+        self.command('inoremap <buffer> <cr> <esc>'+\
+                ':python vdebug.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> <esc>'+\
+                ':python vdebug.handle_return_keypress()<cr>')
+        self.command('setlocal syntax=debugger_stack')
+
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
 
 class WatchWindow(Window):
     name = "Watch"
+
+    def on_create(self):
+        self.command('inoremap <buffer> <cr> <esc>'+\
+                ':python vdebug.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> <esc>'+\
+                ':python vdebug.handle_return_keypress()<cr>')
+        self.command('setlocal syntax=debugger_watch')
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -262,9 +286,10 @@ class StatusWindow(Window):
     name = "Status"
 
     def on_create(self):
-        self.write("Status: \n\nPress <F5> to start "+\
+        self.write("Status: starting\n\nPress <F5> to start "+\
                 "debugging, <F6> to stop/close.\nType "+\
                 ":help vim-debugger for more information.")
+        self.command('setlocal syntax=debugger_status')
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
@@ -288,85 +313,6 @@ class StackGetResponseRenderer(ResponseRenderer):
             string += line + "\n"
         return string
 
-class ContextProperty:
-
-    def __init__(self,node,parent = None,depth = 0):
-        self.parent = parent
-        self.display_name = node.get('fullname')
-        self.type = node.get('type')
-        self.encoding = node.get('encoding')
-        self.depth = depth
-        self.size = node.get('size')
-        self.value = ""
-        self.is_last_child = False
-
-        children = node.get('children')
-        self.num_declared_children = children
-        if children is None:
-            children = 0
-        else:
-            children = int(children)
-        self.has_children = True if children > 0 else False
-        self.children = []
-
-        if self.encoding == 'base64':
-            if node.text is None:
-                self.value = ""
-            else:
-                self.value = base64.decodestring(node.text)
-        elif not self.is_uninitialized() \
-                and not self.has_children:
-            self.value = node.text
-
-        if self.value is None:
-            self.value = ""
-
-        self.num_crs = self.value.count('\n')
-        if self.type == "string":
-            self.value = '"%s"' % self.value.replace('"','\\"')
-
-        if self.has_children:
-            idx = 0
-            for c in node.getchildren():
-                idx += 1
-                p = ContextProperty(c,self,depth+1)
-                self.children.append(p)
-                if idx == self.num_declared_children:
-                    p.mark_as_last_child()
-
-    def mark_as_last_child(self):
-        self.is_last_child = True
-
-    def is_uninitialized(self):
-        if self.type == 'uninitialized':
-            return True
-        else:
-            return False
-
-    def marker(self):
-        char = "⬦"
-        if self.has_children:
-            if self.child_count() == 0:
-                char = "▸"
-            else:
-                char = "▾"
-        return char
-
-    def child_count(self):
-        return len(self.children)
-
-    def type_and_size(self):
-        size = None
-        if self.has_children:
-            size = self.num_declared_children
-        elif self.size is not None:
-            size = self.size
-
-        if size is None:
-            return self.type
-        else:
-            return "%s [%s]" %(self.type,size)
-
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
@@ -374,12 +320,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
         ResponseRenderer.__init__(self,response)
 
     def render(self,indent = 0):
-        context = self.response.get_context()
-        string = ""
-        properties = []
-        for c in context:
-            self.__create_properties(ContextProperty(c),properties)
-        
+        res = ""
+        properties = self.response.get_context()
+       
         num_props = len(properties)
         log.Log("Writing %i properties to the context window" % num_props,\
                 log.Logger.INFO )
@@ -391,14 +334,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
             except IndexError:
                 final = True
                 next_prop = None
-            string += self.__render_property(prop,next_prop,final,indent)
+            res += self.__render_property(prop,next_prop,final,indent)
 
-        return string
-
-    def __create_properties(self,property,properties):
-        properties.append(property)
-        for p in property.children:
-            self.__create_properties(p,properties)
+        return res
 
     def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
@@ -424,3 +362,13 @@ class ContextGetResponseRenderer(ResponseRenderer):
             line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
 
         return line
+
+    def marker(self):
+        char = "¿"
+        if self.has_children:
+            if self.child_count() == 0:
+                char = "¿"
+            else:
+                char = "¿"
+        return char
+
