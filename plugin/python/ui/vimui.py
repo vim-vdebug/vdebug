@@ -341,7 +341,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
                 %{'indent':"".rjust((p.depth * 2)+indent),\
-                'marker':p.marker(),'name':p.display_name,\
+                'marker':self.__get_marker(p),'name':p.display_name,\
                 'type':p.type_and_size(),'value':p.value}
 
         depth = p.depth
@@ -363,12 +363,11 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
         return line
 
-    def marker(self):
-        char = "¿"
-        if self.has_children:
-            if self.child_count() == 0:
-                char = "¿"
+    def __get_marker(self,property):
+        char = "⬦"
+        if property.has_children:
+            if property.child_count() == 0:
+                char = "▸"
             else:
-                char = "¿"
+                char = "▾"
         return char
-

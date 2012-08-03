@@ -76,14 +76,20 @@ class StackGetResponse(Response):
         return self.as_xml().getchildren()
 
 class ContextGetResponse(Response):
-    """Response object used by the context_get command."""
-    properties = []
+    """Response object used by the context_get command.
+    
+    The property nodes are converted into ContextProperty
+    objects, which are much easier to use."""
+
+    def __init__(self,response,cmd,cmd_args):
+        Response.__init__(self,response,cmd,cmd_args)
+        self.properties = []
 
     def get_context(self):
         for c in self.as_xml().getchildren():
             self.__create_properties(ContextProperty(c))
 
-        return self.as_xml().getchildren()
+        return self.properties
 
     def __create_properties(self,property):
         self.properties.append(property)
@@ -226,7 +232,7 @@ class Api:
     def run(self):
         """Tell the debugger to start or resume
         execution."""
-        return self.send_cmd('run','',Response)
+        return self.send_cmd('run','',StatusResponse)
 
     def step_into(self):
         """Tell the debugger to step to the next
@@ -235,7 +241,7 @@ class Api:
         If there's a function call, the debugger engine
         will break on the first statement in the function.
         """
-        return self.send_cmd('step_into','',Response)
+        return self.send_cmd('step_into','',StatusResponse)
 
     def step_over(self):
         """Tell the debugger to step to the next
@@ -244,20 +250,20 @@ class Api:
         If there's a function call, the debugger engine
         will stop at the next statement after the function call.
         """
-        return self.send_cmd('step_over','',Response)
+        return self.send_cmd('step_over','',StatusResponse)
 
     def step_out(self):
         """Tell the debugger to step out of the statement.
         
         The debugger will step out of the current scope.
         """
-        return self.send_cmd('step_out','',Response)
+        return self.send_cmd('step_out','',StatusResponse)
 
     def stop(self):
         """Tell the debugger to stop execution.
 
         The script is terminated immediately."""
-        return self.send_cmd('stop','',Response)
+        return self.send_cmd('stop','',StatusResponse)
 
     def stack_get(self):
         """Get the stack information.
@@ -280,7 +286,7 @@ class Api:
 
         The script is not terminated, but runs as normal
         from this point."""
-        return self.send_cmd('detach','',Response)
+        return self.send_cmd('detach','',StatusResponse)
 
     def breakpoint_set(self,cmd_args):
         """Set a breakpoint.
@@ -422,6 +428,8 @@ class Connection:
 
 class ContextProperty:
 
+    ns = '{urn:debugger_protocol_v1}'
+
     def __init__(self,node,parent = None,depth = 0):
         self.parent = parent
         self.__determine_type(node)
@@ -460,9 +468,23 @@ class ContextProperty:
 
     def __determine_displayname(self,node):
         display_name = node.get('fullname')
+        if display_name == None:
+            display_name = self.__get_enc_node_text(node,'name',"")
         if display_name == '::':
             display_name = self.type
         self.display_name = display_name
+
+    def __get_enc_node_text(self,node,name,default =
+            None):
+        n = node.find('%s%s' %(self.ns, name))
+        if n is not None and n.text is not None:
+            val = base64.decodestring(n.text)
+        else:
+            val = None
+        if val is None:
+            return default
+        else:
+            return val
 
     def __determine_children(self,node):
         children = node.get('children')
@@ -477,12 +499,16 @@ class ContextProperty:
     def __init_children(self,node):
         if self.has_children:
             idx = 0
-            for c in node.getchildren():
-                idx += 1
-                p = ContextProperty(c,self,self.depth+1)
-                self.children.append(p)
-                if idx == self.num_declared_children:
-                    p.mark_as_last_child()
+            children = node.find('%sproperty'%self.ns)
+            print "Length of childrent: %i" % len(children)
+            if children is not None:
+                for c in children:
+                    print c.tag
+                    idx += 1
+                    p = ContextProperty(c,self,self.depth+1)
+                    self.children.append(p)
+                    if idx == self.num_declared_children:
+                        p.mark_as_last_child()
 
     def mark_as_last_child(self):
         self.is_last_child = True

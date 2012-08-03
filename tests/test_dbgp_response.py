@@ -93,3 +93,112 @@ class StackGetTest(unittest.TestCase):
         stack = res.get_stack()
         assert stack[0].get('filename') == "file:///usr/local/bin/cake"
         assert len(stack) == 1
+
+class ContextGetTest(unittest.TestCase):
+    response = """<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1"
+xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+command="context_get" transaction_id="3"
+context="0"><property name="$argc" fullname="$argc"
+address="39795424"
+type="int"><![CDATA[4]]></property><property name="$argv"
+fullname="$argv" address="39794056" type="array"
+children="1" numchildren="4" page="0"
+pagesize="32"><property name="0" fullname="$argv[0]"
+address="39794368" type="string" size="19"
+encoding="base64"><![CDATA[L3Vzci9sb2NhbC9iaW4vY2FrZQ==]]></property><property
+name="1" fullname="$argv[1]" address="39794640"
+type="string" size="8"
+encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property><property
+name="2" fullname="$argv[2]" address="39794904"
+type="string" size="8"
+encoding="base64"><![CDATA[LS1zdGRlcnI=]]></property><property
+name="3" fullname="$argv[3]" address="39795168"
+type="string" size="3"
+encoding="base64"><![CDATA[QWxs]]></property></property><property
+name="$cdstring" fullname="$cdstring"
+type="uninitialized"></property><property name="$cdup"
+fullname="$cdup" type="uninitialized"></property><property
+name="$cwd" fullname="$cwd"
+type="uninitialized"></property><property name="$dir"
+fullname="$dir" type="uninitialized"></property><property
+name="$dirs" fullname="$dirs"
+type="uninitialized"></property><property name="$f"
+fullname="$f" type="uninitialized"></property><property
+name="$f_parts" fullname="$f_parts"
+type="uninitialized"></property><property name="$f_user"
+fullname="$f_user"
+type="uninitialized"></property><property name="$i"
+fullname="$i" type="uninitialized"></property><property
+name="$idx" fullname="$idx"
+type="uninitialized"></property><property name="$op"
+fullname="$op" type="uninitialized"></property><property
+name="$pass" fullname="$pass"
+type="uninitialized"></property><property
+name="$require_chown" fullname="$require_chown"
+type="uninitialized"></property><property name="$retval"
+fullname="$retval"
+type="uninitialized"></property><property name="$tmp_files"
+fullname="$tmp_files"
+type="uninitialized"></property><property name="$uid"
+fullname="$uid" type="uninitialized"></property><property
+name="$user" fullname="$user"
+type="uninitialized"></property></response>
+"""
+
+    def test_properties_are_objects(self):
+        res = dbgp.ContextGetResponse(self.response,"","")
+        context = res.get_context()
+        assert len(context) == 23
+        self.assertIsInstance(context[0],dbgp.ContextProperty)
+
+    def test_int_property_attributes(self):
+        res = dbgp.ContextGetResponse(self.response,"","")
+        context = res.get_context()
+        prop = context[0]
+
+        assert prop.display_name == "$argc"
+        assert prop.type == "int"
+        assert prop.value == "4"
+        assert prop.has_children == False
+
+    def test_array_property_attributes(self):
+        res = dbgp.ContextGetResponse(self.response,"","")
+        context = res.get_context()
+        prop = context[1]
+
+        assert prop.display_name == "$argv"
+        assert prop.type == "array"
+        assert prop.value == ""
+        assert prop.has_children == True
+        assert prop.child_count() == 4
+
+    def test_string_property_attributes(self):
+        res = dbgp.ContextGetResponse(self.response,"","")
+        context = res.get_context()
+        prop = context[2]
+
+        assert prop.display_name == "$argv[0]"
+        assert prop.type == "string"
+        assert prop.value == "`/usr/local/bin/cake`"
+        assert prop.has_children == False
+        assert prop.size == "19"
+
+class ContextGetAlternateTest(unittest.TestCase):
+    response = """<?xml version="1.0" encoding="utf-8"?>
+<response xmlns="urn:debugger_protocol_v1" command="context_get" context="0" transaction_id="15"><property  pagesize="10" numchildren="3" children="1" type="list" page="0" size="3"><name encoding="base64"><![CDATA[bXlsaXN0
+]]></name><fullname encoding="base64"><![CDATA[bXlsaXN0
+]]></fullname></property><property  type="int" children="0" size="0"><value><![CDATA[1]]></value><name encoding="base64"><![CDATA[bXl2YXI=
+]]></name><fullname encoding="base64"><![CDATA[bXl2YXI=
+]]></fullname></property><property  pagesize="10" numchildren="4" children="1" type="Example" page="0" size="0"><name encoding="base64"><![CDATA[b2Jq
+]]></name><fullname encoding="base64"><![CDATA[b2Jq
+]]></fullname></property></response>"""
+
+    def test_properties_are_objects(self):
+        res = dbgp.ContextGetResponse(self.response,"","")
+        context = res.get_context()
+        p = context[0]
+        print "Display name: "+p.display_name
+        assert len(context) == 3
+        self.assertIsInstance(context[0],dbgp.ContextProperty)
+

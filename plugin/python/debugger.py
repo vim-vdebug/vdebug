@@ -95,7 +95,10 @@ class DebuggerInterface:
             self.handle_general_exception()
 
     def close(self):
-        self.runner.close()
+        if self.runner.is_alive():
+            self.runner.close_connection()
+        else:
+            self.runner.close()
 
     
 class Runner:
@@ -121,14 +124,13 @@ class Runner:
         addr = str(self.api.conn.address)
         log.Log("Found connection from " + addr,log.Logger.INFO)
         self.breakpoints.link_api(self.api)
-        self.api.step_into()
-        self.refresh()
+        status = self.api.step_into()
+        self.refresh(status)
 
-    def refresh(self):
+    def refresh(self,status):
         if not self.is_alive():
             self.ui.error("Cannot update: no connection")
         else:
-            status = self.api.status()
 
             if str(status) in ("stopping","stopped"):
                 self.ui.statuswin.set_status("stopped")
@@ -163,8 +165,8 @@ class Runner:
         else:
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
-            self.api.run()
-            self.refresh()
+            res = self.api.run()
+            self.refresh(res)
 
     def step_over(self):
         if not self.is_alive():
@@ -172,8 +174,8 @@ class Runner:
         else:
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
-            self.api.step_over()
-            self.refresh()
+            res = self.api.step_over()
+            self.refresh(res)
 
     def set_breakpoint(self,args):
         bp = breakpoint.Breakpoint.parse(self.ui,args)
@@ -249,9 +251,11 @@ class Runner:
                 self.breakpoints.unlink_api()
                 self.api.stop()
                 self.api.conn.close()
+                self.ui.statuswin.set_status("stopped")
             self.api = None
         except EOFError:
             self.ui.say("Connection has been closed")
+            self.ui.statuswin.set_status("stopped")
 
     def close(self):
         """ Close both the connection and UI.
