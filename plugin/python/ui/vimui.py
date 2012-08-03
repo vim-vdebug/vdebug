@@ -149,10 +149,12 @@ class Window(ui.interface.Window):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
 
     def lock(self):
-        self.command('setlocal nomodifiable')
+        #self.command('setlocal nomodifiable')
+        pass
 
     def unlock(self):
-        self.command('setlocal modifiable')
+        #self.command('setlocal modifiable')
+        pass
 
     def write(self, msg, return_focus = True, after = "normal G"):
         """ append last """
@@ -207,7 +209,7 @@ class Window(ui.interface.Window):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
         #if self.name != 'LOG___WINDOW':
-        vim.command("setlocal buftype=nofile nomodifiable "+ \
+        vim.command("setlocal buftype=nofile modifiable "+ \
                 "winfixheight winfixwidth")
         self.buffer = vim.current.buffer
         self.width  = int( vim.eval("winwidth(0)")  )
