@@ -6,6 +6,7 @@ import inspect
 dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 sys.path.append(dir)
 
+import traceback
 import dbgp
 import log
 import ui.vimui
@@ -39,10 +40,13 @@ class DebuggerInterface:
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
-            self.runner.ui.error(e)
+            self.runner.ui.error(str(e)+"\nTraceback: "+\
+                    traceback.format_exc())
         except:
             self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0]))
+                    str(sys.exc_info()[0])+\
+                    "\nTraceback: "+\
+                    traceback.format_exc())
             #self.runner.close()
             raise
 
@@ -54,10 +58,13 @@ class DebuggerInterface:
         except EOFError:
             self.handle_socket_end()
         except vim.error, e:
-            self.runner.ui.error(e)
+            self.runner.ui.error(str(e)+"\nTraceback: "+\
+                    traceback.format_exc())
         except:
             self.runner.ui.error("An error occured: "+\
-                    str(sys.exc_info()[0]))
+                    str(sys.exc_info()[0])+\
+                    "\nTraceback: "+\
+                    traceback.format_exc())
             #self.runner.close()
             raise
 
