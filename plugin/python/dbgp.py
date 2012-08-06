@@ -441,24 +441,27 @@ class ContextProperty:
         self.is_last_child = False
 
         self.__determine_children(node)
+        self.__determine_value(node)
+        self.__init_children(node)
 
-        if self.encoding == 'base64':
-            if node.text is None:
-                self.value = ""
-            else:
-                self.value = base64.decodestring(node.text)
-        elif not self.is_uninitialized() \
-                and not self.has_children:
-            self.value = node.text
+    def __determine_value(self,node):
+        self.value = self.__get_enc_node_text(node,'value')
+        if self.value is None:
+            if self.encoding == 'base64':
+                if node.text is None:
+                    self.value = ""
+                else:
+                    self.value = base64.decodestring(node.text)
+            elif not self.is_uninitialized() \
+                    and not self.has_children:
+                self.value = node.text
 
         if self.value is None:
             self.value = ""
 
         self.num_crs = self.value.count('\n')
-        if self.type == "string":
+        if self.type[:3] == "str":
             self.value = '`%s`' % self.value.replace('`','\\`')
-
-        self.__init_children(node)
 
     def __determine_type(self,node):
         type = node.get('classname')
@@ -469,7 +472,7 @@ class ContextProperty:
     def __determine_displayname(self,node):
         display_name = node.get('fullname')
         if display_name == None:
-            display_name = self.__get_enc_node_text(node,'name',"")
+            display_name = self.__get_enc_node_text(node,'fullname',"")
         if display_name == '::':
             display_name = self.type
         self.display_name = display_name
@@ -478,7 +481,10 @@ class ContextProperty:
             None):
         n = node.find('%s%s' %(self.ns, name))
         if n is not None and n.text is not None:
-            val = base64.decodestring(n.text)
+            if n.get('encoding') == 'base64':
+                val = base64.decodestring(n.text)
+            else:
+                val = n.text
         else:
             val = None
         if val is None:
@@ -487,28 +493,30 @@ class ContextProperty:
             return val
 
     def __determine_children(self,node):
-        children = node.get('children')
-        self.num_declared_children = children
+        children = node.get('numchildren')
+        if children is None:
+            children = node.get('children')
         if children is None:
             children = 0
         else:
             children = int(children)
+        self.num_declared_children = children
         self.has_children = True if children > 0 else False
         self.children = []
 
     def __init_children(self,node):
         if self.has_children:
             idx = 0
-            children = node.find('%sproperty'%self.ns)
-            print "Length of childrent: %i" % len(children)
+            tagname = '%sproperty' % self.ns
+            children = node.getchildren()
             if children is not None:
                 for c in children:
-                    print c.tag
-                    idx += 1
-                    p = ContextProperty(c,self,self.depth+1)
-                    self.children.append(p)
-                    if idx == self.num_declared_children:
-                        p.mark_as_last_child()
+                    if c.tag == tagname:
+                        idx += 1
+                        p = ContextProperty(c,self,self.depth+1)
+                        self.children.append(p)
+                        if idx == self.num_declared_children:
+                            p.mark_as_last_child()
 
     def mark_as_last_child(self):
         self.is_last_child = True

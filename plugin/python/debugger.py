@@ -210,7 +210,7 @@ class Runner:
             self.ui.sourcewin.set_line(lineno)
 
         
-    def handle_open(self,lineno,line,pointer_index):
+    def handle_property_get(self,lineno,line,pointer_index):
         eq_index = line.find('=')
         name = line[pointer_index+4:eq_index-1]
         context_res = self.api.property_get(name)
