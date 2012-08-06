@@ -2,94 +2,128 @@ import sys
 sys.path.append('../plugin/python')
 import unittest
 import dbgp
-import xml
+import xml.etree.ElementTree as ET
 
-class ResponseTest(unittest.TestCase): 
-    """Test the response class in the dbgp module."""
+class ContextPropertyDefaultTest(unittest.TestCase):
+    def __get_context_property(self,xml_string):
+        xml = ET.fromstring(xml_string)
+        firstnode = xml[0]
+        return dbgp.ContextProperty(firstnode)
 
-    def test_get_cmd(self):
-        """Test that the get_cmd() method returns the command"""
-        cmd = "status"
-        res = dbgp.Response("",cmd,"")
-        assert res.get_cmd() == cmd
+    def test_single_property(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1"
+xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+command="context_get" transaction_id="3"
+context="0"><property name="$argc" fullname="$argc"
+address="39795424"
+type="int"><![CDATA[4]]></property></response>""")
 
-    def test_get_cmd_args(self):
-        """Test that the get_cmd_args() method return command arguments"""
-        cmd_args = "-a abcd"
-        res = dbgp.Response("","",cmd_args)
-        assert res.get_cmd_args() == cmd_args
+        self.assertEqual(prop.display_name,'$argc')
+        self.assertEqual(prop.value,'4')
+        self.assertEqual(prop.type,'int')
+        self.assertEqual(prop.depth,0)
+        self.assertIsNone(prop.size)
+        self.assertFalse(prop.has_children)
 
-    def test_as_string(self):
-        """Test that the as_string() method returns the
-        raw response string"""
-        response = "<?xml..."
-        res = dbgp.Response(response,"","")
-        assert res.as_string() == response
+    def test_undefined_property(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1"
+xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+command="context_get" transaction_id="3"
+context="0"><property name="$uid"
+fullname="$uid" type="uninitialized"></property></response>""")
 
-    def test_as_xml_is_element(self):
-        """Test that the as_xml() method returns an XML
-        element"""
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1"
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="status" transaction_id="1" status="starting" 
-            reason="ok"></response>"""
-        res = dbgp.Response(response,"","")
-        self.assertIsInstance(res.as_xml(),xml.etree.ElementTree.Element)
+        self.assertEqual(prop.display_name,'$uid')
+        self.assertEqual(prop.value,'')
+        self.assertEqual(prop.type,'uninitialized')
+        self.assertEqual(prop.depth,0)
+        self.assertIsNone(prop.size)
+        self.assertFalse(prop.has_children)
 
-    def test_error_tag_raises_exception(self):
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
-            command="stack_get" transaction_id="4"><error
-            code="5"><message><![CDATA[command is not available]]>
-            </message></error></response>"""
-        re = "command is not available"
-        self.assertRaisesRegexp(dbgp.DBGPError,re,dbgp.Response,response,"","")
+    def test_child_properties(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1"
+xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+command="context_get" transaction_id="3"
+context="0"><property name="$argv"
+fullname="$argv" address="39794056" type="array"
+children="1" numchildren="4" page="0"
+pagesize="32"><property name="0" fullname="$argv[0]"
+address="39794368" type="string" size="19"
+encoding="base64"><![CDATA[L3Vzci9sb2NhbC9iaW4vY2FrZQ==]]></property><property
+name="1" fullname="$argv[1]" address="39794640"
+type="string" size="8"
+encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property><property
+name="2" fullname="$argv[2]" address="39794904"
+type="string" size="8"
+encoding="base64"><![CDATA[LS1zdGRlcnI=]]></property><property
+name="3" fullname="$argv[3]" address="39795168"
+type="string" size="3"
+encoding="base64"><![CDATA[QWxs]]></property></property></response>""")
 
-class StatusResponseTest(unittest.TestCase): 
-    """Test the behaviour of the StatusResponse class."""
-    def test_string_is_status_text(self):
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1"
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="status" transaction_id="1" status="starting" 
-            reason="ok"></response>"""
-        res = dbgp.StatusResponse(response,"","")
-        assert str(res) == "starting"
+        self.assertEqual(prop.display_name,'$argv')
+        self.assertEqual(prop.value,'')
+        self.assertEqual(prop.type,'array')
+        self.assertEqual(prop.depth,0)
+        self.assertTrue(prop.has_children)
+        self.assertEqual(prop.child_count(),4)
 
-class FeatureResponseTest(unittest.TestCase): 
-    """Test the behaviour of the FeatureResponse class."""
-    def test_feature_is_supported(self):
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="feature_get" transaction_id="2" 
-            feature_name="max_depth" supported="1"><![CDATA[1]]></response>"""
-        res = dbgp.FeatureGetResponse(response,"","")
-        assert res.is_supported() == 1
+class ContextPropertyAltTest(unittest.TestCase):
+    def __get_context_property(self,xml_string):
+        xml = ET.fromstring(xml_string)
+        firstnode = xml[0]
+        return dbgp.ContextProperty(firstnode)
 
-    def test_feature_is_not_supported(self):
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="feature_get" transaction_id="2" 
-            feature_name="max_depth" supported="0"><![CDATA[0]]></response>"""
-        res = dbgp.FeatureGetResponse(response,"","")
-        assert res.is_supported() == 0
+    def test_single_property(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1"
+xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+command="context_get" transaction_id="3"
+context="0"><property  type="int" children="0" size="0"><value><![CDATA[1]]></value><name encoding="base64"><![CDATA[bXl2YXI=
+]]></name><fullname encoding="base64"><![CDATA[bXl2YXI=
+]]></fullname></property></response>""")
 
-class StackGetTest(unittest.TestCase): 
-    """Test the behaviour of the StackGetResponse class."""
-    def test_string_is_status_text(self):
-        response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
-            command="stack_get" transaction_id="8">
-                <stack where="{main}" level="0" type="file"
-                filename="file:///usr/local/bin/cake" lineno="4">
-                </stack>
-            </response>"""
-        res = dbgp.StackGetResponse(response,"","")
-        stack = res.get_stack()
-        assert stack[0].get('filename') == "file:///usr/local/bin/cake"
-        assert len(stack) == 1
+        self.assertEqual(prop.display_name,'myvar')
+        self.assertEqual(prop.value,'1')
+        self.assertEqual(prop.type,'int')
+        self.assertEqual(prop.depth,0)
+        self.assertFalse(prop.has_children)
+
+    def test_child_properties(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="utf-8"?>
+<response xmlns="urn:debugger_protocol_v1" command="contex_get" context="0" transaction_id="13"><property  pagesize="10" numchildren="3" children="1" type="list" page="0" size="3"><property  type="int" children="0" size="0"><value><![CDATA[1]]></value><name encoding="base64"><![CDATA[WzBd
+]]></name><fullname encoding="base64"><![CDATA[bXlsaXN0WzBd
+]]></fullname></property><property  type="int" children="0" size="0"><value><![CDATA[2]]></value><name encoding="base64"><![CDATA[WzFd
+]]></name><fullname encoding="base64"><![CDATA[bXlsaXN0WzFd
+]]></fullname></property><property  type="int" children="0" size="0"><value><![CDATA[3]]></value><name encoding="base64"><![CDATA[WzJd
+]]></name><fullname encoding="base64"><![CDATA[bXlsaXN0WzJd
+]]></fullname></property><name encoding="base64"><![CDATA[bXlsaXN0
+]]></name><fullname encoding="base64"><![CDATA[bXlsaXN0
+]]></fullname></property></response>""")
+
+        self.assertEqual(prop.display_name,'mylist')
+        self.assertEqual(prop.value,'')
+        self.assertEqual(prop.type,'list')
+        self.assertEqual(prop.depth,0)
+        self.assertTrue(prop.has_children)
+        self.assertEqual(prop.child_count(),3)
+
+    def test_string(self):
+        prop = self.__get_context_property(\
+            """<?xml version="1.0" encoding="utf-8"?>
+<response xmlns="urn:debugger_protocol_v1" command="contex_get" context="0" transaction_id="13"><property  type="str" children="0" size="5"><value encoding="base64"><![CDATA[d29ybGQ=
+]]></value><name encoding="base64"><![CDATA[b2JqX3Zhcg==
+]]></name><fullname encoding="base64"><![CDATA[b2JqLm9ial92YXI=
+]]></fullname></property></response>""")
+
+        self.assertEqual(prop.display_name,'obj.obj_var')
+        self.assertEqual(prop.value,'`world`')
+        self.assertEqual(prop.type,'str')
+        self.assertFalse(prop.has_children)
+
