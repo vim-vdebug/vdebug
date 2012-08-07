@@ -134,14 +134,44 @@ else
   endif
 endif
 
-map <F1> :python vdebug.run_to_cursor()<cr>
-map <F2> :python vdebug.step_over()<cr>
-map <F3> :python vdebug.step_into()<cr>
-map <F4> :python vdebug.step_out()<cr>
-map <F5> :python vdebug.run()<cr>
+if !exists("g:debugger_options")
+    let g:debugger_options = {}
+endif
 
-map <F6> :python vdebug.close()<cr>
-map <F8> :python vdebug.set_breakpoint()<cr>
+if !exists("g:debugger_keymap")
+    let g:debugger_keymap = {}
+endif
+
+let g:debugger_keymap_defaults = {
+\    "run" : "<F5>",
+\    "run_to_cursor" : "<F1>",
+\    "step_over" : "<F2>",
+\    "step_in" : "<F3>",
+\    "step_out" : "<F4>",
+\    "close" : "<F6>",
+\    "set_breakpoint" : "<F8>",
+\}
+
+let g:debugger_options_defaults = {
+\    "port" : 9000,
+\    "debug_level" : 0,
+\    "debug_file" : "",
+\}
+
+let g:debugger_options= extend(g:debugger_options_defaults,g:debugger_options)
+
+for [s:fn, s:key] in items(g:debugger_keymap_defaults)
+    exe "map "+s:key+" :python vdebug."+s:fn+"()<cr>"
+endfor
+
+"map <F1> :python vdebug.run_to_cursor()<cr>
+"map <F2> :python vdebug.step_over()<cr>
+"map <F3> :python vdebug.step_into()<cr>
+"map <F4> :python vdebug.step_out()<cr>
+"map <F5> :python vdebug.run()<cr>
+
+"map <F6> :python vdebug.close()<cr>
+"map <F8> :python vdebug.set_breakpoint()<cr>
 
 vnoremap <Leader>e :python vdebug.handle_visual_eval()<cr>
 
@@ -156,28 +186,6 @@ sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
 
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
-
-if !exists('g:debuggerPort')
-  let g:debuggerPort = 9000
-endif
-if !exists('g:debuggerMaxChildren')
-  let g:debuggerMaxChildren = 64
-endif
-if !exists('g:debuggerMaxData')
-  let g:debuggerMaxData = 2048
-endif
-if !exists('g:debuggerMaxDepth')
-  let g:debuggerMaxDepth = 1
-endif
-if !exists('g:debuggerMiniBufExpl')
-  let g:debuggerMiniBufExpl = 0
-endif
-if !exists('g:debuggerAutoContext')
-  let g:debuggerAutoContext = 1
-endif
-if !exists('g:debuggerDebugMode')
-  let g:debuggerDebugMode = 0
-endif
 
 function! debugger:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
