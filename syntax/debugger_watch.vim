@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language: Vim Debugger debuggerWatch
+" Language: Vim Debugger Watch Window
 " Maintainer: Jon Cairns
 " Latest Revision: 2 August 2012
 
@@ -7,9 +7,10 @@ if exists("b:current_syntax")
   finish
 endif
 
+syn region debuggerWatchTitle start=+\[+ end=+\s\]+
 syn match debuggerWatchMarker '^\s\+[^|\/]'
 syn match debuggerWatchJoiner '^\s\+[|\/^]' 
-syn match debuggerWatchNumber '\d\+\.\=\d*' 
+syn match debuggerWatchNumber '\d\+\.\=\d*'
 syn match debuggerWatchVarName '\s\zs.\+\ze\s=' contains=debuggerWatchStringKey
 syn match debuggerWatchStringKey '\'[^']\+\'' contained 
 syn match debuggerWatchTypeContainer '=\s\zs(.*)\ze\s' contains=debuggerWatchType,debuggerWatchSize
@@ -19,6 +20,7 @@ syn match debuggerWatchSize '\[\zs\d\+\ze\]' contained
 syn region debuggerWatchString start=+\s`+ skip=+\\`+ end=+`\s*$+
 
 
+hi def link debuggerWatchTitle Title
 hi def link debuggerWatchMarker Special
 hi def link debuggerWatchTypeContainer Type
 hi def link debuggerWatchType Type
