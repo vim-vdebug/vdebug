@@ -193,6 +193,7 @@ class Runner:
         self.api = None
         self.breakpoints = breakpoint.Store()
         self.ui = ui.vimui.Ui(self.breakpoints)
+        self.options = vim.eval('g:debugger_options')
 
     def open(self,server='',port=9000,timeout=30):
         """ Open the connection and debugging UI.
@@ -211,6 +212,10 @@ class Runner:
         self.refresh(status)
 
     def refresh(self,status):
+        """The main action performed after a deubugger step.
+    
+        Updates the status window, current stack, source
+        file and line and watch window."""    
         if not self.is_alive():
             self.ui.error("Cannot update: no connection")
         else:
@@ -220,6 +225,7 @@ class Runner:
                 self.ui.say("Debugging session has ended")
                 self.close_connection()
             else:
+                log.Log("Refreshing windows")
                 self.ui.statuswin.set_status(status)
                 stack_res = self.update_stack()
                 stack = stack_res.get_stack()
@@ -228,6 +234,7 @@ class Runner:
                 lineno = stack[0].get('lineno')
 
                 self.ui.sourcewin.set_file(filename)
+                self.ui.sourcewin.set_line(lineno)
                 self.ui.sourcewin.place_pointer(lineno)
 
                 self.ui.watchwin.clean()
@@ -238,18 +245,27 @@ class Runner:
                 self.ui.watchwin.accept_renderer(rend)
 
     def toggle_breakpoint_window(self):
+        """Open or close the breakpoint window.
+
+        The window appears as a horizontal split below the
+        currently selected window."""
         if self.ui.breakpointwin.is_open:
             self.ui.breakpointwin.destroy()
         else:
             self.ui.breakpointwin.create()
 
     def is_alive(self):
+        """Whether the connection is open."""
         if self.api is not None and \
             self.api.conn.isconnected():
                 return True
         return False
 
     def run(self):
+        """Tell the debugger to run.
+
+        It will run until the end of the execution or until a
+        breakpoint is reached."""
         if not self.is_alive():
             self.open()
         else:
@@ -259,6 +275,7 @@ class Runner:
             self.refresh(res)
 
     def step_over(self):
+        """Step over to the next statement."""
         if not self.is_alive():
             self.open()
         else:
@@ -268,6 +285,7 @@ class Runner:
             self.refresh(res)
 
     def step_into(self):
+        """Step into the next statement."""
         if not self.is_alive():
             self.open()
         else:
@@ -277,6 +295,7 @@ class Runner:
             self.refresh(res)
 
     def step_out(self):
+        """Step out of the current context."""
         if not self.is_alive():
             self.open()
         else:
@@ -286,17 +305,21 @@ class Runner:
             self.refresh(res)
 
     def remove_breakpoint(self,args):
+        """Remove a breakpoint, by ID or "*"."""
         if args is None:
             args = ""
         args = args.strip()
         if len(args) == 0:
-            self.ui.error("ID required to remove a breakpoint: run "+\
+            self.ui.error("ID or '*' required to remove a breakpoint: run "+\
                     "':BreakpointWindow' to see breakpoints and their IDs")
             return
 
-        arg_parts = args.split(" ")
-        for id in arg_parts:
-            self.breakpoints.remove_breakpoint_by_id(id)
+        if args == '*':
+            self.breakpoints.clear_breakpoints()
+        else:
+            arg_parts = args.split(" ")
+            for id in arg_parts:
+                self.breakpoints.remove_breakpoint_by_id(id)
 
     def set_breakpoint(self,args):
         bp = breakpoint.Breakpoint.parse(self.ui,args)
@@ -316,7 +339,6 @@ class Runner:
                 %context_res.get_code())
         self.ui.watchwin.clean()
         self.ui.watchwin.accept_renderer(rend)
-
 
     def handle_visual_eval(self):
         selection = vim.eval("debugger:get_visual_selection()")

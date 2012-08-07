@@ -139,6 +139,8 @@ class SourceWindow(ui.interface.Window):
     def set_file(self,file):
         if file.startswith("file://"):
             file = file[7:]
+        if file == self.file:
+            return
         self.file = file
         log.Log("Setting source file: "+file,log.Logger.INFO)
         self.focus()
