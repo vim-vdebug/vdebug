@@ -54,6 +54,18 @@ class DebuggerInterface:
         except:
             self.handle_general_exception()
 
+    def run_to_cursor(self):
+        try:
+            self.runner.run_to_cursor()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+        except:
+            self.handle_general_exception()
+
     def handle_return_keypress(self):
         try:
             return self.runner.handle_return_keypress()
@@ -63,12 +75,67 @@ class DebuggerInterface:
             self.handle_socket_end()
         except vim.error, e:
             self.handle_vim_error(e)
-            self.runner.ui.error(str(e)+"\nTraceback: "+\
+            self.runner.ui.error(str(e)+\
                     traceback.format_exc())
         except:
             self.handle_general_exception()
 
+    def handle_visual_eval(self):
+        try:
+            return self.runner.handle_visual_eval()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+            self.runner.ui.error(str(e)+\
+                    traceback.format_exc())
+        except:
+            self.handle_general_exception()
+
+    def handle_eval(self,args):
+        try:
+            return self.runner.eval(args)
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+            self.runner.ui.error(str(e)+\
+                    traceback.format_exc())
+        except:
+            self.handle_general_exception()
+
+    def toggle_breakpoint_window(self):
+        return self.runner.toggle_breakpoint_window()
+
     def step_over(self):
+        try:
+            self.runner.step_over()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+        except:
+            self.handle_general_exception()
+
+    def step_into(self):
+        try:
+            self.runner.step_into()
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+        except:
+            self.handle_general_exception()
+
+    def step_out(self):
         try:
             self.runner.step_over()
         except dbgp.TimeoutError:
@@ -83,6 +150,20 @@ class DebuggerInterface:
     def set_breakpoint(self,args = None):
         try:
             self.runner.set_breakpoint(args)
+        except breakpoint.BreakpointError, e:
+            self.runner.ui.error(e)
+        except dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+        except:
+            self.handle_general_exception()
+
+    def remove_breakpoint(self,args = None):
+        try:
+            self.runner.remove_breakpoint(args)
         except breakpoint.BreakpointError, e:
             self.runner.ui.error(e)
         except dbgp.TimeoutError:
@@ -109,9 +190,9 @@ class Runner:
     """
 
     def __init__(self):
-        self.ui = ui.vimui.Ui()
         self.api = None
         self.breakpoints = breakpoint.Store()
+        self.ui = ui.vimui.Ui(self.breakpoints)
 
     def open(self,server='',port=9000,timeout=30):
         """ Open the connection and debugging UI.
@@ -121,8 +202,10 @@ class Runner:
         """
         self.listen(server,port,timeout)
         self.ui.open()
-        addr = str(self.api.conn.address)
-        log.Log("Found connection from " + addr,log.Logger.INFO)
+        self.ui.set_listener_details(port)
+        addr = self.api.conn.address
+        log.Log("Found connection from " + str(addr),log.Logger.INFO)
+        self.ui.set_conn_details(addr[0],addr[1])
         self.breakpoints.link_api(self.api)
         status = self.api.step_into()
         self.refresh(status)
@@ -149,9 +232,16 @@ class Runner:
 
                 self.ui.watchwin.clean()
                 context_res = self.api.context_get()
-                rend = ui.vimui.ContextGetResponseRenderer(context_res)
+                rend = ui.vimui.ContextGetResponseRenderer(\
+                        context_res,"Context at %s:%s" \
+                        %(filename,lineno))
                 self.ui.watchwin.accept_renderer(rend)
 
+    def toggle_breakpoint_window(self):
+        if self.ui.breakpointwin.is_open:
+            self.ui.breakpointwin.destroy()
+        else:
+            self.ui.breakpointwin.create()
 
     def is_alive(self):
         if self.api is not None and \
@@ -177,6 +267,37 @@ class Runner:
             res = self.api.step_over()
             self.refresh(res)
 
+    def step_into(self):
+        if not self.is_alive():
+            self.open()
+        else:
+            self.ui.statuswin.set_status("running")
+            self.ui.sourcewin.remove_pointer()
+            res = self.api.step_into()
+            self.refresh(res)
+
+    def step_out(self):
+        if not self.is_alive():
+            self.open()
+        else:
+            self.ui.statuswin.set_status("running")
+            self.ui.sourcewin.remove_pointer()
+            res = self.api.step_out()
+            self.refresh(res)
+
+    def remove_breakpoint(self,args):
+        if args is None:
+            args = ""
+        args = args.strip()
+        if len(args) == 0:
+            self.ui.error("ID required to remove a breakpoint: run "+\
+                    "':BreakpointWindow' to see breakpoints and their IDs")
+            return
+
+        arg_parts = args.split(" ")
+        for id in arg_parts:
+            self.breakpoints.remove_breakpoint_by_id(id)
+
     def set_breakpoint(self,args):
         bp = breakpoint.Breakpoint.parse(self.ui,args)
         if bp.type == "line":
@@ -187,6 +308,26 @@ class Runner:
                 self.breakpoints.remove_breakpoint_by_id(id)
                 return
         self.breakpoints.add_breakpoint(bp)
+
+    def eval(self,code):
+        context_res = self.api.eval(code)
+        rend = ui.vimui.ContextGetResponseRenderer(\
+                context_res,"Eval of: '%s'" \
+                %context_res.get_code())
+        self.ui.watchwin.clean()
+        self.ui.watchwin.accept_renderer(rend)
+
+
+    def handle_visual_eval(self):
+        selection = vim.eval("debugger:get_visual_selection()")
+        self.eval(selection)
+
+    def run_to_cursor(self):
+        row = self.ui.get_current_row()
+        file = self.ui.get_current_file()
+        bp = breakpoint.TemporaryLineBreakpoint(self.ui,file,row)
+        self.api.breakpoint_set(bp.get_cmd())
+        self.run()
 
     def handle_return_keypress(self):
         """ Handle what happens when the user hits return."""
@@ -209,7 +350,6 @@ class Runner:
             self.ui.sourcewin.set_file(file)
             self.ui.sourcewin.set_line(lineno)
 
-        
     def handle_property_get(self,lineno,line,pointer_index):
         eq_index = line.find('=')
         name = line[pointer_index+4:eq_index-1]
@@ -233,7 +373,6 @@ class Runner:
             self.api = dbgp.Api(connection)
 
     def update_stack(self):
-        pass
         if not self.is_alive():
             self.ui.error("Cannot update the stack: no connection")
         else:
@@ -251,11 +390,14 @@ class Runner:
                 self.breakpoints.unlink_api()
                 self.api.stop()
                 self.api.conn.close()
+                self.ui.sourcewin.remove_pointer()
                 self.ui.statuswin.set_status("stopped")
+                self.ui.remove_conn_details()
             self.api = None
         except EOFError:
             self.ui.say("Connection has been closed")
-            self.ui.statuswin.set_status("stopped")
+            if self.ui.is_open:
+                self.ui.statuswin.set_status("stopped")
 
     def close(self):
         """ Close both the connection and UI.

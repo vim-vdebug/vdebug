@@ -7,6 +7,11 @@ class Ui(ui.interface.Ui):
     """Ui layer which manages the Vim windows.
     """
 
+    def __init__(self,breakpoints):
+        self.is_open = False
+        self.breakpoint_store = breakpoints
+        self.breakpointwin = BreakpointWindow(self,'rightbelow 4new')
+
     def open(self):
         if self.is_open:
             return
@@ -36,6 +41,14 @@ class Ui(ui.interface.Ui):
         self.sourcewin = SourceWindow(self,winnr)
         self.sourcewin.focus()
 
+    def set_conn_details(self,addr,port):
+        self.statuswin.insert("Connected to %s:%s" %(addr,port),2,True)
+
+    def remove_conn_details(self):
+        self.statuswin.insert("Not connected",2,True)
+
+    def set_listener_details(self,port):
+        self.statuswin.insert("Listening on port %s" %(port),1,True)
 
     def get_current_file(self):
         return vim.current.buffer.name
@@ -43,14 +56,23 @@ class Ui(ui.interface.Ui):
     def get_current_row(self):
         return vim.current.window.cursor[0]
 
+    def register_breakpoint(self,breakpoint):
+        if breakpoint.type == 'line':
+            self.place_breakpoint(breakpoint.id,\
+                    breakpoint.file,breakpoint.line)
+        if self.breakpointwin.is_open:
+            self.breakpointwin.add_breakpoint(breakpoint)
+
     def place_breakpoint(self,sign_id,file,line):
         vim.command('sign place '+str(sign_id)+\
                 ' name=breakpt line='+str(line)+\
                 ' file='+file)
 
-    def remove_breakpoint(self,sign_id):
-        log.Log("Removing breakpoint sign ID %i " % sign_id)
-        vim.command('sign unplace '+str(sign_id))
+    def remove_breakpoint(self,breakpoint):
+        id = breakpoint.id
+        log.Log("Removing breakpoint sign ID %i " % id)
+        vim.command('sign unplace %i' % id)
+        self.breakpointwin.remove_breakpoint(id)
 
     def __get_srcwin_name(self):
         return vim.windows[0].buffer.name
@@ -149,17 +171,10 @@ class Window(ui.interface.Window):
         self.buffer = None
         self.ui = ui
         self.open_cmd = open_cmd
+        self.is_open = False
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
-
-    def lock(self):
-        #self.command('setlocal nomodifiable')
-        pass
-
-    def unlock(self):
-        #self.command('setlocal modifiable')
-        pass
 
     def write(self, msg, return_focus = True, after = "normal G"):
         """ append last """
@@ -168,12 +183,10 @@ class Window(ui.interface.Window):
           unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
         if return_focus:
             prev_win = vim.eval('winnr()')
-        self.unlock()
         if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
             self.buffer.append(str(msg).split('\n'))
-        self.lock()
         self.command(after)
         if return_focus:
             vim.command('%swincmd W' % prev_win)
@@ -183,7 +196,6 @@ class Window(ui.interface.Window):
         """ insert into current position in buffer"""
         if len(msg) == 0 and allowEmpty == False:
             return
-        self.unlock()
         if self.buffer_empty():
             self.buffer[:] = str(msg).split('\n')
         else:
@@ -201,7 +213,6 @@ class Window(ui.interface.Window):
             else:
                 for line in remaining_buffer:
                     self.buffer.append(line)
-        self.lock()
 
     def buffer_empty(self):
         if len(self.buffer) == 1 \
@@ -229,13 +240,12 @@ class Window(ui.interface.Window):
         #if self.name == 'LOG___WINDOW':
         #  self.command('hide')
         #else:
+        self.is_open = False
         self.command('bwipeout ' + self.name)
 
     def clean(self):
         """ clean all datas in buffer """
-        self.unlock()
         self.buffer[:] = []
-        self.lock()
 
     def command(self, cmd):
         """ go to my window & execute command """
@@ -246,6 +256,43 @@ class Window(ui.interface.Window):
 
     def accept_renderer(self,renderer):
         self.write(renderer.render())
+
+class BreakpointWindow(Window):
+    name = "Breakpoints"
+    is_visible = False
+    header = """-----------------------------------------------------------
+ ID      | TYPE        | DATA
+-----------------------------------------------------------"""
+
+    def on_create(self):
+        self.clean()
+        self.write(self.header)
+        for bp in self.ui.breakpoint_store.get_sorted_list():
+            self.add_breakpoint(bp)
+
+    def add_breakpoint(self,breakpoint):
+        str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
+        if breakpoint.type == 'line':
+            str += "%s:%i" %(breakpoint.file,breakpoint.line)
+        elif breakpoint.type == 'conditional':
+            str += "%s:%i when (%s)" \
+                %(breakpoint.file,breakpoint.line,breakpoint.condition)
+        elif breakpoint.type == 'exception':
+            str += "Exception: %s" % breakpoint.exception
+        elif breakpoint.type == 'call' or \
+                breakpoint.type == 'return':
+            str += "Function: %s" % breakpoint.function
+
+        self.write(str)
+
+    def remove_breakpoint(self,breakpoint_id):
+        i = 0
+        for l in self.buffer:
+            bp_str = " %i " % breakpoint_id
+            bp_id_len = len(bp_str)
+            if l[:bp_id_len-1] == bp_str:
+                self.buffer[i] = ""
+            i += 1
 
 class LogWindow(Window):
     name = "Log"
@@ -286,13 +333,14 @@ class StatusWindow(Window):
     name = "Status"
 
     def on_create(self):
-        self.write("Status: starting\n\nPress <F5> to start "+\
-                "debugging, <F6> to stop/close.\nType "+\
+        self.write("Status: starting\nListening on port\nNot connected\n\nPress <F5> to start "+\
+                "debugging, <F6> to stop/close. Type "+\
                 ":help vim-debugger for more information.")
         self.command('setlocal syntax=debugger_status')
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
+
 
 class ResponseRenderer:
     def __init__(self,response):
@@ -316,11 +364,14 @@ class StackGetResponseRenderer(ResponseRenderer):
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
-    def __init__(self,response):
+    def __init__(self,response,title = None):
         ResponseRenderer.__init__(self,response)
+        self.title = title
 
     def render(self,indent = 0):
         res = ""
+        if self.title:
+            res += "[ %s ]\n\n" % self.title
         properties = self.response.get_context()
        
         num_props = len(properties)

@@ -134,37 +134,28 @@ else
   endif
 endif
 
-map <F1> :python vdebug.set_breakpoint()<cr>
-map <F2> :python debugger_command('step_into')<cr>
-map <F3> :python vdebug.step_over()<cr>
-map <F4> :python debugger_command('step_out')<cr>
-
-map <Leader>dr :python debugger_resize()<cr>
-map <Leader>di :python debugger_command('step_into')<cr>
-map <Leader>do :python debugger_command('step_over')<cr>
-map <Leader>dt :python debugger_command('step_out')<cr>
-
-nnoremap <Leader>e :python debugger_watch_input("eval")<cr>A
-vnoremap <Leader>e :python debugger_visual_eval()<cr>A
-
+map <F1> :python vdebug.run_to_cursor()<cr>
+map <F2> :python vdebug.step_over()<cr>
+map <F3> :python vdebug.step_into()<cr>
+map <F4> :python vdebug.step_out()<cr>
 map <F5> :python vdebug.run()<cr>
-map <F6> :python vdebug.close()<cr>
 
-map <F10> :python debugger_globals()<cr>
-map <F11> :python debugger_context()<cr>
-map <F12> :python debugger_property()<cr>
+map <F6> :python vdebug.close()<cr>
+map <F8> :python vdebug.set_breakpoint()<cr>
+
+vnoremap <Leader>e :python vdebug.handle_visual_eval()<cr>
+
+command! -nargs=? Breakpoint python vdebug.set_breakpoint('<args>')
+command! -nargs=? BreakpointRemove python vdebug.remove_breakpoint('<args>')
+command! BreakpointWindow python vdebug.toggle_breakpoint_window()
+
+command! -nargs=? DebuggerEval python vdebug.handle_eval('<args>')
+
+sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
+sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
 
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
-
-command! -nargs=? Bp python vdebug.set_breakpoint('<args>')
-command! -nargs=? BpRm python debugger_remove_breakpoint('<args>')
-command! -nargs=? BpLs python debugger_list_breakpoints()
-command! -nargs=1 DebugDepth python debugger_set_depth('<args>')
-command! -nargs=0 Up python debugger_up()
-command! -nargs=0 Dn python debugger_down()
-sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
-sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
 
 if !exists('g:debuggerPort')
   let g:debuggerPort = 9000
@@ -188,7 +179,7 @@ if !exists('g:debuggerDebugMode')
   let g:debuggerDebugMode = 0
 endif
 
-function! xdebug:get_visual_selection()
+function! debugger:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
   let lines = getline(lnum1, lnum2)
