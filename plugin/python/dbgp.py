@@ -9,11 +9,12 @@ class Response:
     """Contains response data from a command made to the debugger."""
     ns = '{urn:debugger_protocol_v1}'
 
-    def __init__(self,response,cmd,cmd_args):
+    def __init__(self,response,cmd,cmd_args,api):
         self.response = response
         self.cmd = cmd
         self.cmd_args = cmd_args
         self.xml = None
+        self.api = api
         if "<error" in self.response:
             self.__parse_error()
 
@@ -81,20 +82,35 @@ class ContextGetResponse(Response):
     The property nodes are converted into ContextProperty
     objects, which are much easier to use."""
 
-    def __init__(self,response,cmd,cmd_args):
-        Response.__init__(self,response,cmd,cmd_args)
+    def __init__(self,response,cmd,cmd_args,api):
+        Response.__init__(self,response,cmd,cmd_args,api)
         self.properties = []
 
     def get_context(self):
         for c in self.as_xml().getchildren():
-            self.__create_properties(ContextProperty(c))
+            self.create_properties(ContextProperty(c))
 
         return self.properties
 
-    def __create_properties(self,property):
+    def create_properties(self,property):
         self.properties.append(property)
         for p in property.children:
-            self.__create_properties(p)
+            self.create_properties(p)
+
+class EvalResponse(ContextGetResponse):
+    """Response object returned by the eval command."""
+
+    def get_context(self):
+        code = self.get_code()
+        for c in self.as_xml().getchildren():
+            self.create_properties(EvalProperty(c,code,self.api.language))
+
+        return self.properties
+
+    def get_code(self):
+        cmd = self.get_cmd_args()
+        parts = cmd.split('-- ')
+        return base64.decodestring(parts[1])
 
 
 class BreakpointSetResponse(Response):
@@ -192,7 +208,7 @@ class Api:
         msg = self.conn.recv_msg()
         log.Log("Response: "+msg,\
                 log.Logger.DEBUG)
-        return res_cls(msg,cmd,args)
+        return res_cls(msg,cmd,args,self)
 
     def status(self):
         """Get the debugger status.
@@ -233,6 +249,12 @@ class Api:
         """Tell the debugger to start or resume
         execution."""
         return self.send_cmd('run','',StatusResponse)
+
+    def eval(self,code):
+        """Tell the debugger to start or resume
+        execution."""
+        code_enc = base64.encodestring(code)
+        return self.send_cmd('eval','-- %s' % code_enc,EvalResponse)
 
     def step_into(self):
         """Tell the debugger to step to the next
@@ -433,18 +455,22 @@ class ContextProperty:
     def __init__(self,node,parent = None,depth = 0):
         self.parent = parent
         self.__determine_type(node)
-        self.__determine_displayname(node)
+        self._determine_displayname(node)
         self.encoding = node.get('encoding')
         self.depth = depth
         self.size = node.get('size')
         self.value = ""
         self.is_last_child = False
 
-        self.__determine_children(node)
+        self._determine_children(node)
         self.__determine_value(node)
         self.__init_children(node)
 
     def __determine_value(self,node):
+        if self.has_children:
+            self.value = ""
+            return
+
         self.value = self.__get_enc_node_text(node,'value')
         if self.value is None:
             if self.encoding == 'base64':
@@ -460,7 +486,7 @@ class ContextProperty:
             self.value = ""
 
         self.num_crs = self.value.count('\n')
-        if self.type[:3] == "str":
+        if self.type.lower() in ("string","str"):
             self.value = '`%s`' % self.value.replace('`','\\`')
 
     def __determine_type(self,node):
@@ -469,7 +495,7 @@ class ContextProperty:
             type = node.get('type')
         self.type = type
 
-    def __determine_displayname(self,node):
+    def _determine_displayname(self,node):
         display_name = node.get('fullname')
         if display_name == None:
             display_name = self.__get_enc_node_text(node,'fullname',"")
@@ -492,7 +518,7 @@ class ContextProperty:
         else:
             return val
 
-    def __determine_children(self,node):
+    def _determine_children(self,node):
         children = node.get('numchildren')
         if children is None:
             children = node.get('children')
@@ -513,10 +539,13 @@ class ContextProperty:
                 for c in children:
                     if c.tag == tagname:
                         idx += 1
-                        p = ContextProperty(c,self,self.depth+1)
+                        p = self._create_child(c,self,self.depth+1)
                         self.children.append(p)
                         if idx == self.num_declared_children:
                             p.mark_as_last_child()
+
+    def _create_child(self,node,parent,depth):
+        return ContextProperty(node,parent,depth)
 
     def mark_as_last_child(self):
         self.is_last_child = True
@@ -541,6 +570,35 @@ class ContextProperty:
             return self.type
         else:
             return "%s [%s]" %(self.type,size)
+
+class EvalProperty(ContextProperty):
+    def __init__(self,node,code,language,parent=None,depth=0):
+        self.code = code
+        self.language = language.lower()
+        if parent is None:
+            self.is_parent = True
+        else:
+            self.is_parent = False
+        ContextProperty.__init__(self,node,parent,depth)
+
+    def _create_child(self,node,parent,depth):
+        return EvalProperty(node,self.code,self.language,parent,depth)
+
+    def _determine_displayname(self,node):
+        if self.is_parent:
+            self.display_name = "(%s)" % self.code
+        else:
+            if self.language == 'php' or \
+                    self.language == 'perl':
+                if self.parent.type == 'array':
+                    self.display_name = self.parent.display_name + \
+                        "['%s']" % node.get('name')
+                else:
+                    self.display_name = self.parent.display_name + \
+                        "->"+node.get('name')
+            else:
+                self.display_name = self.parent.display_name + \
+                    "." + node.get('name')
 
 
 """ Errors/Exceptions """

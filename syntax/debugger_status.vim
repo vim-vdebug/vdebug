@@ -11,10 +11,12 @@ syn match debuggerStatusIdentifier '^Status:'
 syn match debuggerStatusBreak '\s\zsbreak\ze'
 syn match debuggerStatusStart '\s\zsrunning\ze'
 syn match debuggerStatusStop '\s\zs\(stopped\|stopping\)\ze'
-syn region debuggerStatusInfo start='Press' end='information.'
+syn match debuggerStatusInfo '^\(Not\|Connected\|Listening\).*$'
+syn region debuggerStatusHelp start='Press' end='information.'
 
-hi def link debuggerStatusIdentifier Type
-hi def link debuggerStatusStop Special
-hi def link debuggerStatusBreak Error
+hi def link debuggerStatusIdentifier Title
+hi def link debuggerStatusStop Error
+hi def link debuggerStatusBreak Special
 hi def link debuggerStatusStart Constant
-hi def link debuggerStatusInfo Comment
+hi def link debuggerStatusInfo Type
+hi def link debuggerStatusHelp Comment

@@ -34,8 +34,9 @@ class Store:
 
     def remove_breakpoint_by_id(self,id):
         id = str(id)
-        log.Log("Removing breakpoint "+\
-                str(self.breakpoints[id]),\
+        if id not in self.breakpoints:
+            raise BreakpointError, "No breakpoint matching ID %s" % id
+        log.Log("Removing breakpoint id %s" % id,\
                 log.Logger.DEBUG)
         if self.api is not None:
             dbg_id = self.breakpoints[id].get_debugger_id()
@@ -59,6 +60,10 @@ class Store:
                     break
         return found
 
+    def get_sorted_list(self):
+        keys = self.breakpoints.keys()
+        keys.sort()
+        return map(self.breakpoints.get,keys)
 
 class BreakpointError(Exception):
     pass
@@ -88,10 +93,10 @@ class Breakpoint:
         return self.dbg_id
 
     def on_add(self):
-        pass
+        self.ui.register_breakpoint(self)
 
     def on_remove(self):
-        pass
+        self.ui.remove_breakpoint(self)
 
     @classmethod
     def parse(self,ui,args):
@@ -149,15 +154,6 @@ class LineBreakpoint(Breakpoint):
         self.file = file
         self.line = line
 
-    def on_add(self):
-        self.ui.place_breakpoint(\
-                self.id,\
-                self.file,\
-                self.line)
-    
-    def on_remove(self):
-        self.ui.remove_breakpoint(self.id)
-
     def get_line(self):
         return self.line
 
@@ -168,7 +164,20 @@ class LineBreakpoint(Breakpoint):
         cmd = "-t " + self.type
         cmd += " -f " + self.file
         cmd += " -n " + str(self.line)
+        cmd += " -s enabled"
+        
         return cmd
+
+class TemporaryLineBreakpoint(LineBreakpoint):
+    def on_add(self):
+        pass
+
+    def on_remove(self):
+        pass
+
+    def get_cmd(self):
+        cmd = LineBreakpoint.get_cmd(self)
+        return cmd + " -r 1"
 
 class ConditionalBreakpoint(LineBreakpoint):
     type = "conditional"
@@ -192,6 +201,7 @@ class ExceptionBreakpoint(Breakpoint):
     def get_cmd(self):
         cmd = "-t " + self.type
         cmd += " -x " + self.exception
+        cmd += " -s enabled"
         return cmd
 
 class CallBreakpoint(Breakpoint):
@@ -204,6 +214,7 @@ class CallBreakpoint(Breakpoint):
     def get_cmd(self):
         cmd = "-t " + self.type
         cmd += " -m " + self.function
+        cmd += " -s enabled"
         return cmd
 
 class ReturnBreakpoint(CallBreakpoint):
