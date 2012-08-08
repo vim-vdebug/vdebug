@@ -11,8 +11,9 @@ syn region debuggerWatchTitle start=+\[+ end=+\s\]+
 syn match debuggerWatchMarker '^\s\+[^|\/]'
 syn match debuggerWatchJoiner '^\s\+[|\/^]' 
 syn match debuggerWatchNumber '\d\+\.\=\d*'
-syn match debuggerWatchVarName '\s\zs.\+\ze\s=' contains=debuggerWatchStringKey
+syn match debuggerWatchVarName '\s\zs.\+\ze\s=' contains=debuggerWatchStringKey,debuggerWatchObjectProperty
 syn match debuggerWatchStringKey '\'[^']\+\'' contained 
+syn match debuggerWatchObjectProperty '\(->\|::\)\zs[^ \-\[:]\+\ze' contained 
 syn match debuggerWatchTypeContainer '=\s\zs(.*)\ze\s' contains=debuggerWatchType,debuggerWatchSize
 syn match debuggerWatchVarValue ')\zs.*$\ze'
 syn match debuggerWatchType '(\zs[^ )]\+)\ze' contained
@@ -26,6 +27,7 @@ hi def link debuggerWatchTypeContainer Type
 hi def link debuggerWatchType Type
 hi def link debuggerWatchString String
 hi def link debuggerWatchStringKey String
+"hi def link debuggerWatchObjectProperty PreProc
 hi def link debuggerWatchVarName Identifier
 hi def link debuggerWatchJoiner Structure
 hi def link debuggerWatchNumber Number

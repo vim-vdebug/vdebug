@@ -295,7 +295,7 @@ class Api:
     def context_get(self):
         """Get the context variables.
         """
-        return self.send_cmd('context_get','-d 0',ContextGetResponse)
+        return self.send_cmd('context_get','',ContextGetResponse)
 
     def property_get(self,name):
         """Get a property.
