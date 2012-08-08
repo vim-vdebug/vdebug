@@ -352,7 +352,7 @@ class Connection:
         port -- port number which debugger is listening on (default 9000)
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
         """
-        self.port = 9000
+        self.port = port
         self.host = host
         self.timeout = timeout
 
