@@ -147,7 +147,7 @@ class Api:
     conn = None
     transID = 0
 
-    def __init__(self,connection,exp_idekey = None):
+    def __init__(self,connection):
         """Create a new Api using a Connection object.
 
         The Connection object specifies the debugger connection,
@@ -158,7 +158,6 @@ class Api:
         """
         self.language = None
         self.protocol = None
-        self.exp_idekey = exp_idekey
         self.idekey = None
         self.startfile = None
         self.conn = connection
@@ -176,9 +175,6 @@ class Api:
                 msg)
 
         self.idekey = xml.get("idekey")
-        if self.exp_idekey is not None:
-            if self.idekey != self.exp_idekey:
-                raise WrongIDEKeyException()
         self.version = xml.get("api_version")
         self.startfile = xml.get("fileuri")
 
@@ -323,12 +319,6 @@ class Api:
 
         The ID is that returned in the response from breakpoint_set."""
         return self.send_cmd('breakpoint_remove','-d %i' % id,Response)
-
-class WrongIDEKeyException(Exception):
-    """An exception raised when the debugger session key is
-    different to the expected one."""
-    pass
-
 
 """Connection module for managing a socket connection
 between this client and the debugger."""

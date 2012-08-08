@@ -157,11 +157,12 @@ let g:debugger_options_defaults = {
 \    "timeout" : 30,
 \    "server" : 'localhost',
 \    "on_close" : 'detach',
+\    "ide_key" : '',
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 2,
 \    "debug_file" : "/home/jon/monkeys",
-\    "remote_path" : "",
-\    "local_path" : "",
+\    "remote_path" : "/home/pi/projects",
+\    "local_path" : "/home/jon",
 \}
 
 let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)

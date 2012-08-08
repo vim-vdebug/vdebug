@@ -3,6 +3,7 @@ class Ui():
     """
     watchwin = None
     stackwin = None
+    statuswin = None
     logwin = None
     sourcewin = None
 
