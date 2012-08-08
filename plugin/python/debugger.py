@@ -57,6 +57,12 @@ class DebuggerInterface:
             self.handle_socket_end()
         except vim.error, e:
             self.handle_vim_error(e)
+        except KeyboardInterrupt:
+            print "Keyboard interrupt - debugging session cancelled"
+            try:
+                self.runner.close()
+            except:
+                pass
         except:
             self.handle_general_exception()
 
@@ -227,8 +233,13 @@ class Runner:
                 self.options['server'],\
                 int(self.options['port']),\
                 int(self.options['timeout']))
+
         self.ui.open(self.options)
-        self.ui.set_listener_details(self.options['server'],self.options['port'])
+        self.ui.set_listener_details(\
+                self.options['server'],\
+                self.options['port'],\
+                self.options['ide_key'])
+
         addr = self.api.conn.address
         log.Log("Found connection from " + str(addr),log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])
@@ -259,9 +270,7 @@ class Runner:
                 lineno = stack[0].get('lineno')
 
                 log.Log("Moving to current position in source window")
-                self.ui.sourcewin.set_file(filename)
-                self.ui.sourcewin.set_line(lineno)
-                self.ui.sourcewin.place_pointer(lineno)
+                self.ui.set_source_position(filename,lineno)
 
                 self.ui.watchwin.clean()
                 log.Log("Getting context variables")
@@ -430,8 +439,19 @@ class Runner:
                 log.Logger.ERROR)
             return
         else:
-            connection = dbgp.Connection(server,port,timeout)
-            self.api = dbgp.Api(connection)
+            while True:
+                    ide_key = self.options['ide_key']
+                    check_ide_key = True
+                    if len(ide_key) == 0:
+                        check_ide_key = False
+                    connection = dbgp.Connection(server,port,timeout)
+                    self.api = dbgp.Api(connection)
+                    if check_ide_key and ide_key != self.api.idekey:
+                        print "Ignoring debugger connection with IDE key '%s'" \
+                                % self.api.idekey
+                        self.api.detach()
+                    else:
+                        break
 
     def update_stack(self):
         if not self.is_alive():
@@ -461,14 +481,12 @@ class Runner:
                 else:
                     self.api.stop()
                 self.api.conn.close()
-                self.ui.sourcewin.remove_pointer()
-                self.ui.statuswin.set_status("stopped")
-                self.ui.remove_conn_details()
+                self.ui.mark_as_stopped()
+                
             self.api = None
         except EOFError:
             self.ui.say("Connection has been closed")
-            if self.ui.is_open:
-                self.ui.statuswin.set_status("stopped")
+            self.ui.mark_as_stopped()
 
     def close(self):
         """ Close both the connection and UI.

@@ -7,7 +7,7 @@ if exists("b:current_syntax")
   finish
 endif
 
-syn region debuggerWatchTitle start=+\[+ end=+\s\]+
+syn region debuggerWatchTitle start=+^\[+ end=+\s\]$+
 syn match debuggerWatchMarker '^\s\+[^|\/]'
 syn match debuggerWatchJoiner '^\s\+[|\/^]' 
 syn match debuggerWatchNumber '\d\+\.\=\d*'
