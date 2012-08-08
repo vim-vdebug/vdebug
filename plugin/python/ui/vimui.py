@@ -428,9 +428,6 @@ class ContextGetResponseRenderer(ResponseRenderer):
         num_props = len(properties)
         log.Log("Writing %i properties to the context window" % num_props,\
                 log.Logger.INFO )
-
-        log.Log("Current depth is %i" %indent)
-
         for idx, prop in enumerate(properties):
             final = False
             try:
@@ -438,8 +435,6 @@ class ContextGetResponseRenderer(ResponseRenderer):
             except IndexError:
                 final = True
                 next_prop = None
-            is_final = "final" if final else "not final"
-            log.Log("Writing property %s, %s" %(prop.display_name,is_final))
             res += self.__render_property(prop,next_prop,final,indent)
 
         log.Log("Writing to context window:\n"+res,log.Logger.DEBUG)
