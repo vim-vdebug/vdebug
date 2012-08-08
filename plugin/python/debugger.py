@@ -193,17 +193,20 @@ class Runner:
         self.api = None
         self.breakpoints = breakpoint.Store()
         self.ui = ui.vimui.Ui(self.breakpoints)
-        self.options = vim.eval('g:debugger_options')
 
-    def open(self,server='',port=9000,timeout=30):
+    def open(self):
         """ Open the connection and debugging UI.
 
         If either of these are already open, the current
         connection or UI is used.
         """
-        self.listen(server,port,timeout)
+        self.options = vim.eval('g:debugger_options')
+        self.listen(\
+                self.options['server'],\
+                int(self.options['port']),\
+                int(self.options['timeout']))
         self.ui.open()
-        self.ui.set_listener_details(port)
+        self.ui.set_listener_details(self.options['port'])
         addr = self.api.conn.address
         log.Log("Found connection from " + str(addr),log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])

@@ -154,14 +154,17 @@ let g:debugger_keymap_defaults = {
 
 let g:debugger_options_defaults = {
 \    "port" : 9000,
+\    "timeout" : 30,
+\    "server" : 'localhost',
 \    "debug_level" : 0,
 \    "debug_file" : "",
 \}
 
-let g:debugger_options= extend(g:debugger_options_defaults,g:debugger_options)
+let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)
+let g:debugger_keymap = extend(g:debugger_keymap_defaults,g:debugger_keymap)
 
-for [s:fn, s:key] in items(g:debugger_keymap_defaults)
-    exe "map "+s:key+" :python vdebug."+s:fn+"()<cr>"
+for [s:fname, s:key] in items(g:debugger_keymap)
+    exe "map ".s:key." :python vdebug.".s:fname."()<cr>"
 endfor
 
 "map <F1> :python vdebug.run_to_cursor()<cr>
