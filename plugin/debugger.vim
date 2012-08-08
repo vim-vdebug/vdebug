@@ -146,7 +146,7 @@ let g:debugger_keymap_defaults = {
 \    "run" : "<F5>",
 \    "run_to_cursor" : "<F1>",
 \    "step_over" : "<F2>",
-\    "step_in" : "<F3>",
+\    "step_into" : "<F3>",
 \    "step_out" : "<F4>",
 \    "close" : "<F6>",
 \    "set_breakpoint" : "<F8>",
@@ -156,8 +156,12 @@ let g:debugger_options_defaults = {
 \    "port" : 9000,
 \    "timeout" : 30,
 \    "server" : 'localhost',
-\    "debug_level" : 0,
-\    "debug_file" : "",
+\    "on_close" : 'detach',
+\    "debug_window_level" : 0,
+\    "debug_file_level" : 2,
+\    "debug_file" : "/home/jon/monkeys",
+\    "remote_path" : "",
+\    "local_path" : "",
 \}
 
 let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)
@@ -166,15 +170,6 @@ let g:debugger_keymap = extend(g:debugger_keymap_defaults,g:debugger_keymap)
 for [s:fname, s:key] in items(g:debugger_keymap)
     exe "map ".s:key." :python vdebug.".s:fname."()<cr>"
 endfor
-
-"map <F1> :python vdebug.run_to_cursor()<cr>
-"map <F2> :python vdebug.step_over()<cr>
-"map <F3> :python vdebug.step_into()<cr>
-"map <F4> :python vdebug.step_out()<cr>
-"map <F5> :python vdebug.run()<cr>
-
-"map <F6> :python vdebug.close()<cr>
-"map <F8> :python vdebug.set_breakpoint()<cr>
 
 vnoremap <Leader>e :python vdebug.handle_visual_eval()<cr>
 

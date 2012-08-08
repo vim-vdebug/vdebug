@@ -10,9 +10,9 @@ class Ui(ui.interface.Ui):
     def __init__(self,breakpoints):
         self.is_open = False
         self.breakpoint_store = breakpoints
-        self.breakpointwin = BreakpointWindow(self,'rightbelow 4new')
+        self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
 
-    def open(self):
+    def open(self,options):
         if self.is_open:
             return
         self.is_open = True
@@ -25,16 +25,16 @@ class Ui(ui.interface.Ui):
         self.watchwin = WatchWindow(self,'vertical belowright new')
         self.watchwin.create()
 
-        self.stackwin = StackWindow(self,'belowright 5new')
+        self.stackwin = StackWindow(self,'belowright new')
         self.stackwin.create()
 
-        self.statuswin = StatusWindow(self,'belowright 5new')
+        self.statuswin = StatusWindow(self,'belowright new')
         self.statuswin.create()
         self.statuswin.set_status("loading")
 
         logwin = LogWindow(self,'rightbelow 6new')
         log.Log.set_logger(log.WindowLogger(\
-                log.Logger.DEBUG,\
+                options['debug_window_level'],\
                 logwin))
 
         winnr = self.__get_srcwinno_by_name(srcwin_name)
@@ -47,8 +47,8 @@ class Ui(ui.interface.Ui):
     def remove_conn_details(self):
         self.statuswin.insert("Not connected",2,True)
 
-    def set_listener_details(self,port):
-        self.statuswin.insert("Listening on port %s" %(port),1,True)
+    def set_listener_details(self,addr,port):
+        self.statuswin.insert("Listening on %s:%s" %(addr,port),1,True)
 
     def get_current_file(self):
         return vim.current.buffer.name
@@ -70,7 +70,6 @@ class Ui(ui.interface.Ui):
 
     def remove_breakpoint(self,breakpoint):
         id = breakpoint.id
-        log.Log("Removing breakpoint sign ID %i " % id)
         vim.command('sign unplace %i' % id)
         self.breakpointwin.remove_breakpoint(id)
 
@@ -150,9 +149,13 @@ class SourceWindow(ui.interface.Window):
         self.focus()
         vim.command("normal %sgg" % str(lineno))
 
+    def get_file(self):
+        self.focus()
+        self.file = vim.eval("expand('%:p')")
+        return self.file
+
     def clear_signs(self):
         vim.command('sign unplace *')
-
 
     def place_pointer(self,line):
         log.Log("Placing pointer sign on line "+str(line),\
@@ -168,6 +171,7 @@ class SourceWindow(ui.interface.Window):
 class Window(ui.interface.Window):
     name = "WINDOW"
     open_cmd = "new"
+    creation_count = 0
 
     def __init__(self,ui,open_cmd):
         self.buffer = None
@@ -179,10 +183,8 @@ class Window(ui.interface.Window):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
 
     def write(self, msg, return_focus = True, after = "normal G"):
-        """ append last """
-        """if type(msg) is unicode:
-          msg =
-          unicodedata.normalize('NFKD',msg).encode('ascii','ignore')"""
+        if not self.is_open:
+            self.create()
         if return_focus:
             prev_win = vim.eval('winnr()')
         if self.buffer_empty():
@@ -192,9 +194,10 @@ class Window(ui.interface.Window):
         self.command(after)
         if return_focus:
             vim.command('%swincmd W' % prev_win)
-        #self.window.cursor = (len(self.buffer), 1)
 
     def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
+        if not self.is_open:
+            self.create()
         """ insert into current position in buffer"""
         if len(msg) == 0 and allowEmpty == False:
             return
@@ -215,6 +218,7 @@ class Window(ui.interface.Window):
             else:
                 for line in remaining_buffer:
                     self.buffer.append(line)
+            self.command(str(lfrom))
 
     def buffer_empty(self):
         if len(self.buffer) == 1 \
@@ -226,22 +230,17 @@ class Window(ui.interface.Window):
     def create(self):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
-        #if self.name != 'LOG___WINDOW':
         vim.command("setlocal buftype=nofile modifiable "+ \
                 "winfixheight winfixwidth")
         self.buffer = vim.current.buffer
-        self.width  = int( vim.eval("winwidth(0)")  )
-        self.height = int( vim.eval("winheight(0)") )
         self.is_open = True
+        self.creation_count += 1
         self.on_create()
 
     def destroy(self):
         """ destroy window """
         if self.buffer == None or len(dir(self.buffer)) == 0:
             return
-        #if self.name == 'LOG___WINDOW':
-        #  self.command('hide')
-        #else:
         self.is_open = False
         self.command('bwipeout ' + self.name)
 
@@ -260,17 +259,20 @@ class Window(ui.interface.Window):
         self.write(renderer.render())
 
 class BreakpointWindow(Window):
-    name = "Breakpoints"
+    name = "DebuggerBreakpoints"
     is_visible = False
-    header = """-----------------------------------------------------------
+    header = """===========================================================
  ID      | TYPE        | DATA
------------------------------------------------------------"""
+==========================================================="""
 
     def on_create(self):
         self.clean()
         self.write(self.header)
         for bp in self.ui.breakpoint_store.get_sorted_list():
             self.add_breakpoint(bp)
+        if self.creation_count == 1:
+            cmd = 'silent au BufWinLeave %s :silent bdelete %s' %(self.name,self.name)
+            vim.command('%s | python vdebug.runner.ui.breakpointwin.is_open = False' % cmd)
 
     def add_breakpoint(self,breakpoint):
         str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
@@ -292,53 +294,64 @@ class BreakpointWindow(Window):
         for l in self.buffer:
             bp_str = " %i " % breakpoint_id
             bp_id_len = len(bp_str)
-            if l[:bp_id_len-1] == bp_str:
-                self.buffer[i] = ""
+            if l[:bp_id_len] == bp_str:
+                del self.buffer[i]
             i += 1
 
 class LogWindow(Window):
-    name = "Log"
+    name = "DebuggerLog"
 
     def on_create(self):
         self.command('setlocal syntax=debugger_log')
+        if self.creation_count == 1:
+            vim.command('silent au BufWinLeave %s :silent bdelete %s' %(self.name,self.name))
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg,return_focus=True)
 
 class StackWindow(Window):
-    name = "Stack"
+    name = "DebuggerStack"
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
                 ':python vdebug.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <cr> <esc>'+\
+        self.command('nnoremap <buffer> <cr> '+\
                 ':python vdebug.handle_return_keypress()<cr>')
         self.command('setlocal syntax=debugger_stack')
+        if self.creation_count == 1:
+            cmd = 'silent au BufWinLeave %s :silent bdelete %s' %(self.name,self.name)
+            vim.command('%s | python vdebug.runner.ui.stackwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
 
 class WatchWindow(Window):
-    name = "Watch"
+    name = "DebuggerWatch"
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
                 ':python vdebug.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <cr> <esc>'+\
+        self.command('nnoremap <buffer> <cr> '+\
                 ':python vdebug.handle_return_keypress()<cr>')
         self.command('setlocal syntax=debugger_watch')
+        if self.creation_count == 1:
+            cmd = 'silent au BufWinLeave %s :silent bdelete %s' %(self.name,self.name)
+            vim.command('%s | python vdebug.runner.ui.watchwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
 
 class StatusWindow(Window):
-    name = "Status"
+    name = "DebuggerStatus"
 
     def on_create(self):
         self.write("Status: starting\nListening on port\nNot connected\n\nPress <F5> to start "+\
                 "debugging, <F6> to stop/close. Type "+\
                 ":help vim-debugger for more information.")
         self.command('setlocal syntax=debugger_status')
+        if self.creation_count == 1:
+            cmd = 'au BufWinLeave %s :silent bdelete %s' %(self.name,self.name)
+            vim.command('%s | python vdebug.runner.ui.statuswin.is_open = False' % cmd)
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
@@ -357,7 +370,7 @@ class StackGetResponseRenderer(ResponseRenderer):
         string = ""
         for s in stack:
             file = s.get('filename')[7:]
-            line = "[%(num)s] %(where)s\t\t%(file)s:%(line)s" \
+            line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':s.get('where'),\
                     'file':file,'line':s.get('lineno')}
             string += line + "\n"
