@@ -20,8 +20,7 @@ class Store:
         self.api = None
 
     def add_breakpoint(self,breakpoint):
-        log.Log("Adding " + str(breakpoint),\
-                log.Logger.INFO)
+        log.Log("Adding " + str(breakpoint))
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
         if self.api is not None:
@@ -36,8 +35,7 @@ class Store:
         id = str(id)
         if id not in self.breakpoints:
             raise BreakpointError, "No breakpoint matching ID %s" % id
-        log.Log("Removing breakpoint id %s" % id,\
-                log.Logger.DEBUG)
+        log.Log("Removing breakpoint id %s" % id)
         if self.api is not None:
             dbg_id = self.breakpoints[id].get_debugger_id()
             if dbg_id is not None:
@@ -46,7 +44,7 @@ class Store:
         del self.breakpoints[id]
 
     def clear_breakpoints(self):
-        for id, bp in self.breakpoints.iteritems():
+        for id in self.breakpoints.keys():
             self.remove_breakpoint_by_id(id)
         self.breakpoints = {}
 
@@ -144,7 +142,7 @@ class Breakpoint:
         pass
 
     def __str__(self):
-        return "%s breakpoint [%i]" %(self.type,self.id)
+        return "%s breakpoint, id %i" %(self.type,self.id)
 
 class LineBreakpoint(Breakpoint):
     type = "line"
