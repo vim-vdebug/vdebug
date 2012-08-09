@@ -5,3 +5,12 @@ VdebugIntro	Vdebug.txt	/*VdebugIntro*
 VdebugIntroDBGP	Vdebug.txt	/*VdebugIntroDBGP*
 VdebugIntroDebugging	Vdebug.txt	/*VdebugIntroDebugging*
 VdebugIntroLanguages	Vdebug.txt	/*VdebugIntroLanguages*
+VdebugSetUp	Vdebug.txt	/*VdebugSetUp*
+VdebugSetUpPHP	Vdebug.txt	/*VdebugSetUpPHP*
+VdebugSetUpPerl	Vdebug.txt	/*VdebugSetUpPerl*
+VdebugSetUpPython	Vdebug.txt	/*VdebugSetUpPython*
+VdebugSetUpRuby	Vdebug.txt	/*VdebugSetUpRuby*
+VdebugSourceWindow	Vdebug.txt	/*VdebugSourceWindow*
+VdebugStart	Vdebug.txt	/*VdebugStart*
+VdebugUI	Vdebug.txt	/*VdebugUI*
+VdebugUsage	Vdebug.txt	/*VdebugUsage*
