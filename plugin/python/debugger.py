@@ -382,7 +382,7 @@ class Runner:
         self.ui.watchwin.accept_renderer(rend)
 
     def handle_visual_eval(self):
-        selection = vim.eval("debugger:get_visual_selection()")
+        selection = vim.eval("vdebug:get_visual_selection()")
         self.eval(selection)
 
     def run_to_cursor(self):
