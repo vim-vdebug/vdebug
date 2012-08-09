@@ -24,35 +24,39 @@ CONTENTS                                                      *Vdebug-contents*
         1.3 Supported languages......................|VdebugIntroLanguages|
     2. Installing the plugin.........................|VdebugInstallation|
     3. Setting up the debugging environment..........|VdebugSetUp|
-    4. Options.......................................|VdebugOptions|
-    5. Usage.........................................|VdebugUsage|
-        5.1 Starting the debugger....................|VdebugStart|
-        5.2 Finding your way around the UI...........|VdebugUI|
-            5.2.1 The source window..................|VdebugSourceWindow|
-            5.2.2 The watch window...................|VdebugWatchWindow|
-            5.2.3 The stack window...................|VdebugStackWindow|
-            5.2.4 The status window..................|VdebugStatusWindow|
-            5.2.5 The breakpoint window..............|VdebugBreakpointWindow|
-        5.3 Commands.................................|VdebugCommands|
-            5.3.1 Run................................|VdebugCommandRun|
-            5.3.2 Step over..........................|VdebugCommandStepOver|
-            5.3.3 Step in............................|VdebugCommandStepIn|
-            5.3.4 Step out...........................|VdebugCommandStepOut|
-            5.3.5 Run to cursor......................|VdebugCommandRunToCursor|
-            5.3.6 Detach.............................|VdebugCommandDetach|
-            5.3.7 Stop/close.........................|VdebugCommandStop|
-        5.4 Breakpoints..............................|VdebugBreakpoints|
-            5.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
-            5.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
-            5.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
-            5.4.4 Breakpoint types...................|VdebugBreakpointTypes|
-            5.4.5 The breakpoint window..............|VdebugBreakpointWindow|
-            5.4.6 Removing all breakpoints...........|VdebugRemoveBreakpoint|
-        5.5 Evaluating expressions...................|VdebugEval|
-            5.5.1 Evaluating any expression..........|VdebugEvalExpression|
-            5.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
+        3.1 PHP set up...............................|VdebugSetUpPHP|
+        3.2 Python set up............................|VdebugSetUpPython|
+        3.3 Ruby set up..............................|VdebugSetUpRuby|
+    4. Usage.........................................|VdebugUsage|
+        4.1 Starting the debugger....................|VdebugStart|
+        4.2 Finding your way around the UI...........|VdebugUI|
+            4.2.1 The source window..................|VdebugSourceWindow|
+            4.2.2 The watch window...................|VdebugWatchWindow|
+            4.2.3 The stack window...................|VdebugStackWindow|
+            4.2.4 The status window..................|VdebugStatusWindow|
+            4.2.5 The breakpoint window..............|VdebugBreakpointWindow|
+        4.3 Commands.................................|VdebugCommands|
+            4.3.1 Run................................|VdebugCommandRun|
+            4.3.2 Step over..........................|VdebugCommandStepOver|
+            4.3.3 Step in............................|VdebugCommandStepIn|
+            4.3.4 Step out...........................|VdebugCommandStepOut|
+            4.3.5 Run to cursor......................|VdebugCommandRunToCursor|
+            4.3.6 Detach.............................|VdebugCommandDetach|
+            4.3.7 Stop/close.........................|VdebugCommandStop|
+        4.4 Breakpoints..............................|VdebugBreakpoints|
+            4.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
+            4.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
+            4.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
+            4.4.4 Breakpoint types...................|VdebugBreakpointTypes|
+            4.4.5 The breakpoint window..............|VdebugBreakpointWindow|
+            4.4.6 Removing all breakpoints...........|VdebugRemoveBreakpoint|
+        4.5 Evaluating expressions...................|VdebugEval|
+            4.5.1 Evaluating any expression..........|VdebugEvalExpression|
+            4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
+    5. Options.......................................|VdebugOptions|
     6. Using an IDE key..............................|VdebugIDEKey|
     7. Debugging a script on a remote server.........|VdebugRemote|
+    8. Troubleshooting...............................|VdebugTroubleshooting|
 
 ==============================================================================
 1. Introduction                                                  *VdebugIntro*
@@ -151,12 +155,188 @@ on Linux/Unix, or: >
     %USERPROFILE%\vimfiles
 <
 on Windows. The %USERPROFILE% directory on Windows is usually: >
-
-    C:\Users\_User_Name
+    C:\Users\[User name]\
 <
 or: >
-    C:\Documents and Settings\_User_Name\
+    C:\Documents and Settings\[User name]\
 <
 
 You may also use the system plugin directory for VIM on your system if you want 
 to install for all users. 
+
+==============================================================================
+3. Setting up the debugging environment                          *VdebugSetUp*
+
+This section looks at setting up the debugger engine to allow Vdebug to
+communicate with it during execution. The set-up varies depending on the
+language and operating system, and I can't possibly list all combinations here.
+What I will do is explain how I set it up for each language on my Linux system
+(Ubuntu 12.04), and hopefully that will give enough information for you to be
+able to apply it to your circumstance.
+
+------------------------------------------------------------------------------
+3.1 PHP set up                                                *VdebugSetUpPHP*
+
+The most popular DBGP debugger for PHP is Xdebug.
+
+I find that the most effective way to install Xdebug is to use PECL, instead
+of a OS-level package manager such as apitude or yum. You can also compile it
+from source if you're feeling hardy. To install it via PECL, run this from a
+command line (requires root/admin privileges): >
+
+    pecl install xdebug
+<
+When this finishes, it will tell you about a library (.so on *nix, .dll on
+Windows) that needs to be included. Copy down the file path, as we need to add
+it as a zend extension. This can be done in the PHP INI file, but in Ubuntu 
+I can add a new file to /etc/php5/conf.d/ that contains all the configuration 
+options and gets loaded automatically by PHP.
+
+Add these options to the INI file: >
+
+    zend_extension=/path/to/xdebug.so
+    xdebug.remote_enable=on
+    xdebug.remote_handler=dbgp
+    xdebug.remote_host=localhost
+    xdebug.remote_port=9000
+<
+If using Apache, restart it to enable the new library. The command line
+interface should be ready to go - type "php -v" and you should see the line >
+    with Xdebug v2.2.0, Copyright (c) 2002-2012, by Derick Rethans
+<
+or something similar (version may differ). You are technically ready to go, but
+there's one extra step that I like to do to make command line debugging nice
+and quick. I create a bash script called "php-xdebug", which automatically
+starts the debugger engine. The script looks like this (unix only): >
+
+#!/bin/bash
+export XDEBUG_CONFIG="idekey=xdebug"
+/usr/bin/php "$@"
+<
+Run "chmod +x" on the file and put it somewhere in your $PATH list, and you can
+then use this instead of php when debugging. For instance, instead of "php
+myscript.php", run "php-xdebug myscript.php" to start the debugger session.
+
+You are now officially ready to start debugging with PHP. However, if you've
+become unstuck at any point then there are plenty of Google tutorials on
+setting up Xdebug, or you can email me and I'll do my best to help.
+
+------------------------------------------------------------------------------
+3.2 Python set up                                          *VdebugSetUpPython*
+
+Python has an standalone debugging tool that you can use from the command line,
+but to use Vdebug in conjunction with your Python scripts you will have to grab
+the "pydbgp" tool, created by ActiveState (who make the Komodo Edit/IDE
+software).
+
+To do this, go to http://code.activestate.com/komodo/remotedebugging/,
+download the Python client for your OS and extract it. Inside this package is 
+a binary file called pydbgp that we can include when running a script, which
+will allow for remote debugging.
+
+If we want to debug a script called "myscript.py", run the following: >
+    python -S path/to/pydbgp -d localhost:9000 myscript.py
+<
+adding in the path to the pydbgp binary file. Running it without starting
+Vdebug will give an error saying that it can't connect to the host. If you see
+this, you're ready to go.
+
+------------------------------------------------------------------------------
+3.3 Ruby set up                                              *VdebugSetUpRuby*
+
+Like Python, Ruby has an standalone debugging tool that you can use from the 
+command line, but to use Vdebug in conjunction with your Ruby scripts you will 
+have to get the "rdbgp.rb" script that comes bundled with Komodo Edit/IDE by
+Activestate.
+
+Get the latest Komodo IDE from
+http://downloads.activestate.com/Komodo/releases/ (e.g. version 7.1.1), and
+unpack it. There's a script called rdbgp.rb, which, in the linux version, is
+located at INSTALLDIR/lib/support/dbgp/rubylib/. This script needs to be
+included when debugging another script remotely.
+
+To start debugging, you need to set two environment variables: one for the
+location of the directory containing the rdbgp.rb script and one for settings
+used by the debugger: >
+    export RUBYDB_LIB=path/to/rubylib/
+    export RUBYDB_OPTS="HOST=localhost PORT=9000"
+
+For example, if we want to debug a Ruby script called "myscript.rb", run the
+following from the command line: >
+    export RUBYDB_LIB=~/KomodoIDE/INSTALLDIR/lib/support/dbgp/rubylib
+    export RUBYDB_OPTS="HOST=localhost PORT=9000"
+    ruby -I$RUBYDB_LIB -r $RUBYDB_LIB/rdbgp.rb myscript.rb
+<
+Change the environment variables to suit your set-up and you will be ready to
+go.
+
+------------------------------------------------------------------------------
+3.4 Perl set up                                              *VdebugSetUpPerl*
+
+TODO
+
+==============================================================================
+4. Usage                                                         *VdebugUsage*
+
+This section deals with how to use Vdebug to debug a script. It assumes that
+you've already set up the debugger with the language that you're using: if you
+haven't see |VdebugSetUp|.
+
+------------------------------------------------------------------------------
+4.1 Starting the debugger                                        *VdebugStart*
+
+The default key for starting the debugger is <F5>. Pressing this should show
+the message: >
+    Waiting for a connection (this message will self-destruct in 30 seconds...)
+<
+Vdebug is now listening for an incoming connection, which will be started when
+a script is run with the debugger engine activated. View the section
+|VdebugSetUp| to see the necessary steps to start a script in this way. It will
+be obvious when a connection is made, because a new VIM tab opens with four
+windows, signalling the start of a new debugging session.
+
+If you are starting a script but Vdebug does not react, see the
+|VdebugTroubleshooting| section for information.
+
+The debugger will pause at the first line of the beginning of the script. It
+then waits for your action before continuing.
+
+------------------------------------------------------------------------------
+4.2 Finding your way around the UI                                  *VdebugUI*
+
+Now that you are in debug mode you will see 4 windows. The far left window
+shows the file at the current point of execution, |VdebugSourceWindow|. The top
+right window is the watch window, showing the variables at the current context,
+|VdebugWatchWindow|. The middle right window shows the stack, or the trace, up
+to that point in the script, |VdebugStackWindow|. The bottom right window shows
+the current debugger status, connection details and a help message.
+
+------------------------------------------------------------------------------
+4.2.1 The source window                                   *VdebugSourceWindow*
+
+This shows the current position of the debugger. The file will automatically
+change as the debugger pauses in different parts of the code, and the current
+line is shown with a "->" sign in the margin.
+
+Don't edit the contents of the file when in debug mode, and especially don't 
+edit without saving - this causes problems when swapping between files.
+
+You can set line breakpoints here with the <F8> key or :Breakpoint, and can
+tell the debugger to run to the cursor with <F1>.
+
+------------------------------------------------------------------------------
+4.2.2 The watch window                                     *VdebugWatchWindow*
+
+The watch window shows the variables at the current position in execution. The
+variable name, type, length (if applicable) and value are shown. They are shown
+as a tree, because arrays/lists and objects have children. Hopefully it's
+fairly self-explanatory: right arrows show a closed tree, down arrows show an
+open tree and diamonds show variables that don't have children.
+
+To open a closed tree, navigate to a line with a closed tree (right arrow) and
+press <enter> (<cr>). This will open the tree, and you can do this as many
+times as there are children.
+
+The watch window automatically updates every time the debugger pauses, so
+nothing needs to be done to update it.
+

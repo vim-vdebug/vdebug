@@ -67,7 +67,7 @@ let g:debugger_options_defaults = {
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 2,
-\    "debug_file" : "/home/jon/monkeys",
+\    "debug_file" : "/home/jon/vdebug.log",
 \    "remote_path" : "/home/pi/projects",
 \    "local_path" : "/home/jon",
 \}
