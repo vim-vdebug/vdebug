@@ -415,12 +415,18 @@ class StackGetResponseRenderer(ResponseRenderer):
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
-    def __init__(self,response,title = None):
+    def __init__(self,response,title = None,contexts = {}):
         ResponseRenderer.__init__(self,response)
         self.title = title
+        self.contexts = contexts
 
     def render(self,indent = 0):
         res = ""
+        if self.contexts:
+            for id,name in self.contexts.iteritems():
+                res += "| %-14s" % name
+            res += "|\n"
+            res += ("=" * 16 ) * len(self.contexts) + "=\n"
         if self.title:
             res += "[ %s ]\n\n" % self.title
         properties = self.response.get_context()

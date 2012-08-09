@@ -244,6 +244,12 @@ class Runner:
         log.Log("Found connection from " + str(addr),log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])
         self.breakpoints.link_api(self.api)
+
+        cn_res = self.api.context_names()
+        self.context_names = cn_res.names()
+        log.Log("Available context names: %s" %\
+                str(self.context_names),log.Logger.DEBUG)
+
         status = self.api.step_into()
         self.refresh(status)
 
@@ -273,11 +279,13 @@ class Runner:
                 self.ui.set_source_position(filename,lineno)
 
                 self.ui.watchwin.clean()
-                log.Log("Getting context variables")
+                name = self.context_names[0]
+                log.Log("Getting %s variables" % name)
                 context_res = self.api.context_get()
                 rend = ui.vimui.ContextGetResponseRenderer(\
-                        context_res,"Context at %s:%s" \
-                        %(self.ui.sourcewin.file,lineno))
+                        context_res,"%s at %s:%s" \
+                        %(name,self.ui.sourcewin.file,lineno),\
+                        self.context_names)
                 self.ui.watchwin.accept_renderer(rend)
 
     def toggle_breakpoint_window(self):

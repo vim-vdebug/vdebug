@@ -64,6 +64,13 @@ class Response:
     def __str__(self):
         return self.as_string()
 
+class ContextNamesResponse(Response):
+    def names(self):
+        names = {}
+        for c in self.as_xml().getchildren():
+            names[int(c.get('id'))] = c.get('name')
+        return names
+
 class StatusResponse(Response):
     """Response object returned by the status command."""
 
@@ -288,10 +295,17 @@ class Api:
         """
         return self.send_cmd('stack_get','',StackGetResponse)
 
-    def context_get(self):
+    def context_get(self,context = 0):
         """Get the context variables.
         """
-        return self.send_cmd('context_get','',ContextGetResponse)
+        return self.send_cmd('context_get',\
+                '-c %i' % int(context),\
+                ContextGetResponse)
+
+    def context_names(self):
+        """Get the context types.
+        """
+        return self.send_cmd('context_names','',ContextNamesResponse)
 
     def property_get(self,name):
         """Get a property.
