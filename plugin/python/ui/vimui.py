@@ -383,7 +383,7 @@ class StatusWindow(Window):
     def on_create(self):
         self.write("Status: starting\nListening on port\nNot connected\n\nPress <F5> to start "+\
                 "debugging, <F6> to stop/close. Type "+\
-                ":help vim-debugger for more information.")
+                ":help Vdebug for more information.")
         self.command('setlocal syntax=debugger_status')
         if self.creation_count == 1:
             cmd = 'au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)

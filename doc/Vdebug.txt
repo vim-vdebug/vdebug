@@ -1,0 +1,113 @@
+*Vdebug*   A powerful, fast, multi-language debugger for Vim
+
+
+    888     888      888          888                        
+    888     888      888          888                        
+    888     888      888          888                        
+    Y88b   d88P  .d88888  .d88b.  88888b.  888  888  .d88b.  
+     Y88b d88P  d88" 888 d8P  Y8b 888 "88b 888  888 d88P"88b 
+      Y88o88P   888  888 88888888 888  888 888  888 888  888 
+       Y888P    Y88b 888 Y8b.     888 d88P Y88b 888 Y88b 888 
+        Y8P      "Y88888  "Y8888  88888P"   "Y88888  "Y88888 
+                                                         888 
+                                                    Y8b d88P 
+                                                     "Y88P"
+
+
+
+===============================================================================
+CONTENTS                                                      *Vdebug-contents*
+
+    1. Introduction..................................|VdebugIntro|
+        1.1 Debugging................................|VdebugIntroDebugging|
+        1.2 The DBGP protocol........................|VdebugIntroDBGP|
+        1.3 Supported languages......................|VdebugIntroLanguages|
+    2. Installing the plugin.........................|VdebugInstallation|
+    3. Setting up the debugging environment..........|VdebugSetUp|
+    4. Options.......................................|VdebugOptions|
+    5. Usage.........................................|VdebugUsage|
+        5.1 Starting the debugger....................|VdebugStart|
+        5.2 Finding your way around the UI...........|VdebugUI|
+            5.2.1 The source window..................|VdebugSourceWindow|
+            5.2.2 The watch window...................|VdebugWatchWindow|
+            5.2.3 The stack window...................|VdebugStackWindow|
+            5.2.4 The status window..................|VdebugStatusWindow|
+            5.2.5 The breakpoint window..............|VdebugBreakpointWindow|
+        5.3 Commands.................................|VdebugCommands|
+            5.3.1 Run................................|VdebugCommandRun|
+            5.3.2 Step over..........................|VdebugCommandStepOver|
+            5.3.3 Step in............................|VdebugCommandStepIn|
+            5.3.4 Step out...........................|VdebugCommandStepOut|
+            5.3.5 Run to cursor......................|VdebugCommandRunToCursor|
+            5.3.6 Detach.............................|VdebugCommandDetach|
+            5.3.7 Stop/close.........................|VdebugCommandStop|
+        5.4 Breakpoints..............................|VdebugBreakpoints|
+            5.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
+            5.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
+            5.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
+            5.4.4 Breakpoint types...................|VdebugBreakpointTypes|
+            5.4.5 The breakpoint window..............|VdebugBreakpointWindow|
+            5.4.6 Removing all breakpoints...........|VdebugRemoveBreakpoint|
+        5.5 Evaluating expressions...................|VdebugEval|
+            5.5.1 Evaluating any expression..........|VdebugEvalExpression|
+            5.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
+    6. Using an IDE key..............................|VdebugIDEKey|
+    7. Debugging a script on a remote server.........|VdebugRemote|
+
+==============================================================================
+1. Introduction                                                  *VdebugIntro*
+
+So what does this plugin actually do? 
+
+It provides an interface for debugging scripts, allowing you to halt execution,
+view the variables at the current position and find out exactly what's going on
+in your program. It supports the DBGP protocol, which includes all types of 
+breakpoint, code snippet evaluation, and more.
+
+------------------------------------------------------------------------------
+1.1 Debugging                                           *VdebugIntroDebugging*
+
+Debugging is mainly used to do what the name suggests: weed out bugs that are
+appearing in your program. Using a debugging tool means that you don't have to
+resort to 'print' statements or writing out to logs to find out where your
+program is going wrong: you can pause execution, step through line by line and
+break at certain points to see what's going on.
+
+This is nothing new, and IDEs have been supporting debuggers for many years. In
+fact, Vim has had several plugins that support debuggers, most notably the long
+line of related Xdebug plugins for PHP.
+
+So why have I created a new one? There are a few reasons:
+
+    * The Xdebug plugin was getting too complicated, and all the code was in
+      one file, making it difficult to navigate and maintain.
+    * It wasn't truly multi-language, and was mainly focussed on Xdebug with
+      PHP. I wanted a debugger that could work identically with any language
+      that had debuggers using the DBGP protocol.
+    * There were some inefficiencies in the Xdebug plugin that affected the
+      speed, which I knew could be addressed.
+    * I wanted to create a set of Python classes that could be used on their
+      own outside of Vim, that provided an interface to debuggers.
+    * There were extra features that I wanted to build in, and doing so in the
+      original plugin would have meant a rewrite anyway.
+
+I hope you find this plugin helpful and enjoyable to use :)
+
+------------------------------------------------------------------------------
+1.2 The DBGP protocol
+
+This is a protocol that defines the communication between an IDE and debugger
+engine. The IDE speaks to the engine in pre-defined plain text commands, such as:
+
+    breakpoint_set -i 10 -t line -f /home/user/example.php -n 5
+
+The debugger engine replies in XML, such as:
+
+    <response command="breakpoint_set"
+          transaction_id="10"
+          state="enabled"
+          id="1"/>
+
+That makes the protocol cross platform and pretty easy to implement. One of the
+Python modules (files), called 'dbgp.py', is a set of classes that provide
+socket handling and a object-oriented interface to the most common operations.
