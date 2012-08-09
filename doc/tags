@@ -14,3 +14,4 @@ VdebugSourceWindow	Vdebug.txt	/*VdebugSourceWindow*
 VdebugStart	Vdebug.txt	/*VdebugStart*
 VdebugUI	Vdebug.txt	/*VdebugUI*
 VdebugUsage	Vdebug.txt	/*VdebugUsage*
+VdebugWatchWindow	Vdebug.txt	/*VdebugWatchWindow*

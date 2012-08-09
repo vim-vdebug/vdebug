@@ -7,7 +7,10 @@ if exists("b:current_syntax")
   finish
 endif
 
-syn region debuggerWatchTitle start=+^\[+ end=+\s\]$+
+syn match debuggerWatchTabLine '^\s\[.*$' contains=debuggerWatchTab
+syn match debuggerWatchTab '\[\s[^\]]\+\s\]' contains=debuggerWatchTabSel
+syn match debuggerWatchTabSel '\*[a-zA-Z\s]\+' contained
+syn match debuggerWatchTitle '^\-\s[A-Z].\+'
 syn match debuggerWatchMarker '^\s\+[^|\/]'
 syn match debuggerWatchJoiner '^\s\+[|\/^]' 
 syn match debuggerWatchNumber '\d\+\.\=\d*'
@@ -23,11 +26,12 @@ syn region debuggerWatchString start=+\s`+ skip=+\\`+ end=+`\s*$+
 
 hi def link debuggerWatchTitle Title
 hi def link debuggerWatchMarker Special
+hi def link debuggerWatchTab Special
+hi def link debuggerWatchTabSel Todo
 hi def link debuggerWatchTypeContainer Type
 hi def link debuggerWatchType Type
 hi def link debuggerWatchString String
 hi def link debuggerWatchStringKey String
-"hi def link debuggerWatchObjectProperty PreProc
 hi def link debuggerWatchVarName Identifier
 hi def link debuggerWatchJoiner Structure
 hi def link debuggerWatchNumber Number
