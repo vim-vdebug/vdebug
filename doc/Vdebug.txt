@@ -94,20 +94,69 @@ So why have I created a new one? There are a few reasons:
 I hope you find this plugin helpful and enjoyable to use :)
 
 ------------------------------------------------------------------------------
-1.2 The DBGP protocol
+1.2 The DBGP protocol                                        *VdebugIntroDBGP*
 
 This is a protocol that defines the communication between an IDE and debugger
-engine. The IDE speaks to the engine in pre-defined plain text commands, such as:
+engine. The IDE speaks to the engine in pre-defined plain text commands, such
+as: >
 
     breakpoint_set -i 10 -t line -f /home/user/example.php -n 5
-
-The debugger engine replies in XML, such as:
+<
+The debugger engine replies in XML, such as: >
 
     <response command="breakpoint_set"
           transaction_id="10"
           state="enabled"
           id="1"/>
-
+<
 That makes the protocol cross platform and pretty easy to implement. One of the
 Python modules (files), called 'dbgp.py', is a set of classes that provide
 socket handling and a object-oriented interface to the most common operations.
+
+For a complete description of the DBGP protocol visit:
+ http://xdebug.org/docs-dbgp.php
+
+------------------------------------------------------------------------------
+1.3 Supported languages                                 *VdebugIntroLanguages*
+
+Technically, supported languages include any that have a debugging engine that
+uses the DBGP protocol. This plugin was designed with four languages in mind,
+PHP, Python, Ruby and Perl. These have all been tested with this plugin. For
+information on how to configure the environment with each of these languages
+see section 3, |VdebugSetUp|.
+
+==============================================================================
+2. Installing the plugin                                  *VdebugInstallation*
+
+Please note that you must have VIM 7+ for this plugin to work, and it must be
+compiled with tabs, signs and Python support.
+
+The Github page for the plugin is https://github.com/joonty/vdebug, and the VIM
+scripts URL is XXX.
+
+By far the easiest way to install is by using a plugin manager, e.g. vundle
+(https://github.com/gmarik/vundle/) or pathogen 
+(https://github.com/tpope/vim-pathogen.git). If you have one of these, follow
+the normal installation procedure.
+
+If you aren't using a plugin manager, you have to do it the long way. Either
+clone the Github repository or download the ZIP from VIM scripts.
+
+Move the contents of each folder in the plugin (e.g. syntax/, plugin/) into 
+the corresponding folder in your VIM home directory - create the directories 
+if they don't exist. The VIM home directory is: >
+    $HOME/.vim
+<
+on Linux/Unix, or: >
+    %USERPROFILE%\vimfiles
+<
+on Windows. The %USERPROFILE% directory on Windows is usually: >
+
+    C:\Users\_User_Name
+<
+or: >
+    C:\Documents and Settings\_User_Name\
+<
+
+You may also use the system plugin directory for VIM on your system if you want 
+to install for all users. 
