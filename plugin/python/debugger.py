@@ -272,21 +272,24 @@ class Runner:
                 stack_res = self.update_stack()
                 stack = stack_res.get_stack()
 
-                filename = stack[0].get('filename')
-                lineno = stack[0].get('lineno')
+                self.cur_filename = stack[0].get('filename')
+                self.cur_lineno = stack[0].get('lineno')
 
                 log.Log("Moving to current position in source window")
-                self.ui.set_source_position(filename,lineno)
+                self.ui.set_source_position(self.cur_filename,self.cur_lineno)
 
-                self.ui.watchwin.clean()
-                name = self.context_names[0]
-                log.Log("Getting %s variables" % name)
-                context_res = self.api.context_get()
-                rend = ui.vimui.ContextGetResponseRenderer(\
-                        context_res,"%s at %s:%s" \
-                        %(name,self.ui.sourcewin.file,lineno),\
-                        self.context_names)
-                self.ui.watchwin.accept_renderer(rend)
+                self.get_context(0)
+
+    def get_context(self,context_id = 0):
+        self.ui.watchwin.clean()
+        name = self.context_names[context_id]
+        log.Log("Getting %s variables" % name)
+        context_res = self.api.context_get(context_id)
+        rend = ui.vimui.ContextGetResponseRenderer(\
+                context_res,"%s at %s:%s" \
+                %(name,self.ui.sourcewin.file,self.cur_lineno),\
+                self.context_names, context_id)
+        self.ui.watchwin.accept_renderer(rend)
 
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
@@ -413,10 +416,14 @@ class Runner:
             log.Log("User action in watch window, line %s" % lineno,\
                     log.Logger.DEBUG)
             line = self.ui.watchwin.buffer[lineno-1]
-            index = line.find("▸")
-            if index > 0:
-                self.handle_property_get(lineno,line,index)
-        if self.ui.stackwin.name in vim.current.buffer.name:
+            if lineno == 1:
+                self.handle_context_change(\
+                    line,vim.current.window.cursor[1])
+            else:
+                index = line.find("▸")
+                if index > 0:
+                    self.handle_property_get(lineno,line,index)
+        elif self.ui.stackwin.name in vim.current.buffer.name:
             log.Log("User action in stack window, line %s" % lineno,\
                     log.Logger.DEBUG)
             line = self.ui.stackwin.buffer[lineno-1]
@@ -427,6 +434,49 @@ class Runner:
             lineno = file_and_line[line_pos+1:]
             self.ui.sourcewin.set_file(file)
             self.ui.sourcewin.set_line(lineno)
+
+    def handle_context_change(self,line,column):
+        log.Log("Finding context name at column %s" % column,\
+                log.Logger.DEBUG)
+        tab_end_pos = -1
+        tab_start_pos = -1
+
+        line_len = len(line)
+        i = column
+        while i < line_len:
+            if line[i] == ']':
+                tab_end_pos = i-1
+                break
+            i += 1
+        j = column
+        while j >= 0:
+            if line[j] == '[':
+                tab_start_pos = j+2
+                break
+            j -= 1
+        if tab_end_pos == -1 or \
+                tab_start_pos == -1:
+            self.ui.error("Failed to find context name under cursor")
+            return
+        context_name = line[tab_start_pos:tab_end_pos]
+        log.Log("Context name: %s" % context_name,\
+                log.Logger.DEBUG)
+        if context_name[0] == '*':
+            self.ui.say("This context is already showing")
+            return
+        found_id = -1
+        for id in self.context_names.keys():
+            name = self.context_names[id]
+            log.Log(name +", "+context_name)
+            if name == context_name:
+                found_id = id
+                break
+        if found_id == -1:
+            self.ui.error("Could not resolve context name")
+            return
+        else:
+            self.get_context(found_id)
+            
 
     def handle_property_get(self,lineno,line,pointer_index):
         eq_index = line.find('=')

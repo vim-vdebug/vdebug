@@ -353,6 +353,8 @@ class StackWindow(Window):
                 ':python vdebug.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '+\
                 ':python vdebug.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <2-LeftMouse> '+\
+                ':python vdebug.handle_return_keypress()<cr>')
         self.command('setlocal syntax=debugger_stack')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
@@ -368,6 +370,8 @@ class WatchWindow(Window):
         self.command('inoremap <buffer> <cr> <esc>'+\
                 ':python vdebug.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '+\
+                ':python vdebug.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <2-LeftMouse> '+\
                 ':python vdebug.handle_return_keypress()<cr>')
         self.command('setlocal syntax=debugger_watch')
         if self.creation_count == 1:
@@ -415,22 +419,19 @@ class StackGetResponseRenderer(ResponseRenderer):
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
-    def __init__(self,response,title = None,contexts = {}):
+    def __init__(self,response,title = None,contexts = {},current_context = 0):
         ResponseRenderer.__init__(self,response)
         self.title = title
         self.contexts = contexts
+        self.current_context = current_context
 
     def render(self,indent = 0):
-        res = ""
-        if self.contexts:
-            for id,name in self.contexts.iteritems():
-                res += "| %-14s" % name
-            res += "|\n"
-            res += ("=" * 16 ) * len(self.contexts) + "=\n"
+        res = self.__create_tabs()
+
         if self.title:
-            res += "[ %s ]\n\n" % self.title
+            res += "- %s\n\n" % self.title
+
         properties = self.response.get_context()
-       
         num_props = len(properties)
         log.Log("Writing %i properties to the context window" % num_props,\
                 log.Logger.INFO )
@@ -445,6 +446,16 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
         log.Log("Writing to context window:\n"+res,log.Logger.DEBUG)
 
+        return res
+
+    def __create_tabs(self):
+        res = ""
+        if self.contexts:
+            for id,name in self.contexts.iteritems():
+                if self.current_context == id:
+                    name = "*"+name
+                res += "[ %s ] " % name
+            res += "\n\n"
         return res
 
     def __render_property(self,p,next_p,last = False,indent = 0):
