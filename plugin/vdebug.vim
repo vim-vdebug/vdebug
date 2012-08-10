@@ -23,25 +23,25 @@ if !has("python")
     finish
 endif
 
-" Load debugger.py either from the runtime directory (usually
+" Load start_vdebug.py either from the runtime directory (usually
 " /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
 " home vim directory (usually ~/.vim/plugin/).
-if filereadable($VIMRUNTIME."/plugin/python/debugger.py")
-  pyfile $VIMRUNTIME/plugin/debugger.py
-elseif filereadable($HOME."/.vim/plugin/python/debugger.py")
-  pyfile $HOME/.vim/plugin/python/debugger.py
+if filereadable($VIMRUNTIME."/plugin/python/start_vdebug.py")
+  pyfile $VIMRUNTIME/plugin/start_vdebug.py
+elseif filereadable($HOME."/.vim/plugin/python/start_vdebug.py")
+  pyfile $HOME/.vim/plugin/python/start_vdebug.py
 else
   " when we use pathogen for instance
   let $CUR_DIRECTORY=expand("<sfile>:p:h")
 
-  if filereadable($CUR_DIRECTORY."/python/debugger.py")
-    pyfile $CUR_DIRECTORY/python/debugger.py
+  if filereadable($CUR_DIRECTORY."/python/start_vdebug.py")
+    pyfile $CUR_DIRECTORY/python/start_vdebug.py
   else
-    call confirm('debugger.vim: Unable to find debugger.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
+    call confirm('vdebug.vim: Unable to find start_vdebug.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
   endif
 endif
 
-python vdebug = DebuggerInterface()
+python debugger = DebuggerInterface()
 
 if !exists("g:debugger_options")
     let g:debugger_options = {}
@@ -78,16 +78,16 @@ let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)
 let g:debugger_keymap = extend(g:debugger_keymap_defaults,g:debugger_keymap)
 
 for [s:fname, s:key] in items(g:debugger_keymap)
-    exe "map ".s:key." :python vdebug.".s:fname."()<cr>"
+    exe "map ".s:key." :python debugger.".s:fname."()<cr>"
 endfor
 
-vnoremap <Leader>e :python vdebug.handle_visual_eval()<cr>
+vnoremap <Leader>e :python debugger.handle_visual_eval()<cr>
 
-command! -nargs=? Breakpoint python vdebug.set_breakpoint('<args>')
-command! -nargs=? BreakpointRemove python vdebug.remove_breakpoint('<args>')
-command! BreakpointWindow python vdebug.toggle_breakpoint_window()
+command! -nargs=? Breakpoint python debugger.set_breakpoint('<args>')
+command! -nargs=? BreakpointRemove python debugger.remove_breakpoint('<args>')
+command! BreakpointWindow python debugger.toggle_breakpoint_window()
 
-command! -nargs=? VdebugEval python vdebug.handle_eval('<args>')
+command! -nargs=? VdebugEval python debugger.handle_eval('<args>')
 
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt

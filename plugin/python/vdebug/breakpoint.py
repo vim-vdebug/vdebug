@@ -1,5 +1,5 @@
 import base64
-import log
+import vdebug.log
 
 class Store:
 
@@ -11,7 +11,7 @@ class Store:
         self.api = api
         num_bps = len(self.breakpoints)
         if num_bps > 0:
-            log.Log("Registering %i breakpoints with the debugger" % num_bps)
+            vdebug.log.Log("Registering %i breakpoints with the debugger" % num_bps)
         for id, bp in self.breakpoints.iteritems():
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
@@ -20,7 +20,7 @@ class Store:
         self.api = None
 
     def add_breakpoint(self,breakpoint):
-        log.Log("Adding " + str(breakpoint))
+        vdebug.log.Log("Adding " + str(breakpoint))
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
         if self.api is not None:
@@ -35,7 +35,7 @@ class Store:
         id = str(id)
         if id not in self.breakpoints:
             raise BreakpointError, "No breakpoint matching ID %s" % id
-        log.Log("Removing breakpoint id %s" % id)
+        vdebug.log.Log("Removing breakpoint id %s" % id)
         if self.api is not None:
             dbg_id = self.breakpoints[id].get_debugger_id()
             if dbg_id is not None:
