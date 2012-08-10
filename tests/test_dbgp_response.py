@@ -1,29 +1,30 @@
 import sys
 sys.path.append('../plugin/python')
 import unittest
-import dbgp
+import vdebug.dbgp
 import xml
+from mock import Mock
 
 class ResponseTest(unittest.TestCase): 
-    """Test the response class in the dbgp module."""
+    """Test the response class in the vdebug.dbgp module."""
 
     def test_get_cmd(self):
         """Test that the get_cmd() method returns the command"""
         cmd = "status"
-        res = dbgp.Response("",cmd,"")
+        res = vdebug.dbgp.Response("",cmd,"",Mock())
         assert res.get_cmd() == cmd
 
     def test_get_cmd_args(self):
         """Test that the get_cmd_args() method return command arguments"""
         cmd_args = "-a abcd"
-        res = dbgp.Response("","",cmd_args)
+        res = vdebug.dbgp.Response("","",cmd_args,Mock())
         assert res.get_cmd_args() == cmd_args
 
     def test_as_string(self):
         """Test that the as_string() method returns the
         raw response string"""
         response = "<?xml..."
-        res = dbgp.Response(response,"","")
+        res = vdebug.dbgp.Response(response,"","",Mock())
         assert res.as_string() == response
 
     def test_as_xml_is_element(self):
@@ -34,7 +35,7 @@ class ResponseTest(unittest.TestCase):
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
             command="status" transaction_id="1" status="starting" 
             reason="ok"></response>"""
-        res = dbgp.Response(response,"","")
+        res = vdebug.dbgp.Response(response,"","",Mock())
         self.assertIsInstance(res.as_xml(),xml.etree.ElementTree.Element)
 
     def test_error_tag_raises_exception(self):
@@ -45,7 +46,7 @@ class ResponseTest(unittest.TestCase):
             code="5"><message><![CDATA[command is not available]]>
             </message></error></response>"""
         re = "command is not available"
-        self.assertRaisesRegexp(dbgp.DBGPError,re,dbgp.Response,response,"","")
+        self.assertRaisesRegexp(vdebug.dbgp.DBGPError,re,vdebug.dbgp.Response,response,"","",Mock())
 
 class StatusResponseTest(unittest.TestCase): 
     """Test the behaviour of the StatusResponse class."""
@@ -55,7 +56,7 @@ class StatusResponseTest(unittest.TestCase):
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
             command="status" transaction_id="1" status="starting" 
             reason="ok"></response>"""
-        res = dbgp.StatusResponse(response,"","")
+        res = vdebug.dbgp.StatusResponse(response,"","",Mock())
         assert str(res) == "starting"
 
 class FeatureResponseTest(unittest.TestCase): 
@@ -66,7 +67,7 @@ class FeatureResponseTest(unittest.TestCase):
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
             command="feature_get" transaction_id="2" 
             feature_name="max_depth" supported="1"><![CDATA[1]]></response>"""
-        res = dbgp.FeatureGetResponse(response,"","")
+        res = vdebug.dbgp.FeatureGetResponse(response,"","",Mock())
         assert res.is_supported() == 1
 
     def test_feature_is_not_supported(self):
@@ -75,7 +76,7 @@ class FeatureResponseTest(unittest.TestCase):
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
             command="feature_get" transaction_id="2" 
             feature_name="max_depth" supported="0"><![CDATA[0]]></response>"""
-        res = dbgp.FeatureGetResponse(response,"","")
+        res = vdebug.dbgp.FeatureGetResponse(response,"","",Mock())
         assert res.is_supported() == 0
 
 class StackGetTest(unittest.TestCase): 
@@ -89,7 +90,7 @@ class StackGetTest(unittest.TestCase):
                 filename="file:///usr/local/bin/cake" lineno="4">
                 </stack>
             </response>"""
-        res = dbgp.StackGetResponse(response,"","")
+        res = vdebug.dbgp.StackGetResponse(response,"","",Mock())
         stack = res.get_stack()
         assert stack[0].get('filename') == "file:///usr/local/bin/cake"
         assert len(stack) == 1
@@ -147,13 +148,13 @@ type="uninitialized"></property></response>
 """
 
     def test_properties_are_objects(self):
-        res = dbgp.ContextGetResponse(self.response,"","")
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
         assert len(context) == 23
-        self.assertIsInstance(context[0],dbgp.ContextProperty)
+        self.assertIsInstance(context[0],vdebug.dbgp.ContextProperty)
 
     def test_int_property_attributes(self):
-        res = dbgp.ContextGetResponse(self.response,"","")
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
         prop = context[0]
 
@@ -163,7 +164,7 @@ type="uninitialized"></property></response>
         assert prop.has_children == False
 
     def test_array_property_attributes(self):
-        res = dbgp.ContextGetResponse(self.response,"","")
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
         prop = context[1]
 
@@ -174,7 +175,7 @@ type="uninitialized"></property></response>
         assert prop.child_count() == 4
 
     def test_string_property_attributes(self):
-        res = dbgp.ContextGetResponse(self.response,"","")
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
         prop = context[2]
 
@@ -195,10 +196,10 @@ class ContextGetAlternateTest(unittest.TestCase):
 ]]></fullname></property></response>"""
 
     def test_properties_are_objects(self):
-        res = dbgp.ContextGetResponse(self.response,"","")
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
         p = context[0]
         print "Display name: "+p.display_name
         assert len(context) == 3
-        self.assertIsInstance(context[0],dbgp.ContextProperty)
+        self.assertIsInstance(context[0],vdebug.dbgp.ContextProperty)
 

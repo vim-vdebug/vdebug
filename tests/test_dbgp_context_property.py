@@ -1,14 +1,14 @@
 import sys
 sys.path.append('../plugin/python')
 import unittest
-import dbgp
+import vdebug.dbgp
 import xml.etree.ElementTree as ET
 
 class ContextPropertyDefaultTest(unittest.TestCase):
     def __get_context_property(self,xml_string):
         xml = ET.fromstring(xml_string)
         firstnode = xml[0]
-        return dbgp.ContextProperty(firstnode)
+        return vdebug.dbgp.ContextProperty(firstnode)
 
     def test_single_property(self):
         prop = self.__get_context_property(\
@@ -76,7 +76,7 @@ class ContextPropertyAltTest(unittest.TestCase):
     def __get_context_property(self,xml_string):
         xml = ET.fromstring(xml_string)
         firstnode = xml[0]
-        return dbgp.ContextProperty(firstnode)
+        return vdebug.dbgp.ContextProperty(firstnode)
 
     def test_single_property(self):
         prop = self.__get_context_property(\
