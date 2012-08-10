@@ -342,7 +342,7 @@ class StackWindow(Window):
         self.command('nnoremap <buffer> <cr> '+\
                 ':python debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python debugger.handle_dobule_click()<cr>')
         self.command('setlocal syntax=debugger_stack')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
@@ -360,7 +360,7 @@ class WatchWindow(Window):
         self.command('nnoremap <buffer> <cr> '+\
                 ':python debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_watch')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)

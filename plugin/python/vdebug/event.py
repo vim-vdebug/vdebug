@@ -7,16 +7,19 @@ class Dispatcher:
     def __init__(self,runner):
         self.runner = runner
 
-    def keypress_return(self):
-        event = self._get_keypress_return_event()
-        return event.execute(self.runner)
+    def by_position(self):
+        event = self._get_event_by_position()
+        if event is not None:
+            return event.execute(self.runner)
+        else:
+            return False
 
-    def _get_keypress_return_event(self):
+    def _get_event_by_position(self):
         buf_name = vim.current.buffer.name
         p = re.compile("[/\\]([^/\\]+)$")
         m = p.match(buf_name)
         if m is None:
-            return
+            return None
 
         window_name = m.group(1)
         if window_name == self.runner.ui.watchwin.name:
