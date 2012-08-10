@@ -1,255 +1,56 @@
 # coding=utf-8
-import sys
-import os
-import inspect
 
-dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
-sys.path.append(dir)
-
-import traceback
-import dbgp
-import log
-import ui.vimui
+import vdebug.dbgp
+import vdebug.log
+import vdebug.ui.vimui
 import vim
-import breakpoint
-import opts
-import util
-
-class DebuggerInterface:
-    """ Acts as an interface, and as an extra layer above the Runner class.
-
-    Fatal exceptions are caught and handled here.
-    """
-    def __init__(self):
-        self.runner = Runner()
-
-    def __del__(self):
-        self.runner.close()
-
-    def handle_timeout(self):
-        self.runner.close()
-        self.runner.ui.say("No connection was made")
-
-    def handle_socket_end(self):
-        self.runner.ui.say("Connection to the debugger has been closed")
-        if self.runner.ui.is_open:
-            self.runner.ui.statuswin.set_status("stopped")
-
-    def handle_vim_error(self,e):
-        self.runner.ui.error("A Vim error occured: "+\
-                str(e)+\
-                "\n"+ traceback.format_exc())
-
-    def handle_helpful_error(self,e):
-        self.runner.ui.error(str(e))
-
-    def handle_general_exception(self):
-        self.runner.ui.error("An error occured: "+\
-                str(sys.exc_info()[0])+\
-                "\n"+ traceback.format_exc())
-
-    def run(self):
-        try:
-            self.runner.run()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except log.LogError, e:
-            self.handle_helpful_error(e)
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except KeyboardInterrupt:
-            print "Keyboard interrupt - debugging session cancelled"
-            try:
-                self.runner.close()
-            except:
-                pass
-        except:
-            self.handle_general_exception()
-
-    def run_to_cursor(self):
-        try:
-            self.runner.run_to_cursor()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except log.LogError, e:
-            self.handle_helpful_error(e)
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def handle_return_keypress(self):
-        try:
-            return self.runner.handle_return_keypress()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def handle_visual_eval(self):
-        try:
-            return self.runner.handle_visual_eval()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def handle_eval(self,args):
-        try:
-            return self.runner.eval(args)
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def toggle_breakpoint_window(self):
-        return self.runner.toggle_breakpoint_window()
-
-    def step_over(self):
-        try:
-            self.runner.step_over()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except log.LogError, e:
-            self.handle_helpful_error(e)
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def step_into(self):
-        try:
-            self.runner.step_into()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except log.LogError, e:
-            self.handle_helpful_error(e)
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def step_out(self):
-        try:
-            self.runner.step_out()
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except log.LogError, e:
-            self.handle_helpful_error(e)
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def set_breakpoint(self,args = None):
-        try:
-            self.runner.set_breakpoint(args)
-        except breakpoint.BreakpointError, e:
-            self.runner.ui.error(e)
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def remove_breakpoint(self,args = None):
-        try:
-            self.runner.remove_breakpoint(args)
-        except breakpoint.BreakpointError, e:
-            self.runner.ui.error(e)
-        except dbgp.TimeoutError:
-            self.handle_timeout()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def detach(self):
-        try:
-            self.runner.detach()
-        except EOFError:
-            self.handle_socket_end()
-        except vim.error, e:
-            self.handle_vim_error(e)
-        except:
-            self.handle_general_exception()
-
-    def close(self):
-        if self.runner.is_alive():
-            self.runner.close_connection()
-        else:
-            self.runner.close()
+import vdebug.breakpoint
+import vdebug.opts
+import vdebug.util
 
 class Runner:
     """ Class that stitches together all the debugger components.
 
-    This instantiates the connection and debugger UI, and provides
+    This instantiates the connection and debugger vdebug.ui, and provides
     an interface that Vim can use to send commands.
     """
 
     def __init__(self):
         self.api = None
-        self.breakpoints = breakpoint.Store()
-        self.ui = ui.vimui.Ui(self.breakpoints)
+        self.breakpoints = vdebug.breakpoint.Store()
+        self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
 
     def open(self):
-        """ Open the connection and debugging UI.
+        """ Open the connection and debugging vdebug.ui.
 
         If either of these are already open, the current
-        connection or UI is used.
+        connection or vdebug.ui is used.
         """
-        opts.Options.set(vim.eval('g:debugger_options'))
-        if opts.Options.isset('debug_file'):
-            log.Log.set_logger(log.FileLogger(\
-                    opts.Options.get('debug_file_level'),\
-                    opts.Options.get('debug_file')))
+        vdebug.opts.Options.set(vim.eval('g:debugger_options'))
+        if vdebug.opts.Options.isset('debug_file'):
+            vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
+                    vdebug.opts.Options.get('debug_file_level'),\
+                    vdebug.opts.Options.get('debug_file')))
         self.listen(\
-                opts.Options.get('server'),\
-                opts.Options.get('port',int),\
-                opts.Options.get('timeout',int))
+                vdebug.opts.Options.get('server'),\
+                vdebug.opts.Options.get('port',int),\
+                vdebug.opts.Options.get('timeout',int))
 
         self.ui.open()
         self.ui.set_listener_details(\
-                opts.Options.get('server'),\
-                opts.Options.get('port'),\
-                opts.Options.get('ide_key'))
+                vdebug.opts.Options.get('server'),\
+                vdebug.opts.Options.get('port'),\
+                vdebug.opts.Options.get('ide_key'))
 
         addr = self.api.conn.address
-        log.Log("Found connection from " + str(addr),log.Logger.INFO)
+        vdebug.log.Log("Found connection from " + str(addr),vdebug.log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])
         self.breakpoints.link_api(self.api)
 
         cn_res = self.api.context_names()
         self.context_names = cn_res.names()
-        log.Log("Available context names: %s" %\
-                str(self.context_names),log.Logger.DEBUG)
+        vdebug.log.Log("Available context names: %s" %\
+                str(self.context_names),vdebug.log.Logger.DEBUG)
 
         status = self.api.step_into()
         self.refresh(status)
@@ -268,15 +69,15 @@ class Runner:
                 self.ui.say("Debugging session has ended")
                 self.close_connection()
             else:
-                log.Log("Getting stack information")
+                vdebug.log.Log("Getting stack information")
                 self.ui.statuswin.set_status(status)
                 stack_res = self.update_stack()
                 stack = stack_res.get_stack()
 
-                self.cur_file = util.FilePath(stack[0].get('filename'))
+                self.cur_file = vdebug.util.FilePath(stack[0].get('filename'))
                 self.cur_lineno = stack[0].get('lineno')
 
-                log.Log("Moving to current position in source window")
+                vdebug.log.Log("Moving to current position in source window")
                 self.ui.set_source_position(\
                         self.cur_file,\
                         self.cur_lineno)
@@ -286,9 +87,9 @@ class Runner:
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
         name = self.context_names[context_id]
-        log.Log("Getting %s variables" % name)
+        vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
-        rend = ui.vimui.ContextGetResponseRenderer(\
+        rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                 context_res,"%s at %s:%s" \
                 %(name,self.ui.sourcewin.file,self.cur_lineno),\
                 self.context_names, context_id)
@@ -319,7 +120,7 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
-            log.Log("Running")
+            vdebug.log.Log("Running")
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
             res = self.api.run()
@@ -330,7 +131,7 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
-            log.Log("Stepping over")
+            vdebug.log.Log("Stepping over")
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
             res = self.api.step_over()
@@ -341,7 +142,7 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
-            log.Log("Stepping into statement")
+            vdebug.log.Log("Stepping into statement")
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
             res = self.api.step_into()
@@ -352,7 +153,7 @@ class Runner:
         if not self.is_alive():
             self.open()
         else:
-            log.Log("Stepping out of statement")
+            vdebug.log.Log("Stepping out of statement")
             self.ui.statuswin.set_status("running")
             self.ui.sourcewin.remove_pointer()
             res = self.api.step_out()
@@ -364,8 +165,8 @@ class Runner:
             args = ""
         args = args.strip()
         if len(args) == 0:
-            self.ui.error("ID or '*' required to remove a breakpoint: run "+\
-                    "':BreakpointWindow' to see breakpoints and their IDs")
+            self.ui.error("ID or '*' reqvdebug.uired to remove a breakpoint: run "+\
+                    "':breakpointWindow' to see breakpoints and their IDs")
             return
 
         if args == '*':
@@ -376,7 +177,7 @@ class Runner:
                 self.breakpoints.remove_breakpoint_by_id(id)
 
     def set_breakpoint(self,args):
-        bp = breakpoint.Breakpoint.parse(self.ui,args)
+        bp = vdebug.breakpoint.Breakpoint.parse(self.ui,args)
         if bp.type == "line":
             id = self.breakpoints.find_breakpoint(\
                     bp.get_file(),\
@@ -387,9 +188,9 @@ class Runner:
         self.breakpoints.add_breakpoint(bp)
 
     def eval(self,code):
-        log.Log("Evaluating code: "+code)
+        vdebug.log.Log("Evaluating code: "+code)
         context_res = self.api.eval(code)
-        rend = ui.vimui.ContextGetResponseRenderer(\
+        rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                 context_res,"Eval of: '%s'" \
                 %context_res.get_code())
         self.ui.watchwin.clean()
@@ -402,13 +203,13 @@ class Runner:
     def run_to_cursor(self):
         row = self.ui.get_current_row()
         file = self.ui.get_current_file()
-        log.Log(file)
-        log.Log(self.ui.sourcewin.get_file())
+        vdebug.log.Log(file)
+        vdebug.log.Log(self.ui.sourcewin.get_file())
         if file != self.ui.sourcewin.get_file():
             self.ui.error("Run to cursor only works in the source window!")
             return
-        log.Log("Running to position: line %s of %s" %(row,file))
-        bp = breakpoint.TemporaryLineBreakpoint(self.ui,file,row)
+        vdebug.log.Log("Running to position: line %s of %s" %(row,file))
+        bp = vdebug.breakpoint.TemporaryLineBreakpoint(self.ui,file,row)
         self.api.breakpoint_set(bp.get_cmd())
         self.run()
 
@@ -418,8 +219,8 @@ class Runner:
             return True
         lineno = vim.current.window.cursor[0]
         if self.ui.watchwin.name in vim.current.buffer.name:
-            log.Log("User action in watch window, line %s" % lineno,\
-                    log.Logger.DEBUG)
+            vdebug.log.Log("User action in watch window, line %s" % lineno,\
+                    vdebug.log.Logger.DEBUG)
             line = self.ui.watchwin.buffer[lineno-1]
             if lineno == 1:
                 self.handle_context_change(\
@@ -429,20 +230,20 @@ class Runner:
                 if index > 0:
                     self.handle_property_get(lineno,line,index)
         elif self.ui.stackwin.name in vim.current.buffer.name:
-            log.Log("User action in stack window, line %s" % lineno,\
-                    log.Logger.DEBUG)
+            vdebug.log.Log("User action in stack window, line %s" % lineno,\
+                    vdebug.log.Logger.DEBUG)
             line = self.ui.stackwin.buffer[lineno-1]
-            filename_pos = line.find("\t\t")
+            filename_pos = line.find(" @ ") + 3
             file_and_line = line[filename_pos:]
             line_pos = file_and_line.find(":")
-            file = util.FilePath(file_and_line[:line_pos])
+            file = vdebug.util.FilePath(file_and_line[:line_pos])
             lineno = file_and_line[line_pos+1:]
             self.ui.sourcewin.set_file(file)
             self.ui.sourcewin.set_line(lineno)
 
     def handle_context_change(self,line,column):
-        log.Log("Finding context name at column %s" % column,\
-                log.Logger.DEBUG)
+        vdebug.log.Log("Finding context name at column %s" % column,\
+                vdebug.log.Logger.DEBUG)
         tab_end_pos = -1
         tab_start_pos = -1
 
@@ -464,15 +265,15 @@ class Runner:
             self.ui.error("Failed to find context name under cursor")
             return
         context_name = line[tab_start_pos:tab_end_pos]
-        log.Log("Context name: %s" % context_name,\
-                log.Logger.DEBUG)
+        vdebug.log.Log("Context name: %s" % context_name,\
+                vdebug.log.Logger.DEBUG)
         if context_name[0] == '*':
             self.ui.say("This context is already showing")
             return
         found_id = -1
         for id in self.context_names.keys():
             name = self.context_names[id]
-            log.Log(name +", "+context_name)
+            vdebug.log.Log(name +", "+context_name)
             if name == context_name:
                 found_id = id
                 break
@@ -487,28 +288,28 @@ class Runner:
         eq_index = line.find('=')
         name = line[pointer_index+4:eq_index-1]
         context_res = self.api.property_get(name)
-        rend = ui.vimui.ContextGetResponseRenderer(context_res)
+        rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
         self.ui.watchwin.insert(output.rstrip(),lineno-1,True)
 
     def listen(self,server,port,timeout):
-        """ Open the dbgp API with connection.
+        """ Open the vdebug.dbgp API with connection.
 
         Uses existing connection if possible.
         """
         if self.is_alive():
-            log.Log("Cannot open a new connection \
+            vdebug.log.Log("Cannot open a new connection \
                 while one already exists",\
-                log.Logger.ERROR)
+                vdebug.log.Logger.ERROR)
             return
         else:
             while True:
-                    ide_key = opts.Options.get('ide_key')
+                    ide_key = vdebug.opts.Options.get('ide_key')
                     check_ide_key = True
                     if len(ide_key) == 0:
                         check_ide_key = False
-                    connection = dbgp.Connection(server,port,timeout)
-                    self.api = dbgp.Api(connection)
+                    connection = vdebug.dbgp.Connection(server,port,timeout)
+                    self.api = vdebug.dbgp.Api(connection)
                     if check_ide_key and ide_key != self.api.idekey:
                         print "Ignoring debugger connection with IDE key '%s'" \
                                 % self.api.idekey
@@ -522,7 +323,7 @@ class Runner:
         else:
             self.ui.stackwin.clean()
             res = self.api.stack_get()
-            renderer = ui.vimui.StackGetResponseRenderer(res)
+            renderer = vdebug.ui.vimui.StackGetResponseRenderer(res)
             self.ui.stackwin.accept_renderer(renderer)
             return res
 
@@ -539,7 +340,7 @@ class Runner:
         try:
             if self.is_alive():
                 self.breakpoints.unlink_api()
-                if opts.Options.get('on_close') == 'detach':
+                if vdebug.opts.Options.get('on_close') == 'detach':
                     self.api.detach()
                 else:
                     self.api.stop()
@@ -552,7 +353,7 @@ class Runner:
             self.ui.mark_as_stopped()
 
     def close(self):
-        """ Close both the connection and UI.
+        """ Close both the connection and vdebug.ui.
         """
         self.close_connection()
         self.ui.close()

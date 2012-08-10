@@ -1,5 +1,5 @@
-import opts
-import log
+import vdebug.opts
+import vdebug.log
 
 class FilePath:
     """Normalizes a file name and allows for remote and local path mapping.
@@ -19,12 +19,12 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if opts.Options.isset('remote_path'):
-            rp = opts.Options.get('remote_path')
-            lp = opts.Options.get('local_path')
-            log.Log("Replacing remote path (%s) " % rp +\
+        if vdebug.opts.Options.isset('remote_path'):
+            rp = vdebug.opts.Options.get('remote_path')
+            lp = vdebug.opts.Options.get('local_path')
+            vdebug.log.Log("Replacing remote path (%s) " % rp +\
                     "with local path (%s)" % lp,\
-                    log.Logger.DEBUG)
+                    vdebug.log.Logger.DEBUG)
             if ret.startswith(rp):
                 ret = ret.replace(rp,lp)
         return ret
@@ -35,12 +35,12 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if opts.Options.isset('remote_path'):
-            rp = opts.Options.get('remote_path')
-            lp = opts.Options.get('local_path')
-            log.Log("Replacing local path (%s) " % rp +\
+        if vdebug.opts.Options.isset('remote_path'):
+            rp = vdebug.opts.Options.get('remote_path')
+            lp = vdebug.opts.Options.get('local_path')
+            vdebug.log.Log("Replacing local path (%s) " % rp +\
                     "with remote path (%s)" % lp,\
-                    log.Logger.DEBUG)
+                    vdebug.log.Logger.DEBUG)
             if ret.startswith(lp):
                 ret = ret.replace(lp,rp)
         return ret
