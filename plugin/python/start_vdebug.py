@@ -8,6 +8,7 @@ sys.path.append(dir)
 import vim
 import traceback
 import vdebug.interface
+import vdebug.event
 
 class DebuggerInterface:
     """ Acts as an interface, and as an extra layer above the Runner class.
@@ -16,6 +17,7 @@ class DebuggerInterface:
     """
     def __init__(self):
         self.runner = vdebug.interface.Runner()
+        self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
         self.runner.close()
@@ -78,7 +80,9 @@ class DebuggerInterface:
 
     def handle_return_keypress(self):
         try:
-            return self.runner.handle_return_keypress()
+            return self.event_dispatcher.keypress_return()
+        except vdebug.event.EventError,e :
+            self.runner.ui.error(e)
         except vdebug.dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
@@ -90,7 +94,7 @@ class DebuggerInterface:
 
     def handle_visual_eval(self):
         try:
-            return self.runner.handle_visual_eval()
+            return self.event_dispatcher.handle_visual_eval()
         except vdebug.dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
