@@ -12,6 +12,8 @@ import log
 import ui.vimui
 import vim
 import breakpoint
+import opts
+import util
 
 class DebuggerInterface:
     """ Acts as an interface, and as an extra layer above the Runner class.
@@ -149,7 +151,7 @@ class DebuggerInterface:
 
     def step_out(self):
         try:
-            self.runner.step_over()
+            self.runner.step_out()
         except dbgp.TimeoutError:
             self.handle_timeout()
         except log.LogError, e:
@@ -205,7 +207,6 @@ class DebuggerInterface:
         else:
             self.runner.close()
 
-    
 class Runner:
     """ Class that stitches together all the debugger components.
 
@@ -224,21 +225,21 @@ class Runner:
         If either of these are already open, the current
         connection or UI is used.
         """
-        self.options = vim.eval('g:debugger_options')
-        if len(self.options['debug_file']):
+        opts.Options.set(vim.eval('g:debugger_options'))
+        if opts.Options.isset('debug_file'):
             log.Log.set_logger(log.FileLogger(\
-                    self.options['debug_file_level'],\
-                    self.options['debug_file']))
+                    opts.Options.get('debug_file_level'),\
+                    opts.Options.get('debug_file')))
         self.listen(\
-                self.options['server'],\
-                int(self.options['port']),\
-                int(self.options['timeout']))
+                opts.Options.get('server'),\
+                opts.Options.get('port',int),\
+                opts.Options.get('timeout',int))
 
-        self.ui.open(self.options)
+        self.ui.open()
         self.ui.set_listener_details(\
-                self.options['server'],\
-                self.options['port'],\
-                self.options['ide_key'])
+                opts.Options.get('server'),\
+                opts.Options.get('port'),\
+                opts.Options.get('ide_key'))
 
         addr = self.api.conn.address
         log.Log("Found connection from " + str(addr),log.Logger.INFO)
@@ -272,11 +273,13 @@ class Runner:
                 stack_res = self.update_stack()
                 stack = stack_res.get_stack()
 
-                self.cur_filename = stack[0].get('filename')
+                self.cur_file = util.FilePath(stack[0].get('filename'))
                 self.cur_lineno = stack[0].get('lineno')
 
                 log.Log("Moving to current position in source window")
-                self.ui.set_source_position(self.cur_filename,self.cur_lineno)
+                self.ui.set_source_position(\
+                        self.cur_file,\
+                        self.cur_lineno)
 
                 self.get_context(0)
 
@@ -399,6 +402,8 @@ class Runner:
     def run_to_cursor(self):
         row = self.ui.get_current_row()
         file = self.ui.get_current_file()
+        log.Log(file)
+        log.Log(self.ui.sourcewin.get_file())
         if file != self.ui.sourcewin.get_file():
             self.ui.error("Run to cursor only works in the source window!")
             return
@@ -430,7 +435,7 @@ class Runner:
             filename_pos = line.find("\t\t")
             file_and_line = line[filename_pos:]
             line_pos = file_and_line.find(":")
-            file = file_and_line[:line_pos]
+            file = util.FilePath(file_and_line[:line_pos])
             lineno = file_and_line[line_pos+1:]
             self.ui.sourcewin.set_file(file)
             self.ui.sourcewin.set_line(lineno)
@@ -498,7 +503,7 @@ class Runner:
             return
         else:
             while True:
-                    ide_key = self.options['ide_key']
+                    ide_key = opts.Options.get('ide_key')
                     check_ide_key = True
                     if len(ide_key) == 0:
                         check_ide_key = False
@@ -534,7 +539,7 @@ class Runner:
         try:
             if self.is_alive():
                 self.breakpoints.unlink_api()
-                if self.options['on_close'] == 'detach':
+                if opts.Options.get('on_close') == 'detach':
                     self.api.detach()
                 else:
                     self.api.stop()
@@ -551,5 +556,3 @@ class Runner:
         """
         self.close_connection()
         self.ui.close()
-
-vdebug = DebuggerInterface()
