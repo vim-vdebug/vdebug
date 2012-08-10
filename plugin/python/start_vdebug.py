@@ -80,7 +80,7 @@ class DebuggerInterface:
 
     def handle_return_keypress(self):
         try:
-            return self.event_dispatcher.keypress_return()
+            return self.event_dispatcher.by_position()
         except vdebug.event.EventError,e :
             self.runner.ui.error(e)
         except vdebug.dbgp.TimeoutError:
@@ -91,6 +91,21 @@ class DebuggerInterface:
             self.handle_vim_error(e)
         except:
             self.handle_general_exception()
+
+    def handle_double_click(self):
+        try:
+            return self.event_dispatcher.by_position()
+        except vdebug.event.EventError,e :
+            self.runner.ui.error(e)
+        except vdebug.dbgp.TimeoutError:
+            self.handle_timeout()
+        except EOFError:
+            self.handle_socket_end()
+        except vim.error, e:
+            self.handle_vim_error(e)
+        except:
+            self.handle_general_exception()
+
 
     def handle_visual_eval(self):
         try:
