@@ -470,6 +470,7 @@ class ContextProperty:
         self._determine_displayname(node)
         self.encoding = node.get('encoding')
         self.depth = depth
+        
         self.size = node.get('size')
         self.value = ""
         self.is_last_child = False
@@ -477,6 +478,8 @@ class ContextProperty:
         self._determine_children(node)
         self.__determine_value(node)
         self.__init_children(node)
+        if self.type == 'scalar':
+            self.size = len(self.value) - 2
 
     def __determine_value(self,node):
         if self.has_children:
@@ -498,13 +501,15 @@ class ContextProperty:
             self.value = ""
 
         self.num_crs = self.value.count('\n')
-        if self.type.lower() in ("string","str"):
+        if self.type.lower() in ("string","str","scalar"):
             self.value = '`%s`' % self.value.replace('`','\\`')
 
     def __determine_type(self,node):
         type = node.get('classname')
         if type is None:
             type = node.get('type')
+        if type is None:
+            type = 'unknown'
         self.type = type
 
     def _determine_displayname(self,node):

@@ -118,6 +118,13 @@ class Breakpoint:
                             "require a condition to be specified"
                 cond = " ".join(arg_parts)
                 return ConditionalBreakpoint(ui,file,row,cond)
+            elif type == 'watch':
+                if len(arg_parts) == 0:
+                    raise BreakpointError, "Watch breakpoints " +\
+                            "require a condition to be specified"
+                expr = " ".join(arg_parts)
+                vdebug.log.Log("Expression: %s"%expr)
+                return WatchBreakpoint(ui,expr)
             elif type == 'exception':
                 if len(arg_parts) == 0:
                     raise BreakpointError, "Exception breakpoints " +\
@@ -128,25 +135,13 @@ class Breakpoint:
                 if l == 0:
                     raise BreakpointError, "Return breakpoints " +\
                             "require a function name to be specified"
-                elif l > 1:
-                    clazz = arg_parts[0]
-                    fn = arg_parts[1]
-                else:
-                    fn = arg_parts[0]
-                    clazz = None
-                return ReturnBreakpoint(ui,fn,clazz)
+                return ReturnBreakpoint(ui,arg_parts[0])
             elif type == 'call':
                 l = len(arg_parts)
                 if l == 0:
                     raise BreakpointError, "Call breakpoints " +\
                             "require a function name to be specified"
-                elif l > 1:
-                    clazz = arg_parts[0]
-                    fn = arg_parts[1]
-                else:
-                    fn = arg_parts[0]
-                    clazz = None
-                return CallBreakpoint(ui,fn,clazz)
+                return CallBreakpoint(ui,arg_parts[0])
             else:
                 raise BreakpointError, "Unknown breakpoint type, " +\
                         "please choose one of: conditional, exception,"+\
@@ -174,7 +169,7 @@ class LineBreakpoint(Breakpoint):
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        cmd += " -f " + self.file.as_remote()
+        cmd += " -f file://" + self.file.as_remote()
         cmd += " -n " + str(self.line)
         cmd += " -s enabled"
         
@@ -203,6 +198,19 @@ class ConditionalBreakpoint(LineBreakpoint):
         cmd += " -- " + base64.encodestring(self.condition)
         return cmd
 
+class WatchBreakpoint(Breakpoint):
+    type = "watch"
+
+    def __init__(self,ui,expr):
+        Breakpoint.__init__(self,ui)
+        self.expr = expr
+
+    def get_cmd(self):
+        cmd = "-t " + self.type
+        cmd += " -- " + base64.encodestring(self.expr)
+        return cmd
+
+
 class ExceptionBreakpoint(Breakpoint):
     type = "exception"
 
@@ -219,15 +227,12 @@ class ExceptionBreakpoint(Breakpoint):
 class CallBreakpoint(Breakpoint):
     type = "call"
 
-    def __init__(self,ui,function,clazz = None):
+    def __init__(self,ui,function):
         Breakpoint.__init__(self,ui)
         self.function = function
-        self.clazz = clazz
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        if self.clazz is not None:
-            cmd += " -a %s" % self.clazz
         cmd += " -m %s" % self.function
         cmd += " -s enabled"
         return cmd

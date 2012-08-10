@@ -65,13 +65,13 @@ let g:debugger_options_defaults = {
 \    "port" : 9000,
 \    "timeout" : 30,
 \    "server" : 'localhost',
-\    "on_close" : 'detach',
+\    "on_close" : 'stop',
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 2,
 \    "debug_file" : "/home/jon/vdebug.log",
-\    "remote_path" : "/home/pi/projects",
-\    "local_path" : "/home/jon",
+\    "remote_path" : "",
+\    "local_path" : "",
 \}
 
 let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)
