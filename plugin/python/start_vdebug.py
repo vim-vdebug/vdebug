@@ -28,8 +28,7 @@ class DebuggerInterface:
 
     def handle_socket_end(self):
         self.runner.ui.say("Connection to the debugger has been closed")
-        if self.runner.ui.is_open:
-            self.runner.ui.statuswin.set_status("stopped")
+        self.runner.close_connection()
 
     def handle_vim_error(self,e):
         self.runner.ui.error("A Vim error occured: "+\

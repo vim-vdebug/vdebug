@@ -64,7 +64,11 @@ class Runner:
             self.ui.error("Cannot update: no connection")
         else:
 
-            if str(status) in ("stopping","stopped"):
+            if str(status) == "interactive":
+                self.ui.error("Debugger engine says it is in interactive mode,"+\
+                        "which is not supported: closing connection")
+                self.close_connection()
+            elif str(status) in ("stopping","stopped"):
                 self.ui.statuswin.set_status("stopped")
                 self.ui.say("Debugging session has ended")
                 self.close_connection()
@@ -267,20 +271,20 @@ class Runner:
     def close_connection(self):
         """ Close the connection to the debugger.
         """
+        self.breakpoints.unlink_api()
+        self.ui.mark_as_stopped()
         try:
             if self.is_alive():
-                self.breakpoints.unlink_api()
+                vdebug.log.Log("Closing the connection")
                 if vdebug.opts.Options.get('on_close') == 'detach':
                     self.api.detach()
                 else:
                     self.api.stop()
                 self.api.conn.close()
-                self.ui.mark_as_stopped()
                 
             self.api = None
         except EOFError:
             self.ui.say("Connection has been closed")
-            self.ui.mark_as_stopped()
 
     def close(self):
         """ Close both the connection and vdebug.ui.
