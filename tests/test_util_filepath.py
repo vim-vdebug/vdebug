@@ -2,13 +2,13 @@ import sys
 sys.path.append('../plugin/python')
 import unittest
 """ Mock vim import """
-import opts
-from util import FilePath,FilePathError
+import vdebug.opts
+from vdebug.util import FilePath,FilePathError
 
 class LocalFilePathTest(unittest.TestCase):
 
     def setUp(self):
-        opts.Options.set({'local_path':'','remote_path':''})
+        vdebug.opts.Options.set({'local_path':'','remote_path':''})
 
     def test_as_local(self):
         filename = "/home/user/some/path"
@@ -70,7 +70,7 @@ class LocalFilePathTest(unittest.TestCase):
 def RemotePathTest(self):
     def setUp(self):
         map = {"remote_path":"/remote/","local_path":"/local/"}
-        opts.Options.set(map)
+        vdebug.opts.Options.set(map)
 
     def test_as_local(self):
         filename = "/remote/path/to/file"
