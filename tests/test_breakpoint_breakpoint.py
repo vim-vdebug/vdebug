@@ -1,7 +1,8 @@
 import sys
 sys.path.append('../plugin/python/')
 import unittest
-import breakpoint
+import vdebug.breakpoint
+import vdebug.util
 import base64
 from mock import Mock
 
@@ -12,7 +13,7 @@ class LineBreakpointTest(unittest.TestCase):
         ui = None
         file = "/path/to/file"
         line = 1
-        bp = breakpoint.LineBreakpoint(ui,file,line)
+        bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
         assert bp.get_file() == file
 
     def test_get_line(self):
@@ -20,48 +21,48 @@ class LineBreakpointTest(unittest.TestCase):
         ui = None
         file = "/path/to/file"
         line = 10
-        bp = breakpoint.LineBreakpoint(ui,file,line)
+        bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
         assert bp.get_line() == line
 
     def test_get_cmd(self):
         """ Test that the dbgp command is correct."""
         ui = None
-        file = "/path/to/file"
+        file = vdebug.util.FilePath("/path/to/file")
         line = 20
-        bp = breakpoint.LineBreakpoint(ui,file,line)
-        assert bp.get_cmd() == "-t line -f %s -n %i" %(file, line)
+        bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
+        assert bp.get_cmd() == "-t line -f %s -n %i -s enabled" %(file, line)
 
     def test_on_add_sets_ui_breakpoint(self):
         """ Test that the breakpoint is placed on the source window."""
         ui = Mock()
-        file = "/path/to/file"
+        file = vdebug.util.FilePath("/path/to/file")
         line = 20
-        bp = breakpoint.LineBreakpoint(ui,file,line)
+        bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
         bp.on_add()
-        ui.place_breakpoint.assert_called_with(\
-                bp.get_id(),\
-                file,\
-                line)
+        ui.register_breakpoint.assert_called_with(bp)
 
     def test_on_remove_deletes_ui_breakpoint(self):
         """ Test that the breakpoint is removed from the source window."""
         ui = Mock()
-        file = "/path/to/file"
+        file = vdebug.util.FilePath("/path/to/file")
         line = 20
-        bp = breakpoint.LineBreakpoint(ui,file,line)
+        bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
         bp.on_remove()
-        ui.remove_breakpoint.assert_called_with(bp.get_id())
+        ui.remove_breakpoint.assert_called_with(bp)
 
 class ConditionalBreakpointTest(unittest.TestCase):
+    def setUp(self):
+        vdebug.opts.Options.set({})
+
     def test_get_cmd(self):
         """ Test that the dbgp command is correct."""
         ui = None
-        file = "/path/to/file"
+        file = vdebug.util.FilePath("/path/to/file")
         line = 20
         condition = "$x > 20"
-        bp = breakpoint.ConditionalBreakpoint(ui,file,line,condition)
+        bp = vdebug.breakpoint.ConditionalBreakpoint(ui,file,line,condition)
         b64cond = base64.encodestring(condition)
-        exp_cmd = "-t conditional -f %s -n %i -- %s" %(file, line, b64cond)
+        exp_cmd = "-t conditional -f %s -n %i -s enabled -- %s" %(file, line, b64cond)
         assert bp.get_cmd() == exp_cmd
 
 class ExceptionBreakpointTest(unittest.TestCase):
@@ -69,8 +70,8 @@ class ExceptionBreakpointTest(unittest.TestCase):
         """ Test that the dbgp command is correct."""
         ui = None
         exception = "ExampleException"
-        bp = breakpoint.ExceptionBreakpoint(ui,exception)
-        exp_cmd = "-t exception -x %s" % exception
+        bp = vdebug.breakpoint.ExceptionBreakpoint(ui,exception)
+        exp_cmd = "-t exception -x %s -s enabled" % exception
         assert bp.get_cmd() == exp_cmd
 
 class CallBreakpointTest(unittest.TestCase):
@@ -78,8 +79,8 @@ class CallBreakpointTest(unittest.TestCase):
         """ Test that the dbgp command is correct."""
         ui = None
         function = "myfunction"
-        bp = breakpoint.CallBreakpoint(ui,function)
-        exp_cmd = "-t call -m %s" % function
+        bp = vdebug.breakpoint.CallBreakpoint(ui,function)
+        exp_cmd = "-t call -m %s -s enabled" % function
         assert bp.get_cmd() == exp_cmd
 
 class ReturnBreakpointTest(unittest.TestCase):
@@ -87,34 +88,35 @@ class ReturnBreakpointTest(unittest.TestCase):
         """ Test that the dbgp command is correct."""
         ui = None
         function = "myfunction"
-        bp = breakpoint.ReturnBreakpoint(ui,function)
-        exp_cmd = "-t return -m %s" % function
+        bp = vdebug.breakpoint.ReturnBreakpoint(ui,function)
+        exp_cmd = "-t return -m %s -s enabled" % function
+        print bp.get_cmd()
         assert bp.get_cmd() == exp_cmd
 
 
 class BreakpointTest(unittest.TestCase):
 
     def test_id_is_unique(self):
-        """Test that each Breakpoint has a unique ID.
+        """Test that each vdebug.breakpoint has a unique ID.
 
         Consecutively generated breakpoints should have
         different IDs."""
-        bp1 = breakpoint.Breakpoint(None)
-        bp2 = breakpoint.Breakpoint(None)
+        bp1 = vdebug.breakpoint.Breakpoint(None)
+        bp2 = vdebug.breakpoint.Breakpoint(None)
 
         self.assertNotEqual(bp1.get_id(),bp2.get_id())
 
     def test_parse_with_line_breakpoint(self):
         """ Test that a LineBreakpoint is created."""
         ui = Mock()
-        ret = breakpoint.Breakpoint.parse(ui,"")
-        self.assertIsInstance(ret,breakpoint.LineBreakpoint)
+        ret = vdebug.breakpoint.Breakpoint.parse(ui,"")
+        self.assertIsInstance(ret,vdebug.breakpoint.LineBreakpoint)
 
     def test_parse_with_conditional_breakpoint(self):
         """ Test that a ConditionalBreakpoint is created."""
         ui = Mock()
-        ret = breakpoint.Breakpoint.parse(ui,"conditional $x == 3")
-        self.assertIsInstance(ret,breakpoint.ConditionalBreakpoint)
+        ret = vdebug.breakpoint.Breakpoint.parse(ui,"conditional $x == 3")
+        self.assertIsInstance(ret,vdebug.breakpoint.ConditionalBreakpoint)
         assert ret.condition == "$x == 3"
 
     def test_parse_with_conditional_raises_error(self):
@@ -123,14 +125,14 @@ class BreakpointTest(unittest.TestCase):
         args = "conditional"
         re = "Conditional breakpoints require a condition "+\
                 "to be specified"
-        self.assertRaisesRegexp(breakpoint.BreakpointError,\
-                re, breakpoint.Breakpoint.parse, ui, args)
+        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+                re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_exception_breakpoint(self):
         """ Test that a ExceptionBreakpoint is created."""
         ui = Mock()
-        ret = breakpoint.Breakpoint.parse(ui,"exception ExampleException")
-        self.assertIsInstance(ret,breakpoint.ExceptionBreakpoint)
+        ret = vdebug.breakpoint.Breakpoint.parse(ui,"exception ExampleException")
+        self.assertIsInstance(ret,vdebug.breakpoint.ExceptionBreakpoint)
         assert ret.exception == "ExampleException"
 
     def test_parse_with_exception_raises_error(self):
@@ -139,15 +141,15 @@ class BreakpointTest(unittest.TestCase):
         args = "exception"
         re = "Exception breakpoints require an exception name "+\
                 "to be specified"
-        self.assertRaisesRegexp(breakpoint.BreakpointError,\
-                re, breakpoint.Breakpoint.parse, ui, args)
+        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+                re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
 
     def test_parse_with_call_breakpoint(self):
         """ Test that a CallBreakpoint is created."""
         ui = Mock()
-        ret = breakpoint.Breakpoint.parse(ui,"call myfunction")
-        self.assertIsInstance(ret,breakpoint.CallBreakpoint)
+        ret = vdebug.breakpoint.Breakpoint.parse(ui,"call myfunction")
+        self.assertIsInstance(ret,vdebug.breakpoint.CallBreakpoint)
         assert ret.function == "myfunction"
 
     def test_parse_with_call_raises_error(self):
@@ -156,14 +158,14 @@ class BreakpointTest(unittest.TestCase):
         args = "call"
         re = "Call breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(breakpoint.BreakpointError,\
-                re, breakpoint.Breakpoint.parse, ui, args)
+        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+                re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_return_breakpoint(self):
         """ Test that a ReturnBreakpoint is created."""
         ui = Mock()
-        ret = breakpoint.Breakpoint.parse(ui,"return myfunction")
-        self.assertIsInstance(ret,breakpoint.ReturnBreakpoint)
+        ret = vdebug.breakpoint.Breakpoint.parse(ui,"return myfunction")
+        self.assertIsInstance(ret,vdebug.breakpoint.ReturnBreakpoint)
         assert ret.function == "myfunction"
 
     def test_parse_with_return_raises_error(self):
@@ -172,15 +174,6 @@ class BreakpointTest(unittest.TestCase):
         args = "return"
         re = "Return breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(breakpoint.BreakpointError,\
-                re, breakpoint.Breakpoint.parse, ui, args)
-
-    def test_parse_with_call_raises_error(self):
-        """ Test that an exception is raised with invalid call args."""
-        ui = Mock()
-        args = "call"
-        re = "Call breakpoints require a function name "+\
-                "to be specified"
-        self.assertRaisesRegexp(breakpoint.BreakpointError,\
-                re, breakpoint.Breakpoint.parse, ui, args)
+        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+                re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 

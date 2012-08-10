@@ -1,11 +1,11 @@
 import sys
 sys.path.append('../plugin/python/')
 import unittest
-import dbgp
+import vdebug.dbgp
 from mock import MagicMock, patch
 
 class ApiTest(unittest.TestCase):      
-    """Test the Api class in the dbgp module."""
+    """Test the Api class in the vdebug.dbgp module."""
 
     init_msg = """<?xml version="1.0"
         encoding="iso-8859-1"?>\n<init
@@ -20,11 +20,11 @@ class ApiTest(unittest.TestCase):
         Rethans]]></copyright></init>"""
 
     def setUp(self):
-        with patch('dbgp.Connection') as c:
+        with patch('vdebug.dbgp.Connection') as c:
             self.c = c.return_value
             self.c.recv_msg.return_value = self.init_msg
             self.c.isconnected.return_value = 1
-            self.p = dbgp.Api(self.c)
+            self.p = vdebug.dbgp.Api(self.c)
 
     def test_init_msg_parsed(self):
         """Test that the init message from the debugger is
@@ -163,17 +163,10 @@ class apiInvalidInitTest(unittest.TestCase):
         xmlns="urn:debugger_api_v1">\n</invalid>"""
 
     def test_invalid_response_raises_error(self):
-        with patch('dbgp.Connection') as c:
+        with patch('vdebug.dbgp.Connection') as c:
             c = c.return_value
             c.recv_msg.return_value = self.invalid_init_msg
             c.isconnected.return_value = 1
             re = "Invalid XML response from debugger"
-            self.assertRaisesRegexp(dbgp.ResponseError,re,dbgp.Api,c)
-
-    def test_wrong_idekey_raises_exception(self):
-        with patch('dbgp.Connection') as c:
-            c = c.return_value
-            c.recv_msg.return_value = self.init_msg
-            c.isconnected.return_value = 1
-            self.assertRaises(dbgp.WrongIDEKeyException,dbgp.Api,c,'other-ide-key')
+            self.assertRaisesRegexp(vdebug.dbgp.ResponseError,re,vdebug.dbgp.Api,c)
 
