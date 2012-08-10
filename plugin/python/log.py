@@ -90,6 +90,7 @@ class FileLogger(Logger):
             self.__open()
         self.f.write(\
             self.format(string,level)+"\n")
+        self.f.flush()
 
 class Log:
 
