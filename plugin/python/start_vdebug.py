@@ -7,7 +7,7 @@ sys.path.append(dir)
 
 import vim
 import traceback
-import vdebug.interface
+import vdebug.runner
 import vdebug.event
 
 class DebuggerInterface:
@@ -16,7 +16,7 @@ class DebuggerInterface:
     Fatal exceptions are caught and handled here.
     """
     def __init__(self):
-        self.runner = vdebug.interface.Runner()
+        self.runner = vdebug.runner.Runner()
         self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
@@ -109,7 +109,7 @@ class DebuggerInterface:
 
     def handle_visual_eval(self):
         try:
-            return self.event_dispatcher.handle_visual_eval()
+            return self.event_dispatcher.visual_eval()
         except vdebug.dbgp.TimeoutError:
             self.handle_timeout()
         except EOFError:
