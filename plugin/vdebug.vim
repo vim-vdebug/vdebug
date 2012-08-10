@@ -41,6 +41,8 @@ else
   endif
 endif
 
+python vdebug = DebuggerInterface()
+
 if !exists("g:debugger_options")
     let g:debugger_options = {}
 endif

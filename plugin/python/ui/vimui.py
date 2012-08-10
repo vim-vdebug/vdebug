@@ -1,7 +1,9 @@
 # coding=utf-8
 import ui.interface
+import util
 import vim
 import log
+import opts
 
 class Ui(ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -12,12 +14,10 @@ class Ui(ui.interface.Ui):
         self.is_open = False
         self.breakpoint_store = breakpoints
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
-        self.options = None
 
-    def open(self,options):
+    def open(self):
         if self.is_open:
             return
-        self.options = options
         self.is_open = True
         vim.command('silent tabnew')
         self.tabnr = vim.eval("tabpagenr()")
@@ -39,26 +39,15 @@ class Ui(ui.interface.Ui):
 
         logwin = LogWindow(self,'rightbelow 6new')
         log.Log.set_logger(log.WindowLogger(\
-                options['debug_window_level'],\
+                opts.Options.get('debug_window_level'),\
                 logwin))
 
         winnr = self.__get_srcwinno_by_name(srcwin_name)
         self.sourcewin = SourceWindow(self,winnr)
         self.sourcewin.focus()
 
-    def set_source_position(self,filename,lineno):
-        if len(self.options['remote_path']):
-            if filename.startswith('file://'):
-                filename = filename[7:]
-            rp = self.options['remote_path']
-            lp = self.options['local_path']
-            log.Log("Replacing remote path (%s) " % rp +\
-                    "with local path (%s)" % lp,\
-                    log.Logger.DEBUG)
-            if filename.startswith(rp):
-                filename = filename.replace(rp,lp)
-
-        self.sourcewin.set_file(filename)
+    def set_source_position(self,file,lineno):
+        self.sourcewin.set_file(file)
         self.sourcewin.set_line(lineno)
         self.sourcewin.place_pointer(lineno)
 
@@ -83,7 +72,7 @@ class Ui(ui.interface.Ui):
         self.statuswin.insert(details,1,True)
 
     def get_current_file(self):
-        return vim.current.buffer.name
+        return util.FilePath(vim.current.buffer.name)
 
     def get_current_row(self):
         return vim.current.window.cursor[0]
@@ -168,8 +157,6 @@ class SourceWindow(ui.interface.Window):
         vim.command(command_str)
 
     def set_file(self,file):
-        if file.startswith("file://"):
-            file = file[7:]
         if file == self.file:
             return
         self.file = file
@@ -183,7 +170,7 @@ class SourceWindow(ui.interface.Window):
 
     def get_file(self):
         self.focus()
-        self.file = vim.eval("expand('%:p')")
+        self.file = util.FilePath(vim.eval("expand('%:p')"))
         return self.file
 
     def clear_signs(self):
