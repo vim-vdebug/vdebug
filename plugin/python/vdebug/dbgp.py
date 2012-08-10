@@ -106,6 +106,14 @@ class ContextGetResponse(Response):
 
 class EvalResponse(ContextGetResponse):
     """Response object returned by the eval command."""
+    def __init__(self,response,cmd,cmd_args,api):
+        try:
+            ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
+        except DBGPError, e:
+            if int(e.args[1]) == 206:
+                raise EvalError
+            else:
+                raise e
 
     def get_context(self):
         code = self.get_code()
@@ -612,6 +620,10 @@ class TimeoutError(Exception):
 
 class DBGPError(Exception):
     """Raised when the debugger returns an error message."""
+    pass
+
+class EvalError(Exception):
+    """Raised when some evaluated code is invalid."""
     pass
 
 class ResponseError(Exception):
