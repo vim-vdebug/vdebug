@@ -7,6 +7,10 @@ class Dispatcher:
     def __init__(self,runner):
         self.runner = runner
 
+    def visual_eval(self):
+        event = VisualEvalEvent()
+        return event.execute(self.runner)
+
     def by_position(self):
         event = self._get_event_by_position()
         if event is not None:
@@ -16,7 +20,7 @@ class Dispatcher:
 
     def _get_event_by_position(self):
         buf_name = vim.current.buffer.name
-        p = re.compile("[/\\]([^/\\]+)$")
+        p = re.compile('.*[\\/]([^\\/]+)')
         m = p.match(buf_name)
         if m is None:
             return None
@@ -26,10 +30,10 @@ class Dispatcher:
             lineno = vim.current.window.cursor[0]
             vdebug.log.Log("User action in watch window, line %s" % lineno,\
                     vdebug.log.Logger.DEBUG)
-            line = self.ui.watchwin.buffer[lineno-1]
+            line = self.runner.ui.watchwin.buffer[lineno-1]
             if lineno == 1:
                 return WatchWindowContextChangeEvent()
-            elif line.find("▸"):
+            elif line.find("▸") > -1:
                 return WatchWindowPropertyGetEvent()
         elif window_name == self.runner.ui.stackwin.name:
             return StackWindowLineSelectEvent()
@@ -37,6 +41,12 @@ class Dispatcher:
 class Event:
     def execute(self,runner):
         pass
+
+class VisualEvalEvent(Event):
+    def execute(self,runner):
+        selection = vim.eval("vdebug:get_visual_selection()")
+        runner.eval(selection)
+        return True
 
 class StackWindowLineSelectEvent(Event):
     def execute(self,runner):
@@ -56,10 +66,13 @@ class StackWindowLineSelectEvent(Event):
 class WatchWindowPropertyGetEvent(Event):
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
-        line = vim.current.buffer[lineno]
+        line = vim.current.buffer[lineno-1]
         pointer_index = line.find("▸")
 
         eq_index = line.find('=')
+        if eq_index == -1:
+            raise EventError, "Cannot read the selected property"
+
         name = line[pointer_index+4:eq_index-1]
         context_res = runner.api.property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)

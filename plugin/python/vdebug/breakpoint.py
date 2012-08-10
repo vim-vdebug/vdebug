@@ -124,15 +124,29 @@ class Breakpoint:
                             "require an exception name to be specified"
                 return ExceptionBreakpoint(ui,arg_parts[0])
             elif type == 'return':
-                if len(arg_parts) == 0:
+                l = len(arg_parts)
+                if l == 0:
                     raise BreakpointError, "Return breakpoints " +\
                             "require a function name to be specified"
-                return ReturnBreakpoint(ui,arg_parts[0])
+                elif l > 1:
+                    clazz = arg_parts[0]
+                    fn = arg_parts[1]
+                else:
+                    fn = arg_parts[0]
+                    clazz = None
+                return ReturnBreakpoint(ui,fn,clazz)
             elif type == 'call':
-                if len(arg_parts) == 0:
+                l = len(arg_parts)
+                if l == 0:
                     raise BreakpointError, "Call breakpoints " +\
                             "require a function name to be specified"
-                return CallBreakpoint(ui,arg_parts[0])
+                elif l > 1:
+                    clazz = arg_parts[0]
+                    fn = arg_parts[1]
+                else:
+                    fn = arg_parts[0]
+                    clazz = None
+                return CallBreakpoint(ui,fn,clazz)
             else:
                 raise BreakpointError, "Unknown breakpoint type, " +\
                         "please choose one of: conditional, exception,"+\
@@ -205,13 +219,16 @@ class ExceptionBreakpoint(Breakpoint):
 class CallBreakpoint(Breakpoint):
     type = "call"
 
-    def __init__(self,ui,function):
+    def __init__(self,ui,function,clazz = None):
         Breakpoint.__init__(self,ui)
         self.function = function
+        self.clazz = clazz
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        cmd += " -m " + self.function
+        if self.clazz is not None:
+            cmd += " -a %s" % self.clazz
+        cmd += " -m %s" % self.function
         cmd += " -s enabled"
         return cmd
 
