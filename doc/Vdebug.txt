@@ -35,6 +35,7 @@ CONTENTS                                                      *Vdebug-contents*
             4.2.3 The stack window...................|VdebugStackWindow|
             4.2.4 The status window..................|VdebugStatusWindow|
             4.2.5 The breakpoint window..............|VdebugBreakpointWindow|
+            4.2.6 The log window.....................|VdebugLogWindow|
         4.3 Commands.................................|VdebugCommands|
             4.3.1 Run................................|VdebugCommandRun|
             4.3.2 Step over..........................|VdebugCommandStepOver|
@@ -48,15 +49,17 @@ CONTENTS                                                      *Vdebug-contents*
             4.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
             4.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
             4.4.4 Breakpoint types...................|VdebugBreakpointTypes|
-            4.4.5 The breakpoint window..............|VdebugBreakpointWindow|
-            4.4.6 Removing all breakpoints...........|VdebugRemoveBreakpoint|
+            4.4.5 Removing all breakpoints...........|VdebugRemoveBreakpoint|
         4.5 Evaluating expressions...................|VdebugEval|
             4.5.1 Evaluating any expression..........|VdebugEvalExpression|
             4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
     5. Options.......................................|VdebugOptions|
     6. Using an IDE key..............................|VdebugIDEKey|
     7. Debugging a script on a remote server.........|VdebugRemote|
-    8. Troubleshooting...............................|VdebugTroubleshooting|
+    8. Logging.......................................|VdebugLogging|
+        8.1 Window logging...........................|VdebugWindowLogging|
+        8.2 File logging.............................|VdebugFileLogging|
+    9. Troubleshooting...............................|VdebugTroubleshooting|
 
 ==============================================================================
 1. Introduction                                                  *VdebugIntro*
@@ -273,7 +276,43 @@ go.
 ------------------------------------------------------------------------------
 3.4 Perl set up                                              *VdebugSetUpPerl*
 
-TODO
+Perl is one of the trickier languages to set up, unless you have very specific 
+instructions on what to do. Fortunately, that's what I'm going to give you!
+
+Like Python and Ruby, Activestate provide a standalone module that you can use 
+to remotely debug Perl applications. What makes this more difficult than Python
+and Ruby is that the debugging script changes and, as far as I can see, breaks
+after a particular version. That means you have to get the right version from
+Activestate, and working that out on your own is a bit of a pain.
+
+Fortunately, I'm going to make it easy for you and give you the exact version
+to download. Go to the archive at 
+http://downloads.activestate.com/Komodo/releases/archive/4.x/4.4.1/remotedebugging 
+and download the archive with "Perl" in the name that suits your operating system.
+
+Just a reminder that, from here, the instructions are for Linux. Activestate
+have instructions for other systems on their website.
+
+Unpack the archive somewhere on your system. There is a perl5db.pl script that 
+you will need to include to enable debugging. To do this you need to set some 
+environment variables to point to the directory containing this file: >
+    export PERL5LIB=/path/to/Komodo-PerlRemoteDebugging-xxx/
+    export PERL5DB="BEGIN { require q($PERL5LIB/perl5db.pl)}"
+    export PERLDB_OPTS="RemotePort=localhost:9000"
+    export DBGP_IDEKEY="whatever"
+<
+The second line is for good measure, making sure the right file is included
+when perl starts up. The third line sets debugger options, and the fourth line
+allows you to set an IDE key if you want to use one (Vdebug allows you to
+restrict connections to a single IDE key, but by default all connections will
+be picked up - see section |VdebugIDEKey|).
+
+To start a Perl script with the debugger engine activated, e.g. myscript.pl,
+run: >
+    perl -d myscript.pl
+<
+If you haven't started Vdebug you will get a message saying that it can't
+connect. This means you've set it up correctly.
 
 ==============================================================================
 4. Usage                                                         *VdebugUsage*
@@ -289,6 +328,9 @@ The default key for starting the debugger is <F5>. Pressing this should show
 the message: >
     Waiting for a connection (this message will self-destruct in 30 seconds...)
 <
+(If you don't get this message see the section on troubleshooting,
+|VdebugTroubleshooting|)
+
 Vdebug is now listening for an incoming connection, which will be started when
 a script is run with the debugger engine activated. View the section
 |VdebugSetUp| to see the necessary steps to start a script in this way. It will
@@ -334,9 +376,139 @@ fairly self-explanatory: right arrows show a closed tree, down arrows show an
 open tree and diamonds show variables that don't have children.
 
 To open a closed tree, navigate to a line with a closed tree (right arrow) and
-press <enter> (<cr>). This will open the tree, and you can do this as many
-times as there are children.
+press <enter> (<cr>) or double-click if you have mouse-support enabled. This 
+will open the tree, and show all the children.
 
 The watch window automatically updates every time the debugger pauses, so
-nothing needs to be done to update it.
+nothing needs to be done on your part.
 
+You can also see variables from different contexts. For example, PHP has normal
+context variables and global variables, and the debugging engine differentiates
+between them. The options are shown in a sort of tab interface at the top of
+the watch window, and you can switch to a different context by pressing <enter>
+(<cr>) on the context you want, or double-clicking on it with your mouse if you
+have mouse support enabled. The currently showing context is highlighted (if
+you have syntax highlighting on) and starts with an asterix.
+
+The watch window is also used to show the results of "eval" operations. See
+the |VdebugEval| section for more on that.
+
+------------------------------------------------------------------------------
+4.2.3 The stack window                                     *VdebugStackWindow*
+
+The stack window shows the current execution stack, which is a list of files
+and functions/methods that the program has run through to get the current
+position. The top entry ([0]) is always the current position, and the entries
+below show the path the script has taken.
+
+Like the watch window, the stack will update automatically every time the 
+debugger pauses. You can jump to a place in the stack by putting your cursor
+over a line and pressing <enter> (<cr>) or by double clicking with your mouse
+(if you have mouse support enabled).
+
+------------------------------------------------------------------------------
+4.2.4 The status window                                   *VdebugStatusWindow*
+
+The status window shows several things. At the top of the window it shows the
+debugger's status, which is a message the engine sends to Vdebug. It will say
+when it's starting, running, breaking or stopping.
+
+The two lines below show the connection details. The first of these lines show
+which address and port Vdebug is binding itself to (defaults to localhost:9000)
+and the second shows the address and port that the engine has used to connect.
+If you're debugging a script on your machine then the IP address will be the
+same as localhost. It's only when you're debugging a script on a remote server
+that it will be any different. However, the port used will be, to all intents
+and purposes, random.
+
+The bottom line is just a helpful message, reminding you how to start and where
+to go for help!
+
+------------------------------------------------------------------------------
+4.2.5 The breakpoint window                           *VdebugBreakpointWindow*
+
+This is a bit of an odd one out, as it doesn't show by default and can be
+summoned at will. It lists all the breakpoints that have been set, and shows
+their IDs that can be used to remove them.
+
+To open the window use the command :BreakpointWindow. It's in a table format,
+so hopefully it won't need any more explanation. To close the window again,
+just re-type :BreakpointWindow or :q.
+
+To see more about breakpoints see |VdebugBreakpoints|.
+
+------------------------------------------------------------------------------
+4.2.6 The log window                                         *VdebugLogWindow*
+
+Another odd one out, this only appears in two situations:
+    1. You have the "debug_window_level" option set to >= 1
+    2. An error occurs
+
+In the case of 1), the window will open as soon as a debugging session starts.
+This isn't recommended for normal use, as it noticeably slows the interface
+down. In the case of 2), the window will automatically open when an error happens.
+
+If you want to log things, it's better to use file logging (see
+|VdebugLogFile|).
+
+------------------------------------------------------------------------------
+4.3 Commands                                                  *VdebugCommands*
+
+This section will describe the basic commands that you will need to start
+debugging, and the default keys mapped to those commands.
+
+    4.3.1 Run                                               *VdebugCommandRun*
+    Default key: <F5>
+    Tells the debugger engine to run, which it will do until it meets a
+    breakpoint or the end of the script.
+
+    4.3.2 Step over                                    *VdebugCommandStepOver*
+    Default key: <F2>
+    Tells the debugger engine to step to the next statement, e.g. the next line
+    of the script. Useful for going through a problem section of the script
+    with a fine toothcomb.
+    
+    4.3.3 Step in                                        *VdebugCommandStepIn*
+    Default key: <F3>
+    Tells the debugger engine to step in to a statement on the current line.
+    For instance, if there's a function call on the current line it will jump to
+    the start of that function.
+    
+    4.3.4 Step out                                      *VdebugCommandStepOut*
+    Default key: <F4>
+    Tells the debugger engine to step out of the current statement into the
+    calling statement. Essentially this is the opposite of step in.
+
+    4.3.5 Run to cursor                             *VdebugCommandRunToCursor*
+    Default key: <F1>
+    Tells the debugger engine to run until the point where the cursor is
+    currently sitting. One of the most useful commands, as it means that
+    setting a hard breakpoint is not always necessary. This only works if the
+    cursor is in the source window, otherwise it doesn't make sense! But it
+    also doesn't need to be a point in the current file, just somewhere that 
+    the execution is going to hit.
+
+    4.3.6 Detach                                         *VdebugCommandDetach*
+    Default key: <F7>
+    Tells the debugger engine to break away and continue execution as normal.
+    At this point, breakpoints are forgotten and Vdebug doesn't have any more
+    control over execution. An alternative to "stop", which kills the program.
+
+    4.3.7 Stop/close                                       *VdebugCommandStop*
+    Default key: <F6>
+    Tells the debugger engine to stop the program, killing it at the point it's
+    reached. If the program has already been stopped it closes the debugger UI.
+    
+        4.4 Breakpoints..............................|VdebugBreakpoints|
+            4.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
+            4.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
+            4.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
+            4.4.4 Breakpoint types...................|VdebugBreakpointTypes|
+            4.4.5 Removing all breakpoints...........|VdebugRemoveBreakpoint|
+
+------------------------------------------------------------------------------
+4.4 Breakpoints                                            *VdebugBreakpoints*
+
+This section explains how to set and remove line breakpoints, and also how to
+set more advanced types of breakpoint. It also explains how to manage your list
+of breakpoints.
