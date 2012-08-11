@@ -58,7 +58,8 @@ let g:debugger_keymap_defaults = {
 \    "step_into" : "<F3>",
 \    "step_out" : "<F4>",
 \    "close" : "<F6>",
-\    "set_breakpoint" : "<F8>",
+\    "detach" : "<F7>",
+\    "set_breakpoint" : "<F10>",
 \}
 
 let g:debugger_options_defaults = {
