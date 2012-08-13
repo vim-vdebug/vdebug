@@ -631,12 +631,12 @@ On evaluating an expression, the result is shown in the watch window.
 ------------------------------------------------------------------------------
 4.5.1 Evaluating any expression                         *VdebugEvalExpression*
 
-To evaluate an expression, use the command :DebuggerEval: >
-    :DebuggerEval <code>
+To evaluate an expression, use the command :VdebugEval: >
+    :VdebugEval <code>
 <
 
 The result is shown on the watch window. E.g: >
-    :DebuggerEval $x + 2
+    :VdebugEval $x + 2
 <
 
 ------------------------------------------------------------------------------

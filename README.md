@@ -76,7 +76,7 @@ Once in debugging mode, the following default mappings are available:
  * `<F10>`: set line breakpoint
  * `:Breakpoint <type> <args>`: set a breakpoint of any type (see :help
     VdebugBreakpoints)
- * `:DebuggerEval <code>`: evaluate some code and display the result
+ * `:VdebugEval <code>`: evaluate some code and display the result
  * `<Leader>e`: evaluate the expression under visual highlight and display the result
 
 To stop debugging, press `<F6>`. Press it again to close the debugger interface.
