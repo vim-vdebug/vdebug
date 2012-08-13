@@ -1,55 +1,57 @@
-# Vim-Xdebug
+# Vdebug
 
-This vim plugin provides a debugger interface to DBGp protocol, and therefore
-Xdebug (only tested on Xdebug 2).
+Vdebug is a new, fast, powerful debugger client for Vim. It's multi-language,
+and has been tested with PHP, Python, Ruby and Perl. It interfaces with
+debuggers that use the DBGP protocol, such as Xdebug for PHP. 
 
-This is a fork of [this plugin](https://github.com/ludovicPelle/vim-xdebug), 
-which in itself is a fork of [this plugin](http://www.vim.org/scripts/script.php?script_id=1152), which
-is a bit buggy, limited is many ways and not maintained anymore.
+It builds on the experience gained through the legacy of the Xdebug Vim script 
+originally created by Seung Woo Shin and extended by so many others, but it's a
+total rebuild to allow for a nicer interface and support of new features.
 
-# Changes
+It's written in Python, and has an object-oriented interface that is easy to extend 
+and can even be used from the command-line.
 
-* Open the whole debugger session in a new tab, so that your carefully configured windows don't get messed up. When you end the session the whole tab closes.
-* The watch window now clears each time a new request is made, so that it doesn't get confusing.
-* Do a quick eval on expressions in visual selection.
-* If the maximum depth is reached on an array or object in the watch window, hit `<CR>` (return key) and the contents will be inserted inline.
-* Better code folding in the watch window.
-* You can now show all globals in the current context, and class variables (i.e. static variables).
-* Better information and error messages.
-* Improved formatting for eval results in watch window.
-* Fixed some problems with unicode.
-* The default depth of data to retrieve is now configurable, so that you can look deeper into arrays/objects.
-* A new "command" window shows the list of commands made to the debugger, and you can hit `<CR>` on any of them to re-run it. You can also type in commands and `<CR>` will execute them.
-* When the debugger session ends, no longer do you get an ugly exception. Instead, you get a nice message telling you that it's closed.
-* Windows are better arranged (I think).
-* Toggle variable for putting it in debug/verbose mode.
+# How to use
 
+There is *extensive* help provided in the form of a Vim help file. This goes
+through absolutely everything, from installation to configuration, setting up
+debuggers for various languages, explanation of the interface, options, remote
+server debugging and more.
+
+To get this help, type:
+
+```
+:help Vdebug
+```
+
+after installing the plugin.
 
 # Installation
 
 **Requirements**:
 
-  * Vim compiled with Python (2) support
-  * DBGp protocol enabled debugging module, such as Xdebug.
+  * Vim compiled with Python 2 support, tabs and signs
+  * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
+    Perl, Tcl...
 
 ## Classic
 
 Clone or download a tarball of the plugin and move its content in your
 `~/.vim/` directory.
 
-Your `~/.vim/plugins/` directory should now have two more files: `debugger.py`
-and `debugger.vim`.
+Your `~/.vim/plugins/` directory should now contain vdebug.vim and a directory
+called "python".
 
 ## Using git and Pathogen
 
-Clone this repository in your `~/.vim/bundle` directory (and yeah, you're done).
+Clone this repository in your `~/.vim/bundle` directory
 
 ## Using vundle
 
 Add this to your `~/.vimrc` file:
 
 ```vim
-Bundle 'joonty/vim-xdebug.git'
+Bundle 'joonty/vdebug.git'
 ```
 
 Then, from the command line, run:
@@ -60,35 +62,26 @@ vim +BundleInstall +qall
 
 # Quick guide
 
-  1. setup Xdebug - or other DBGp enabled server - correctly (with proper remote
-     debug option)
-  2. press `F5` to make Vim wait for a debugging connection and browse your PHP
-     file (it will wait for 30 seconds, to give you plenty of time to run your program).
-
-     All the currently opened windows will be closed and debugging interface
-     will appear.
+  1. Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp) 
+  2. Start Vdebug with `<F5>`, which will make it wait for an incoming connection. Run the script you want to debug, with the debugging engine enabled. A new tab will open with the debugging interface.
   3. Once in debugging mode, the following mappings are available:
 
-      * `<F1>`: set breakpoint
-      * `<F2>`: step into
-      * `<F3>`: step over
+      * `<F1>`: run to cursor
+      * `<F2>`: step over
+      * `<F3>`: step into
       * `<F4>`: step out
+      * `<F5>`: run (to next breakpoint/end of script)
       * `<F6>`: stop debugging
-      * `<F11>`: shows all variables
-      * `<F12>`: shows variable on current cursor
-      * `,e`: evaluate an expression and display the result
-  4. To stop debugging, press `<F6>`
-
-
-# Contributors
-
- * Jon Cairns <jon AT joncairns.com>
- * Ludovic Pelle <ludovic_pelle AT carpe-hora.com>
- * [Kévin Gomez](https://github.com/K-Phoen) <contact AT kevingomez.fr>
- * Sam Ghods <sam AT box.net>
- * Seung Woo Shin <segv AT sayclub.com>
-
+      * `<F10>`: set line breakpoint
+      * `:Breakpoint <type> <args>`: set a breakpoint of any type (see :help
+        VdebugBreakpoints)
+      * `:DebuggerEval <code>`: evaluate some code and display the result
+      * `<Leader>e`: evaluate the expression under visual highlight and display the result
+  4. To stop debugging, press `<F6>`. Press it again to close the debugger
+     interface.
 
 # Licence
 
-The MIT/Expat licence.
+This plugin is released under the [MIT License][6].
+
+[1]: https://raw.github.com/joonty/vdebug/master/LICENSE

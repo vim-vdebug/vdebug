@@ -5,9 +5,9 @@
 "    Copyright: Copyright (C) 2012 Jon Cairns
 "      Licence:	The MIT Licence (see LICENCE file)
 " Name Of File: vdebug.vim
-"  Description: Multi-language debugger client for Vim
+"  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
+"               Perl)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
-"  Last Change: June 18, 2007
 "      Version: 1.0
 "               Inspired by the Xdebug plugin, which was originally written by 
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
