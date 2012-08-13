@@ -62,9 +62,9 @@ vim +BundleInstall +qall
 
 # Quick guide
 
-  1. Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp) 
-  2. Start Vdebug with `<F5>`, which will make it wait for an incoming connection. Run the script you want to debug, with the debugging engine enabled. A new tab will open with the debugging interface.
-  3. Once in debugging mode, the following default mappings are available:
+Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp). Start Vdebug with `<F5>`, which will make it wait for an incoming connection. Run the script you want to debug, with the debugging engine enabled. A new tab will open with the debugging interface.
+
+Once in debugging mode, the following default mappings are available:
 
  * `<F1>`: run to cursor
  * `<F2>`: step over
@@ -77,8 +77,8 @@ vim +BundleInstall +qall
     VdebugBreakpoints)
  * `:DebuggerEval <code>`: evaluate some code and display the result
  * `<Leader>e`: evaluate the expression under visual highlight and display the result
-  4. To stop debugging, press `<F6>`. Press it again to close the debugger
-     interface.
+
+To stop debugging, press `<F6>`. Press it again to close the debugger interface.
 
 # Licence
 
