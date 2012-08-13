@@ -46,19 +46,18 @@ CONTENTS                                                      *Vdebug-contents*
             4.3.7 Stop/close.........................|VdebugCommandStop|
         4.4 Breakpoints..............................|VdebugBreakpoints|
             4.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
-            4.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
-            4.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
-            4.4.4 Breakpoint types...................|VdebugBreakpointTypes|
-            4.4.5 Removing all breakpoints...........|VdebugRemoveBreakpoint|
-        4.5 Evaluating expressions...................|VdebugEval|
+            4.4.2 Setting other breakpoints..........|VdebugSetBreakpoints|
+            4.4.3 Viewing your breakpoints...........|VdebugViewBreakpoints|
+            4.4.4 Removing breakpoints...............|VdebugRemoveBreakpoints|
+        4.5 Evaluating code..........................|VdebugEval|
             4.5.1 Evaluating any expression..........|VdebugEvalExpression|
             4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
     5. Options.......................................|VdebugOptions|
-    6. Using an IDE key..............................|VdebugIDEKey|
-    7. Debugging a script on a remote server.........|VdebugRemote|
-    8. Logging.......................................|VdebugLogging|
-        8.1 Window logging...........................|VdebugWindowLogging|
-        8.2 File logging.............................|VdebugFileLogging|
+    6. Key maps......................................|VdebugKeys|
+    7. Using an IDE key..............................|VdebugIDEKey|
+    8. Debugging a script on a remote server.........|VdebugRemote|
+        8.1 File path mapping........................|VdebugRemoteFilePaths|
+        8.2 Connecting the two machines..............|VdebugRemoteConnection|
     9. Troubleshooting...............................|VdebugTroubleshooting|
 
 ==============================================================================
@@ -363,7 +362,7 @@ line is shown with a "->" sign in the margin.
 Don't edit the contents of the file when in debug mode, and especially don't 
 edit without saving - this causes problems when swapping between files.
 
-You can set line breakpoints here with the <F8> key or :Breakpoint, and can
+You can set line breakpoints here with the <F10> key or :Breakpoint, and can
 tell the debugger to run to the cursor with <F1>.
 
 ------------------------------------------------------------------------------
@@ -498,13 +497,6 @@ debugging, and the default keys mapped to those commands.
     Default key: <F6>
     Tells the debugger engine to stop the program, killing it at the point it's
     reached. If the program has already been stopped it closes the debugger UI.
-    
-        4.4 Breakpoints..............................|VdebugBreakpoints|
-            4.4.1 Setting a line breakpoint..........|VdebugSetLineBreakpoint|
-            4.4.2 Removing a line breakpoint.........|VdebugRemoveLineBreakpoint|
-            4.4.3 Setting all breakpoints............|VdebugSetBreakpoint|
-            4.4.4 Breakpoint types...................|VdebugBreakpointTypes|
-            4.4.5 Removing all breakpoints...........|VdebugRemoveBreakpoint|
 
 ------------------------------------------------------------------------------
 4.4 Breakpoints                                            *VdebugBreakpoints*
@@ -512,3 +504,427 @@ debugging, and the default keys mapped to those commands.
 This section explains how to set and remove line breakpoints, and also how to
 set more advanced types of breakpoint. It also explains how to manage your list
 of breakpoints.
+
+There are several types of breakpoint, and their support varies between
+debugger engines. The breakpoint types are:
+
+    * Line: break at a line in a given file
+    * Conditional: break at a line in a file when a given condition is true
+    * Exception: break when a given exception is thrown
+    * Call: break when a given function is called
+    * Return: break when returning from a given function
+    * Watch: break when a variable or address is written
+
+------------------------------------------------------------------------------
+4.4.1 Setting a line breakpoint                      *VdebugSetLineBreakpoint*
+
+This is the simplest kind of breakpoint to set, as it can be done in a single
+button press. The reason for this is that it is visual: put the cursor over the
+line and activate the breakpoint - all the work is then done to tell the
+debugger to break at this file and line number.
+
+To set a breakpoint, make sure you're in the source window and place the VIM
+cursor over the line you want to break at. Press <F10> to set a line breakpoint,
+or type :Breakpoint. The line is then highlighted. To remove the breakpoint
+just repeat the action on the same line.
+
+------------------------------------------------------------------------------
+4.4.2 Setting other breakpoints                         *VdebugSetBreakpoints*
+
+You can set any type of breakpoint using the :Breakpoint command. The syntax
+is: >
+    :Breakpoint <type> <arguments>
+<
+Using :Breakpoint without any arguments sets a line breakpoint at the current
+cursor position.
+
+The options for type are:
+
+    * line
+    * conditional
+    * exception
+    * return
+    * call
+    * watch
+
+Each type has its own interpretation of the following arguments. The "line"
+type breakpoint is covered in the previous section, |VdebugSetLineBreakpoint|.
+
+:Breakpoint conditional <condition>          *VdebugSetBreakpoints-conditional*
+    Extends the line breakpoint. Sets a breakpoint on the current file and
+    line, but only if <condition> evaluates to true. Everything after
+    'conditional' is treated as the condition, and it must be valid code in the
+    current language. E.g: >
+
+    :Breakpoint conditional $x == 2
+<
+
+:Breakpoint exception <exception-name>         *VdebugSetBreakpoints-exception*
+    Sets a breakpoint to activate when an exception is thrown. The full name of
+    the exception should be provided. E.g: >
+
+    :Breakpoint exception PDOException
+<
+
+:Breakpoint call <function-name>                    *VdebugSetBreakpoints-call*
+    Sets a breakpoint to activate when a function is called. The debugger stops
+    at the first line of the function. Note that the syntax for <function-name>
+    varies between debugger engine and is NOT well documented. In fact, Xdebug
+    doesn't mention how to set a breakpoint on class/object methods, and I have
+    yet to successfully do so. Global functions work without a problem. E.g: >
+    
+    :Breakpoint call open_file 
+<
+
+:Breakpoint return <function-name>                *VdebugSetBreakpoints-return*
+    Sets a breakpoint to activate when a function returns. The debugger stops
+    at the return line of the function. Note that this suffers from the same
+    problem as <call>, and setting class/object methods may not be possible.
+    Again, global functions work without a problem. E.g: >
+    
+    :Breakpoint return open_file 
+<
+
+:Breakpoint watch <variable-or-address>            *VdebugSetBreakpoints-watch*
+    Sets a breakpoint to activate when a variable or address is written. This
+    is not supported by Xdebug, so don't get your hopes up. Still, if it did
+    work then it might look like this: >
+    
+    :Breakpoint watch $myvar
+<
+
+------------------------------------------------------------------------------
+4.4.3 Viewing your breakpoints                         *VdebugViewBreakpoints*
+
+To see your current list of breakpoints, use the :BreakpointWindow command to
+open a window showing a tabular list. You can read more about it at
+|VdebugBreakpointWindow|.
+
+------------------------------------------------------------------------------
+4.4.4 Removing breakpoints                           *VdebugRemoveBreakpoints*
+
+Line breakpoints can be removed by pressing <F10> (default) or :Breakpoint while
+on a line with an existing breakpoint. Other types of breakpoint can be removed
+using the command: >
+    :BreakpointRemove <id>
+<
+The breakpoint's ID can be found in the breakpoint window (see
+|VdebugBreakpointWindow|), in the first column. For example: >
+    :BreakpointRemove 11000
+<
+To remove all breakpoints in one go use the command: >
+    :BreakpointRemove *
+<
+
+------------------------------------------------------------------------------
+4.5 Evaluating code                                               *VdebugEval*
+
+You can evaluate code snippets at the current point of execution, which can be
+used to see the result of a condition, arithmetic expressions, etc. These
+snippets are written in the language that's being debugged. There are two ways
+of evaluating expresions: you can either write them yourself
+(|VdebugEvalExpression) or use visual highlighting to select an expression from
+the source window.
+
+On evaluating an expression, the result is shown in the watch window.
+
+------------------------------------------------------------------------------
+4.5.1 Evaluating any expression                         *VdebugEvalExpression*
+
+To evaluate an expression, use the command :DebuggerEval: >
+    :DebuggerEval <code>
+<
+
+The result is shown on the watch window. E.g: >
+    :DebuggerEval $x + 2
+<
+
+------------------------------------------------------------------------------
+4.5.2 Evaluating highlighting expressions              *VdebugEvalHighlighted*
+
+Use visual highlighting (default command "v") to select an expression that you
+want to evalute and type "<Leader>e" (leader key followed by the letter "e"). 
+The result of the evaluation is shown on the watch window.
+
+==============================================================================
+5. Options                                                     *VdebugOptions*
+
+As there are a lot of options in Vdebug, they are set using a dictionary
+(the equivalent of an associative array in PHP or a hash in Ruby). This
+dictionary can be modified using the global variable "g:vdebug_options". The
+default ptions look like this: >
+    let g:vdebug_options= {
+    \    "port" : 9000,
+    \    "server" : 'localhost',
+    \    "timeout" : 20,
+    \    "on_close" : 'detach',
+    \    "ide_key" : '',
+    \    "remote_path" : "",
+    \    "local_path" : "",
+    \    "debug_window_level" : 0,
+    \    "debug_file_level" : 0,
+    \    "debug_file" : "",
+    \}
+<
+You can either use the multi-line notation like above, or set individual keys:
+>
+    g:vdebug_options['port'] = 9001
+<
+You only need to set the options you want to change: the defaults will be used
+if you don't set them.
+
+Here is a list of all the available options.
+
+                                                          *VdebugOptions-port*
+g:vdebug_options["port"] (default = 9000)                 
+    This sets the port that Vdebug will use to listen for connections. Xdebug
+    defaults to 9000, and it's the normal port for DBGP, so only change it if
+    you also change the port that the engine uses.
+
+                                                        *VdebugOptions-server*
+g:vdebug_options["server"] (default = "localhost")      
+    Sets the address that Vdebug will use to listen for connections. It
+    defaults to localhost, as it assumes that the debugger engine will be
+    running on the same machine and also connecting to localhost. If you want
+    to debug a script on a different machine, look at |VdebugRemote|.
+
+                                                       *VdebugOptions-timeout*
+g:vdebug_options["timeout"] (default = 20)             
+    Number of seconds to wait for when listening for a connection. VIM will
+    lock up due to the server socket listening for a client connection, so this
+    timeout is there to protect your VIM for locking up forever!
+
+                                                      *VdebugOptions-on_close*
+g:vdebug_options["on_close"] (default = "detach")     
+    The default action when stopping the debugger. By default, it will detach
+    the debugger engine meaning that the script will execute until it finishes.
+    The other option is "stop", which means that the script will be killed
+    immediately.
+
+                                                       *VdebugOptions-ide_key*
+g:vdebug_options["ide_key"] (default = empty)          
+    The IDE key that Vdebug will watch for with incoming connections. This
+    allows you to differentiate between connections, and only start a session
+    when this key matches the incoming key. This is empty by default, which
+    means that any incoming connection will be accepted. Filling in a value
+    restricts the connections to those that have a matching key. See
+    |VdebugIDEKey| for more information.
+
+                                                   *VdebugOptions-remote_path*
+g:vdebug_options["remote_path"] (default = empty)  
+    This is only used for debugging a script on a remote machine. This is used
+    to map remote file paths to local file paths, as they are very likely to be
+    different. Any file path specified here will be replaced by "local_path", 
+    so that the correct file is opened in the source window.
+
+                                                    *VdebugOptions-local_path*
+g:vdebug_options["local_path"] (default = empty)    
+    This is only used for debugging a script on a remote machine. This is used
+    to map local file paths to remote file paths, as they are very likely to be
+    different. Any file path specified here will be replaced by "remote_path"
+    before sending commands to the debugger engine.
+
+                                            *VdebugOptions-debug_window_level*
+g:vdebug_options["debug_window_level"] (default = 0)    
+    Sets the amount of information sent to the log window, |VdebugLogWindow|.
+    The default value, 0, only shows errors. The other options are 1
+    (information) and 2 (debug). The latter option is not ideal to use, as it
+    noticeably slows down the interface due to the amount of window writes.
+    It's far better to use file logging (|VdebugOptions-debug_file_level|) for
+    debugging.
+
+                                              *VdebugOptions-debug_file_level*
+g:vdebug_options["debug_file_level"] (default = 0)    
+    Sets the amount of information written to the log file, which is set with
+    the |VdebugOptions-debug_file| option. The default value, 0, only shows 
+    errors. The other options are 1 (information) and 2 (debug).
+
+                                                    *VdebugOptions-debug_file*
+g:vdebug_options["debug_file"] (default = empty)    
+    Sets the path to the log file, which writes information set by
+    |VdebugOptions-debug_file_level|. This is empty by default, meaning that
+    file logging is turned off. Enter a file path to enable file logging.
+
+==============================================================================
+6. Key maps                                                       *VdebugKeys*
+
+By default, function keys are mapped to execute debugger commands. However, I'm
+aware that people may already have them mapped to something else, so would like
+to change the default behaviour. This is possible using the key map dictionary,
+g:vdebug_keymap: >
+
+    let g:vdebug_keymap = {
+    \    "run" : "<F5>",
+    \    "run_to_cursor" : "<F1>",
+    \    "step_over" : "<F2>",
+    \    "step_into" : "<F3>",
+    \    "step_out" : "<F4>",
+    \    "close" : "<F6>",
+    \    "detach" : "<F7>",
+    \    "set_breakpoint" : "<F10>",
+    \}
+<
+
+As you can see, these are the default keys. You can change the keys using the
+multi-line notation as shown above, or by setting invidiual keys: >
+
+    let g:vdebug_keymap['run'] = '<C-s>'
+<
+Any options that you don't set will use the default value.
+
+==============================================================================
+7. Using an IDE Key                                             *VdebugIDEKey*
+
+An IDE key is used to restrict debugger connections, kind of like a password:
+only a connection that supplies the same key as the IDE uses (in this case
+Vdebug) will be used, otherwise it's ignored. For instance, using Xdebug and
+PHP with Netbeans requires you to use the IDE key "netbeans-xdebug".
+
+You can tell Vdebug to use an IDE key with the option
+"g:vdebug_options['ide_key']" (see |VdebugOptions-ide_key|). This is empty by
+default, so all connections will be picked up, even if an IDE key has been set
+on the debugger engine side of things. It's useful to leave the IDE key option
+empty if you're having trouble getting a connection, as it's one less thing to 
+have to worry about.
+
+If you do set an IDE key and a connection comes in with a different IDE key, it
+will be ignored (and there will be a message saying so).
+
+However, I find it best to leave out the IDE key all the time, as I use VIM for 
+all my debugging and don't have to juggle multiple connections at a time.
+
+Setting an IDE key varies between debugger implementations. For example, Xdebug 
+can be initiated from the browser with the GET variable
+XDEBUG_SESSION_START=<ide-key>, where <ide-key> is the key for that session.
+From the command line, the environment variable "XDEBUG_CONFIG" holds the IDE
+key.
+
+==============================================================================
+8. Debugging a script on a remote server                        *VdebugRemote*
+
+This is where things get really cool. You don't have to be on the same machine
+as the running script to be able to debug it: you can tell the remote script to
+use your machine's IP and debugger port, and you can pick up the remote
+connection.
+
+There are a couple of hurdles to overcome in doing this:
+    
+    1. File paths are unlikely to be the same on the local and remote machines
+    2. You need to bind Vdebug to the right address, and make sure there's a
+       network route between the two machines.
+
+------------------------------------------------------------------------------
+8.1 File path mapping                                  *VdebugRemoteFilePaths*
+
+Firstly, file paths aren't a problem. You can use the options "remote_path" and
+"local_path" to swap out sections of the file URIs to make them compatible with
+eachother.
+
+Let's say we're debugging a file on a remote machine, and the path is
+/home/user/scripts/myscript.php. On my machine the same script is located in
+/home/jon/php/myscript.php. I would have to set the remote and local path
+options as so: >
+
+    let g:vdebug_options['remote_path'] = "/home/user/scripts"
+    let g:vdebug_options['local_path'] = "/home/jon/php"
+<
+When the debugger engine sends any file paths, a straight swap of the paths is
+done, so all instances of "/home/user/scripts" are replaced with
+"/home/jon/php". The opposite is done when sending file paths in the other
+direction. 
+
+------------------------------------------------------------------------------
+8.2 Connecting the two machines                       *VdebugRemoteConnection*
+
+This part depends a lot upon your network set-up and firewall rules. But here's
+the basic information:
+
+    * You need to bind Vdebug to an address that's visible to the remote
+      machine (i.e. not "localhost")
+    * You must have port 9000 allowed by any firewall you might have on your
+      machine or router
+
+I'll give an example of my own here. I had two machines on an internal network,
+one was my desktop (192.168.1.1) and the other was a server (192.168.1.2) running 
+the script that I wanted to debug on my desktop. I configured Xdebug on the 
+server to use my desktop's IP address as the remote host. I then set the Vdebug
+server address to be "192.168.1.1" (NOT "localhost") in the options: >
+
+    let g:vdebug_options['server'] = "192.168.1.1"
+<
+I also had to set an Xdebug option "remote_connect_back=on" in the INI file on
+the server. This combination of things allowed me to accept remote connections 
+on my desktop.
+
+The two machines don't have to be on an internal network, but if they aren't
+then I can all but guarantee that you will have to route port 9000 to your 
+machine using your router, as it will be blocked by default.
+
+==============================================================================
+9. Troubleshooting/FAQ                                 *VdebugTroubleshooting*
+
+If you have any questions or problems that aren't addressed or fixed here then
+feel free to raise an issue on the Github page https://github.com/joonty/vdebug
+or email me at <jon AT joncairns.com>. If the question is good I might even add
+it to this list.
+
+    Q. I can't get the debugger to run! Pressing <F5> does nothing.
+    A. The most common reason for this is that your VIM installation is not
+       compiled with Python support. To check this, run "vim --version" and check 
+       for any mention of Python. If it is compiled with Python support, try
+       remapping the start key to something else, e.g: >
+        :let g:vdebug_keymap['run'] = '<C-s>'
+<
+
+    Q. I'm listening for connections with Vdebug, but when I run the script it
+        doesn't do anything.
+    A. This is either due to the debugger engine not being activated, or
+        differing connection details. Check that the debugger is installed for
+        the language you're using and that you're doing what's necessary to
+        activate the engine when running the script (e.g. setting environment
+        variables/URL variables). If the problem persists, check that the
+        debugger engine is connecting the same port and address that Vdebug is
+        binding to (the 'port' and 'server' options). Also check that the IDE
+        key option is empty.
+
+    Q. I can't debug a script on a remote machine, what's going on?
+    A. Have you read the section on remote debugging, |VdebugRemote|? I mean,
+        have you REALLY read it? If you have, then drop me an email with your
+        problem and I'll try to help.
+
+    Q. I don't seem to be able to get "call" or "return" breakpoints to work,
+        any idea why?
+    A. I've only ever been able to get these to work with global functions, not
+        classes or objects. There is a very small amount of information on the
+        Interwebs regarding this problem, and Xdebug says that it's been
+        solved. However, no-one seems to know what syntax to use for class and
+        object method names. First one to discover it wins a prize! (The prize
+        of feeling good about helping others)
+
+    Q. When setting a breakpoint I get the message that it isn't supported, why
+        is that?
+    A. Implementation of every feature is down to each debugger engine, and
+        they pick and choose what goes in. Without modifying the engine's
+        source there's nothing I can do I'm afraid :(
+
+    Q. I keep getting error <x> when doing <y>.
+    A. Send the details of the error to me at the email address at the top of
+        this section, or raise an issue on the Github page.
+
+    Q. Can you implement feature <x>?
+    A. Maybe - raise an issue on the Github page (top of this section) and I'll
+        weigh up the benefits vs time. Either that, or you can fork the
+        repository and try to implement it yourself! I do accept merges.
+
+    Q. Why doesn't Ross, the largest friend, simply eat the other ones?
+    A. Think of the indigestion that would result.
+
+
+==============================================================================
+10. Acknowledgements                                  *VdebugAcknowledgements*
+
+This plugin was inspired by the original Xdebug plugin created by Seung Woo Shin 
+(<segv <at> sayclub.com>),
+http://www.vim.org/scripts/script.php?script_id=1152. There are even a few
+remnants of the original code, but not many. He showed us all that it was
+possible.

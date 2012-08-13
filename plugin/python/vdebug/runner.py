@@ -26,7 +26,7 @@ class Runner:
         If either of these are already open, the current
         connection or vdebug.ui is used.
         """
-        vdebug.opts.Options.set(vim.eval('g:debugger_options'))
+        vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         if vdebug.opts.Options.isset('debug_file'):
             vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
                     vdebug.opts.Options.get('debug_file_level'),\
