@@ -1,4 +1,4 @@
-" Powerful, fast, multi-language debugger client for Vim.
+" Vdebug: Powerful, fast, multi-language debugger client for Vim.
 "
 " Script Info and Documentation  {{{
 "=============================================================================
@@ -43,15 +43,15 @@ endif
 
 python debugger = DebuggerInterface()
 
-if !exists("g:debugger_options")
-    let g:debugger_options = {}
+if !exists("g:vdebug_options")
+    let g:vdebug_options = {}
 endif
 
-if !exists("g:debugger_keymap")
-    let g:debugger_keymap = {}
+if !exists("g:vdebug_keymap")
+    let g:vdebug_keymap = {}
 endif
 
-let g:debugger_keymap_defaults = {
+let g:vdebug_keymap_defaults = {
 \    "run" : "<F5>",
 \    "run_to_cursor" : "<F1>",
 \    "step_over" : "<F2>",
@@ -62,7 +62,7 @@ let g:debugger_keymap_defaults = {
 \    "set_breakpoint" : "<F10>",
 \}
 
-let g:debugger_options_defaults = {
+let g:vdebug_options_defaults = {
 \    "port" : 9000,
 \    "timeout" : 30,
 \    "server" : 'localhost',
@@ -75,10 +75,10 @@ let g:debugger_options_defaults = {
 \    "local_path" : "",
 \}
 
-let g:debugger_options = extend(g:debugger_options_defaults,g:debugger_options)
-let g:debugger_keymap = extend(g:debugger_keymap_defaults,g:debugger_keymap)
+let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
+let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
 
-for [s:fname, s:key] in items(g:debugger_keymap)
+for [s:fname, s:key] in items(g:vdebug_keymap)
     exe "map ".s:key." :python debugger.".s:fname."()<cr>"
 endfor
 
