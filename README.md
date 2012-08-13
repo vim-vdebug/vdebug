@@ -85,4 +85,4 @@ To stop debugging, press `<F6>`. Press it again to close the debugger interface.
 
 This plugin is released under the [MIT License][1].
 
-[1]: https://github.com/joonty/vdebug/raw/master/LICENSE
+[1]: https://raw.github.com/joonty/vdebug/master/LICENCE
