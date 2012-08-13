@@ -1,8 +1,8 @@
 # Vdebug
 
 Vdebug is a new, fast, powerful debugger client for Vim. It's multi-language,
-and has been tested with PHP, Python, Ruby and Perl. It interfaces with
-debuggers that use the DBGP protocol, such as Xdebug for PHP. 
+and has been tested with PHP, Python, Ruby and Perl. It interfaces with **any**
+debugger that faithfully uses the DBGP protocol, such as Xdebug for PHP. 
 
 It builds on the experience gained through the legacy of the Xdebug Vim script 
 originally created by Seung Woo Shin and extended by so many others, but it's a
@@ -64,19 +64,19 @@ vim +BundleInstall +qall
 
   1. Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp) 
   2. Start Vdebug with `<F5>`, which will make it wait for an incoming connection. Run the script you want to debug, with the debugging engine enabled. A new tab will open with the debugging interface.
-  3. Once in debugging mode, the following mappings are available:
+  3. Once in debugging mode, the following default mappings are available:
 
-      * `<F1>`: run to cursor
-      * `<F2>`: step over
-      * `<F3>`: step into
-      * `<F4>`: step out
-      * `<F5>`: run (to next breakpoint/end of script)
-      * `<F6>`: stop debugging
-      * `<F10>`: set line breakpoint
-      * `:Breakpoint <type> <args>`: set a breakpoint of any type (see :help
-        VdebugBreakpoints)
-      * `:DebuggerEval <code>`: evaluate some code and display the result
-      * `<Leader>e`: evaluate the expression under visual highlight and display the result
+ * `<F1>`: run to cursor
+ * `<F2>`: step over
+ * `<F3>`: step into
+ * `<F4>`: step out
+ * `<F5>`: run (to next breakpoint/end of script)
+ * `<F6>`: stop debugging
+ * `<F10>`: set line breakpoint
+ * `:Breakpoint <type> <args>`: set a breakpoint of any type (see :help
+    VdebugBreakpoints)
+ * `:DebuggerEval <code>`: evaluate some code and display the result
+ * `<Leader>e`: evaluate the expression under visual highlight and display the result
   4. To stop debugging, press `<F6>`. Press it again to close the debugger
      interface.
 
