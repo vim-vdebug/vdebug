@@ -9,7 +9,8 @@ originally created by Seung Woo Shin and extended by so many others, but it's a
 total rebuild to allow for a nicer interface and support of new features.
 
 It's written in Python, and has an object-oriented interface that is easy to extend 
-and can even be used from the command-line.
+and can even be used from the command-line. It even has unit tests covering
+some of the more critical parts of the code.
 
 # How to use
 
