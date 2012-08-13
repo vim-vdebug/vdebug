@@ -14,7 +14,7 @@ class LineBreakpointTest(unittest.TestCase):
         file = "/path/to/file"
         line = 1
         bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
-        assert bp.get_file() == file
+        self.assertEqual(bp.get_file(),file)
 
     def test_get_line(self):
         """ Test that the line number is retrievable."""
@@ -22,7 +22,7 @@ class LineBreakpointTest(unittest.TestCase):
         file = "/path/to/file"
         line = 10
         bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
-        assert bp.get_line() == line
+        self.assertEqual(bp.get_line(),line)
 
     def test_get_cmd(self):
         """ Test that the dbgp command is correct."""
@@ -30,7 +30,7 @@ class LineBreakpointTest(unittest.TestCase):
         file = vdebug.util.FilePath("/path/to/file")
         line = 20
         bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
-        assert bp.get_cmd() == "-t line -f %s -n %i -s enabled" %(file, line)
+        self.assertEqual(bp.get_cmd(),"-t line -f file://%s -n %i -s enabled" %(file, line))
 
     def test_on_add_sets_ui_breakpoint(self):
         """ Test that the breakpoint is placed on the source window."""
@@ -62,8 +62,8 @@ class ConditionalBreakpointTest(unittest.TestCase):
         condition = "$x > 20"
         bp = vdebug.breakpoint.ConditionalBreakpoint(ui,file,line,condition)
         b64cond = base64.encodestring(condition)
-        exp_cmd = "-t conditional -f %s -n %i -s enabled -- %s" %(file, line, b64cond)
-        assert bp.get_cmd() == exp_cmd
+        exp_cmd = "-t conditional -f file://%s -n %i -s enabled -- %s" %(file, line, b64cond)
+        self.assertEqual(bp.get_cmd(), exp_cmd)
 
 class ExceptionBreakpointTest(unittest.TestCase):
     def test_get_cmd(self):
@@ -72,7 +72,7 @@ class ExceptionBreakpointTest(unittest.TestCase):
         exception = "ExampleException"
         bp = vdebug.breakpoint.ExceptionBreakpoint(ui,exception)
         exp_cmd = "-t exception -x %s -s enabled" % exception
-        assert bp.get_cmd() == exp_cmd
+        self.assertEqual(bp.get_cmd(), exp_cmd)
 
 class CallBreakpointTest(unittest.TestCase):
     def test_get_cmd(self):
@@ -81,7 +81,7 @@ class CallBreakpointTest(unittest.TestCase):
         function = "myfunction"
         bp = vdebug.breakpoint.CallBreakpoint(ui,function)
         exp_cmd = "-t call -m %s -s enabled" % function
-        assert bp.get_cmd() == exp_cmd
+        self.assertEqual(bp.get_cmd(), exp_cmd)
 
 class ReturnBreakpointTest(unittest.TestCase):
     def test_get_cmd(self):
@@ -90,8 +90,7 @@ class ReturnBreakpointTest(unittest.TestCase):
         function = "myfunction"
         bp = vdebug.breakpoint.ReturnBreakpoint(ui,function)
         exp_cmd = "-t return -m %s -s enabled" % function
-        print bp.get_cmd()
-        assert bp.get_cmd() == exp_cmd
+        self.assertEqual(bp.get_cmd(), exp_cmd)
 
 
 class BreakpointTest(unittest.TestCase):
@@ -117,7 +116,7 @@ class BreakpointTest(unittest.TestCase):
         ui = Mock()
         ret = vdebug.breakpoint.Breakpoint.parse(ui,"conditional $x == 3")
         self.assertIsInstance(ret,vdebug.breakpoint.ConditionalBreakpoint)
-        assert ret.condition == "$x == 3"
+        self.assertEqual(ret.condition, "$x == 3")
 
     def test_parse_with_conditional_raises_error(self):
         """ Test that an exception is raised with invalid conditional args."""
@@ -133,7 +132,7 @@ class BreakpointTest(unittest.TestCase):
         ui = Mock()
         ret = vdebug.breakpoint.Breakpoint.parse(ui,"exception ExampleException")
         self.assertIsInstance(ret,vdebug.breakpoint.ExceptionBreakpoint)
-        assert ret.exception == "ExampleException"
+        self.assertEqual(ret.exception, "ExampleException")
 
     def test_parse_with_exception_raises_error(self):
         """ Test that an exception is raised with invalid exception args."""
@@ -150,7 +149,7 @@ class BreakpointTest(unittest.TestCase):
         ui = Mock()
         ret = vdebug.breakpoint.Breakpoint.parse(ui,"call myfunction")
         self.assertIsInstance(ret,vdebug.breakpoint.CallBreakpoint)
-        assert ret.function == "myfunction"
+        self.assertEqual(ret.function , "myfunction")
 
     def test_parse_with_call_raises_error(self):
         """ Test that an exception is raised with invalid call args."""
@@ -166,7 +165,7 @@ class BreakpointTest(unittest.TestCase):
         ui = Mock()
         ret = vdebug.breakpoint.Breakpoint.parse(ui,"return myfunction")
         self.assertIsInstance(ret,vdebug.breakpoint.ReturnBreakpoint)
-        assert ret.function == "myfunction"
+        self.assertEqual(ret.function, "myfunction")
 
     def test_parse_with_return_raises_error(self):
         """ Test that an exception is raised with invalid return args."""
