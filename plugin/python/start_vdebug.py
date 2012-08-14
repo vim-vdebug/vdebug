@@ -190,7 +190,9 @@ class DebuggerInterface:
                 self.runner.close()
             except:
                 pass
-        elif isinstance(e,vim.error):
-            self.handle_vim_error(e)
         else:
             self.handle_general_exception()
+        """
+        elif isinstance(e,vim.error):
+            self.handle_vim_error(e)
+        """
