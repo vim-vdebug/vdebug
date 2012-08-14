@@ -3,6 +3,7 @@
 import vdebug.dbgp
 import vdebug.log
 import vdebug.ui.vimui
+import socket
 import vim
 import vdebug.breakpoint
 import vdebug.opts
@@ -52,7 +53,10 @@ class Runner:
         vdebug.log.Log("Available context names: %s" %\
                 str(self.context_names),vdebug.log.Logger.DEBUG)
 
-        status = self.api.step_into()
+        if vdebug.opts.Options.get('break_on_open',int) == 1:
+            status = self.api.step_into()
+        else:
+            status = self.api.run()
         self.refresh(status)
 
     def refresh(self,status):
@@ -284,6 +288,10 @@ class Runner:
                 
             self.api = None
         except EOFError:
+            self.api = None
+            self.ui.say("Connection has been closed")
+        except socket.error:
+            self.api = None
             self.ui.say("Connection has been closed")
 
     def close(self):

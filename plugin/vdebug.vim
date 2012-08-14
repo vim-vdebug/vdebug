@@ -67,6 +67,7 @@ let g:vdebug_options_defaults = {
 \    "timeout" : 30,
 \    "server" : 'localhost',
 \    "on_close" : 'stop',
+\    "break_on_open" : 1,
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 2,
