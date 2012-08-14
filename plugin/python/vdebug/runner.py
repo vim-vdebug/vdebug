@@ -130,7 +130,6 @@ class Runner:
         else:
             vdebug.log.Log("Running")
             self.ui.statuswin.set_status("running")
-            self.ui.sourcewin.remove_pointer()
             res = self.api.run()
             self.refresh(res)
 
@@ -141,7 +140,6 @@ class Runner:
         else:
             vdebug.log.Log("Stepping over")
             self.ui.statuswin.set_status("running")
-            self.ui.sourcewin.remove_pointer()
             res = self.api.step_over()
             self.refresh(res)
 
@@ -152,7 +150,6 @@ class Runner:
         else:
             vdebug.log.Log("Stepping into statement")
             self.ui.statuswin.set_status("running")
-            self.ui.sourcewin.remove_pointer()
             res = self.api.step_into()
             self.refresh(res)
 
@@ -163,7 +160,6 @@ class Runner:
         else:
             vdebug.log.Log("Stepping out of statement")
             self.ui.statuswin.set_status("running")
-            self.ui.sourcewin.remove_pointer()
             res = self.api.step_out()
             self.refresh(res)
 
