@@ -262,7 +262,7 @@ location of the directory containing the rdbgp.rb script and one for settings
 used by the debugger: >
     export RUBYDB_LIB=path/to/rubylib/
     export RUBYDB_OPTS="HOST=localhost PORT=9000"
-
+<
 For example, if we want to debug a Ruby script called "myscript.rb", run the
 following from the command line: >
     export RUBYDB_LIB=~/KomodoIDE/INSTALLDIR/lib/support/dbgp/rubylib
@@ -271,6 +271,16 @@ following from the command line: >
 <
 Change the environment variables to suit your set-up and you will be ready to
 go.
+
+NOTE: You may have a problem when changing context in the watch window. If you
+get a long error message when switching to globals, for instance, you will need
+to patch your commands/context.rb file in the rubylib directory. I've created a
+patch that you can get at https://gist.github.com/3347567 - if using unix you
+can use the patch command, e.g: >
+
+    patch rubylib/commands/context.rb < context.patch
+<
+If you're still having trouble, drop me an email.
 
 ------------------------------------------------------------------------------
 3.4 Perl set up                                              *VdebugSetUpPerl*
@@ -906,6 +916,11 @@ it to this list.
     A. Implementation of every feature is down to each debugger engine, and
         they pick and choose what goes in. Without modifying the engine's
         source there's nothing I can do I'm afraid :(
+
+    Q. I can't switch variable context when debugging a Ruby script - I keep
+        getting a long error. How can I fix it?
+    A. This is addressed in |VdebugSetUpRuby|. A patch needs to be applied to
+        the debugger engine code.
 
     Q. I keep getting error <x> when doing <y>.
     A. Send the details of the error to me at the email address at the top of
