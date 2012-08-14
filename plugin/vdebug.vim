@@ -60,18 +60,19 @@ let g:vdebug_keymap_defaults = {
 \    "close" : "<F6>",
 \    "detach" : "<F7>",
 \    "set_breakpoint" : "<F10>",
+\    "get_context" : "<F11>",
 \}
 
 let g:vdebug_options_defaults = {
 \    "port" : 9000,
-\    "timeout" : 30,
+\    "timeout" : 20,
 \    "server" : 'localhost',
-\    "on_close" : 'stop',
+\    "on_close" : 'detach',
 \    "break_on_open" : 1,
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
-\    "debug_file_level" : 2,
-\    "debug_file" : "/home/jon/vdebug.log",
+\    "debug_file_level" : 0,
+\    "debug_file" : "",
 \    "remote_path" : "",
 \    "local_path" : "",
 \}

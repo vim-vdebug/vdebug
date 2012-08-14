@@ -655,7 +655,8 @@ of evaluating expresions: you can either write them yourself
 (|VdebugEvalExpression) or use visual highlighting to select an expression from
 the source window.
 
-On evaluating an expression, the result is shown in the watch window.
+On evaluating an expression, the result is shown in the watch window. To return
+back to the context view, press <F11> (default).
 
 ------------------------------------------------------------------------------
 4.5.1 Evaluating any expression                         *VdebugEvalExpression*
@@ -687,6 +688,7 @@ default ptions look like this: >
     \    "server" : 'localhost',
     \    "timeout" : 20,
     \    "on_close" : 'detach',
+    \    "break_on_open" : 1,
     \    "ide_key" : '',
     \    "remote_path" : "",
     \    "local_path" : "",
@@ -729,6 +731,12 @@ g:vdebug_options["on_close"] (default = "detach")
     the debugger engine meaning that the script will execute until it finishes.
     The other option is "stop", which means that the script will be killed
     immediately.
+
+                                                 *VdebugOptions-break_on_open*
+g:vdebug_options["break_on_open"] (default = 1)     
+    This determines whether the debugger should stop on the first line of the
+    script, or just immediately start running until it hits a pre-defined
+    breakpoint.
 
                                                        *VdebugOptions-ide_key*
 g:vdebug_options["ide_key"] (default = empty)          
@@ -791,6 +799,7 @@ g:vdebug_keymap: >
     \    "close" : "<F6>",
     \    "detach" : "<F7>",
     \    "set_breakpoint" : "<F10>",
+    \    "get_context" : "<F11>",
     \}
 <
 
