@@ -243,6 +243,16 @@ adding in the path to the pydbgp binary file. Running it without starting
 Vdebug will give an error saying that it can't connect to the host. If you see
 this, you're ready to go.
 
+NOTE: You may have a problem when trying to do an "eval". If you get an error
+mentioning something about not providing a length then you need to patch the
+client.py file in the Python remote debugger source code. I've created a patch 
+that you can get at https://gist.github.com/3348076 - if using unix you can use 
+the patch command to apply it, e.g: >
+
+    patch dbgp/client.py < client.patch
+<
+If you're still having trouble, drop me an email.
+
 ------------------------------------------------------------------------------
 3.3 Ruby set up                                              *VdebugSetUpRuby*
 
@@ -276,7 +286,7 @@ NOTE: You may have a problem when changing context in the watch window. If you
 get a long error message when switching to globals, for instance, you will need
 to patch your commands/context.rb file in the rubylib directory. I've created a
 patch that you can get at https://gist.github.com/3347567 - if using unix you
-can use the patch command, e.g: >
+can use the patch command to apply it, e.g: >
 
     patch rubylib/commands/context.rb < context.patch
 <
@@ -930,6 +940,11 @@ it to this list.
         getting a long error. How can I fix it?
     A. This is addressed in |VdebugSetUpRuby|. A patch needs to be applied to
         the debugger engine code.
+
+    Q. I can't use the eval commands when debugging a Python script - I keep
+        getting an error about not providing length. How can I fix it?
+    A. This is addressed in |VdebugSetUpPython|. A patch needs to be applied 
+        to the debugger engine code.
 
     Q. I keep getting error <x> when doing <y>.
     A. Send the details of the error to me at the email address at the top of
