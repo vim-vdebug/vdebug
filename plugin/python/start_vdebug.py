@@ -120,6 +120,15 @@ class DebuggerInterface:
         except Exception, e:
             self.handle_exception(e)
 
+    def get_context(self):
+        """Get all the variables in the default context
+        """
+        try:
+            self.runner.get_context()
+        except Exception, e:
+            self.handle_exception(e)
+
+
     def detach(self):
         """Detach the debugger, so the script runs to the end.
         """
