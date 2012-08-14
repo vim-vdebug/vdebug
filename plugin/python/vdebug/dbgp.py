@@ -188,7 +188,7 @@ class Api:
             raise ResponseError(
                 "Invalid XML response from debugger",
                 msg)
-
+        self.language = self.language.lower()
         self.idekey = xml.get("idekey")
         self.version = xml.get("api_version")
         self.startfile = xml.get("fileuri")
@@ -265,7 +265,13 @@ class Api:
         """Tell the debugger to start or resume
         execution."""
         code_enc = base64.encodestring(code)
-        return self.send_cmd('eval','-- %s' % code_enc,EvalResponse)
+        args = '-- %s' % code_enc
+
+        """ The python engine incorrectly requires length.
+        if self.language == 'python':
+            args = ("-l %i " % len(code_enc) ) + args"""
+            
+        return self.send_cmd('eval',args,EvalResponse)
 
     def step_into(self):
         """Tell the debugger to step to the next
@@ -486,7 +492,7 @@ class ContextProperty:
             self.value = ""
             return
 
-        self.value = self.__get_enc_node_text(node,'value')
+        self.value = self._get_enc_node_text(node,'value')
         if self.value is None:
             if self.encoding == 'base64':
                 if node.text is None:
@@ -515,12 +521,12 @@ class ContextProperty:
     def _determine_displayname(self,node):
         display_name = node.get('fullname')
         if display_name == None:
-            display_name = self.__get_enc_node_text(node,'fullname',"")
+            display_name = self._get_enc_node_text(node,'fullname',"")
         if display_name == '::':
             display_name = self.type
         self.display_name = display_name
 
-    def __get_enc_node_text(self,node,name,default =
+    def _get_enc_node_text(self,node,name,default =
             None):
         n = node.find('%s%s' %(self.ns, name))
         if n is not None and n.text is not None:
@@ -614,8 +620,15 @@ class EvalProperty(ContextProperty):
                     self.display_name = self.parent.display_name + \
                         "->"+node.get('name')
             else:
-                self.display_name = self.parent.display_name + \
-                    "." + node.get('name')
+                name = node.get('name')
+                if name is None:
+                    name = "?"
+                    name = self._get_enc_node_text(node,'name','?')
+                if self.parent.type == 'list':
+                    self.display_name = self.parent.display_name + name
+                else:
+                    self.display_name = self.parent.display_name + \
+                        "." + name
 
 
 """ Errors/Exceptions """

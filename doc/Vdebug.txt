@@ -581,16 +581,25 @@ type breakpoint is covered in the previous section, |VdebugSetLineBreakpoint|.
     at the first line of the function. Note that the syntax for <function-name>
     varies between debugger engine and is NOT well documented. In fact, Xdebug
     doesn't mention how to set a breakpoint on class/object methods, and I have
-    yet to successfully do so. Global functions work without a problem. E.g: >
+    had limited success in doing so. Global functions work without a problem, 
+    e.g: >
     
     :Breakpoint call open_file 
 <
+    In PHP, it seems that you need to use static method syntax to break at
+    methods, even if the method isn't static. If I have a class called Foo and
+    a method on it called bar(), I would use: >
+
+    :Breakpoint call Foo::bar
+<
+    This seems to work, but I'm not guaranteeing it!
 
 :Breakpoint return <function-name>                *VdebugSetBreakpoints-return*
     Sets a breakpoint to activate when a function returns. The debugger stops
     at the return line of the function. Note that this suffers from the same
     problem as <call>, and setting class/object methods may not be possible.
-    Again, global functions work without a problem. E.g: >
+    Read the call documentation for more on that. However, global functions 
+    work without a problem. E.g: >
     
     :Breakpoint return open_file 
 <
