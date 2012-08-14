@@ -23,6 +23,7 @@ VdebugIntroLanguages	Vdebug.txt	/*VdebugIntroLanguages*
 VdebugKeys	Vdebug.txt	/*VdebugKeys*
 VdebugLogWindow	Vdebug.txt	/*VdebugLogWindow*
 VdebugOptions	Vdebug.txt	/*VdebugOptions*
+VdebugOptions-break_on_open	Vdebug.txt	/*VdebugOptions-break_on_open*
 VdebugOptions-debug_file	Vdebug.txt	/*VdebugOptions-debug_file*
 VdebugOptions-debug_file_level	Vdebug.txt	/*VdebugOptions-debug_file_level*
 VdebugOptions-debug_window_level	Vdebug.txt	/*VdebugOptions-debug_window_level*
