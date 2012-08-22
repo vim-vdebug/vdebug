@@ -1,5 +1,6 @@
 import vdebug.opts
 import vdebug.log
+import sys
 
 class FilePath:
     """Normalizes a file name and allows for remote and local path mapping.
@@ -8,8 +9,12 @@ class FilePath:
         if filename is None or \
             len(filename) == 0:
             raise FilePathError, "Missing or invalid file name"
-        if filename.startswith('file://'):
-            filename = filename[7:]
+        if filename.startswith('file:///'):
+            if sys.platform == "win32":
+                """ remove prefix till the drive letter """
+                filename = filename[8:]
+            else:
+                filename = filename[7:]
         self.local = self._create_local(filename)
         self.remote = self._create_remote(filename)
 
