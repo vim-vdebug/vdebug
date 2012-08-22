@@ -181,6 +181,7 @@ class Runner:
                 self.breakpoints.remove_breakpoint_by_id(id)
 
     def set_breakpoint(self,args):
+        vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         bp = vdebug.breakpoint.Breakpoint.parse(self.ui,args)
         if bp.type == "line":
             id = self.breakpoints.find_breakpoint(\
