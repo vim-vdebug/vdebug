@@ -20,6 +20,8 @@ class Runner:
         self.api = None
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         self.breakpoints = vdebug.breakpoint.Store()
+        self.keymapper = vdebug.util.Keymapper()
+        self.keymapper.map()
         self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
 
     def open(self):
@@ -296,3 +298,4 @@ class Runner:
         """
         self.close_connection()
         self.ui.close()
+        self.keymapper.unmap()
