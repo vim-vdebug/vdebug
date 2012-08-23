@@ -1,6 +1,31 @@
 import vdebug.opts
 import vdebug.log
+import vim
 import sys
+
+class Keymapper:
+    """Map and unmap key commands for the Vim user interface.
+    """
+
+    exclude = ["run","set_breakpoint"]
+
+    def __init__(self):
+        self.keymaps = vim.eval("g:vdebug_keymap")
+        self.leader = vim.eval("g:vdebug_leader_key")
+
+    def map(self):
+        for func in self.keymaps:
+            key = self.keymaps[func]
+            if key not in self.exclude:
+                map_cmd = "map %s%s :python debugger.%s()<cr>" %\
+                    (self.leader,key,func)
+                vim.command(map_cmd)
+
+    def unmap(self):
+        for func in self.keymaps:
+            key = self.keymaps[func]
+            if key not in self.exclude:
+                vim.command("unmap %s%s" %(self.leader,key))
 
 class FilePath:
     """Normalizes a file name and allows for remote and local path mapping.
