@@ -21,7 +21,6 @@ class Runner:
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         self.breakpoints = vdebug.breakpoint.Store()
         self.keymapper = vdebug.util.Keymapper()
-        self.keymapper.map()
         self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
 
     def open(self):
@@ -41,6 +40,7 @@ class Runner:
                 vdebug.opts.Options.get('timeout',int))
 
         self.ui.open()
+        self.keymapper.map()
         self.ui.set_listener_details(\
                 vdebug.opts.Options.get('server'),\
                 vdebug.opts.Options.get('port'),\
