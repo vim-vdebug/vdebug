@@ -243,6 +243,11 @@ class Window(vdebug.ui.interface.Window):
                     self.buffer.append(line)
             self.command(str(lfrom))
 
+    def delete(self,start_line,end_line):
+        remaining_buffer = self.buffer[end_line:]
+        del self.buffer[start_line:]
+        self.buffer.append(remaining_buffer)
+
     def buffer_empty(self):
         if len(self.buffer) == 1 \
                 and len(self.buffer[0]) == 0:

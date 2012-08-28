@@ -35,6 +35,8 @@ class Dispatcher:
                 return WatchWindowContextChangeEvent()
             elif line.find("▸") > -1:
                 return WatchWindowPropertyGetEvent()
+            elif line.find("▾") > -1:
+                return WatchWindowHideEvent()
         elif window_name == self.runner.ui.stackwin.name:
             return StackWindowLineSelectEvent()
 
@@ -77,8 +79,26 @@ class WatchWindowPropertyGetEvent(Event):
         context_res = runner.api.property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
+        runner.ui.watchwin.delete(lineno,lineno+1)
         runner.ui.watchwin.insert(output.rstrip(),lineno-1,True)
 
+class WatchWindowHideEvent(Event):
+    def execute(self,runner):
+        lineno = vim.current.window.cursor[0]
+        line = vim.current.buffer[lineno-1]
+        pointer_index = line.find("▾")
+
+        buf_len = len(vim.current.buffer)
+        end_lineno = buf_len
+        for i in range(lineno,buf_len-1):
+            buf_line = vim.current.buffer[i]
+            char = buf_line[pointer_index]
+            if char != " ":
+                end_lineno = i - 1
+                break
+        runner.ui.watchwin.delete(lineno,end_lineno+1)
+        append = "\n" + "".rjust(pointer_index) + "|"
+        runner.ui.watchwin.insert(line.replace("▾","▸")+append,lineno-1,True)
 
 class WatchWindowContextChangeEvent(Event):
     """Event used to trigger a watch window context change.

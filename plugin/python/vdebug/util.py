@@ -19,7 +19,7 @@ class Keymapper:
             return
         for func in self.keymaps:
             key = self.keymaps[func]
-            if key not in self.exclude:
+            if func not in self.exclude:
                 map_cmd = "map %s%s :python debugger.%s()<cr>" %\
                     (self.leader,key,func)
                 vim.command(map_cmd)
@@ -30,7 +30,7 @@ class Keymapper:
 
         for func in self.keymaps:
             key = self.keymaps[func]
-            if key not in self.exclude:
+            if func not in self.exclude:
                 vim.command("unmap %s%s" %(self.leader,key))
 
 class FilePath:
