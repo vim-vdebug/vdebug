@@ -6,7 +6,6 @@ dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 sys.path.append(dir)
 
 import socket
-import vim
 import traceback
 import vdebug.runner
 import vdebug.event
@@ -22,7 +21,7 @@ class DebuggerInterface:
         self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
-        self.runner.close()
+        self.runner.close_connection()
 
     def run(self):
         """Tell the debugger to run, until the next breakpoint or end of script.

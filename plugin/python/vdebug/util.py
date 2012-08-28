@@ -26,12 +26,13 @@ class Keymapper:
         self.is_mapped = True
 
     def unmap(self):
-        self.is_mapped = False
+        if self.is_mapped:
+            self.is_mapped = False
 
-        for func in self.keymaps:
-            key = self.keymaps[func]
-            if func not in self.exclude:
-                vim.command("unmap %s%s" %(self.leader,key))
+            for func in self.keymaps:
+                key = self.keymaps[func]
+                if func not in self.exclude:
+                    vim.command("unmap %s%s" %(self.leader,key))
 
 class FilePath:
     """Normalizes a file name and allows for remote and local path mapping.
