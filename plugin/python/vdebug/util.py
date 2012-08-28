@@ -12,16 +12,22 @@ class Keymapper:
     def __init__(self):
         self.keymaps = vim.eval("g:vdebug_keymap")
         self.leader = vim.eval("g:vdebug_leader_key")
+        self.is_mapped = False
 
     def map(self):
+        if self.is_mapped:
+            return
         for func in self.keymaps:
             key = self.keymaps[func]
             if key not in self.exclude:
                 map_cmd = "map %s%s :python debugger.%s()<cr>" %\
                     (self.leader,key,func)
                 vim.command(map_cmd)
+        self.is_mapped = True
 
     def unmap(self):
+        self.is_mapped = False
+
         for func in self.keymaps:
             key = self.keymaps[func]
             if key not in self.exclude:
