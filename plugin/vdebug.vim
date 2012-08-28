@@ -51,7 +51,7 @@ endif
 
 let g:vdebug_keymap_defaults = {
 \    "run" : "<F5>",
-\    "run_to_cursor" : "<F1>",
+\    "run_to_cursor" : "<F9>",
 \    "step_over" : "<F2>",
 \    "step_into" : "<F3>",
 \    "step_out" : "<F4>",
@@ -69,8 +69,8 @@ let g:vdebug_options_defaults = {
 \    "break_on_open" : 1,
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
-\    "debug_file_level" : 2,
-\    "debug_file" : "/home/jon/vdebug.log",
+\    "debug_file_level" : 0,
+\    "debug_file" : "",
 \    "remote_path" : "",
 \    "local_path" : "",
 \}
