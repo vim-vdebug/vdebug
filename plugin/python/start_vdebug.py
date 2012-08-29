@@ -180,6 +180,11 @@ class DebuggerInterface:
         """
         self.runner.ui.error(str(e))
 
+    def handle_dbgp_error(self,e):
+        """Simply print an error, since it is human readable enough.
+        """
+        self.runner.ui.error(str(e.args[0]))
+
     def handle_general_exception(self):
         """Handle an unknown error of any kind.
         """
@@ -198,6 +203,8 @@ class DebuggerInterface:
             self.handle_readable_error(e)
         elif isinstance(e,vdebug.log.LogError):
             self.handle_readable_error(e)
+        elif isinstance(e,vdebug.dbgp.DBGPError):
+            self.handle_dbgp_error(e)
         elif isinstance(e,(EOFError,socket.error)):
             self.handle_socket_end()
         elif isinstance(e,KeyboardInterrupt):
