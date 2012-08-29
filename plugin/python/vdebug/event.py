@@ -11,6 +11,7 @@ class Dispatcher:
         event = VisualEvalEvent()
         return event.execute(self.runner)
 
+
     def by_position(self):
         event = self._get_event_by_position()
         if event is not None:
@@ -89,8 +90,9 @@ class WatchWindowHideEvent(Event):
         pointer_index = line.find("▾")
 
         buf_len = len(vim.current.buffer)
-        end_lineno = buf_len
-        for i in range(lineno,buf_len-1):
+        end_lineno = buf_len - 1
+        print "End line: %i" % end_lineno
+        for i in range(lineno,end_lineno):
             buf_line = vim.current.buffer[i]
             char = buf_line[pointer_index]
             if char != " ":
