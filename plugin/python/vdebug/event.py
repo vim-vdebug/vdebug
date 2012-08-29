@@ -63,11 +63,14 @@ class CursorEvalEvent(Event):
     """
     char_regex = {
         "default" : "a-zA-Z0-9_.\[\]'\"",
+        "ruby" : "$@a-zA-Z0-9_.\[\]'\"",
         "perl" : "$a-zA-Z0-9_{}'\"",
         "php" : "$@%a-zA-Z0-9_\[\]'\"\->"
     }
 
     var_regex = {
+        "default" : "^[a-zA-Z_]",
+        "ruby" : "^[$@a-zA-Z_]",
         "php" : "^\$",
         "perl" : "^[$@%]"
     }
@@ -102,10 +105,14 @@ class CursorEvalEvent(Event):
                     break
 
         if lang in self.var_regex:
-            f = re.compile(self.var_regex[lang])
-            if f.match(var) is None:
-                runner.ui.error("Cannot find a valid variable under the cursor")
-                return False
+            reg = self.var_regex[lang]
+        else:
+            reg = self.var_regex["default"]
+
+        f = re.compile(reg)
+        if f.match(var) is None:
+            runner.ui.error("Cannot find a valid variable under the cursor")
+            return False
 
         if len(var):
             runner.eval(var)
