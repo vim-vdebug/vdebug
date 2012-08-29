@@ -95,6 +95,14 @@ class DebuggerInterface:
         except Exception, e:
             self.handle_exception(e)
 
+    def eval_under_cursor(self):
+        """Evaluate the property under the cursor.
+        """
+        try:
+            return self.event_dispatcher.eval_under_cursor()
+        except Exception, e:
+            self.handle_exception(e)
+
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
         """

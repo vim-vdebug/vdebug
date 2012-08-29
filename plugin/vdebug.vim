@@ -59,6 +59,7 @@ let g:vdebug_keymap_defaults = {
 \    "detach" : "<F7>",
 \    "set_breakpoint" : "<F10>",
 \    "get_context" : "<F11>",
+\    "eval_under_cursor" : "<F12>",
 \}
 
 let g:vdebug_options_defaults = {

@@ -11,6 +11,9 @@ class Dispatcher:
         event = VisualEvalEvent()
         return event.execute(self.runner)
 
+    def eval_under_cursor(self):
+        event = CursorEvalEvent()
+        return event.execute(self.runner)
 
     def by_position(self):
         event = self._get_event_by_position()
@@ -42,16 +45,78 @@ class Dispatcher:
             return StackWindowLineSelectEvent()
 
 class Event:
+    """Base event class.
+    """
     def execute(self,runner):
         pass
 
 class VisualEvalEvent(Event):
+    """Evaluate a block of code given by visual selection in Vim.
+    """
     def execute(self,runner):
         selection = vim.eval("vdebug:get_visual_selection()")
         runner.eval(selection)
         return True
 
+class CursorEvalEvent(Event):
+    """Evaluate the variable currently under the cursor.
+    """
+    char_regex = {
+        "default" : "a-zA-Z0-9_.\[\]'\"",
+        "perl" : "$a-zA-Z0-9_{}'\"",
+        "php" : "$@%a-zA-Z0-9_\[\]'\"\->"
+    }
+
+    var_regex = {
+        "php" : "^\$",
+        "perl" : "^[$@%]"
+    }
+
+    def execute(self,runner):
+        lineno = vim.current.window.cursor[0]
+        colno = vim.current.window.cursor[1]
+        line = vim.current.buffer[lineno-1]
+        lang = runner.api.language
+        if lang in self.char_regex:
+            reg = self.char_regex[lang]
+        else:
+            reg = self.char_regex['default']
+
+        p = re.compile('['+reg+']')
+        var = ""
+        linelen = len(line)
+
+        for i in range(colno,linelen-1):
+            char = line[i]
+            if p.match(char):
+                var += char
+            else:
+                break
+
+        if colno > 0:
+            for i in range(colno-1,-1,-1):
+                char = line[i]
+                if p.match(char):
+                    var = char + var
+                else:
+                    break
+
+        if lang in self.var_regex:
+            f = re.compile(self.var_regex[lang])
+            if f.match(var) is None:
+                runner.ui.error("Cannot find a valid variable under the cursor")
+                return False
+
+        if len(var):
+            runner.eval(var)
+            return True
+        else:
+            runner.ui.error("Cannot find a valid variable under the cursor")
+            return False
+
 class StackWindowLineSelectEvent(Event):
+    """Move the the currently selected file and line in the stack window
+    """
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
 
@@ -67,6 +132,10 @@ class StackWindowLineSelectEvent(Event):
         runner.ui.sourcewin.set_line(lineno)
 
 class WatchWindowPropertyGetEvent(Event):
+    """Open a tree node in the watch window.
+
+    This retrieves the child nodes and displays them underneath.
+    """
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
@@ -84,6 +153,8 @@ class WatchWindowPropertyGetEvent(Event):
         runner.ui.watchwin.insert(output.rstrip(),lineno-1,True)
 
 class WatchWindowHideEvent(Event):
+    """Close a tree node in the watch window.
+    """
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
