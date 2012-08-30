@@ -29,7 +29,7 @@ class ApiTest(unittest.TestCase):
     def test_init_msg_parsed(self):
         """Test that the init message from the debugger is
         parsed successfully"""
-        assert self.p.language == "PHP"
+        assert self.p.language == "php"
         assert self.p.version == "1.0"
         assert self.p.idekey == "netbeans-xdebug"
 
