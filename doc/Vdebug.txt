@@ -27,6 +27,7 @@ CONTENTS                                                      *Vdebug-contents*
         3.1 PHP set up...............................|VdebugSetUpPHP|
         3.2 Python set up............................|VdebugSetUpPython|
         3.3 Ruby set up..............................|VdebugSetUpRuby|
+        3.4 Perl set up..............................|VdebugSetUpPerl|
     4. Usage.........................................|VdebugUsage|
         4.1 Starting the debugger....................|VdebugStart|
         4.2 Finding your way around the UI...........|VdebugUI|
@@ -52,6 +53,7 @@ CONTENTS                                                      *Vdebug-contents*
         4.5 Evaluating code..........................|VdebugEval|
             4.5.1 Evaluating any expression..........|VdebugEvalExpression|
             4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
+            4.5.3 Evaluating variable under cursor   |VdebugEvalUnderCursor|
     5. Options.......................................|VdebugOptions|
     6. Key maps......................................|VdebugKeys|
     7. Using an IDE key..............................|VdebugIDEKey|
@@ -59,6 +61,7 @@ CONTENTS                                                      *Vdebug-contents*
         8.1 File path mapping........................|VdebugRemoteFilePaths|
         8.2 Connecting the two machines..............|VdebugRemoteConnection|
     9. Troubleshooting...............................|VdebugTroubleshooting|
+    10. Acknowledgements.............................|VdebugAcknowledgements|
 
 ==============================================================================
 1. Introduction                                                  *VdebugIntro*
@@ -410,7 +413,8 @@ have mouse support enabled. The currently showing context is highlighted (if
 you have syntax highlighting on) and starts with an asterix.
 
 The watch window is also used to show the results of "eval" operations. See
-the |VdebugEval| section for more on that.
+the |VdebugEval| section for more on that. After evaluating an expression you
+can return to the variable context with <F11> (default).
 
 ------------------------------------------------------------------------------
 4.2.3 The stack window                                     *VdebugStackWindow*
@@ -499,7 +503,7 @@ debugging, and the default keys mapped to those commands.
     calling statement. Essentially this is the opposite of step in.
 
     4.3.5 Run to cursor                             *VdebugCommandRunToCursor*
-    Default key: <F1>
+    Default key: <F10>
     Tells the debugger engine to run until the point where the cursor is
     currently sitting. One of the most useful commands, as it means that
     setting a hard breakpoint is not always necessary. This only works if the
@@ -670,11 +674,19 @@ The result is shown on the watch window. E.g: >
 <
 
 ------------------------------------------------------------------------------
-4.5.2 Evaluating highlighting expressions              *VdebugEvalHighlighted*
+4.5.2 Evaluating highlighted expressions               *VdebugEvalHighlighted*
 
 Use visual highlighting (default command "v") to select an expression that you
 want to evalute and type "<Leader>e" (leader key followed by the letter "e"). 
 The result of the evaluation is shown on the watch window.
+
+------------------------------------------------------------------------------
+4.5.3 Evaluating the variable under cursor             *VdebugEvalUnderCursor*
+
+You can evaluate the variable under the cursor in the watch window with <F12>
+(default key). Note that only variables before the current line will have a
+value, and trying to evaluate uninitialized variables may cause an error with
+some debugger engines.
 
 ==============================================================================
 5. Options                                                     *VdebugOptions*
@@ -800,6 +812,7 @@ g:vdebug_keymap: >
     \    "detach" : "<F7>",
     \    "set_breakpoint" : "<F10>",
     \    "get_context" : "<F11>",
+    \    "eval_under_cursor" : "<F12>",
     \}
 <
 
