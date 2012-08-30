@@ -1,8 +1,6 @@
 import sys
 sys.path.append('../plugin/python')
 import unittest
-""" Mock vim import """
-import vim
 from vdebug.opts import Options,OptionsError
 
 class OptionsTest(unittest.TestCase):
