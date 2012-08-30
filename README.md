@@ -67,13 +67,16 @@ Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp). Start V
 
 Once in debugging mode, the following default mappings are available:
 
- * `<F1>`: run to cursor
+ * `<F5>`: start/run (to next breakpoint/end of script)
  * `<F2>`: step over
  * `<F3>`: step into
  * `<F4>`: step out
- * `<F5>`: run (to next breakpoint/end of script)
  * `<F6>`: stop debugging
+ * `<F7>`: detach script from debugger
+ * `<F9>`: run to cursor
  * `<F10>`: set line breakpoint
+ * `<F11>`: show context variables (e.g. after "eval")
+ * `<F12>`: evaluate variable under cursor
  * `:Breakpoint <type> <args>`: set a breakpoint of any type (see :help
     VdebugBreakpoints)
  * `:VdebugEval <code>`: evaluate some code and display the result
