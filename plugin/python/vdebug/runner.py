@@ -241,7 +241,10 @@ class Runner:
                 check_ide_key = True
                 if len(ide_key) == 0:
                     check_ide_key = False
-                connection = vdebug.dbgp.Connection(server,port,timeout)
+                    
+                connection = vdebug.dbgp.Connection(server,port,\
+                        timeout,vdebug.util.InputStream())
+
                 self.api = vdebug.dbgp.Api(connection)
                 if check_ide_key and ide_key != self.api.idekey:
                     print "Ignoring debugger connection with IDE key '%s'" \
