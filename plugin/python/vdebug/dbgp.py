@@ -421,7 +421,7 @@ class Connection:
                     raise socket.timeout
                 try:
                     vim.eval("getchar(0)")
-                    (self.sock, self.address) = serv.accept()
+                    return serv.accept()
                 except socket.error:
                     pass
         except vim.error:
