@@ -2,6 +2,8 @@ import xml.etree.ElementTree as ET
 import socket
 import vdebug.log
 import base64
+import time
+import vim
 
 """ Response objects for the DBGP module."""
 
@@ -383,26 +385,47 @@ class Connection:
         return self.isconned
 
     def open(self):
-        """Listen for a connection from the debugger.
-
-        The socket is blocking, and it will wait for the length of
-        time given by the timeout (default is 30 seconds).
-        """
+        """Listen for a connection from the debugger. Listening for the actual
+        connection is handled by self.listen()."""
         print 'Waiting for a connection (this message will self-destruct in ',self.timeout,' seconds...)'
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            serv.settimeout(self.timeout)
+            serv.setblocking(0)
             serv.bind((self.host, self.port))
             serv.listen(5)
-            (self.sock, self.address) = serv.accept()
+            (self.sock, self.address) = self.listen(serv, self.timeout)
             self.sock.settimeout(None)
         except socket.timeout:
             serv.close()
             raise TimeoutError,"Timeout waiting for connection"
+        except UserInterrupt as e:
+            serv.close()
+            raise e
 
         self.isconned = 1
         serv.close()
+    
+    def listen(self, serv, timeout):
+        """Non-blocking listener. Provides support for keyboard interrupts from
+        the user. Although it's non-blocking, the user interface will still 
+        block until the timeout is reached.
+        
+        serv -- Socket server to listen to.
+        timeout -- Seconds before timeout.
+        """
+        start = time.time()
+        try:
+            while True:
+                if (time.time() - start) > timeout:
+                    raise socket.timeout
+                try:
+                    vim.eval("getchar(0)")
+                    (self.sock, self.address) = serv.accept()
+                except socket.error:
+                    pass
+        except vim.error:
+            raise UserInterrupt,"Connection cancelled by user"
 
     def close(self):
         """Close the connection."""
@@ -635,7 +658,6 @@ class EvalProperty(ContextProperty):
 class TimeoutError(Exception):
     pass
 
-
 class DBGPError(Exception):
     """Raised when the debugger returns an error message."""
     pass
@@ -648,3 +670,6 @@ class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
     pass
+
+class UserInterrupt(Exception):
+    """Raised when a user interrupts connection wait."""
