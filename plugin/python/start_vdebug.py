@@ -203,7 +203,7 @@ class DebuggerInterface:
         """
         if isinstance(e,vdebug.dbgp.TimeoutError):
             self.handle_timeout()
-        elif isinstance(e,vdebug.dbgp.UserInterrupt):
+        elif isinstance(e,vdebug.util.UserInterrupt):
             self.handle_interrupt()
         elif isinstance(e,vdebug.event.EventError):
             self.handle_readable_error(e)

@@ -114,3 +114,17 @@ class FilePath:
 
 class FilePathError(Exception):
     pass
+
+class InputStream:
+    """Get a character from Vim's input stream.
+
+    Used to check for keyboard interrupts."""
+
+    def probe(self):
+        try:
+            vim.eval("getchar(0)")
+        except vim.error:
+            raise UserInterrupt
+
+class UserInterrupt(Exception):
+    """Raised when a user interrupts connection wait."""

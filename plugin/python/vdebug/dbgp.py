@@ -3,7 +3,6 @@ import socket
 import vdebug.log
 import base64
 import time
-import vim
 
 """ Response objects for the DBGP module."""
 
@@ -363,7 +362,7 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30):
+    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
@@ -371,10 +370,12 @@ class Connection:
         host -- host name where debugger is running (default '')
         port -- port number which debugger is listening on (default 9000)
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
+        input_stream -- object for checking input stream and user interrupts (default None)
         """
         self.port = port
         self.host = host
         self.timeout = timeout
+        self.input_stream = input_stream
 
     def __del__(self):
         """Make sure the connection is closed."""
@@ -399,9 +400,9 @@ class Connection:
         except socket.timeout:
             serv.close()
             raise TimeoutError,"Timeout waiting for connection"
-        except UserInterrupt as e:
+        except:
             serv.close()
-            raise e
+            raise
 
         self.isconned = 1
         serv.close()
@@ -415,17 +416,16 @@ class Connection:
         timeout -- Seconds before timeout.
         """
         start = time.time()
-        try:
-            while True:
-                if (time.time() - start) > timeout:
-                    raise socket.timeout
-                try:
-                    vim.eval("getchar(0)")
-                    return serv.accept()
-                except socket.error:
-                    pass
-        except vim.error:
-            raise UserInterrupt,"Connection cancelled by user"
+        while True:
+            if (time.time() - start) > timeout:
+                raise socket.timeout
+            try:
+                """Check for user interrupts"""
+                if self.input_stream is not None:
+                    self.input_stream.probe()
+                return serv.accept()
+            except socket.error:
+                pass
 
     def close(self):
         """Close the connection."""
@@ -670,6 +670,3 @@ class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
     pass
-
-class UserInterrupt(Exception):
-    """Raised when a user interrupts connection wait."""
