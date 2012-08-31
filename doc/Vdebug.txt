@@ -968,6 +968,12 @@ it to this list.
     A. This is addressed in |VdebugSetUpPython|. A patch needs to be applied 
         to the debugger engine code.
 
+    Q. I am debugging a PHP script and VDebug won't stop at my breakpoint, but 
+        it will stop at other breakpoints. What do I do?
+    A. You should try reproducing this case outside of your (likely large) 
+        codebase. In the meantime, you can use the xdebug_break() function to 
+        hardcode a breakpoint in your file.
+
     Q. I keep getting error <x> when doing <y>.
     A. Send the details of the error to me at the email address at the top of
         this section, or raise an issue on the Github page.
