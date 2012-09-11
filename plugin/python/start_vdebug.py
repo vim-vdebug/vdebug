@@ -2,8 +2,8 @@ import sys
 import os
 import inspect
 
-dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
-sys.path.append(dir)
+directory = os.path.dirname(inspect.getfile(inspect.currentframe()))
+sys.path.append(directory)
 
 import socket
 import traceback
