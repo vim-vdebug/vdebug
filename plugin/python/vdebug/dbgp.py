@@ -632,7 +632,7 @@ class EvalProperty(ContextProperty):
 
     def _determine_displayname(self,node):
         if self.is_parent:
-            self.display_name = "(%s)" % self.code
+            self.display_name = self.code
         else:
             if self.language == 'php' or \
                     self.language == 'perl':
