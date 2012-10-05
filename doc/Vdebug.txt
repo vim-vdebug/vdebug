@@ -401,6 +401,12 @@ To open a closed tree, navigate to a line with a closed tree (right arrow) and
 press <enter> (<cr>) or double-click if you have mouse-support enabled. This 
 will open the tree, and show all the children.
 
+There are two style options for the watch window: expanded (default) and compact.
+The expanded version has a new line between each variable, and uses separator
+strings to indicate relationships. The compact version has a variable on each
+line, and works better for smaller screens. To set this option, see 
+|VdebugOptions-watch_window_style|.
+
 The watch window automatically updates every time the debugger pauses, so
 nothing needs to be done on your part.
 
@@ -707,6 +713,7 @@ default ptions look like this: >
     \    "debug_window_level" : 0,
     \    "debug_file_level" : 0,
     \    "debug_file" : "",
+    \    "watch_window_style" : 'expanded',
     \}
 <
 You can either use the multi-line notation like above, or set individual keys:
@@ -793,6 +800,12 @@ g:vdebug_options["debug_file"] (default = empty)
     Sets the path to the log file, which writes information set by
     |VdebugOptions-debug_file_level|. This is empty by default, meaning that
     file logging is turned off. Enter a file path to enable file logging.
+
+                                            *VdebugOptions-watch_window_style*
+g:vdebug_options["watch_window_style"] (default = 'expanded')    
+    Sets the style of the watch window, 'expanded' or 'compact'. The compact
+    version works better for smaller screens, but the expanded version looks
+    a bit nicer in my opinion.
 
 ==============================================================================
 6. Key maps                                                       *VdebugKeys*
