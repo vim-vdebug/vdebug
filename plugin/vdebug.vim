@@ -74,6 +74,7 @@ let g:vdebug_options_defaults = {
 \    "debug_file" : "",
 \    "remote_path" : "",
 \    "local_path" : "",
+\    "watch_window_style" : 'expanded',
 \}
 
 let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
