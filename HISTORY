@@ -1,5 +1,16 @@
-=== Vdebug 1.2 / 2012 - ? - ?
+=== Vdebug 1.2 / 2012-??-??
 
-* Support for nodejs debugging using the komodo-debug package in NPM
-* Keyboard interrupt while Vim is waiting for a connection (thanks: http://github.com/artnez)
-* 
+ * Support for nodejs debugging using the komodo-debug package in NPM
+ * Keyboard interrupt while Vim is waiting for a connection (thanks: http://github.com/artnez, #6)
+ * Fixed overwriting dir function with badly named variable (thanks: http://github.com/csomme, #8)
+ * Function keys for debugger are only mapped when the session starts, and are unmapped when it's closed (issue #1)
+ * Removed the help tags file from the git repo (issue #10)
+
+=== Vdebug 1.1 / 2012-08-30
+
+ * Fix for Windows file paths (thanks: http://github.com/beatle, #4)
+ * Watch window trees can be closed as well as opened (issue #5)
+
+=== Vdebug 1.0 / 2012-08-14
+
+ * First release!
