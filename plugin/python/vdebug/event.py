@@ -1,5 +1,6 @@
 # coding=utf-8
 import vdebug.log
+import vdebug.opts
 import vim
 import re
 
@@ -178,7 +179,10 @@ class WatchWindowHideEvent(Event):
                 end_lineno = i - 1
                 break
         runner.ui.watchwin.delete(lineno,end_lineno+1)
-        append = "\n" + "".rjust(pointer_index) + "|"
+        if vdebug.opts.Options.get('watch_window_style') == 'expanded':
+            append = "\n" + "".rjust(pointer_index) + "|"
+        else:
+            append = ""
         runner.ui.watchwin.insert(line.replace("▾","▸")+append,lineno-1,True)
 
 class WatchWindowContextChangeEvent(Event):

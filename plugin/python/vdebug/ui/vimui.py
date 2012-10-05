@@ -461,6 +461,24 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 %{'indent':"".rjust((p.depth * 2)+indent),\
                 'marker':self.__get_marker(p),'name':p.display_name,\
                 'type':p.type_and_size(),'value':p.value}
+
+        if vdebug.opts.Options.get('watch_window_style') == 'expanded':
+            depth = p.depth
+            if next_p and not last:
+                next_depth = next_p.depth
+                if depth == next_depth:
+                    next_sep = "|"
+                    num_spaces = depth * 2
+                elif depth > next_depth:
+                    next_sep = "/"
+                    num_spaces = (depth * 2) - 1
+                else:
+                    next_sep = "\\"
+                    num_spaces = (depth * 2) + 1
+
+                line += "".rjust(num_spaces+indent) + " " + next_sep + "\n"
+            elif depth > 0:
+                line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
         return line
 
     def __get_marker(self,property):
