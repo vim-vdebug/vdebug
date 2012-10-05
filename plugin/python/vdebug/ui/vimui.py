@@ -406,10 +406,11 @@ class StackGetResponseRenderer(ResponseRenderer):
         stack = self.response.get_stack()
         string = ""
         for s in stack:
-            file = s.get('filename')[7:]
+            where = s.get('where') if s.get('where') else 'main'
+            file = vdebug.util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
-                    %{'num':s.get('level'),'where':s.get('where'),\
-                    'file':file,'line':s.get('lineno')}
+                    %{'num':s.get('level'),'where':where,\
+                    'file':str(file),'line':s.get('lineno')}
             string += line + "\n"
         return string
 

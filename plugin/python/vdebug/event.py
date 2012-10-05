@@ -130,6 +130,8 @@ class StackWindowLineSelectEvent(Event):
         vdebug.log.Log("User action in stack window, line %s" % lineno,\
                 vdebug.log.Logger.DEBUG)
         line = runner.ui.stackwin.buffer[lineno-1]
+        if line.find(" @ ") == -1:
+            return False
         filename_pos = line.find(" @ ") + 3
         file_and_line = line[filename_pos:]
         line_pos = file_and_line.find(":")
@@ -169,7 +171,6 @@ class WatchWindowHideEvent(Event):
 
         buf_len = len(vim.current.buffer)
         end_lineno = buf_len - 1
-        print "End line: %i" % end_lineno
         for i in range(lineno,end_lineno):
             buf_line = vim.current.buffer[i]
             char = buf_line[pointer_index]
