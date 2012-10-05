@@ -28,6 +28,7 @@ CONTENTS                                                      *Vdebug-contents*
         3.2 Python set up............................|VdebugSetUpPython|
         3.3 Ruby set up..............................|VdebugSetUpRuby|
         3.4 Perl set up..............................|VdebugSetUpPerl|
+        3.5 NodeJS set up............................|VdebugSetUpNodejs|
     4. Usage.........................................|VdebugUsage|
         4.1 Starting the debugger....................|VdebugStart|
         4.2 Finding your way around the UI...........|VdebugUI|
@@ -335,6 +336,21 @@ run: >
 <
 If you haven't started Vdebug you will get a message saying that it can't
 connect. This means you've set it up correctly.
+
+------------------------------------------------------------------------------
+3.5 NodeJS set up                                          *VdebugSetUpNodejs*
+
+NodeJS is the easiest language to set up for debugging with Vdebug, as
+Activestate have made the debugger engine available through npm. All you need
+to do is run: >
+    npm install komodo-debug -g
+<
+
+You can then begin a debug session by starting Vdebug and running: >
+    node-dbgp -h 127.0.0.1 -p 9000 myscript.js
+<
+Where the 'h' option specifies the address that Vdebug is listening on, and 'p'
+is the port.
 
 ==============================================================================
 4. Usage                                                         *VdebugUsage*
@@ -1008,3 +1024,7 @@ This plugin was inspired by the original Xdebug plugin created by Seung Woo Shin
 http://www.vim.org/scripts/script.php?script_id=1152. There are even a few
 remnants of the original code, but not many. He showed us all that it was
 possible.
+
+Thanks to everyone who's contributed ideas and code so far, including Githubbers
+artnez, csomme and beatle. Also thanks to Gareth Oslar to pointing out that
+Vdebug (almost) worked with NodeJS.
