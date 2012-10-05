@@ -104,7 +104,10 @@ class Breakpoint:
         if len(args) == 0:
             """ Line breakpoint """
             row = ui.get_current_row()
-            file = ui.get_current_file()
+            try:
+                file = ui.get_current_file()
+            except vdebug.util.FilePathError:
+                raise BreakpointError, 'No file, cannot set breakpoint'
             return LineBreakpoint(ui,file,row)
         else:
             arg_parts = args.split(' ')
