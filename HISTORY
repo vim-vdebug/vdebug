@@ -1,4 +1,4 @@
-=== Vdebug 1.2 / 2012-??-??
+=== Vdebug 1.2 / 2012-10-05
 
  * Support for nodejs debugging using the komodo-debug package in NPM
  * Keyboard interrupt while Vim is waiting for a connection (thanks: http://github.com/artnez, #6)
