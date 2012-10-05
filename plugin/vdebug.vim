@@ -1,14 +1,14 @@
 " Vdebug: Powerful, fast, multi-language debugger client for Vim.
 "
-" Script Info and Documentation  {{{
+" Script Info  {{{
 "=============================================================================
 "    Copyright: Copyright (C) 2012 Jon Cairns
 "      Licence:	The MIT Licence (see LICENCE file)
 " Name Of File: vdebug.vim
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
-"               Perl)
+"               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
-"      Version: 1.0
+"      Version: 1.2
 "               Inspired by the Xdebug plugin, which was originally written by 
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
