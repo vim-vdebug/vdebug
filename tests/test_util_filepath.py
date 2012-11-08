@@ -8,7 +8,7 @@ from vdebug.util import FilePath,FilePathError
 class LocalFilePathTest(unittest.TestCase):
 
     def setUp(self):
-        vdebug.opts.Options.set({'local_path':'','remote_path':''})
+        vdebug.opts.Options.set({'path_maps':{}})
 
     def test_as_local(self):
         filename = "/home/user/some/path"
@@ -69,15 +69,22 @@ class LocalFilePathTest(unittest.TestCase):
 
 def RemotePathTest(self):
     def setUp(self):
-        map = {"remote_path":"/remote/","local_path":"/local/"}
-        vdebug.opts.Options.set(map)
+        vdebug.opts.Options.set({'path_maps':{'/remote1/':'/local1/', '/remote2/':'/local2'}})
 
     def test_as_local(self):
-        filename = "/remote/path/to/file"
+        filename = "/remote1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/local/path/to/file",file)
+        self.assertEqual("/local1/path/to/file",file)
+
+        filename = "/remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local2/path/to/file",file)
 
     def test_as_remote(self):
-        filename = "/local/path/to/file"
+        filename = "/local1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/remote/path/to/file",file)
+        self.assertEqual("/remote1/path/to/file",file)
+
+        filename = "/local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/remote2/path/to/file",file)
