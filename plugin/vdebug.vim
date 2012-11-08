@@ -72,8 +72,7 @@ let g:vdebug_options_defaults = {
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 0,
 \    "debug_file" : "",
-\    "remote_path" : "",
-\    "local_path" : "",
+\    "path_maps" : {},
 \    "watch_window_style" : 'expanded',
 \}
 

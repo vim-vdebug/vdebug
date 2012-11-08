@@ -724,8 +724,7 @@ default ptions look like this: >
     \    "on_close" : 'detach',
     \    "break_on_open" : 1,
     \    "ide_key" : '',
-    \    "remote_path" : "",
-    \    "local_path" : "",
+    \    "path_maps" : {},
     \    "debug_window_level" : 0,
     \    "debug_file_level" : 0,
     \    "debug_file" : "",
@@ -782,19 +781,12 @@ g:vdebug_options["ide_key"] (default = empty)
     restricts the connections to those that have a matching key. See
     |VdebugIDEKey| for more information.
 
-                                                   *VdebugOptions-remote_path*
-g:vdebug_options["remote_path"] (default = empty)  
+                                                       *VdebugOptions-path_maps*
+g:vdebug_options["path_maps"] (default = {})          
     This is only used for debugging a script on a remote machine. This is used
     to map remote file paths to local file paths, as they are very likely to be
-    different. Any file path specified here will be replaced by "local_path", 
-    so that the correct file is opened in the source window.
-
-                                                    *VdebugOptions-local_path*
-g:vdebug_options["local_path"] (default = empty)    
-    This is only used for debugging a script on a remote machine. This is used
-    to map local file paths to remote file paths, as they are very likely to be
-    different. Any file path specified here will be replaced by "remote_path"
-    before sending commands to the debugger engine.
+    different. This is a VimL dictionary of mappings between remote files (keys)
+    and local files (values).
 
                                             *VdebugOptions-debug_window_level*
 g:vdebug_options["debug_window_level"] (default = 0)    
@@ -905,13 +897,15 @@ Let's say we're debugging a file on a remote machine, and the path is
 /home/jon/php/myscript.php. I would have to set the remote and local path
 options as so: >
 
-    let g:vdebug_options['remote_path'] = "/home/user/scripts"
-    let g:vdebug_options['local_path'] = "/home/jon/php"
+    let g:vdebug_options['path_maps'] = {"/home/user/scripts": "/home/jon/php"}
 <
 When the debugger engine sends any file paths, a straight swap of the paths is
 done, so all instances of "/home/user/scripts" are replaced with
 "/home/jon/php". The opposite is done when sending file paths in the other
-direction. 
+direction.
+
+It is possible to have multiple file path mappings by adding more items in the
+"path_maps" dictionary.
 
 ------------------------------------------------------------------------------
 8.2 Connecting the two machines                       *VdebugRemoteConnection*
