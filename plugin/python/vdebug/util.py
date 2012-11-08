@@ -56,14 +56,14 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if vdebug.opts.Options.isset('remote_path'):
-            rp = vdebug.opts.Options.get('remote_path')
-            lp = vdebug.opts.Options.get('local_path')
-            vdebug.log.Log("Replacing remote path (%s) " % rp +\
-                    "with local path (%s)" % lp,\
-                    vdebug.log.Logger.DEBUG)
-            if ret.startswith(rp):
-                ret = ret.replace(rp,lp)
+        if vdebug.opts.Options.isset('path_maps'):
+            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+                if ret.startswith(remote):
+                    vdebug.log.Log("Replacing remote path (%s) " % remote +\
+                            "with local path (%s)" % local ,\
+                            vdebug.log.Logger.DEBUG)
+                    ret = ret.replace(remote,local)
+                    break
         return ret
 
     def _create_remote(self,f):
@@ -72,14 +72,15 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if vdebug.opts.Options.isset('remote_path'):
-            rp = vdebug.opts.Options.get('remote_path')
-            lp = vdebug.opts.Options.get('local_path')
-            vdebug.log.Log("Replacing local path (%s) " % rp +\
-                    "with remote path (%s)" % lp,\
-                    vdebug.log.Logger.DEBUG)
-            if ret.startswith(lp):
-                ret = ret.replace(lp,rp)
+
+        if vdebug.opts.Options.isset('path_maps'):
+            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+                if ret.startswith(local):
+                    vdebug.log.Log("Replacing local path (%s) " % local +\
+                            "with remote path (%s)" % remote ,\
+                            vdebug.log.Logger.DEBUG)
+                    ret = ret.replace(local,remote)
+                    break
         return ret
 
     def as_local(self):
