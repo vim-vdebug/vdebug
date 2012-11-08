@@ -38,9 +38,9 @@ class Dispatcher:
             line = self.runner.ui.watchwin.buffer[lineno-1]
             if lineno == 1:
                 return WatchWindowContextChangeEvent()
-            elif line.find("▸") > -1:
+            elif line.find("+") > -1:
                 return WatchWindowPropertyGetEvent()
-            elif line.find("▾") > -1:
+            elif line.find("-") > -1:
                 return WatchWindowHideEvent()
         elif window_name == self.runner.ui.stackwin.name:
             return StackWindowLineSelectEvent()
@@ -149,13 +149,13 @@ class WatchWindowPropertyGetEvent(Event):
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
-        pointer_index = line.find("▸")
+        pointer_index = line.find("+")
 
         eq_index = line.find('=')
         if eq_index == -1:
             raise EventError, "Cannot read the selected property"
 
-        name = line[pointer_index+4:eq_index-1]
+        name = line[pointer_index+3:eq_index-1]
         context_res = runner.api.property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
@@ -168,7 +168,13 @@ class WatchWindowHideEvent(Event):
     def execute(self,runner):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
-        pointer_index = line.find("▾")
+
+        # don't hide lines without a = in them, since we can not
+        # expand them afterwards
+        if line.find('=') == -1:
+            return
+
+        pointer_index = line.find("-")
 
         buf_len = len(vim.current.buffer)
         end_lineno = buf_len - 1
@@ -183,7 +189,7 @@ class WatchWindowHideEvent(Event):
             append = "\n" + "".rjust(pointer_index) + "|"
         else:
             append = ""
-        runner.ui.watchwin.insert(line.replace("▾","▸")+append,lineno-1,True)
+        runner.ui.watchwin.insert(line.replace("-","+")+append,lineno-1,True)
 
 class WatchWindowContextChangeEvent(Event):
     """Event used to trigger a watch window context change.
