@@ -410,8 +410,8 @@ tell the debugger to run to the cursor with <F1>.
 The watch window shows the variables at the current position in execution. The
 variable name, type, length (if applicable) and value are shown. They are shown
 as a tree, because arrays/lists and objects have children. Hopefully it's
-fairly self-explanatory: right arrows show a closed tree, down arrows show an
-open tree and diamonds show variables that don't have children.
+fairly self-explanatory: plus signs show a closed tree, minus signs show an
+open tree and asterisks show variables that don't have children.
 
 To open a closed tree, navigate to a line with a closed tree (right arrow) and
 press <enter> (<cr>) or double-click if you have mouse-support enabled. This 

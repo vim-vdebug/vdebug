@@ -482,10 +482,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
         return line
 
     def __get_marker(self,property):
-        char = "⬦"
+        char = "*"
         if property.has_children:
             if property.child_count() == 0:
-                char = "▸"
+                char = "+"
             else:
-                char = "▾"
+                char = "-"
         return char
