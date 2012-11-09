@@ -87,11 +87,11 @@ exe "map ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()
 
 vnoremap <Leader>e :python debugger.handle_visual_eval()<cr>
 
-command! -nargs=? Breakpoint python debugger.set_breakpoint('<args>')
-command! -nargs=? BreakpointRemove python debugger.remove_breakpoint('<args>')
+command! -nargs=? Breakpoint python debugger.set_breakpoint(<q-args>)
+command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 
-command! -nargs=? VdebugEval python debugger.handle_eval('<args>')
+command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
