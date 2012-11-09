@@ -2,6 +2,7 @@ import vdebug.opts
 import vdebug.log
 import vim
 import sys
+import re
 
 class Keymapper:
     """Map and unmap key commands for the Vim user interface.
@@ -13,6 +14,7 @@ class Keymapper:
         self.keymaps = vim.eval("g:vdebug_keymap")
         self.leader = vim.eval("g:vdebug_leader_key")
         self.is_mapped = False
+        self.existing = []
 
     def map(self):
         if self.is_mapped:
@@ -20,10 +22,21 @@ class Keymapper:
         for func in self.keymaps:
             key = self.keymaps[func]
             if func not in self.exclude:
+                vim.command("redir @z | silent map %s%s | redir END" %(self.leader,key))
+                self.__save_map_output( vim.eval("@z").strip() )
                 map_cmd = "map %s%s :python debugger.%s()<cr>" %\
                     (self.leader,key,func)
                 vim.command(map_cmd)
         self.is_mapped = True
+
+    def __save_map_output(self,output):
+        if output.startswith('No mapping'):
+            return False
+        else:
+            vdebug.log.Log("Storing existing key mapping, '%s' " % output,\
+                    vdebug.log.Logger.DEBUG)
+            self.existing.append(output)
+            return True
 
     def unmap(self):
         if self.is_mapped:
@@ -33,6 +46,10 @@ class Keymapper:
                 key = self.keymaps[func]
                 if func not in self.exclude:
                     vim.command("unmap %s%s" %(self.leader,key))
+            for mapping in self.existing:
+                vdebug.log.Log("Remapping key with '%s' " % mapping,\
+                        vdebug.log.Logger.DEBUG)
+                vim.command("map %s" % mapping)
 
 class FilePath:
     """Normalizes a file name and allows for remote and local path mapping.
