@@ -411,7 +411,9 @@ The watch window shows the variables at the current position in execution. The
 variable name, type, length (if applicable) and value are shown. They are shown
 as a tree, because arrays/lists and objects have children. Hopefully it's
 fairly self-explanatory: right arrows show a closed tree, down arrows show an
-open tree and diamonds show variables that don't have children.
+open tree and diamonds show variables that don't have children. These markers
+be customised (see |VdebugOptions|), and will fall back to ASCII equivalents
+if multi byte support is not enabled in the VIM configuration.
 
 To open a closed tree, navigate to a line with a closed tree (right arrow) and
 press <enter> (<cr>) or double-click if you have mouse-support enabled. This 
@@ -729,6 +731,9 @@ default ptions look like this: >
     \    "debug_file_level" : 0,
     \    "debug_file" : "",
     \    "watch_window_style" : 'expanded',
+    \    "marker_default" : '⬦',
+    \    "marker_closed_tree" : '▸',
+    \    "marker_open_tree" : '▾'
     \}
 <
 You can either use the multi-line notation like above, or set individual keys:
@@ -815,13 +820,36 @@ g:vdebug_options["watch_window_style"] (default = 'expanded')
     version works better for smaller screens, but the expanded version looks
     a bit nicer in my opinion.
 
+                                                *VdebugOptions-marker_default*
+g:vdebug_options["marker_default"] (default = '⬦')    
+    Sets the marker used for a variable in the watch window that has no
+    children. A "*" symbol is used if multi byte support is not enabled.
+
+                                            *VdebugOptions-marker_closed_tree*
+g:vdebug_options["marker_closed_tree"] (default = '▸')    
+    Sets the marker used for a variable in the watch window that does have
+    children, but the tree is currently closed. A "+" symbol is used if multi 
+    byte support is not enabled.
+
+                                              *VdebugOptions-marker_open_tree*
+g:vdebug_options["marker_open_tree"] (default = '▾')    
+    Sets the marker used for a variable in the watch window that does have
+    children, and the tree is currently open. A "-" symbol is used if multi 
+    byte support is not enabled.
+
 ==============================================================================
 6. Key maps                                                       *VdebugKeys*
 
 By default, function keys are mapped to execute debugger commands. However, I'm
 aware that people may already have them mapped to something else, so would like
-to change the default behaviour. This is possible using the key map dictionary,
-g:vdebug_keymap: >
+to change the default behaviour. Before you do that, be aware that Vdebug only
+maps one command outside of the debugger mode, which is "run". All others are
+mapped only when Vdebug starts up, and unmapped when it shuts down. Not only this,
+but any commands that you have already mapped to these keys will be remembered 
+and restored when you come out of debugging mode.
+
+If you would still like to remap the default keys, this is possible using the 
+key map dictionary, g:vdebug_keymap: >
 
     let g:vdebug_keymap = {
     \    "run" : "<F5>",
