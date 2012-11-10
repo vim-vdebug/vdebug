@@ -482,10 +482,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
         return line
 
     def __get_marker(self,property):
-        char = "⬦"
+        char = vdebug.opts.Options.get('marker_default')
         if property.has_children:
             if property.child_count() == 0:
-                char = "▸"
+                char = vdebug.opts.Options.get('marker_closed_tree')
             else:
-                char = "▾"
+                char = vdebug.opts.Options.get('marker_open_tree')
         return char

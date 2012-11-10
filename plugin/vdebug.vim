@@ -74,7 +74,16 @@ let g:vdebug_options_defaults = {
 \    "debug_file" : "",
 \    "path_maps" : {},
 \    "watch_window_style" : 'expanded',
+\    "marker_default" : '⬦',
+\    "marker_closed_tree" : '▸',
+\    "marker_open_tree" : '▾'
 \}
+
+if has('multi_byte') == 0
+    let g:vdebug_options_defaults["marker_default"] = '*'
+    let g:vdebug_options_defaults["marker_closed_tree"] = '+'
+    let g:vdebug_options_defaults["marker_open_tree"] = '-'
+endif
 
 let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
 let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
