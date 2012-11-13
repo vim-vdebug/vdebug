@@ -388,7 +388,7 @@ class Connection:
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
-        print 'Waiting for a connection (this message will self-destruct in ',self.timeout,' seconds...)'
+        print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ',self.timeout,' seconds...)'
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
