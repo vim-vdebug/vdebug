@@ -76,7 +76,8 @@ let g:vdebug_options_defaults = {
 \    "watch_window_style" : 'expanded',
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
-\    "marker_open_tree" : '▾'
+\    "marker_open_tree" : '▾',
+\    "continuous_mode"  : 1
 \}
 
 if has('multi_byte') == 0
