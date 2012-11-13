@@ -2,7 +2,7 @@ import vdebug.opts
 import vdebug.log
 import vim
 import sys
-import re
+import urllib
 
 class Keymapper:
     """Map and unmap key commands for the Vim user interface.
@@ -58,6 +58,7 @@ class FilePath:
         if filename is None or \
             len(filename) == 0:
             raise FilePathError, "Missing or invalid file name"
+        filename = urllib.unquote(filename)
         if filename.startswith('file:///'):
             if sys.platform == "win32":
                 """ remove prefix till the drive letter """
@@ -100,8 +101,11 @@ class FilePath:
                     break
         return ret
 
-    def as_local(self):
-        return self.local
+    def as_local(self,quote = False):
+        if quote:
+            return urllib.quote(self.local)
+        else:
+            return self.local
 
     def as_remote(self):
         return self.remote
