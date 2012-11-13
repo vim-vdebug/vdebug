@@ -8,7 +8,7 @@ class Keymapper:
     """Map and unmap key commands for the Vim user interface.
     """
 
-    exclude = ["run","set_breakpoint"]
+    exclude = ["run","set_breakpoint","eval_visual"]
 
     def __init__(self):
         self.keymaps = vim.eval("g:vdebug_keymap")
