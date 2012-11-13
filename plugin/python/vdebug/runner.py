@@ -5,7 +5,6 @@ import vdebug.log
 import vdebug.ui.vimui
 import socket
 import vim
-import urllib
 import vdebug.breakpoint
 import vdebug.opts
 import vdebug.util
@@ -89,9 +88,7 @@ class Runner:
                 stack_res = self.update_stack()
                 stack = stack_res.get_stack()
 
-                filename = urllib.unquote(stack[0].get('filename'))
-                self.cur_file = vdebug.util.FilePath(filename)
-                # self.cur_file = vdebug.util.FilePath(stack[0].get('filename'))
+                self.cur_file = vdebug.util.FilePath(stack[0].get('filename'))
                 self.cur_lineno = stack[0].get('lineno')
 
                 vdebug.log.Log("Moving to current position in source window")
