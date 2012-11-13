@@ -274,7 +274,7 @@ class Runner:
         if not self.is_alive():
             self.ui.error("Cannot detach: no debugger connection")
         else:
-            self.say("Detaching the debugger")
+            self.ui.say("Detaching the debugger")
             self.api.detach()
 
     def close_connection(self,stop = True):
