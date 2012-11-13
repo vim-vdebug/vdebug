@@ -60,6 +60,7 @@ let g:vdebug_keymap_defaults = {
 \    "set_breakpoint" : "<F10>",
 \    "get_context" : "<F11>",
 \    "eval_under_cursor" : "<F12>",
+\    "eval_visual" : "<Leader>e"
 \}
 
 let g:vdebug_options_defaults = {
@@ -80,6 +81,7 @@ let g:vdebug_options_defaults = {
 \    "continuous_mode"  : 0
 \}
 
+" Different symbols for non unicode Vims
 if has('multi_byte') == 0
     let g:vdebug_options_defaults["marker_default"] = '*'
     let g:vdebug_options_defaults["marker_closed_tree"] = '+'
@@ -90,22 +92,25 @@ let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
 let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
 let g:vdebug_leader_key = ""
 
+" Create the top dog
 python debugger = DebuggerInterface()
 
+" Mappings allowed in non-debug mode
 exe "map ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
 exe "map ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
 
-vnoremap <Leader>e :python debugger.handle_visual_eval()<cr>
+" Exceptional case for visual evaluation
+exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
 
+" Commands
 command! -nargs=? Breakpoint python debugger.set_breakpoint(<q-args>)
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
-
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 
+" Signs and highlighted lines for breakpoints, etc.
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
-
 hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 
