@@ -77,7 +77,7 @@ let g:vdebug_options_defaults = {
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
-\    "continuous_mode"  : 1
+\    "continuous_mode"  : 0
 \}
 
 if has('multi_byte') == 0
