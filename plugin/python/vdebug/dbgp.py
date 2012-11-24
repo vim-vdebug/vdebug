@@ -343,6 +343,9 @@ class Api:
         return self.send_cmd('breakpoint_set',cmd_args,\
                 BreakpointSetResponse)
 
+    def breakpoint_list(self):
+        return self.send_cmd('breakpoint_list')
+
     def breakpoint_remove(self,id):
         """Remove a breakpoint by ID.
 
