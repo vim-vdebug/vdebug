@@ -21,7 +21,8 @@ class Ui(vdebug.ui.interface.Ui):
         self.is_open = True
         vim.command('silent tabnew')
         self.tabnr = vim.eval("tabpagenr()")
-        
+        self.emptybuffer = vim.eval("bufwinnr(expand('%:p'))")
+
         srcwin_name = self.__get_srcwin_name()
 
         self.watchwin = WatchWindow(self,'vertical belowright new')
@@ -138,6 +139,8 @@ class Ui(vdebug.ui.interface.Ui):
         self.watchwin = None
         self.stackwin = None
         self.statuswin = None
+
+        vim.command('bwipeout'+self.emptybuffer)
 
 class SourceWindow(vdebug.ui.interface.Window):
 
