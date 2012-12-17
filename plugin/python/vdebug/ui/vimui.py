@@ -13,15 +13,20 @@ class Ui(vdebug.ui.interface.Ui):
         vdebug.ui.interface.Ui.__init__(self)
         self.is_open = False
         self.breakpoint_store = breakpoints
+        self.emptybuffer = None
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
 
     def open(self):
         if self.is_open:
             return
         self.is_open = True
-        vim.command('silent tabnew')
+        
+        cur_buf_name = vim.eval("bufname('%')")
+        if cur_buf_name is None:
+            cur_buf_name = ''
+
+        vim.command('silent tabnew ' + cur_buf_name)
         self.tabnr = vim.eval("tabpagenr()")
-        self.emptybuffer = vim.eval("bufwinnr(expand('%:p'))")
 
         srcwin_name = self.__get_srcwin_name()
 
@@ -52,6 +57,9 @@ class Ui(vdebug.ui.interface.Ui):
         self.sourcewin.set_file(file)
         self.sourcewin.set_line(lineno)
         self.sourcewin.place_pointer(lineno)
+
+    def __get_buf_list(self):
+        return vim.eval("range(1, bufnr('$'))")
 
     def mark_as_stopped(self):
         if self.is_open:
@@ -139,8 +147,6 @@ class Ui(vdebug.ui.interface.Ui):
         self.watchwin = None
         self.stackwin = None
         self.statuswin = None
-
-        vim.command('bwipeout'+self.emptybuffer)
 
 class SourceWindow(vdebug.ui.interface.Window):
 
