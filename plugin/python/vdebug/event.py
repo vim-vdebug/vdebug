@@ -21,11 +21,13 @@ class Dispatcher:
         if event is not None:
             return event.execute(self.runner)
         else:
+            vdebug.log.Log("No executable event found at current cursor position",\
+                    vdebug.log.Logger.DEBUG)
             return False
 
     def _get_event_by_position(self):
         buf_name = vim.current.buffer.name
-        p = re.compile('.*[\\/]([^\\/]+)')
+        p = re.compile('.*[\\\/]([^\\\/]+)')
         m = p.match(buf_name)
         if m is None:
             return None
