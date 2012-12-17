@@ -41,6 +41,15 @@ else
   endif
 endif
 
+" Nice characters get screwed up on windows
+if has('win32') || has('win64')
+    let g:vdebug_force_ascii = 1
+elseif has('multibyte') == 0
+    let g:vdebug_force_ascii = 1
+else
+    let g:vdebug_force_ascii = 0
+end
+
 if !exists("g:vdebug_options")
     let g:vdebug_options = {}
 endif
@@ -82,7 +91,7 @@ let g:vdebug_options_defaults = {
 \}
 
 " Different symbols for non unicode Vims
-if has('multi_byte') == 0
+if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults["marker_default"] = '*'
     let g:vdebug_options_defaults["marker_closed_tree"] = '+'
     let g:vdebug_options_defaults["marker_open_tree"] = '-'
