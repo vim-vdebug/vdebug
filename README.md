@@ -31,7 +31,7 @@ after installing the plugin.
 
 **Requirements**:
 
-  * Vim compiled with Python 2 support, tabs and signs
+  * Vim compiled with Python 2.6+ support, tabs and signs
   * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
     Perl, NodeJS, Tcl...
 
