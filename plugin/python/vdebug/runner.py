@@ -287,7 +287,12 @@ class Runner:
                 vdebug.log.Log("Closing the connection")
                 if stop:
                     if vdebug.opts.Options.get('on_close') == 'detach':
-                        self.api.detach()
+                        try:
+                            self.api.detach()
+                        except vdebug.dbgp.CmdNotImplementedError:
+                            self.ui.error('Detach is not supported by the debugger, stopping instead')
+                            vdebug.opts.Options.overwrite('on_close','stop')
+                            self.api.stop()
                     else:
                         self.api.stop()
                 self.api.conn.close()

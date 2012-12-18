@@ -32,6 +32,11 @@ class Options:
             raise OptionsError, "No option with key '%s'" % name
 
     @classmethod
+    def overwrite(cls,name,value):
+        inst = cls.inst()
+        inst.options[name] = value
+
+    @classmethod
     def isset(cls,name):
         """Checks whether the option exists and is set.
 
