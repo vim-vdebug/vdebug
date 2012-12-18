@@ -24,17 +24,22 @@ class Response:
         in the response, then raise it as a DBGPError."""
         xml = self.as_xml()
         err_el = xml.find('%serror' % self.ns)
-        code = err_el.get("code")
-        if code is None:
-            raise ResponseError(
-                    "Missing error code in response",
-                    self.response)
-        msg_el = err_el.find('%smessage' % self.ns)
-        if msg_el is None:
-            raise ResponseError(
-                    "Missing error message in response",
-                    self.response)
-        raise DBGPError(msg_el.text,code)
+        if err_el is None:
+            raise DBGPError("Could not parse error from return XML",1)
+        else:
+            code = err_el.get("code")
+            if code is None:
+                raise ResponseError(
+                        "Missing error code in response",
+                        self.response)
+            elif int(code) == 4:
+                raise CmdNotImplementedError('Command not implemented')
+            msg_el = err_el.find('%smessage' % self.ns)
+            if msg_el is None:
+                raise ResponseError(
+                        "Missing error message in response",
+                        self.response)
+            raise DBGPError(msg_el.text,code)
 
     def get_cmd(self):
         """Get the command that created this response."""
@@ -60,7 +65,16 @@ class Response:
         """
         if self.xml == None:
             self.xml = ET.fromstring(self.response)
+            self.__determine_ns()
         return self.xml
+
+    def __determine_ns(self):
+        tag_repr = str(self.xml.tag)
+        if tag_repr[0] != '{':
+            raise DBGPError('Invalid or missing XML namespace',1)
+        else:
+            ns_parts = tag_repr.split('}')
+            self.ns = ns_parts[0] + '}'
 
     def __str__(self):
         return self.as_string()
@@ -662,6 +676,10 @@ class TimeoutError(Exception):
     pass
 
 class DBGPError(Exception):
+    """Raised when the debugger returns an error message."""
+    pass
+
+class CmdNotImplementedError(Exception):
     """Raised when the debugger returns an error message."""
     pass
 
