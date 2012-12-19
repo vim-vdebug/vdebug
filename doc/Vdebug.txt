@@ -29,6 +29,7 @@ CONTENTS                                                      *Vdebug-contents*
         3.3 Ruby set up..............................|VdebugSetUpRuby|
         3.4 Perl set up..............................|VdebugSetUpPerl|
         3.5 NodeJS set up............................|VdebugSetUpNodejs|
+        3.6 TCL/Wish set up..........................|VdebugSetUpTcl|
     4. Usage.........................................|VdebugUsage|
         4.1 Starting the debugger....................|VdebugStart|
         4.2 Finding your way around the UI...........|VdebugUI|
@@ -351,6 +352,32 @@ You can then begin a debug session by starting Vdebug and running: >
 <
 Where the 'h' option specifies the address that Vdebug is listening on, and 'p'
 is the port.
+
+------------------------------------------------------------------------------
+3.6 TCL/Wish set up                                           *VdebugSetUpTcl*
+
+Like Python and Ruby, Tcl and Wish have an standalone debugging tool that you 
+can use from the command line, which has again been made avilable by 
+ActiveState.
+
+Go to http://code.activestate.com/komodo/remotedebugging/, download the Tcl 
+client for your OS and extract it. Inside this package is a binary file called 
+dbgp_tcldebug that we will use instead of the tcl/wish binary. It accepts the
+script as an option, along with the vdebug server address and port.
+
+If we want to debug a Tcl script called "myscript.tcl", start Vdebug listening
+and run the following: >
+    path/to/dbgp_tcldebug -dbgp localhost:9000 -app-file myscript.tcl \
+        -app-shell /usr/bin/tcl
+<
+To debug a wish script called "mywishscript.tcl", run the following: >
+    path/to/dbgp_tcldebug -dbgp localhost:9000 -app-file mywishscript.tcl \
+        -app-shell /usr/bin/wish
+<
+Note that the only difference is the app shell argument. 
+
+There is a known error with using "tix", however, as it appears that Activestate's
+debugger engine doesn't support it.
 
 ==============================================================================
 4. Usage                                                         *VdebugUsage*
@@ -1034,7 +1061,9 @@ it to this list.
 
     Q. I keep getting error <x> when doing <y>.
     A. Send the details of the error to me at the email address at the top of
-        this section, or raise an issue on the Github page.
+        this section, or raise an issue on the Github page. Please supply the
+        version of Vdebug, your Vim version and your OS to make it as easy as
+        possible to diagnose!
 
     Q. Can you implement feature <x>?
     A. Maybe - raise an issue on the Github page (top of this section) and I'll
