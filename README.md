@@ -1,7 +1,7 @@
 # Vdebug
 
 Vdebug is a new, fast, powerful debugger client for Vim. It's multi-language,
-and has been tested with PHP, Python, Ruby, Perl and NodeJS. It interfaces with 
+and has been tested with PHP, Python, Ruby, Perl, Tcl and NodeJS. It interfaces with 
 **any** debugger that faithfully uses the DBGP protocol, such as Xdebug for PHP. 
 
 It builds on the experience gained through the legacy of the Xdebug Vim script 
