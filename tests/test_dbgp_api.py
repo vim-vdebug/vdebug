@@ -45,6 +45,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="status"
+                      xmlns="urn:debugger_api_v1"
                       status="starting"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -58,6 +59,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="run"
+                      xmlns="urn:debugger_api_v1"
                       status="running"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -71,6 +73,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
+                      xmlns="urn:debugger_api_v1"
                       status="break"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -84,6 +87,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
+                      xmlns="urn:debugger_api_v1"
                       status="break"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -97,6 +101,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
+                      xmlns="urn:debugger_api_v1"
                       status="break"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -110,6 +115,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="stop"
+                      xmlns="urn:debugger_api_v1"
                       status="stopping"
                       reason="ok"
                       transaction_id="transaction_id">
@@ -123,6 +129,7 @@ class ApiTest(unittest.TestCase):
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="detatch"
+                      xmlns="urn:debugger_api_v1"
                       status="stopped"
                       reason="ok"
                       transaction_id="transaction_id">
