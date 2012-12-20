@@ -26,6 +26,11 @@ class LocalFilePathTest(unittest.TestCase):
         file = FilePath(quoted)
         self.assertEqual("/home/user/file.tcl",file.as_local())
 
+    def test_win(self):
+        quoted = "file:///C:/home/user/file%2etcl"
+        file = FilePath(quoted)
+        self.assertEqual("C:\\home\\user\\file.tcl",file.as_local())
+
     def test_as_remote(self):
         filename = "/home/user/some/path"
         file = FilePath(filename)
@@ -125,3 +130,7 @@ class RemotePathTest(unittest.TestCase):
         filename = "C:\\local2\\path\\to\\file"
         file = FilePath(filename)
         self.assertEqual("file:///C:/remote2/path/to/file",file.as_remote())
+
+        filename = "C:/local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("C:\\local2\\path\\to\\file",file.as_local())
