@@ -64,9 +64,11 @@ class FilePath:
         if filename.startswith('file://'):
             filename = filename[7:]
 
-        p = re.compile('^[a-zA-Z]:')
+        p = re.compile('^/?[a-zA-Z]:')
         if p.match(filename):
             self.is_win = True
+            if filename[0] == "/":
+                filename = filename[1:]
             if filename[2] == "\\":
                 filename = filename.replace("\\","/")
 
@@ -104,7 +106,10 @@ class FilePath:
                             vdebug.log.Logger.DEBUG)
                     ret = ret.replace(local,remote)
                     break
-        return "file://"+ret
+        if self.is_win:
+            return "file:///"+ret
+        else:
+            return "file://"+ret
 
     def as_local(self,quote = False):
         if quote:

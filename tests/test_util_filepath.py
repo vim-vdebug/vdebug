@@ -111,17 +111,17 @@ class RemotePathTest(unittest.TestCase):
     def test_as_remote_with_win_paths(self):
         filename = "C:/local1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("file://C:/remote1/path/to/file",file.as_remote())
+        self.assertEqual("file:///C:/remote1/path/to/file",file.as_remote())
 
-        filename = "C:/local2/path/to/file"
+        filename = "file:///C:/local2/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("file://C:/remote2/path/to/file",file.as_remote())
+        self.assertEqual("file:///C:/remote2/path/to/file",file.as_remote())
 
     def test_as_remote_with_backslashed_win_paths(self):
         filename = "C:\\local1\\path\\to\\file"
         file = FilePath(filename)
-        self.assertEqual("file://C:/remote1/path/to/file",file.as_remote())
+        self.assertEqual("file:///C:/remote1/path/to/file",file.as_remote())
 
         filename = "C:\\local2\\path\\to\\file"
         file = FilePath(filename)
-        self.assertEqual("file://C:/remote2/path/to/file",file.as_remote())
+        self.assertEqual("file:///C:/remote2/path/to/file",file.as_remote())
