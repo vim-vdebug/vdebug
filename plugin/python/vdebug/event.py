@@ -137,7 +137,7 @@ class StackWindowLineSelectEvent(Event):
             return False
         filename_pos = line.find(" @ ") + 3
         file_and_line = line[filename_pos:]
-        line_pos = file_and_line.find(":")
+        line_pos = file_and_line.rfind(":")
         file = vdebug.util.FilePath(file_and_line[:line_pos])
         lineno = file_and_line[line_pos+1:]
         runner.ui.sourcewin.set_file(file)
