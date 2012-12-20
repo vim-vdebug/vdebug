@@ -21,10 +21,15 @@ class LocalFilePathTest(unittest.TestCase):
         file = FilePath(prefix+filename)
         self.assertEqual(filename,file.as_local())
 
+    def test_quoted(self):
+        quoted = "file:///home/user/file%2etcl"
+        file = FilePath(quoted)
+        self.assertEqual("/home/user/file.tcl",file.as_local())
+
     def test_as_remote(self):
         filename = "/home/user/some/path"
         file = FilePath(filename)
-        self.assertEqual(filename,file.as_remote())
+        self.assertEqual("file://"+filename,file.as_remote())
 
     def test_eq(self):
         filename = "/home/user/some/path"
@@ -67,24 +72,56 @@ class LocalFilePathTest(unittest.TestCase):
     def test_empty_file_raises_error(self):
         self.assertRaises(FilePathError,FilePath,"")
 
-def RemotePathTest(self):
+class RemotePathTest(unittest.TestCase):
     def setUp(self):
-        vdebug.opts.Options.set({'path_maps':{'/remote1/':'/local1/', '/remote2/':'/local2'}})
+        vdebug.opts.Options.set({'path_maps':{'/remote1/':'/local1/', '/remote2/':'/local2/'}})
 
     def test_as_local(self):
         filename = "/remote1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/local1/path/to/file",file)
+        self.assertEqual("/local1/path/to/file",file.as_local())
 
         filename = "/remote2/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/local2/path/to/file",file)
+        self.assertEqual("/local2/path/to/file",file.as_local())
 
-    def test_as_remote(self):
+    def test_as_local_with_uri(self):
+        filename = "file:///remote1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local1/path/to/file",file.as_local())
+
+        filename = "file:///remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local2/path/to/file",file.as_local())
+
+    def test_as_local_does_nothing(self):
+        filename = "/the/remote/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/the/remote/path/to/file",file.as_local())
+
+    def test_as_remote_with_unix_paths(self):
         filename = "/local1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/remote1/path/to/file",file)
+        self.assertEqual("file:///remote1/path/to/file",file.as_remote())
 
-        filename = "/local2/path/to/file"
+        filename = "file:///local2/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/remote2/path/to/file",file)
+        self.assertEqual("file:///remote2/path/to/file",file.as_remote())
+
+    def test_as_remote_with_win_paths(self):
+        filename = "C:/local1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file://C:/remote1/path/to/file",file.as_remote())
+
+        filename = "C:/local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file://C:/remote2/path/to/file",file.as_remote())
+
+    def test_as_remote_with_backslashed_win_paths(self):
+        filename = "C:\\local1\\path\\to\\file"
+        file = FilePath(filename)
+        self.assertEqual("file://C:/remote1/path/to/file",file.as_remote())
+
+        filename = "C:\\local2\\path\\to\\file"
+        file = FilePath(filename)
+        self.assertEqual("file://C:/remote2/path/to/file",file.as_remote())
