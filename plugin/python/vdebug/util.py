@@ -69,8 +69,6 @@ class FilePath:
             self.is_win = True
             if filename[0] == "/":
                 filename = filename[1:]
-            if filename[2] == "\\":
-                filename = filename.replace("\\","/")
 
         self.local = self._create_local(filename)
         self.remote = self._create_remote(filename)
@@ -81,6 +79,9 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
+        if ret[2] == "/":
+            ret = ret.replace("/","\\")
+        
         if vdebug.opts.Options.isset('path_maps'):
             for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
                 if remote in ret:
@@ -97,6 +98,8 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
+        if ret[2] == "\\":
+            ret = ret.replace("\\","/")
 
         if vdebug.opts.Options.isset('path_maps'):
             for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
