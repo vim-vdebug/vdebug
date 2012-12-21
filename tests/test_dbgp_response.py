@@ -1,5 +1,6 @@
-import sys
-sys.path.append('../plugin/python')
+if __name__ == "__main__":
+    import sys
+    sys.path.append('../plugin/python/')
 import unittest
 import vdebug.dbgp
 import xml
@@ -198,8 +199,6 @@ class ContextGetAlternateTest(unittest.TestCase):
     def test_properties_are_objects(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        p = context[0]
-        print "Display name: "+p.display_name
         assert len(context) == 3
         self.assertIsInstance(context[0],vdebug.dbgp.ContextProperty)
 
