@@ -1,5 +1,7 @@
 # Vdebug
 
+[![Build Status](https://travis-ci.org/joonty/vdebug.png?branch=master)](https://travis-ci.org/joonty/vdebug)
+
 Vdebug is a new, fast, powerful debugger client for Vim. It's multi-language,
 and has been tested with PHP, Python, Ruby, Perl, Tcl and NodeJS. It interfaces with 
 **any** debugger that faithfully uses the DBGP protocol, such as Xdebug for PHP.  
