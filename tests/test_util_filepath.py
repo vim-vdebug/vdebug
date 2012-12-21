@@ -1,5 +1,6 @@
-import sys
-sys.path.append('../plugin/python')
+if __name__ == "__main__":
+    import sys
+    sys.path.append('../plugin/python/')
 import unittest
 """ Mock vim import """
 import vdebug.opts
