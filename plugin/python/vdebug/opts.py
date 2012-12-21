@@ -16,7 +16,7 @@ class Options:
         """Get the Options instance.
         """
         if cls.instance is None:
-            raise OptionsError, "No options have been set"
+            raise OptionsError("No options have been set")
         return cls.instance
 
     @classmethod
@@ -29,7 +29,7 @@ class Options:
         if name in inst.options:
             return as_type(inst.options[name])
         else:
-            raise OptionsError, "No option with key '%s'" % name
+            raise OptionsError("No option with key '%s'" % name)
 
     @classmethod
     def overwrite(cls,name,value):

@@ -71,12 +71,12 @@ class FileLogger(Logger):
     def __open(self):
         try:
             self.f = open(self.filename,'w')
-        except IOError, e:
-            raise LogError, "Invalid file name '%s' for log file: %s" \
-                    %(self.filename,str(e))
+        except IOError as e:
+            raise LogError("Invalid file name '%s' for log file: %s" \
+                    %(self.filename,str(e)))
         except:
-            raise LogError, "Error using file '%s' as a log file: %s" \
-                    %(self.filename,sys.exc_info()[0])
+            raise LogError("Error using file '%s' as a log file: %s" \
+                    %(self.filename,sys.exc_info()[0]))
 
 
     def shutdown(self):
