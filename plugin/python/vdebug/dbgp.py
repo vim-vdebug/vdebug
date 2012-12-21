@@ -124,9 +124,9 @@ class EvalResponse(ContextGetResponse):
     def __init__(self,response,cmd,cmd_args,api):
         try:
             ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
-        except DBGPError, e:
+        except DBGPError as e:
             if int(e.args[1]) == 206:
-                raise EvalError
+                raise EvalError()
             else:
                 raise e
 
@@ -416,7 +416,7 @@ class Connection:
             self.sock.settimeout(None)
         except socket.timeout:
             serv.close()
-            raise TimeoutError,"Timeout waiting for connection"
+            raise TimeoutError("Timeout waiting for connection")
         except:
             serv.close()
             raise
@@ -458,7 +458,7 @@ class Connection:
             c = self.sock.recv(1)
             if c == '':
                 self.close()
-                raise EOFError, 'Socket Closed'
+                raise EOFError('Socket Closed')
             if c == '\0':
                 return int(length)
             if c.isdigit():
@@ -470,7 +470,7 @@ class Connection:
             c = self.sock.recv(1)
             if c == '':
                 self.close()
-                raise EOFError, 'Socket Closed'
+                raise EOFError('Socket Closed')
             if c == '\0':
                 return
 
@@ -484,7 +484,7 @@ class Connection:
             buf = self.sock.recv(to_recv)
             if buf == '':
                 self.close()
-                raise EOFError, 'Socket Closed'
+                raise EOFError('Socket Closed')
             to_recv -= len(buf)
             body = body + buf
         return body

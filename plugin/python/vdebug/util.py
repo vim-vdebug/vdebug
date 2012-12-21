@@ -59,7 +59,7 @@ class FilePath:
     def __init__(self,filename):
         if filename is None or \
             len(filename) == 0:
-            raise FilePathError, "Missing or invalid file name"
+            raise FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
         if filename.startswith('file://'):
             filename = filename[7:]
@@ -159,7 +159,7 @@ class InputStream:
         try:
             vim.eval("getchar(0)")
         except vim.error:
-            raise UserInterrupt
+            raise UserInterrupt()
 
 class UserInterrupt(Exception):
     """Raised when a user interrupts connection wait."""
