@@ -156,7 +156,7 @@ class WatchWindowPropertyGetEvent(Event):
 
         eq_index = line.find('=')
         if eq_index == -1:
-            raise EventError, "Cannot read the selected property"
+            raise EventError("Cannot read the selected property")
 
         name = line[pointer_index+step:eq_index-1]
         context_res = runner.api.property_get(name)
@@ -210,7 +210,7 @@ class WatchWindowContextChangeEvent(Event):
 
         if tab_end_pos == -1 or \
                 tab_start_pos == -1:
-            raise EventError, "Failed to find context name under cursor"
+            raise EventError("Failed to find context name under cursor")
 
         context_name = line[tab_start_pos:tab_end_pos]
         vdebug.log.Log("Context name: %s" % context_name,\
@@ -223,7 +223,7 @@ class WatchWindowContextChangeEvent(Event):
                 runner.context_names,context_name)
 
         if context_id == -1:
-            raise EventError, "Could not resolve context name"
+            raise EventError("Could not resolve context name")
             return False
         else:
             runner.get_context(context_id)
