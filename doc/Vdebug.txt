@@ -877,10 +877,10 @@ g:vdebug_options["continuous_mode"] (default = 0)
 By default, function keys are mapped to execute debugger commands. However, I'm
 aware that people may already have them mapped to something else, so would like
 to change the default behaviour. Before you do that, be aware that Vdebug only
-maps one command outside of the debugger mode, which is "run". All others are
-mapped only when Vdebug starts up, and unmapped when it shuts down. Not only this,
-but any commands that you have already mapped to these keys will be remembered 
-and restored when you come out of debugging mode.
+maps two commands outside of the debugger mode, "run" and "set_breakpoint". All
+others are mapped only when Vdebug starts up, and unmapped when it shuts down.
+Not only this, but any commands that you have already mapped to these keys will
+be remembered and restored when you come out of debugging mode.
 
 If you would still like to remap the default keys, this is possible using the 
 key map dictionary, g:vdebug_keymap: >
@@ -900,7 +900,7 @@ key map dictionary, g:vdebug_keymap: >
 <
 
 As you can see, these are the default keys. You can change the keys using the
-multi-line notation as shown above, or by setting invidiual keys: >
+multi-line notation as shown above, or by setting individual keys: >
 
     let g:vdebug_keymap['run'] = '<C-s>'
 <
