@@ -1,7 +1,7 @@
+import sys
 if __name__ == "__main__":
-    import sys
     sys.path.append('../plugin/python/')
-import unittest
+import unittest2 as unittest
 import vdebug.dbgp
 import xml
 from mock import Mock
@@ -29,6 +29,8 @@ class ResponseTest(unittest.TestCase):
         assert res.as_string() == response
 
     def test_as_xml_is_element(self):
+        if sys.version_info < (2, 7):
+            return
         """Test that the as_xml() method returns an XML
         element"""
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
