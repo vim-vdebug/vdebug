@@ -22,9 +22,9 @@ class Keymapper:
         for func in self.keymaps:
             key = self.keymaps[func]
             if func not in self.exclude:
-                vim.command("redir @z | silent map %s%s | redir END" %(self.leader,key))
+                vim.command("redir @z | silent noremap %s%s | redir END" %(self.leader,key))
                 self.__save_map_output( vim.eval("@z").strip() )
-                map_cmd = "map %s%s :python debugger.%s()<cr>" %\
+                map_cmd = "noremap %s%s :python debugger.%s()<cr>" %\
                     (self.leader,key,func)
                 vim.command(map_cmd)
         self.is_mapped = True
@@ -49,7 +49,7 @@ class Keymapper:
             for mapping in self.existing:
                 vdebug.log.Log("Remapping key with '%s' " % mapping,\
                         vdebug.log.Logger.DEBUG)
-                vim.command("map %s" % mapping)
+                vim.command("noremap %s" % mapping)
 
 class FilePath:
     is_win = False
