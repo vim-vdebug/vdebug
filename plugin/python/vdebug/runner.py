@@ -79,7 +79,7 @@ class Runner:
                 self.ui.statuswin.set_status("stopped")
                 self.ui.say("Debugging session has ended")
                 self.close_connection(False)
-                if vdebug.opts.Options.get('continuous_mode',bool):
+                if vdebug.opts.Options.get('continuous_mode', int) != 0:
                     self.open()
                     return
             else:
