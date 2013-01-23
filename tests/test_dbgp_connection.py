@@ -1,7 +1,7 @@
 if __name__ == "__main__":
     import sys
     sys.path.append('../plugin/python/')
-import unittest
+import unittest2 as unittest
 import vdebug.dbgp
 
 class SocketMockError():
