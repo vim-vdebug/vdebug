@@ -105,8 +105,8 @@ let g:vdebug_leader_key = ""
 python debugger = DebuggerInterface()
 
 " Mappings allowed in non-debug mode
-exe "map ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
-exe "map ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
+exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
+exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
 
 " Exceptional case for visual evaluation
 exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
