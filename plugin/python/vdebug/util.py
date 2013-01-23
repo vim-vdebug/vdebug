@@ -158,7 +158,7 @@ class InputStream:
     def probe(self):
         try:
             vim.eval("getchar(0)")
-        except vim.error:
+        except: # vim.error
             raise UserInterrupt()
 
 class UserInterrupt(Exception):
