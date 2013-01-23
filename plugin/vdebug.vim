@@ -44,7 +44,7 @@ endif
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
     let g:vdebug_force_ascii = 1
-elseif has('multibyte') == 0
+elseif has('multi_byte') == 0
     let g:vdebug_force_ascii = 1
 else
     let g:vdebug_force_ascii = 0
