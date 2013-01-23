@@ -1,3 +1,12 @@
+=== Vdebug 1.3.0 / 2012-12-21
+
+Bug fixes:
+ * Filepath problems with Windows version
+
+Other:
+ * Packaged tests as an easy-to-run suite
+ * Set up on Travis CI
+
 === Vdebug 1.3.0 / 2012-12-19
 
 Features:

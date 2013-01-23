@@ -8,7 +8,7 @@
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
 "               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
-"      Version: 1.2
+"      Version: 1.3.1
 "               Inspired by the Xdebug plugin, which was originally written by 
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
@@ -44,7 +44,7 @@ endif
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
     let g:vdebug_force_ascii = 1
-elseif has('multibyte') == 0
+elseif has('multi_byte') == 0
     let g:vdebug_force_ascii = 1
 else
     let g:vdebug_force_ascii = 0
