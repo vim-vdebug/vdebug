@@ -120,8 +120,8 @@ command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
-hi DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
-hi DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
+hi default DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
+hi default DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
 
 function! vdebug:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
