@@ -141,6 +141,7 @@ class DebuggerInterface:
         """
         try:
             self.runner.detach()
+            self.runner.close_connection()
         except Exception as e:
             self.handle_exception(e)
 

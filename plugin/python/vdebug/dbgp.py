@@ -347,7 +347,9 @@ class Api:
 
         The script is not terminated, but runs as normal
         from this point."""
-        return self.send_cmd('detach','',StatusResponse)
+        ret = self.send_cmd('detach','',StatusResponse)
+        self.conn.close()
+        return ret
 
     def breakpoint_set(self,cmd_args):
         """Set a breakpoint.
@@ -447,6 +449,8 @@ class Connection:
     def close(self):
         """Close the connection."""
         if self.sock != None:
+            vdebug.log.Log("Closing the socket",\
+                            vdebug.log.Logger.DEBUG)
             self.sock.close()
             self.sock = None
         self.isconned = 0
