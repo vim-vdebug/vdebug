@@ -106,6 +106,10 @@ class Breakpoint:
             row = ui.get_current_row()
             try:
                 file = ui.get_current_file()
+                line = ui.get_current_line()
+                if len(line.strip()) == 0:
+                    raise BreakpointError('Cannot set a breakpoint ' +\
+                                            'on an empty line')
             except vdebug.util.FilePathError:
                 raise BreakpointError('No file, cannot set breakpoint')
             return LineBreakpoint(ui,file,row)

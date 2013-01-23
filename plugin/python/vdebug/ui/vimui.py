@@ -87,6 +87,12 @@ class Ui(vdebug.ui.interface.Ui):
     def get_current_row(self):
         return vim.current.window.cursor[0]
 
+    def get_current_line(self):
+        return self.get_line(self.get_current_row())
+
+    def get_line(self,row):
+        return vim.eval("getline(" + str(row) + ")")
+
     def register_breakpoint(self,breakpoint):
         if breakpoint.type == 'line':
             self.place_breakpoint(breakpoint.id,\
