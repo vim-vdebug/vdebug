@@ -111,6 +111,21 @@ class Ui(vdebug.ui.interface.Ui):
         if self.breakpointwin.is_open:
             self.breakpointwin.remove_breakpoint(id)
 
+    def get_breakpoint_sign_positions(self):
+        vim.command('redir @a')
+        vim.command('silent sign place')
+        vim.command('redir END')
+        sign_output = vim.eval('@a')
+        sign_lines = sign_output.split("\n")
+        positions = {}
+        for line in sign_lines:
+            if "name=breakpt" in line:
+                attributes = line.strip().split()
+                lineinfo = attributes[0].split('=')
+                idinfo = attributes[1].split('=')
+                positions[idinfo[1]] = lineinfo[1]
+        return positions
+
     def __get_srcwin_name(self):
         return vim.windows[0].buffer.name
 
