@@ -16,6 +16,17 @@ class Store:
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
 
+    # Update line-based breakpoints with a dict of IDs and lines
+    def update_lines(self,lines):
+        for id, line in lines.iteritems():
+            try:
+                self.breakpoints[id].set_line(line)
+                vdebug.log.Log("Updated line number of breakpoint %s to %s"\
+                                    %(str(id),str(line)) )
+            except ValueError:
+                pass
+                # No method set_line, not a line breakpoint
+
     def unlink_api(self):
         self.api = None
 
@@ -170,6 +181,9 @@ class LineBreakpoint(Breakpoint):
 
     def get_line(self):
         return self.line
+
+    def set_line(self,line):
+        self.line = line
 
     def get_file(self):
         return self.file

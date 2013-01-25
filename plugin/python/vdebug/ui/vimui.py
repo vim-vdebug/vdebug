@@ -112,11 +112,7 @@ class Ui(vdebug.ui.interface.Ui):
             self.breakpointwin.remove_breakpoint(id)
 
     def get_breakpoint_sign_positions(self):
-        vim.command('redir @a')
-        vim.command('silent sign place')
-        vim.command('redir END')
-        sign_output = vim.eval('@a')
-        sign_lines = sign_output.split("\n")
+        sign_lines = self.command('sign place').split("\n")
         positions = {}
         for line in sign_lines:
             if "name=breakpt" in line:
@@ -137,6 +133,13 @@ class Ui(vdebug.ui.interface.Ui):
             else:
                 i += 1
         return i
+
+    # Execute a vim command and return the output.
+    def command(self,cmd):
+        vim.command('redir => _tmp')
+        vim.command('silent %s' % cmd)
+        vim.command('redir END')
+        return vim.eval('_tmp')
 
     def say(self,string):
         """ Vim picks up Python prints, so just print """

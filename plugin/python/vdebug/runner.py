@@ -49,6 +49,8 @@ class Runner:
         addr = self.api.conn.address
         vdebug.log.Log("Found connection from " + str(addr),vdebug.log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])
+
+        self.breakpoints.update_lines(self.ui.get_breakpoint_sign_positions())
         self.breakpoints.link_api(self.api)
 
         cn_res = self.api.context_names()
