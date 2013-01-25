@@ -159,15 +159,22 @@ class Ui(vdebug.ui.interface.Ui):
 
 
     def __get_srcwin_name(self):
-        return vim.windows[0].buffer.name
+        return vim.current.buffer.name
 
     def __get_srcwinno_by_name(self,name):
         i = 1
+        vdebug.log.Log("Searching for win by name %s" % name,\
+                vdebug.log.Logger.INFO)
         for w in vim.windows:
+            vdebug.log.Log("Win %d, name %s" %(i,w.buffer.name),\
+                vdebug.log.Logger.INFO)
             if w.buffer.name == name:
                 break
             else:
                 i += 1
+
+        vdebug.log.Log("Returning window number %d" % i,\
+                vdebug.log.Logger.INFO)
         return i
 
     def __get_buf_list(self):
