@@ -58,9 +58,6 @@ class Ui(vdebug.ui.interface.Ui):
         self.sourcewin.set_line(lineno)
         self.sourcewin.place_pointer(lineno)
 
-    def __get_buf_list(self):
-        return vim.eval("range(1, bufnr('$'))")
-
     def mark_as_stopped(self):
         if self.is_open:
             if self.sourcewin:
@@ -122,18 +119,6 @@ class Ui(vdebug.ui.interface.Ui):
                 positions[idinfo[1]] = lineinfo[1]
         return positions
 
-    def __get_srcwin_name(self):
-        return vim.windows[0].buffer.name
-
-    def __get_srcwinno_by_name(self,name):
-        i = 1
-        for w in vim.windows:
-            if w.buffer.name == name:
-                break
-            else:
-                i += 1
-        return i
-
     # Execute a vim command and return the output.
     def command(self,cmd):
         vim.command('redir => _tmp')
@@ -171,6 +156,22 @@ class Ui(vdebug.ui.interface.Ui):
         self.watchwin = None
         self.stackwin = None
         self.statuswin = None
+
+
+    def __get_srcwin_name(self):
+        return vim.windows[0].buffer.name
+
+    def __get_srcwinno_by_name(self,name):
+        i = 1
+        for w in vim.windows:
+            if w.buffer.name == name:
+                break
+            else:
+                i += 1
+        return i
+
+    def __get_buf_list(self):
+        return vim.eval("range(1, bufnr('$'))")
 
 class SourceWindow(vdebug.ui.interface.Window):
 
