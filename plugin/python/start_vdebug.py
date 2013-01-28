@@ -9,6 +9,7 @@ import socket
 import traceback
 import vdebug.runner
 import vdebug.event
+import vim
 
 class DebuggerInterface:
     """Acts as a facade layer to the debugger client.
@@ -62,6 +63,22 @@ class DebuggerInterface:
             self.runner.step_out()
         except Exception as e:
             self.handle_exception(e)
+
+    def handle_opt(self,option,value = None):
+        """Set an option, overwriting the existing value.
+        """
+        try:
+            if value is None:
+                return self.runner.ui.say(vdebug.opts.Options.get(option))
+            else:
+                self.runner.ui.say("Setting vdebug option '%s' to: %s"\
+                                    %(option,value))
+                vim.command('let g:vdebug_options["%s"] = "%s"' %(option,value))
+                return vdebug.opts.Options.overwrite(option,value)
+
+        except Exception as e:
+            self.handle_exception(e)
+
 
     def handle_return_keypress(self):
         """React to a <enter> keypress event.

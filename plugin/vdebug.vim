@@ -116,12 +116,28 @@ command! -nargs=? Breakpoint python debugger.set_breakpoint(<q-args>)
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
+command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
 
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
 sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
 hi default DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
 hi default DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
+
+function! s:OptionNames(A,L,P)
+    let arg_to_cursor = strpart(a:L,10,a:P)
+    let space_idx = stridx(arg_to_cursor,' ')
+    if space_idx == -1
+        return filter(keys(g:vdebug_options_defaults),'v:val =~ a:A')
+    else
+        let opt_name = strpart(arg_to_cursor,0,space_idx)
+        if has_key(g:vdebug_options,opt_name)
+            return [g:vdebug_options[opt_name]]
+        else
+            return []
+        endif
+    endif
+endfunction
 
 function! vdebug:get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
