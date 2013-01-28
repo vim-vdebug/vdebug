@@ -58,7 +58,7 @@ CONTENTS                                                      *Vdebug-contents*
             4.5.3 Evaluating variable under cursor   |VdebugEvalUnderCursor|
     5. Options.......................................|VdebugOptions|
         5.1 Quickly setting options..................|VdebugOpt|
-        5.2 List of options..........................|VdebugOptions|
+        5.2 List of options..........................|VdebugOptionList|
     6. Key maps......................................|VdebugKeys|
     7. Using an IDE key..............................|VdebugIDEKey|
     8. Debugging a script on a remote server.........|VdebugRemote|
@@ -744,9 +744,9 @@ some debugger engines.
 ==============================================================================
 5. Options                                                     *VdebugOptions*
 
-As there are a lot of options in Vdebug, they are set using a dictionary
-(the equivalent of an associative array in PHP or a hash in Ruby). This
-dictionary can be modified using the global variable "g:vdebug_options".
+There are two ways of setting options for Vdebug. The options are stored in a 
+Vim dictionary (the equivalent of an associative array in PHP or a hash in Ruby). 
+This dictionary can be modified using the global variable "g:vdebug_options".
 However, as you may want to change options on the fly, a command (:VdebugOpt) 
 has been added for your convenience so that you can easily get and set options 
 without having to use Vim dictionary syntax.
@@ -766,9 +766,12 @@ will autocomplete to the current value, if set. Here are some examples: >
     :VdebugOpt continuous_mode 0 "Sets to 0
     :VdebugOpt debug_file /home/jon/vdebug.log
 <
+Note that using :VdebugOpt only sets the value of the option for the time that
+your vim session is open. As soon as you close it they will be forgotten, so
+retain option settings by adding them to your vimrc.
 
 ------------------------------------------------------------------------------
-5.2 List of options                                            *VdebugOptions*
+5.2 List of options                                         *VdebugOptionList*
 
 The default options look like this: >
     let g:vdebug_options= {
