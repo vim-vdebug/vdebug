@@ -16,7 +16,16 @@ It's written in Python, and has an object-oriented interface that is easy to ext
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
+# Recent version (version 1.3.2)
+
+ * Use `:VdebugOpt <option>` to get the value of an option, and `:VdebugOpt <option> <value>` to set it.
+ * Line breakpoints change position along with the Vim sign
+ * Compatibility fixes for Python 2.6
+ * And more... check out the HISTORY file
+
 # How to use
+
+First of all, scoot down to the quick guide below.
 
 There is *extensive* help provided in the form of a Vim help file. This goes
 through absolutely everything, from installation to configuration, setting up
@@ -88,8 +97,18 @@ Once in debugging mode, the following default mappings are available:
 
 To stop debugging, press `<F6>`. Press it again to close the debugger interface.
 
+If you can't get a connection, then chances are you need to spend a bit of time setting up your environment. Type `:help Vdebug` for more information.
+
+# Contributing
+
+I gladly accept contributions to the code. Just fork the repository, make your changes and open a pull request with detail about your changes. There are a couple of conditions:
+
+ * The tests must pass (run `python vdebugtests.py` in the top directory of the plugin)
+ * Your commit messages should follow the [rules outlined here][2]
+
 # Licence
 
 This plugin is released under the [MIT License][1].
 
 [1]: https://raw.github.com/joonty/vdebug/master/LICENCE
+[2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
