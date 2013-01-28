@@ -57,6 +57,8 @@ CONTENTS                                                      *Vdebug-contents*
             4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
             4.5.3 Evaluating variable under cursor   |VdebugEvalUnderCursor|
     5. Options.......................................|VdebugOptions|
+        5.1 Quickly setting options..................|VdebugOpt|
+        5.2 List of options..........................|VdebugOptions|
     6. Key maps......................................|VdebugKeys|
     7. Using an IDE key..............................|VdebugIDEKey|
     8. Debugging a script on a remote server.........|VdebugRemote|
@@ -744,8 +746,31 @@ some debugger engines.
 
 As there are a lot of options in Vdebug, they are set using a dictionary
 (the equivalent of an associative array in PHP or a hash in Ruby). This
-dictionary can be modified using the global variable "g:vdebug_options". The
-default ptions look like this: >
+dictionary can be modified using the global variable "g:vdebug_options".
+However, as you may want to change options on the fly, a command (:VdebugOpt) 
+has been added for your convenience so that you can easily get and set options 
+without having to use Vim dictionary syntax.
+
+I've found that the best way of setting options is to use the dictionary in your
+vimrc file and the :VdebugOpt command when you want to set options on the fly.
+
+------------------------------------------------------------------------------
+5.1 Quickly setting options with :VdebugOpt                        *VdebugOpt*
+
+The VdebugOpt command takes one or two arguments: one if you want to retrieve
+the value of an option, and two if you want to set the option to a new value.
+The first argument autocompletes with a list of options, and the second argument
+will autocomplete to the current value, if set. Here are some examples: >
+
+    :VdebugOpt server " Prints the current value
+    :VdebugOpt continuous_mode 0 "Sets to 0
+    :VdebugOpt debug_file /home/jon/vdebug.log
+<
+
+------------------------------------------------------------------------------
+5.2 List of options                                            *VdebugOptions*
+
+The default options look like this: >
     let g:vdebug_options= {
     \    "port" : 9000,
     \    "server" : 'localhost',
