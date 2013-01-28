@@ -1,3 +1,20 @@
+=== Vdebug 1.3.2 / 2013-28-01
+
+Features:
+ * Don't allow breakpoints to be set on empty lines (issue #27)
+ * Add :VdebugOpt command for easy setting and getting of options (issue #38)
+
+Bug fixes:
+ * Small fixes for documentation (thanks: https://github.com/grota, #31)
+ * Parse continuous mode option as an integer (thanks: https://github.com/grota, #32)
+ * Stop Xdebug hanging when using the detach command (issue #33)
+ * Don't use recursive Vim mapping (issue #34)
+ * Track movement of line breaks with Vim signs (issue #35)
+ * Add "default" keyword to highlights, to allow custom colours (issue #36)
+ * Fix check for multibyte support (issue #37)
+ * Fix deprecation warning in Python 2.6, catching string exceptions (issue #39)
+ * Stop source code panel opening in incorrect position (issue #40)
+
 === Vdebug 1.3.1 / 2012-12-21
 
 Bug fixes:
