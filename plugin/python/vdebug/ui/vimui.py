@@ -349,19 +349,19 @@ class BreakpointWindow(Window):
             vim.command('%s | python debugger.runner.ui.breakpointwin.is_open = False' % cmd)
 
     def add_breakpoint(self,breakpoint):
-        str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
+        bp_str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
         if breakpoint.type == 'line':
-            str += "%s:%i" %(breakpoint.file,breakpoint.line)
+            bp_str += "%s:%s" %(breakpoint.file,str(breakpoint.line))
         elif breakpoint.type == 'conditional':
-            str += "%s:%i when (%s)" \
-                %(breakpoint.file,breakpoint.line,breakpoint.condition)
+            bp_str += "%s:%s when (%s)" \
+                %(breakpoint.file,str(breakpoint.line),breakpoint.condition)
         elif breakpoint.type == 'exception':
-            str += "Exception: %s" % breakpoint.exception
+            bp_str += "Exception: %s" % breakpoint.exception
         elif breakpoint.type == 'call' or \
                 breakpoint.type == 'return':
-            str += "Function: %s" % breakpoint.function
+            bp_str += "Function: %s" % breakpoint.function
 
-        self.write(str)
+        self.write(bp_str)
 
     def remove_breakpoint(self,breakpoint_id):
         i = 0
