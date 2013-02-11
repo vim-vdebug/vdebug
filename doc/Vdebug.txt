@@ -431,7 +431,7 @@ Don't edit the contents of the file when in debug mode, and especially don't
 edit without saving - this causes problems when swapping between files.
 
 You can set line breakpoints here with the <F10> key or :Breakpoint, and can
-tell the debugger to run to the cursor with <F1>.
+tell the debugger to run to the cursor with <F9>.
 
 ------------------------------------------------------------------------------
 4.2.2 The watch window                                     *VdebugWatchWindow*
@@ -556,7 +556,7 @@ debugging, and the default keys mapped to those commands.
     calling statement. Essentially this is the opposite of step in.
 
     4.3.5 Run to cursor                             *VdebugCommandRunToCursor*
-    Default key: <F10>
+    Default key: <F9>
     Tells the debugger engine to run until the point where the cursor is
     currently sitting. One of the most useful commands, as it means that
     setting a hard breakpoint is not always necessary. This only works if the
