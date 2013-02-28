@@ -106,7 +106,10 @@ class Log:
 
     @classmethod
     def set_logger(cls, logger):
-        cls.loggers[logger.__class__.__name__] = logger
+        k = logger.__class__.__name__
+        if k in cls.loggers:
+            cls.loggers[k].shutdown()
+        cls.loggers[k] = logger
 
     @classmethod
     def remove_logger(cls, type):

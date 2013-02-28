@@ -149,8 +149,7 @@ class Ui(vdebug.ui.interface.Ui):
         if self.statuswin:
             self.statuswin.destroy()
 
-        vdebug.log.Log.shutdown()
-
+        vdebug.log.Log.remove_logger('WindowLogger')
         vim.command('silent! '+self.tabnr+'tabc!')
 
         self.watchwin = None
