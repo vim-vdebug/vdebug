@@ -15,6 +15,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.breakpoint_store = breakpoints
         self.emptybuffer = None
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
+        self.current_tab = "1"
 
     def open(self):
         if self.is_open:
@@ -24,6 +25,8 @@ class Ui(vdebug.ui.interface.Ui):
         cur_buf_name = vim.eval("bufname('%')")
         if cur_buf_name is None:
             cur_buf_name = ''
+
+        self.current_tab = vim.eval("tabpagenr()")
 
         vim.command('silent tabnew ' + cur_buf_name)
         self.tabnr = vim.eval("tabpagenr()")
@@ -151,6 +154,7 @@ class Ui(vdebug.ui.interface.Ui):
 
         vdebug.log.Log.remove_logger('WindowLogger')
         vim.command('silent! '+self.tabnr+'tabc!')
+        vim.command('tabn '+self.current_tab)
 
         self.watchwin = None
         self.stackwin = None
