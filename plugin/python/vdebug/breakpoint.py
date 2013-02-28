@@ -183,7 +183,7 @@ class LineBreakpoint(Breakpoint):
         return self.line
 
     def set_line(self,line):
-        self.line = line
+        self.line = int(line)
 
     def get_file(self):
         return self.file
