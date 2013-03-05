@@ -16,6 +16,12 @@ class Keymapper:
         self.is_mapped = False
         self.existing = []
 
+    def run_key(self):
+        return self.keymaps['run']
+
+    def close_key(self):
+        return self.keymaps['close']
+
     def map(self):
         if self.is_mapped:
             return
