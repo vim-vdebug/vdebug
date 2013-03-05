@@ -9,21 +9,24 @@ class Dispatcher:
         self.runner = runner
 
     def visual_eval(self):
-        event = VisualEvalEvent()
-        return event.execute(self.runner)
+        if self.runner.is_alive():
+            event = VisualEvalEvent()
+            return event.execute(self.runner)
 
     def eval_under_cursor(self):
-        event = CursorEvalEvent()
-        return event.execute(self.runner)
+        if self.runner.is_alive():
+            event = CursorEvalEvent()
+            return event.execute(self.runner)
 
     def by_position(self):
-        event = self._get_event_by_position()
-        if event is not None:
-            return event.execute(self.runner)
-        else:
-            vdebug.log.Log("No executable event found at current cursor position",\
-                    vdebug.log.Logger.DEBUG)
-            return False
+        if self.runner.is_alive():
+            event = self._get_event_by_position()
+            if event is not None:
+                return event.execute(self.runner)
+            else:
+                vdebug.log.Log("No executable event found at current cursor position",\
+                        vdebug.log.Logger.DEBUG)
+                return False
 
     def _get_event_by_position(self):
         buf_name = vim.current.buffer.name
