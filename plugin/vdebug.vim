@@ -90,6 +90,8 @@ let g:vdebug_options_defaults = {
 \    "continuous_mode"  : 0
 \}
 
+let g:vdebug_features = {}
+
 " Different symbols for non unicode Vims
 if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults["marker_default"] = '*'
