@@ -16,45 +16,57 @@ class Ui(vdebug.ui.interface.Ui):
         self.emptybuffer = None
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
         self.current_tab = "1"
+        self.tabnr = None
+
+    def is_modified(self):
+       modified = int(vim.eval('&mod'))
+       if modified:
+           return True
+       else:
+           return False
 
     def open(self):
         if self.is_open:
             return
         self.is_open = True
         
-        cur_buf_name = vim.eval("bufname('%')")
-        if cur_buf_name is None:
-            cur_buf_name = ''
+        try:
+            cur_buf_name = vim.eval("bufname('%')")
+            if cur_buf_name is None:
+                cur_buf_name = ''
 
-        self.current_tab = vim.eval("tabpagenr()")
+            self.current_tab = vim.eval("tabpagenr()")
 
-        vim.command('silent tabnew ' + cur_buf_name)
-        self.tabnr = vim.eval("tabpagenr()")
+            vim.command('silent tabnew ' + cur_buf_name)
+            self.tabnr = vim.eval("tabpagenr()")
 
-        srcwin_name = self.__get_srcwin_name()
+            srcwin_name = self.__get_srcwin_name()
 
-        self.watchwin = WatchWindow(self,'vertical belowright new')
-        self.watchwin.create()
+            self.watchwin = WatchWindow(self,'vertical belowright new')
+            self.watchwin.create()
 
-        self.stackwin = StackWindow(self,'belowright new')
-        self.stackwin.create()
+            self.stackwin = StackWindow(self,'belowright new')
+            self.stackwin.create()
 
-        self.statuswin = StatusWindow(self,'belowright new')
-        self.statuswin.create()
-        self.statuswin.set_status("loading")
+            self.statuswin = StatusWindow(self,'belowright new')
+            self.statuswin.create()
+            self.statuswin.set_status("loading")
 
-        self.watchwin.set_height(20)
-        self.statuswin.set_height(5)
+            self.watchwin.set_height(20)
+            self.statuswin.set_height(5)
 
-        logwin = LogWindow(self,'rightbelow 6new')
-        vdebug.log.Log.set_logger(\
-                vdebug.log.WindowLogger(\
-                vdebug.opts.Options.get('debug_window_level'),\
-                logwin))
+            logwin = LogWindow(self,'rightbelow 6new')
+            vdebug.log.Log.set_logger(\
+                    vdebug.log.WindowLogger(\
+                    vdebug.opts.Options.get('debug_window_level'),\
+                    logwin))
 
-        winnr = self.__get_srcwinno_by_name(srcwin_name)
-        self.sourcewin = SourceWindow(self,winnr)
-        self.sourcewin.focus()
+            winnr = self.__get_srcwinno_by_name(srcwin_name)
+            self.sourcewin = SourceWindow(self,winnr)
+            self.sourcewin.focus()
+        except Exception as e:
+            self.is_open = False
+            raise e
 
     def set_source_position(self,file,lineno):
         self.sourcewin.set_file(file)
@@ -153,8 +165,10 @@ class Ui(vdebug.ui.interface.Ui):
             self.statuswin.destroy()
 
         vdebug.log.Log.remove_logger('WindowLogger')
-        vim.command('silent! '+self.tabnr+'tabc!')
-        vim.command('tabn '+self.current_tab)
+        if self.tabnr:
+            vim.command('silent! '+self.tabnr+'tabc!')
+        if self.current_tab:
+            vim.command('tabn '+self.current_tab)
 
         self.watchwin = None
         self.stackwin = None
