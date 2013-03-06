@@ -103,7 +103,7 @@ class Ui(vdebug.ui.interface.Ui):
     def place_breakpoint(self,sign_id,file,line):
         vim.command('sign place '+str(sign_id)+\
                 ' name=breakpt line='+str(line)+\
-                ' file='+file)
+                ' file='+file.as_local())
 
     def remove_breakpoint(self,breakpoint):
         id = breakpoint.id
