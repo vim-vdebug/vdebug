@@ -16,11 +16,11 @@ It's written in Python, and has an object-oriented interface that is easy to ext
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
-# Recent version (version 1.3.2)
+# Recent version (version 1.4.0)
 
- * Use `:VdebugOpt <option>` to get the value of an option, and `:VdebugOpt <option> <value>` to set it.
- * Line breakpoints change position along with the Vim sign
- * Compatibility fixes for Python 2.6
+ * Allow setting of debugger features with the `g:vdebug_features` dictionary
+ * Stop error when trying to debug with an unsaved file
+ * Fixed stuck breakpoints
  * And more... check out the HISTORY file
 
 # How to use
@@ -98,6 +98,19 @@ Once in debugging mode, the following default mappings are available:
 To stop debugging, press `<F6>`. Press it again to close the debugger interface.
 
 If you can't get a connection, then chances are you need to spend a bit of time setting up your environment. Type `:help Vdebug` for more information.
+
+# Debugging
+
+If you have a problem, and would like to see what's going on under the hood or raise an issue, it's best to create a log file. You can do this by setting these options before you start debugging:
+
+```vim
+:VdebugOpt debug_file ~/vdebug.log
+:VdebugOpt debug_file_level 2
+```
+
+Then start debugging, and you can follow what's added to the log file as you go. It shows the communication between the debugging engine and Vdebug.
+
+If you're creating an issue then it's probably best to upload a log as a Gist, as it can be pretty large.
 
 # Contributing
 
