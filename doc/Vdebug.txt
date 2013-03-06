@@ -1131,5 +1131,5 @@ remnants of the original code, but not many. He showed us all that it was
 possible.
 
 Thanks to everyone who's contributed ideas and code so far, including Githubbers
-artnez, csomme and beatle. Also thanks to Gareth Oslar to pointing out that
-Vdebug (almost) worked with NodeJS.
+teranex, qstrahl, artnez, csomme and beatle. Also thanks to Gareth Oslar to 
+pointing out that Vdebug (almost) worked with NodeJS.
