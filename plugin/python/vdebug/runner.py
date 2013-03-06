@@ -30,6 +30,7 @@ class Runner:
         connection or vdebug.ui is used.
         """
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
+        
         if vdebug.opts.Options.isset('debug_file'):
             vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
                     vdebug.opts.Options.get('debug_file_level'),\
@@ -50,6 +51,7 @@ class Runner:
         vdebug.log.Log("Found connection from " + str(addr),vdebug.log.Logger.INFO)
         self.ui.set_conn_details(addr[0],addr[1])
 
+        self.set_features()
         self.breakpoints.update_lines(self.ui.get_breakpoint_sign_positions())
         self.breakpoints.link_api(self.api)
 
@@ -63,6 +65,15 @@ class Runner:
         else:
             status = self.api.run()
         self.refresh(status)
+
+    def set_features(self):
+        features = vim.eval('g:vdebug_features')
+        for name, value in features.iteritems():
+            try:
+                self.api.feature_set(name, value)
+            except vdebug.dbgp.DBGPError as e:
+                error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
+                self.ui.error(error_str)
 
     def refresh(self,status):
         """The main action performed after a deubugger step.
