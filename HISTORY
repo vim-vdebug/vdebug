@@ -1,4 +1,17 @@
-=== Vdebug 1.3.2 / 2013-28-01
+=== Vdebug 1.4.0 / 2013-03-06
+
+Features:
+ * Set debugger features with g:vdebug_features dictionary (issue #55)
+ * Allow use of '~' in log files (issue #53)
+
+Bug fixes:
+ * Print error message if trying to start debugger with unsaved buffers (issue #57)
+ * Don't allow visual eval outside of debugging session (issue #52)
+ * Show updated key mappings in status window (issue #51)
+ * Fix problem with stuck breakpoints after debugging (issue #48, #43)
+ * Swap back to original tab after debugging session closes (issue #23)
+
+=== Vdebug 1.3.2 / 2013-01-28
 
 Features:
  * Don't allow breakpoints to be set on empty lines (issue #27)
