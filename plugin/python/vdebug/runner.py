@@ -67,6 +67,11 @@ class Runner:
         self.refresh(status)
 
     def set_features(self):
+        """Evaluate vim dictionary of features and pass to debugger.
+
+        Errors are caught if the debugger doesn't like the feature name or
+        value. This doesn't break the loop, so multiple features can be set
+        even in the case of an error."""
         features = vim.eval('g:vdebug_features')
         for name, value in features.iteritems():
             try:
