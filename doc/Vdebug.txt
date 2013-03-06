@@ -60,12 +60,13 @@ CONTENTS                                                      *Vdebug-contents*
         5.1 Quickly setting options..................|VdebugOpt|
         5.2 List of options..........................|VdebugOptionList|
     6. Key maps......................................|VdebugKeys|
-    7. Using an IDE key..............................|VdebugIDEKey|
-    8. Debugging a script on a remote server.........|VdebugRemote|
-        8.1 File path mapping........................|VdebugRemoteFilePaths|
-        8.2 Connecting the two machines..............|VdebugRemoteConnection|
-    9. Troubleshooting...............................|VdebugTroubleshooting|
-    10. Acknowledgements.............................|VdebugAcknowledgements|
+    7. Setting debugger features.....................|VdebugFeatures|
+    8. Using an IDE key..............................|VdebugIDEKey|
+    9. Debugging a script on a remote server.........|VdebugRemote|
+        9.1 File path mapping........................|VdebugRemoteFilePaths|
+        9.2 Connecting the two machines..............|VdebugRemoteConnection|
+    10. Troubleshooting..............................|VdebugTroubleshooting|
+    11. Acknowledgements.............................|VdebugAcknowledgements|
 
 ==============================================================================
 1. Introduction                                                  *VdebugIntro*
@@ -935,7 +936,25 @@ multi-line notation as shown above, or by setting individual keys: >
 Any options that you don't set will use the default value.
 
 ==============================================================================
-7. Using an IDE Key                                             *VdebugIDEKey*
+7. Setting debugger features                                  *VdebugFeatures*
+
+The DBGP protocol allows you to set features for debugging, such as the max 
+length of data that the debugger returns. You can set these features in the Vim
+dictionary g:vdebug_features, and they will be sent to the debugger when you 
+start a new debugging session.
+
+For example: >
+   let g:vdebug_features['max_depth'] = 2048
+<
+
+This will send the command to the debugger to set the "max_depth" feature to 
+2048.
+
+For a list of features supported by DBGP see 
+http://xdebug.org/docs-dbgp.php#feature-names.
+
+==============================================================================
+8. Using an IDE Key                                             *VdebugIDEKey*
 
 An IDE key is used to restrict debugger connections, kind of like a password:
 only a connection that supplies the same key as the IDE uses (in this case
@@ -962,7 +981,7 @@ From the command line, the environment variable "XDEBUG_CONFIG" holds the IDE
 key.
 
 ==============================================================================
-8. Debugging a script on a remote server                        *VdebugRemote*
+9. Debugging a script on a remote server                        *VdebugRemote*
 
 This is where things get really cool. You don't have to be on the same machine
 as the running script to be able to debug it: you can tell the remote script to
@@ -976,7 +995,7 @@ There are a couple of hurdles to overcome in doing this:
        network route between the two machines.
 
 ------------------------------------------------------------------------------
-8.1 File path mapping                                  *VdebugRemoteFilePaths*
+9.1 File path mapping                                  *VdebugRemoteFilePaths*
 
 Firstly, file paths aren't a problem. You can use the options "remote_path" and
 "local_path" to swap out sections of the file URIs to make them compatible with
@@ -998,7 +1017,7 @@ It is possible to have multiple file path mappings by adding more items in the
 "path_maps" dictionary.
 
 ------------------------------------------------------------------------------
-8.2 Connecting the two machines                       *VdebugRemoteConnection*
+9.2 Connecting the two machines                       *VdebugRemoteConnection*
 
 This part depends a lot upon your network set-up and firewall rules. But here's
 the basic information:
@@ -1025,7 +1044,7 @@ then I can all but guarantee that you will have to route port 9000 to your
 machine using your router, as it will be blocked by default.
 
 ==============================================================================
-9. Troubleshooting/FAQ                                 *VdebugTroubleshooting*
+10. Troubleshooting/FAQ                                *VdebugTroubleshooting*
 
 If you have any questions or problems that aren't addressed or fixed here then
 feel free to raise an issue on the Github page https://github.com/joonty/vdebug
@@ -1103,7 +1122,7 @@ it to this list.
 
 
 ==============================================================================
-10. Acknowledgements                                  *VdebugAcknowledgements*
+11. Acknowledgements                                  *VdebugAcknowledgements*
 
 This plugin was inspired by the original Xdebug plugin created by Seung Woo Shin 
 (<segv <at> sayclub.com>),
