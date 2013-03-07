@@ -58,6 +58,10 @@ if !exists("g:vdebug_keymap")
     let g:vdebug_keymap = {}
 endif
 
+if !exists("g:vdebug_features")
+    let g:vdebug_features = {}
+endif
+
 let g:vdebug_keymap_defaults = {
 \    "run" : "<F5>",
 \    "run_to_cursor" : "<F9>",
@@ -89,8 +93,6 @@ let g:vdebug_options_defaults = {
 \    "marker_open_tree" : '▾',
 \    "continuous_mode"  : 0
 \}
-
-let g:vdebug_features = {}
 
 " Different symbols for non unicode Vims
 if g:vdebug_force_ascii == 1
