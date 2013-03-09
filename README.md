@@ -122,10 +122,12 @@ I gladly accept contributions to the code. Just fork the repository, make your c
 # Tests
 
  * The tests use `unittest2` and `mock`, so make sure they're installed
+
 ```
 pip install unittest2
 pip install mock
 ```
+
 * To run the tests, run `python vdebugtests.py` in the top directory of the plugin
 
 # Licence
