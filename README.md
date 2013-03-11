@@ -116,8 +116,19 @@ If you're creating an issue then it's probably best to upload a log as a Gist, a
 
 I gladly accept contributions to the code. Just fork the repository, make your changes and open a pull request with detail about your changes. There are a couple of conditions:
 
- * The tests must pass (run `python vdebugtests.py` in the top directory of the plugin)
+ * The tests must pass (see below)
  * Your commit messages should follow the [rules outlined here][2]
+
+# Tests
+
+ * The tests use `unittest2` and `mock`, so make sure they're installed
+
+```
+pip install unittest2
+pip install mock
+```
+
+* To run the tests, run `python vdebugtests.py` in the top directory of the plugin
 
 # Licence
 
