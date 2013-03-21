@@ -55,7 +55,18 @@ class Keymapper:
             for mapping in self.existing:
                 vdebug.log.Log("Remapping key with '%s' " % mapping,\
                         vdebug.log.Logger.DEBUG)
-                vim.command("noremap %s" % mapping)
+                regex = re.compile(r'\s+')
+                parts = regex.split(mapping)
+                mapcmd = 'noremap'
+                if len(parts)>2:
+                    modeRegex = re.compile(r'^[nvsxoilc!]$')
+                    if modeRegex.match(parts[0]):
+                        mapping = ' '.join(parts[1:])
+                        if parts[0]=='!':
+                            mapcmd = 'noremap!'
+                        else:
+                            mapcmd = '%snoremap' % parts[0]
+                vim.command("%s %s" % (mapcmd,mapping))
 
 class FilePath:
     is_win = False
