@@ -164,6 +164,22 @@ class FilePath:
     def __repr__(self):
         return str(self)
 
+class LocalFilePath(FilePath):
+    def _create_local(self,f):
+        """Create the file name as a locally valid version.
+
+        Uses the "local_path" and "remote_path" options.
+        """
+        return f
+
+class RemoteFilePath(FilePath):
+    def _create_remote(self,f):
+        """Create the file name valid for the remote server.
+
+        Uses the "local_path" and "remote_path" options.
+        """
+        return f
+
 class FilePathError(Exception):
     pass
 
