@@ -94,7 +94,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin.insert(details,1,True)
 
     def get_current_file(self):
-        return vdebug.util.FilePath(vim.current.buffer.name)
+        return vdebug.util.LocalFilePath(vim.current.buffer.name)
 
     def get_current_row(self):
         return vim.current.window.cursor[0]
@@ -229,7 +229,7 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def get_file(self):
         self.focus()
-        self.file = vdebug.util.FilePath(vim.eval("expand('%:p')"))
+        self.file = vdebug.util.LocalFilePath(vim.eval("expand('%:p')"))
         return self.file
 
     def clear_signs(self):
@@ -470,7 +470,7 @@ class StackGetResponseRenderer(ResponseRenderer):
         string = ""
         for s in stack:
             where = s.get('where') if s.get('where') else 'main'
-            file = vdebug.util.FilePath(s.get('filename'))
+            file = vdebug.util.LocalFilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\
                     'file':str(file),'line':s.get('lineno')}
