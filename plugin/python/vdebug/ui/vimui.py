@@ -29,15 +29,21 @@ class Ui(vdebug.ui.interface.Ui):
         if self.is_open:
             return
         self.is_open = True
-        
+
         try:
+            existing_buffer = True
             cur_buf_name = vim.eval("bufname('%')")
             if cur_buf_name is None:
+                existing_buffer = False
                 cur_buf_name = ''
 
             self.current_tab = vim.eval("tabpagenr()")
 
-            vim.command('silent tabnew ' + cur_buf_name)
+            vim.command('silent tabnew')
+            self.empty_buf_num = vim.eval('bufnr("%")')
+            if existing_buffer:
+                vim.command('call vdebug:edit("%s")' % cur_buf_name)
+
             self.tabnr = vim.eval("tabpagenr()")
 
             srcwin_name = self.__get_srcwin_name()
@@ -170,6 +176,9 @@ class Ui(vdebug.ui.interface.Ui):
         if self.current_tab:
             vim.command('tabn '+self.current_tab)
 
+        if self.empty_buf_num:
+            vim.command('bw' + self.empty_buf_num)
+
         self.watchwin = None
         self.stackwin = None
         self.statuswin = None
@@ -221,7 +230,7 @@ class SourceWindow(vdebug.ui.interface.Window):
         self.file = file
         vdebug.log.Log("Setting source file: "+file,vdebug.log.Logger.INFO)
         self.focus()
-        vim.command("silent edit " + file)
+        vim.command('call vdebug:edit("%s")' % file)
 
     def set_line(self,lineno):
         self.focus()

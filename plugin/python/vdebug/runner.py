@@ -69,9 +69,9 @@ class Runner:
             else:
                 status = self.api.run()
             self.refresh(status)
-        except Exception as e:
+        except Exception:
             self.close()
-            raise e
+            raise
 
     def set_features(self):
         """Evaluate vim dictionary of features and pass to debugger.

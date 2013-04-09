@@ -151,3 +151,11 @@ function! vdebug:get_visual_selection()
   let lines[0] = lines[0][col1 - 1:]
   return join(lines, "\n")
 endfunction
+
+function vdebug:edit(filename)
+    try
+        execute 'buffer' fnameescape(a:filename)
+    catch /^Vim\%((\a\+)\)\=:E94/
+        execute 'silent edit' fnameescape(a:filename)
+    endtry
+endfunction
