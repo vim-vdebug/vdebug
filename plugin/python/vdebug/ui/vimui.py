@@ -270,6 +270,9 @@ class Window(vdebug.ui.interface.Window):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
 
     def set_height(self,height):
+        minheight  =  vim.eval("&winminheight")
+        if height < minheight:
+            height  =  minheight
         self.command('set winheight=%s' % str(height))
 
     def write(self, msg, return_focus = True, after = "normal G"):
