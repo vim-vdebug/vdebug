@@ -163,13 +163,6 @@ class Ui(vdebug.ui.interface.Ui):
             return
         self.is_open = False
 
-        if self.watchwin:
-            self.watchwin.destroy()
-        if self.stackwin:
-            self.stackwin.destroy()
-        if self.statuswin:
-            self.statuswin.destroy()
-
         vdebug.log.Log.remove_logger('WindowLogger')
         if self.tabnr:
             vim.command('silent! '+self.tabnr+'tabc!')
@@ -178,6 +171,13 @@ class Ui(vdebug.ui.interface.Ui):
 
         if self.empty_buf_num:
             vim.command('bw' + self.empty_buf_num)
+
+        if self.watchwin:
+            self.watchwin.destroy()
+        if self.stackwin:
+            self.stackwin.destroy()
+        if self.statuswin:
+            self.statuswin.destroy()
 
         self.watchwin = None
         self.stackwin = None
