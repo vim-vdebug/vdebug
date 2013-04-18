@@ -230,7 +230,7 @@ class SourceWindow(vdebug.ui.interface.Window):
         self.file = file
         vdebug.log.Log("Setting source file: "+file,vdebug.log.Logger.INFO)
         self.focus()
-        vim.command('call vdebug:edit("%s")' % file)
+        vim.command('call vdebug:edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self,lineno):
         self.focus()
