@@ -151,6 +151,7 @@ function! vdebug:get_visual_selection()
   let lines[0] = lines[0][col1 - 1:]
   return join(lines, "\n")
 endfunction
+<<<<<<< HEAD
 
 function vdebug:edit(filename)
     try
@@ -159,3 +160,5 @@ function vdebug:edit(filename)
         execute 'silent edit' fnameescape(a:filename)
     endtry
 endfunction
+=======
+>>>>>>> fix-file-paths
