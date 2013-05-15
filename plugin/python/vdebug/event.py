@@ -77,7 +77,7 @@ class CursorEvalEvent(Event):
     var_regex = {
         "default" : "^[a-zA-Z_]",
         "ruby" : "^[$@a-zA-Z_]",
-        "php" : "^\$",
+        "php" : "^[\$A-Z]",
         "perl" : "^[$@%]"
     }
 
@@ -231,7 +231,7 @@ class WatchWindowContextChangeEvent(Event):
         else:
             runner.get_context(context_id)
             return True
-            
+
     def __get_word_end(self,line,column):
         tab_end_pos = -1
         line_len = len(line)
