@@ -95,7 +95,7 @@ class CursorEvalEvent(Event):
         var = ""
         linelen = len(line)
 
-        for i in range(colno,linelen-1):
+        for i in range(colno,linelen):
             char = line[i]
             if p.match(char):
                 var += char
