@@ -82,7 +82,7 @@ class Response:
 class ContextNamesResponse(Response):
     def names(self):
         names = {}
-        for c in self.as_xml().getchildren():
+        for c in list(self.as_xml()):
             names[int(c.get('id'))] = c.get('name')
         return names
 
@@ -96,7 +96,7 @@ class StackGetResponse(Response):
     """Response object used by the stack_get command."""
 
     def get_stack(self):
-        return self.as_xml().getchildren()
+        return list(self.as_xml())
 
 class ContextGetResponse(Response):
     """Response object used by the context_get command.
@@ -109,7 +109,7 @@ class ContextGetResponse(Response):
         self.properties = []
 
     def get_context(self):
-        for c in self.as_xml().getchildren():
+        for c in list(self.as_xml()):
             self.create_properties(ContextProperty(c))
 
         return self.properties
@@ -132,7 +132,7 @@ class EvalResponse(ContextGetResponse):
 
     def get_context(self):
         code = self.get_code()
-        for c in self.as_xml().getchildren():
+        for c in list(self.as_xml()):
             self.create_properties(EvalProperty(c,code,self.api.language))
 
         return self.properties
@@ -601,7 +601,7 @@ class ContextProperty:
         if self.has_children:
             idx = 0
             tagname = '%sproperty' % self.ns
-            children = node.getchildren()
+            children = list(node)
             if children is not None:
                 for c in children:
                     if c.tag == tagname:
