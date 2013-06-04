@@ -23,6 +23,8 @@ if !has("python")
     finish
 endif
 
+silent doautocmd User VdebugPre
+
 " Load start_vdebug.py either from the runtime directory (usually
 " /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
 " home vim directory (usually ~/.vim/plugin/).
@@ -161,3 +163,5 @@ function vdebug:edit(filename)
         execute 'silent edit' fnameescape(a:filename)
     endtry
 endfunction
+
+silent doautocmd User VdebugPost
