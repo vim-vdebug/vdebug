@@ -273,7 +273,7 @@ class Window(vdebug.ui.interface.Window):
         minheight = vim.eval("&winminheight")
         if height < minheight:
             height = minheight
-        if height < 0:
+        if height <= 0:
             height = 1
         self.command('set winheight=%s' % str(height))
 
