@@ -1,3 +1,23 @@
+=== Vdebug 1.4.1 / 2013-06-09
+
+Bug fixes:
+ * Fix folds being forgotten after debugging (issue #56)
+ * Don't overwrite features array if it exists (issue #59)
+ * Mapping of single modes (thanks @xbot, #66)
+ * Stop empty buffers from being created (issue #70)
+ * Fix ElementTree deprecation warning (thanks @InFog, #89)
+ * Fix minheight error for windows (thanks @zhaocai, #73, also #84)
+ * Fix filename handling on windows (thanks @Chronial, #74)
+ * Use :mkexrc for restoring keymapping (thanks @Chronial and @qstrahl, #75)
+ * Fix window destruction (thanks @Chronial, #76)
+ * Inspect PHP constants with cursor eval (issue #80)
+ * Don't cut final character when inspecting variables at end of line (issue #85)
+
+Documentation:
+ * Test suite requirements (thanks @michaeltwofish, #61)
+ * Add helptag instructions to README (issue #67)
+ * Add 'eval_visual' to documentation (issue #88)
+
 === Vdebug 1.4.0 / 2013-03-06
 
 Features:
