@@ -16,6 +16,10 @@ It's written in Python, and has an object-oriented interface that is easy to ext
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
+# News
+
+Vdebug now has an irc channel on freenode! If you're running into problems installing, configuring or running vdebug, or you just want to ask a general question, join us on **#vdebug**.
+
 # Recent version (version 1.4.1)
 
  * Fix folds being forgotten after debugging (issue #56)
