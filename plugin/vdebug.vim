@@ -8,7 +8,7 @@
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
 "               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
-"      Version: 1.4.0
+"      Version: 1.4.1
 "               Inspired by the Xdebug plugin, which was originally written by 
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
@@ -22,6 +22,8 @@
 if !has("python")
     finish
 endif
+
+silent doautocmd User VdebugPre
 
 " Load start_vdebug.py either from the runtime directory (usually
 " /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
@@ -123,10 +125,12 @@ command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
 
 " Signs and highlighted lines for breakpoints, etc.
-sign define current text=->  texthl=DbgCurrent linehl=DbgCurrent
-sign define breakpt text=B>  texthl=DbgBreakPt linehl=DbgBreakPt
-hi default DbgCurrent term=reverse ctermfg=White ctermbg=Red gui=reverse
-hi default DbgBreakPt term=reverse ctermfg=White ctermbg=Green gui=reverse
+sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
+sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
+hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 
 function! s:OptionNames(A,L,P)
     let arg_to_cursor = strpart(a:L,10,a:P)
@@ -159,3 +163,5 @@ function vdebug:edit(filename)
         execute 'silent edit' fnameescape(a:filename)
     endtry
 endfunction
+
+silent doautocmd User VdebugPost

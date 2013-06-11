@@ -16,11 +16,13 @@ It's written in Python, and has an object-oriented interface that is easy to ext
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
-# Recent version (version 1.4.0)
+# Recent version (version 1.4.1)
 
- * Allow setting of debugger features with the `g:vdebug_features` dictionary
- * Stop error when trying to debug with an unsaved file
- * Fixed stuck breakpoints
+ * Fix folds being forgotten after debugging (issue #56)
+ * Don't overwrite features array if it exists (issue #59)
+ * Mapping of single modes (thanks @xbot, #66)
+ * Stop empty buffers from being created (issue #70)
+ * Fix ElementTree deprecation warning (thanks @InFog, #89)
  * And more... check out the HISTORY file
 
 # How to use
