@@ -1,16 +1,27 @@
 require 'spec_helper'
 
+# The subject of the test, human readable
 describe ":VdebugOpt" do
+
+  # This is what is run when using "it_behaves_like"
   shared_examples "a vdebug option" do |option, value|
+
+    # What is being checked?
     context "the resulting option value" do
+      # Code to run before the test
       before  { vim.command "VdebugOpt #{option} #{value}" }
+
+      # What does "it" refer to?
       subject { vim.echo "g:vdebug_options['#{option}']" }
 
+      # The actual test assertion
       it { should == value }
     end
   end
 
+  # Each test for a different option is in a context block
   context "setting debug_file" do
+    # Calls the block "a vdebug option", which contains a test
     it_behaves_like "a vdebug option", "debug_file", "path/to/file.log"
   end
 
