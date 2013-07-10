@@ -10,7 +10,11 @@ class Vdebug
   def start_listening
     clear_buffer_cache!
     vim.server.remote_send ":python debugger.run()<CR>"
-    sleep 0.5
+    sleep 1
+  end
+
+  def step_over
+    vim.command 'python debugger.step_over()'
   end
 
   # Retrieve a hash with the buffer names (values) and numbers (keys)
@@ -36,8 +40,8 @@ class Vdebug
   end
 
   def connected?
-     vim.server.remote_send(
-       ":python debugger.runner.is_alive()"
+     vim.command(
+       "python print debugger.runner.is_alive()"
      ) == "True"
   end
 

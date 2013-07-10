@@ -23,18 +23,28 @@ describe Vdebug do
 
   end
 
+  describe "the debugger commands" do
+    context "step over" do
+      it "should send the command to vdebug" do
+        vim.should_receive(:command).
+          with('python debugger.step_over()')
+        vdebug.step_over
+      end
+    end
+  end
+
   describe "the status queries" do
     context "asking whether it's connected" do
       it "should query the vdebug api" do
-        vim.server.should_receive(:remote_send).
-          with(":python debugger.runner.is_alive()").
+        vim.should_receive(:command).
+          with("python print debugger.runner.is_alive()").
           and_return("True")
         vdebug.connected?
       end
 
       context "when the vdebug api returns 'False'" do
         before do
-          vim.server.should_receive(:remote_send).and_return("False")
+          vim.should_receive(:command).and_return("False")
         end
         subject { vdebug.connected? }
         it { should be false }
@@ -42,7 +52,7 @@ describe Vdebug do
 
       context "when the vdebug api returns 'True'" do
         before do
-          vim.server.should_receive(:remote_send).and_return("True")
+          vim.should_receive(:command).and_return("True")
         end
         subject { vdebug.connected? }
         it { should be true }
