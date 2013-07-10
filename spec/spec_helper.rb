@@ -1,3 +1,7 @@
+require 'rspec'
+require 'rspec/core'
+require 'rspec/mocks'
+require 'rspec/expectations'
 require 'vimrunner'
 require 'vimrunner/rspec'
 

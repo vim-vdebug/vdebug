@@ -1,6 +1,6 @@
 Given "I start the debugger with the PHP script $script" do |script|
-  fullscript = Dir.getwd + "/" + script
-  $vim.server.remote_send ":python debugger.run()<CR>"
-  sleep 1
-  system %Q{XDEBUG_CONFIG="idekey=something" /usr/bin/env php #{fullscript} &}
+  vdebug.start_listening
+  full_script_path = Dir.getwd + "/" + script
+  run_php_script full_script_path
+  vdebug.gui_open?.should_be true
 end
