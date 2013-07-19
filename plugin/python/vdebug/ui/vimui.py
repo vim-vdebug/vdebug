@@ -537,7 +537,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
                 %{'indent':"".rjust((p.depth * 2)+indent),\
-                'marker':self.__get_marker(p),'name':p.display_name,\
+                'marker':self.__get_marker(p),'name':p.display_name.encode('latin1'),\
                 'type':p.type_and_size(),'value':p.value}
 
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':

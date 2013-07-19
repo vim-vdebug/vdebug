@@ -56,7 +56,7 @@ class Vdebug
 protected
   def fetch_buffer_content(name)
     bufnum = buffers.invert.fetch(name)
-    vim.echo(%Q{join(getline(#{bufnum}, "$"), "\\n")})
+    vim.echo(%Q{join(getbufline(#{bufnum}, 1, "$"), "\\n")})
   rescue KeyError
     raise BufferNotFound, "#{name} buffer not found"
   end
