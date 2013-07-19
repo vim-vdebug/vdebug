@@ -457,10 +457,10 @@ class StatusWindow(Window):
     def on_create(self):
         keys = vdebug.util.Keymapper()
         output = "Status: starting\nListening on port\nNot connected\n\n"
-        output += "Press %s to start debugging, " %(keys.run_key()) 
+        output += "Press %s to start debugging, " %(keys.run_key())
         output += "%s to stop/close. " %(keys.close_key())
         output += "Type :help Vdebug for more information."
-        
+
         self.write(output)
 
         self.command('setlocal syntax=debugger_status')
@@ -525,20 +525,20 @@ class ContextGetResponseRenderer(ResponseRenderer):
         return res
 
     def __create_tabs(self):
-        res = ""
+        res = []
         if self.contexts:
             for id,name in self.contexts.iteritems():
                 if self.current_context == id:
                     name = "*"+name
-                res += "[ %s ] " % name
-            res += "\n\n"
-        return res
+                res.append("[ %s ]" % name)
+        return " ".join(res) + "\n\n"
 
     def __render_property(self,p,next_p,last = False,indent = 0):
-        line = "%(indent)s %(marker)s %(name)s = (%(type)s) %(value)s\n" \
+        line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" \
                 %{'indent':"".rjust((p.depth * 2)+indent),\
                 'marker':self.__get_marker(p),'name':p.display_name.encode('latin1'),\
-                'type':p.type_and_size(),'value':p.value}
+                'type':p.type_and_size(),'value': " " + p.value}
+        line = line.rstrip() + "\n"
 
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':
             depth = p.depth
