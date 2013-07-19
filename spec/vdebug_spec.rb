@@ -132,7 +132,7 @@ Other things
             3 => 'DebuggerWatch'
           })
           vim.should_receive(:echo).
-            with('join(getline(3, "$"), "\n")').
+            with('join(getbufline(3, 1, "$"), "\n")').
             and_return(buffer)
         end
 
@@ -166,7 +166,7 @@ Etc.
             6 => 'DebuggerStatus'
           })
           vim.should_receive(:echo).
-            with('join(getline(6, "$"), "\n")').
+            with('join(getbufline(6, 1, "$"), "\n")').
             and_return(buffer)
         end
 
