@@ -13,4 +13,4 @@ before_script:
 # command to install dependencies
 install: pip install -r requirements.txt --use-mirrors
 # command to run tests
-script: python vdebugtests.py && rake spec && cucumber
+script: bundle exec rake travis
