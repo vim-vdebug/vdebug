@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module VdebugHelper
   def vdebug
     @vdebug ||= Vdebug.new vim
@@ -18,7 +20,7 @@ end
 
 module ScriptRunner
   def run_php_script(path)
-    fork_and_run 'php', path
+    fork_and_run 'php', Shellwords.escape(path)
   end
 
   def fork_and_run(bin, argstr)
