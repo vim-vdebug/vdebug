@@ -347,7 +347,8 @@ class Window(vdebug.ui.interface.Window):
         if self.buffer == None or len(dir(self.buffer)) == 0:
             return
         self.is_open = False
-        self.command('bwipeout ' + self.name)
+        if int(vim.eval('buffer_exists("'+self.name+'")')) == 1:
+            vim.command('bwipeout ' + self.name)
 
     def clean(self):
         """ clean all datas in buffer """
