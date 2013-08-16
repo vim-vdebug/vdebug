@@ -81,8 +81,10 @@ class FilePath:
             len(filename) == 0:
             raise FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
-        if filename.startswith('file://'):
-            filename = filename[7:]
+        if filename.startswith('file:'):
+            filename = filename[5:]
+            if filename.startswith('///'):
+                filename = filename[2:]
 
         p = re.compile('^/?[a-zA-Z]:')
         if p.match(filename):
