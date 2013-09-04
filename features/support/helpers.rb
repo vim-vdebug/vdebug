@@ -20,7 +20,7 @@ end
 
 module ScriptRunner
   def run_php_script(path)
-    fork_and_run 'php', Shellwords.escape(path)
+    fork_and_run "php -c #{PHP_INI}", Shellwords.escape(path)
   end
 
   def fork_and_run(bin, argstr)

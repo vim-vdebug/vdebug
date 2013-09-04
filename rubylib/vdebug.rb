@@ -43,7 +43,6 @@ class Vdebug
      is_connected = vim.command(
        "python print debugger.runner.is_alive()"
      )
-     puts "Connected? #{is_connected.inspect}"
      is_connected == "True"
   end
 

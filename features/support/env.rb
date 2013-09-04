@@ -1,6 +1,8 @@
 require 'vimrunner'
 require_relative "../../rubylib/vdebug"
 
+PHP_INI = File.expand_path('../../../.travis.php.ini', __FILE__)
+
 Before do
   Dir.mkdir 'tmpspace' unless Dir.exists? 'tmpspace'
   Dir.chdir 'tmpspace'
