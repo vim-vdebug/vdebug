@@ -50,6 +50,33 @@ class Vdebug
     fetch_buffer_content 'DebuggerWatch'
   end
 
+  def watch_vars
+    watch_lines = watch_window_content.split("\n")[4..-1]
+    Hash[watch_lines.join("").split('|').map { |v|
+      v[3..-1].split("=", 2).map(&:strip)
+    }]
+  end
+
+  def stack_window_content
+    fetch_buffer_content 'DebuggerStack'
+  end
+
+  def stack
+    stack_window_content.split("\n").map { |l|
+      s = {}
+      matches = /^\[(\d+)\] {([^}]+)} @ ([^:]+):(\d+)/.match(l)
+      if matches
+        s[:level] = matches[1]
+        s[:name] = matches[2]
+        s[:file] = matches[3]
+        s[:line] = matches[4]
+        s
+      else
+        raise "Invalid stack line: #{l}"
+      end
+    }
+  end
+
   def status_window_content
     fetch_buffer_content 'DebuggerStatus'
   end
