@@ -94,6 +94,10 @@ class Vdebug
     fetch_buffer_content 'DebuggerStatus'
   end
 
+  def status
+    /Status: (\S+)/.match(status_window_content)[1]
+  end
+
 protected
   def fetch_buffer_content(name)
     bufnum = buffers.invert.fetch(name)

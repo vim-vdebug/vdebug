@@ -3,6 +3,17 @@ Feature: Correct window setup
     As a user
     I want to see correct watch, stack and status information
 
+    Scenario: The status window
+        Given I have a file example.php containing
+            """
+            <?php
+            $var1 = 1;
+            ?>
+            """
+        When I start the debugger with the PHP script example.php
+        Then the status should be break
+        And the status window should contain localhost:9000
+
     Scenario: The watch window
         Given I have a file example.php containing
             """
@@ -49,3 +60,5 @@ Feature: Correct window setup
         When I step in
         Then item 1 on the stack should show the file example2.php
         And item 1 on the stack should show line 2
+        And item 2 on the stack should show the file example.php
+        And item 2 on the stack should show line 2
