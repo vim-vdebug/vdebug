@@ -19,13 +19,19 @@ module VdebugHelper
 end
 
 module ScriptRunner
+  STDERR_FILE = "error.out"
+
   def run_php_script(path)
     fork_and_run "php -c #{PHP_INI}", Shellwords.escape(path)
   end
 
+  def stderr_contents
+    File.read(STDERR_FILE)
+  end
+
   def fork_and_run(bin, argstr)
     fork do
-      exec %Q{XDEBUG_CONFIG="idekey=something" /usr/bin/env #{bin} #{argstr}}
+      exec %Q{XDEBUG_CONFIG="idekey=something" /usr/bin/env #{bin} #{argstr} 2>#{STDERR_FILE}}
       exit!
     end
     sleep 0.5

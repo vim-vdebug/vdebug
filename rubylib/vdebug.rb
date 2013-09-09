@@ -13,8 +13,21 @@ class Vdebug
     sleep 1
   end
 
+  def messages
+    vim.command("messages")
+  end
+
+  def step_to_line(number)
+    vim.command "#{number}"
+    vim.command "python debugger.run_to_cursor()"
+  end
+
   def step_over
     vim.command 'python debugger.step_over()'
+  end
+
+  def step_in
+    vim.command 'python debugger.step_into()'
   end
 
   # Retrieve a hash with the buffer names (values) and numbers (keys)
@@ -64,7 +77,7 @@ class Vdebug
   def stack
     stack_window_content.split("\n").map { |l|
       s = {}
-      matches = /^\[(\d+)\] {([^}]+)} @ ([^:]+):(\d+)/.match(l)
+      matches = /^\[(\d+)\] (\S+) @ ([^:]+):(\d+)/.match(l)
       if matches
         s[:level] = matches[1]
         s[:name] = matches[2]
