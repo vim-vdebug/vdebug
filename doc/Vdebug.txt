@@ -240,11 +240,16 @@ the "pydbgp" tool, created by ActiveState (who make the Komodo Edit/IDE
 software).
 
 To do this, go to http://code.activestate.com/komodo/remotedebugging/,
-download the Python client for your OS and extract it. Inside this package is 
-a binary file called pydbgp that we can include when running a script, which
-will allow for remote debugging.
+download the Python client for your OS and extract it.
 
-If we want to debug a script called "myscript.py", run the following: >
+Inside this package is a binary file called pydbgp that we can include when
+running a script, which will allow for remote debugging. If you're using
+version 8 or greater, then you will need to move the dbgp directory, which is
+inside pythonlib, to the same directory that contains the pydbgp executable.
+If you don't do this then you will get an error saying "No module named
+dbgp.client".
+
+To debug a script called "myscript.py", run the following: >
     python -S path/to/pydbgp -d localhost:9000 myscript.py
 <
 adding in the path to the pydbgp binary file. Running it without starting
@@ -254,10 +259,12 @@ this, you're ready to go.
 NOTE: You may have a problem when trying to do an "eval". If you get an error
 mentioning something about not providing a length then you need to patch the
 client.py file in the Python remote debugger source code. I've created a patch 
-that you can get at https://gist.github.com/3348076 - if using unix you can use 
-the patch command to apply it, e.g: >
+that you can get at https://gist.github.com/3348076. It will only apply cleanly
+if it's for the same version as the package you downloaded. 
 
-    patch dbgp/client.py < client.patch
+If using unix you can use the `patch` command to apply the changes, e.g: >
+
+    patch dbgp/client.py < client-7.1.0.patch
 <
 If you're still having trouble, drop me an email.
 
