@@ -12,4 +12,4 @@ Feature: Unicode in source buffer
             """
         And I start the debugger with the PHP script test.php
         When I step over
-        Then the watch window should show the variable $arr
+        Then the watch window should show $arr

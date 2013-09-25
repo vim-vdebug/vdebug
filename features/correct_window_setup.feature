@@ -24,8 +24,8 @@ Feature: Correct window setup
             """
         And I start the debugger with the PHP script example.php
         When I step over
-        Then the watch window should show the variable $var1
-        And the watch window should show the variable $var2
+        Then the watch window should show $var1
+        And the watch window should show $var2
         And the watch window variable $var1 should be (int) 1
         And the watch window variable $var2 should be (uninitialized)
 

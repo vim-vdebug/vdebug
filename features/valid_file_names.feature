@@ -12,7 +12,7 @@ Feature: Valid file names
             """
         And I start the debugger with the PHP script My File.php
         When I step over
-        Then the watch window should show the variable $var
+        Then the watch window should show $var
 
     Scenario: Debug a PHP file with a space in the directory
         Given I have a file A Path/myfile.php containing
@@ -23,4 +23,4 @@ Feature: Valid file names
             """
         And I start the debugger with the PHP script A Path/myfile.php
         When I step over
-        Then the watch window should show the variable $var
+        Then the watch window should show $var

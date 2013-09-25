@@ -30,6 +30,11 @@ class Vdebug
     vim.command 'python debugger.step_into()'
   end
 
+  def evaluate(expression)
+    safe_expression = expression.gsub(/['"\\\x0]/,'\\\\\0')
+    vim.command %Q{python debugger.handle_eval("#{safe_expression}")}
+  end
+
   # Retrieve a hash with the buffer names (values) and numbers (keys)
   def buffers
     @buffers ||= fetch_buffers
