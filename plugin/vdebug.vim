@@ -156,7 +156,7 @@ function! vdebug:get_visual_selection()
   return join(lines, "\n")
 endfunction
 
-function vdebug:edit(filename)
+function! vdebug:edit(filename)
     try
         execute 'buffer' fnameescape(a:filename)
     catch /^Vim\%((\a\+)\)\=:E94/
