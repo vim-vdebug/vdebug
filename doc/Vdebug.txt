@@ -403,7 +403,7 @@ Vdebug is now listening for an incoming connection, which will be started when
 a script is run with the debugger engine activated. View the section
 |VdebugSetUp| to see the necessary steps to start a script in this way. It will
 be obvious when a connection is made, because a new VIM tab opens with four
-windows, signaling the start of a new debugging session.
+windows, signalling the start of a new debugging session.
 
 If you are starting a script but Vdebug does not react, see the
 |VdebugTroubleshooting| section for information.
@@ -442,7 +442,7 @@ variable name, type, length (if applicable) and value are shown. They are shown
 as a tree, because arrays/lists and objects have children. Hopefully it's
 fairly self-explanatory: right arrows show a closed tree, down arrows show an
 open tree and diamonds show variables that don't have children. These markers
-can be customized (see |VdebugOptions|), and will fall back to ASCII equivalents
+can be customised (see |VdebugOptions|), and will fall back to ASCII equivalents
 if multi byte support is not enabled in the VIM configuration.
 
 To open a closed tree, navigate to a line with a closed tree (right arrow) and
@@ -580,10 +580,10 @@ debugging, and the default keys mapped to those commands.
 4.4 Breakpoints                                            *VdebugBreakpoints*
 
 This section explains how to set and remove line breakpoints, and also how to
-set more advanced types of breakpoints. It also explains how to manage your list
+set more advanced types of breakpoint. It also explains how to manage your list
 of breakpoints.
 
-There are several types of breakpoints, and their support varies between
+There are several types of breakpoint, and their support varies between
 debugger engines. The breakpoint types are:
 
     * Line: break at a line in a given file
