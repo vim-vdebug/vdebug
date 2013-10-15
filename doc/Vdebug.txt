@@ -403,7 +403,7 @@ Vdebug is now listening for an incoming connection, which will be started when
 a script is run with the debugger engine activated. View the section
 |VdebugSetUp| to see the necessary steps to start a script in this way. It will
 be obvious when a connection is made, because a new VIM tab opens with four
-windows, signalling the start of a new debugging session.
+windows, signaling the start of a new debugging session.
 
 If you are starting a script but Vdebug does not react, see the
 |VdebugTroubleshooting| section for information.
@@ -442,7 +442,7 @@ variable name, type, length (if applicable) and value are shown. They are shown
 as a tree, because arrays/lists and objects have children. Hopefully it's
 fairly self-explanatory: right arrows show a closed tree, down arrows show an
 open tree and diamonds show variables that don't have children. These markers
-be customised (see |VdebugOptions|), and will fall back to ASCII equivalents
+can be customized (see |VdebugOptions|), and will fall back to ASCII equivalents
 if multi byte support is not enabled in the VIM configuration.
 
 To open a closed tree, navigate to a line with a closed tree (right arrow) and
@@ -474,7 +474,7 @@ can return to the variable context with <F11> (default).
 4.2.3 The stack window                                     *VdebugStackWindow*
 
 The stack window shows the current execution stack, which is a list of files
-and functions/methods that the program has run through to get the current
+and functions/methods that the program has run through to get to the current
 position. The top entry ([0]) is always the current position, and the entries
 below show the path the script has taken.
 
@@ -506,7 +506,7 @@ to go for help!
 
 This is a bit of an odd one out, as it doesn't show by default and can be
 summoned at will. It lists all the breakpoints that have been set, and shows
-their IDs that can be used to remove them.
+the IDs that can be used to remove them.
 
 To open the window use the command :BreakpointWindow. It's in a table format,
 so hopefully it won't need any more explanation. To close the window again,
@@ -547,7 +547,7 @@ debugging, and the default keys mapped to those commands.
     
     4.3.3 Step in                                        *VdebugCommandStepIn*
     Default key: <F3>
-    Tells the debugger engine to step in to a statement on the current line.
+    Tells the debugger engine to step into a statement on the current line.
     For instance, if there's a function call on the current line it will jump to
     the start of that function.
     
@@ -580,10 +580,10 @@ debugging, and the default keys mapped to those commands.
 4.4 Breakpoints                                            *VdebugBreakpoints*
 
 This section explains how to set and remove line breakpoints, and also how to
-set more advanced types of breakpoint. It also explains how to manage your list
+set more advanced types of breakpoints. It also explains how to manage your list
 of breakpoints.
 
-There are several types of breakpoint, and their support varies between
+There are several types of breakpoints, and their support varies between
 debugger engines. The breakpoint types are:
 
     * Line: break at a line in a given file
@@ -818,7 +818,7 @@ g:vdebug_options["server"] (default = "localhost")
 g:vdebug_options["timeout"] (default = 20)             
     Number of seconds to wait for when listening for a connection. VIM will
     lock up due to the server socket listening for a client connection, so this
-    timeout is there to protect your VIM for locking up forever!
+    timeout is there to protect your VIM from locking up forever!
 
                                                       *VdebugOptions-on_close*
 g:vdebug_options["on_close"] (default = "detach")     
