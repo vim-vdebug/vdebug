@@ -80,7 +80,7 @@ class LocalFilePathTest(unittest.TestCase):
 
 class RemotePathTest(unittest.TestCase):
     def setUp(self):
-        vdebug.opts.Options.set({'path_maps':{'/remote1/':'/local1/', '/remote2/':'/local2/'}})
+        vdebug.opts.Options.set({'path_maps':{'remote1':'local1', 'remote2':'local2'}})
 
     def test_as_local(self):
         filename = "/remote1/path/to/file"

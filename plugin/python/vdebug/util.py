@@ -81,8 +81,10 @@ class FilePath:
             len(filename) == 0:
             raise FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
-        if filename.startswith('file://'):
-            filename = filename[7:]
+        if filename.startswith('file:'):
+            filename = filename[5:]
+            if filename.startswith('///'):
+                filename = filename[2:]
 
         p = re.compile('^/?[a-zA-Z]:')
         if p.match(filename):
@@ -101,7 +103,7 @@ class FilePath:
         ret = f
         if ret[2] == "/":
             ret = ret.replace("/","\\")
-        
+
         if vdebug.opts.Options.isset('path_maps'):
             for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
                 if remote in ret:
@@ -118,8 +120,6 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if ret[2] == "\\":
-            ret = ret.replace("\\","/")
 
         if vdebug.opts.Options.isset('path_maps'):
             for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
@@ -129,6 +129,10 @@ class FilePath:
                             vdebug.log.Logger.DEBUG)
                     ret = ret.replace(local,remote)
                     break
+
+        if ret[2] == "\\":
+            ret = ret.replace("\\","/")
+
         if self.is_win:
             return "file:///"+ret
         else:
