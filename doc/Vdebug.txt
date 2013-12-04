@@ -190,7 +190,7 @@ able to apply it to your circumstance.
 The most popular DBGP debugger for PHP is Xdebug.
 
 I find that the most effective way to install Xdebug is to use PECL, instead
-of a OS-level package manager such as apitude or yum. You can also compile it
+of a OS-level package manager such as aptitude or yum. You can also compile it
 from source if you're feeling hardy. To install it via PECL, run this from a
 command line (requires root/admin privileges): >
 
