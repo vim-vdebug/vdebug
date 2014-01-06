@@ -197,7 +197,15 @@ class InputStream:
 
     def probe(self):
         try:
-            vim.eval("getchar(0)")
+            c = vim.eval("getchar(0)")
+            if c == "10":
+                vim.command('TmuxNavigateDown')
+            if c == "11":
+                vim.command('TmuxNavigateUp')
+            if c == "12":
+                vim.command('TmuxNavigateRight')
+            if c == "8":
+                vim.command('TmuxNavigateLeft')
         except: # vim.error
             raise UserInterrupt()
 
