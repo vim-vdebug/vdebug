@@ -164,4 +164,9 @@ function! vdebug:edit(filename)
     endtry
 endfunction
 
+function! vdebug:statusline()
+    python debugger.start_if_ready()
+    return pyeval("debugger.status()")
+endfunction
+
 silent doautocmd User VdebugPost

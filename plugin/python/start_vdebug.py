@@ -9,6 +9,7 @@ import socket
 import traceback
 import vdebug.runner
 import vdebug.event
+import vdebug.listener
 import vim
 
 class DebuggerInterface:
@@ -19,16 +20,33 @@ class DebuggerInterface:
     """
     def __init__(self):
         self.runner = vdebug.runner.Runner()
+        self.listener = vdebug.listener.Listener()
         self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
         self.runner.close_connection()
 
+    def status(self):
+        if self.runner.is_alive():
+            return "running"
+        else:
+            return self.listener.status()
+
+    def start_if_ready(self):
+        if not self.runner.is_alive() and self.listener.is_ready():
+            self.runner.handle_connection(self.listener.create_connection())
+            return True
+        else:
+            return False
+
     def run(self):
         """Tell the debugger to run, until the next breakpoint or end of script.
         """
         try:
-            self.runner.run()
+            if self.runner.has_connection():
+                self.runner.run()
+            else:
+                self.listener.start()
         except Exception as e:
             self.handle_exception(e)
 

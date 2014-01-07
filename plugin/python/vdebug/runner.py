@@ -8,6 +8,7 @@ import vim
 import vdebug.breakpoint
 import vdebug.opts
 import vdebug.util
+import vdebug.connection
 
 class Runner:
     """ Class that stitches together all the debugger components.
@@ -34,15 +35,11 @@ class Runner:
                 self.ui.error("Modified buffers must be saved before debugging")
                 return
             vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
-            
+
             if vdebug.opts.Options.isset('debug_file'):
                 vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
                         vdebug.opts.Options.get('debug_file_level'),\
                         vdebug.opts.Options.get('debug_file')))
-            self.listen(\
-                    vdebug.opts.Options.get('server'),\
-                    vdebug.opts.Options.get('port',int),\
-                    vdebug.opts.Options.get('timeout',int))
 
             self.ui.open()
             self.keymapper.map()
@@ -73,6 +70,9 @@ class Runner:
             self.close()
             raise
 
+    def has_connection(self):
+        return self.api is not None
+
     def set_features(self):
         """Evaluate vim dictionary of features and pass to debugger.
 
@@ -89,9 +89,9 @@ class Runner:
 
     def refresh(self,status):
         """The main action performed after a deubugger step.
-    
+
         Updates the status window, current stack, source
-        file and line and watch window."""    
+        file and line and watch window."""
         if not self.is_alive():
             self.ui.error("Cannot update: no connection")
         else:
@@ -156,7 +156,7 @@ class Runner:
 
         It will run until the end of the execution or until a
         breakpoint is reached."""
-        if not self.is_alive():
+        if not self.ui.is_open:
             self.open()
         else:
             vdebug.log.Log("Running")
@@ -253,7 +253,7 @@ class Runner:
         self.api.breakpoint_set(bp.get_cmd())
         self.run()
 
-    def listen(self,server,port,timeout):
+    def handle_connection(self,connection):
         """Open the vdebug.dbgp API with connection.
 
         Uses existing connection if possible.
@@ -264,22 +264,7 @@ class Runner:
                 vdebug.log.Logger.ERROR)
             return
         else:
-            while True:
-                ide_key = vdebug.opts.Options.get('ide_key')
-                check_ide_key = True
-                if len(ide_key) == 0:
-                    check_ide_key = False
-                    
-                connection = vdebug.dbgp.Connection(server,port,\
-                        timeout,vdebug.util.InputStream())
-
-                self.api = vdebug.dbgp.Api(connection)
-                if check_ide_key and ide_key != self.api.idekey:
-                    print "Ignoring debugger connection with IDE key '%s'" \
-                            % self.api.idekey
-                    self.api.detach()
-                else:
-                    break
+            self.api = vdebug.dbgp.Api(connection)
 
     def update_stack(self):
         """Update the stack window with the current stack info.

@@ -285,7 +285,7 @@ class Api:
         """ The python engine incorrectly requires length.
         if self.language == 'python':
             args = ("-l %i " % len(code_enc) ) + args"""
-            
+
         return self.send_cmd('eval',args,EvalResponse)
 
     def step_into(self):

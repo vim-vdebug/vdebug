@@ -34,7 +34,7 @@ module ScriptRunner
       exec %Q{XDEBUG_CONFIG="idekey=something" /usr/bin/env #{bin} #{argstr} 2>#{STDERR_FILE}}
       exit!
     end
-    sleep 0.5
+    sleep 1
   end
 end
 
