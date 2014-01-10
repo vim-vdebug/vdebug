@@ -125,6 +125,16 @@ class DebuggerInterface:
         else:
             self.session.ui().breakpointwin.create()
 
+    def toggle_status_window(self):
+        """Open or close the status window.
+
+        The window appears as a horizontal split below the
+        currently selected window."""
+        if self.session.ui().statuswin.is_open:
+            self.session.ui().statuswin.destroy()
+        else:
+            self.session.ui().statuswin.create()
+
 
     def set_breakpoint(self,args = None):
         """Set a breakpoint, specified by args.
