@@ -5,30 +5,27 @@ import vim
 import re
 
 class Dispatcher:
-    def __init__(self,runner):
-        self.runner = runner
+    def visual_eval(self, session):
+        if session.is_connected():
+            event = VisualEvalEvent(session)
+            return event.dispatch()
 
-    def visual_eval(self):
-        if self.runner.is_alive():
-            event = VisualEvalEvent()
-            return event.execute(self.runner)
+    def eval_under_cursor(self, session):
+        if session.is_connected():
+            event = CursorEvalEvent(session)
+            return event.dispatch()
 
-    def eval_under_cursor(self):
-        if self.runner.is_alive():
-            event = CursorEvalEvent()
-            return event.execute(self.runner)
-
-    def by_position(self):
-        if self.runner.is_alive():
-            event = self._get_event_by_position()
+    def by_position(self, session):
+        if session.is_connected():
+            event = self._get_event_by_position(session)
             if event is not None:
-                return event.execute(self.runner)
+                return event.dispatch()
             else:
                 vdebug.log.Log("No executable event found at current cursor position",\
                         vdebug.log.Logger.DEBUG)
                 return False
 
-    def _get_event_by_position(self):
+    def _get_event_by_position(self, session):
         buf_name = vim.current.buffer.name
         p = re.compile('.*[\\\/]([^\\\/]+)')
         m = p.match(buf_name)
@@ -36,32 +33,33 @@ class Dispatcher:
             return None
 
         window_name = m.group(1)
-        if window_name == self.runner.ui.watchwin.name:
+        if window_name == session.ui().watchwin.name:
             lineno = vim.current.window.cursor[0]
-            vdebug.log.Log("User action in watch window, line %s" % lineno,\
-                    vdebug.log.Logger.DEBUG)
-            line = self.runner.ui.watchwin.buffer[lineno-1].strip()
+            vdebug.log.Log("User action in watch window, line %s" % lineno,
+                            vdebug.log.Logger.DEBUG)
+            line = session.ui().watchwin.buffer[lineno-1].strip()
             if lineno == 1:
-                return WatchWindowContextChangeEvent()
+                return WatchWindowContextChangeEvent(session)
             elif line.startswith(vdebug.opts.Options.get('marker_closed_tree')):
-                return WatchWindowPropertyGetEvent()
+                return WatchWindowPropertyGetEvent(session)
             elif line.startswith(vdebug.opts.Options.get('marker_open_tree')):
-                return WatchWindowHideEvent()
-        elif window_name == self.runner.ui.stackwin.name:
-            return StackWindowLineSelectEvent()
+                return WatchWindowHideEvent(session)
+        elif window_name == session.ui().stackwin.name:
+            return StackWindowLineSelectEvent(session)
 
 class Event:
-    """Base event class.
-    """
-    def execute(self,runner):
+    def __init__(self, session):
+        self._session = session
+
+    def dispatch(self):
         pass
 
 class VisualEvalEvent(Event):
     """Evaluate a block of code given by visual selection in Vim.
     """
-    def execute(self,runner):
+    def dispatch(self):
         selection = vim.eval("vdebug:get_visual_selection()")
-        runner.eval(selection)
+        self._session.dispatch_event("eval", selection)
         return True
 
 class CursorEvalEvent(Event):
@@ -81,11 +79,11 @@ class CursorEvalEvent(Event):
         "perl" : "^[$@%]"
     }
 
-    def execute(self,runner):
+    def dispatch(self):
         lineno = vim.current.window.cursor[0]
         colno = vim.current.window.cursor[1]
         line = vim.current.buffer[lineno-1]
-        lang = runner.api.language
+        lang = self._session.api().language
         if lang in self.char_regex:
             reg = self.char_regex[lang]
         else:
@@ -117,25 +115,25 @@ class CursorEvalEvent(Event):
 
         f = re.compile(reg)
         if f.match(var) is None:
-            runner.ui.error("Cannot find a valid variable under the cursor")
+            self._session.ui().error("Cannot find a valid variable under the cursor")
             return False
 
         if len(var):
-            runner.eval(var)
+            self._session.dispatch_event("eval", var)
             return True
         else:
-            runner.ui.error("Cannot find a valid variable under the cursor")
+            self._session.ui().error("Cannot find a valid variable under the cursor")
             return False
 
 class StackWindowLineSelectEvent(Event):
     """Move the the currently selected file and line in the stack window
     """
-    def execute(self,runner):
+    def dispatch(self):
         lineno = vim.current.window.cursor[0]
 
         vdebug.log.Log("User action in stack window, line %s" % lineno,\
                 vdebug.log.Logger.DEBUG)
-        line = runner.ui.stackwin.buffer[lineno-1]
+        line = self._session.ui().stackwin.buffer[lineno-1]
         if line.find(" @ ") == -1:
             return False
         filename_pos = line.find(" @ ") + 3
@@ -143,15 +141,15 @@ class StackWindowLineSelectEvent(Event):
         line_pos = file_and_line.rfind(":")
         file = vdebug.util.LocalFilePath(file_and_line[:line_pos])
         lineno = file_and_line[line_pos+1:]
-        runner.ui.sourcewin.set_file(file)
-        runner.ui.sourcewin.set_line(lineno)
+        self._session.ui().sourcewin.set_file(file)
+        self._session.ui().sourcewin.set_line(lineno)
 
 class WatchWindowPropertyGetEvent(Event):
     """Open a tree node in the watch window.
 
     This retrieves the child nodes and displays them underneath.
     """
-    def execute(self,runner):
+    def dispatch(self):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
         pointer_index = line.find(vdebug.opts.Options.get('marker_closed_tree'))
@@ -162,16 +160,16 @@ class WatchWindowPropertyGetEvent(Event):
             raise EventError("Cannot read the selected property")
 
         name = line[pointer_index+step:eq_index-1]
-        context_res = runner.api.property_get(name)
+        context_res = self._session.api().property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
-        runner.ui.watchwin.delete(lineno,lineno+1)
-        runner.ui.watchwin.insert(output.rstrip(),lineno-1,True)
+        self._session.ui().watchwin.delete(lineno,lineno+1)
+        self._session.ui().watchwin.insert(output.rstrip(),lineno-1,True)
 
 class WatchWindowHideEvent(Event):
     """Close a tree node in the watch window.
     """
-    def execute(self,runner):
+    def dispatch(self):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
         pointer_index = line.find(vdebug.opts.Options.get('marker_open_tree'))
@@ -184,12 +182,12 @@ class WatchWindowHideEvent(Event):
             if char != " ":
                 end_lineno = i - 1
                 break
-        runner.ui.watchwin.delete(lineno,end_lineno+1)
+        self._session.ui().watchwin.delete(lineno, end_lineno+1)
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':
             append = "\n" + "".rjust(pointer_index) + "|"
         else:
             append = ""
-        runner.ui.watchwin.insert(line.replace(\
+        self._session.ui().watchwin.insert(line.replace(\
                     vdebug.opts.Options.get('marker_open_tree'),\
                     vdebug.opts.Options.get('marker_closed_tree'),1) + \
                 append,lineno-1,True)
@@ -201,7 +199,7 @@ class WatchWindowContextChangeEvent(Event):
     new context name.
     """
 
-    def execute(self,runner):
+    def dispatch(self):
         column = vim.current.window.cursor[1]
         line = vim.current.buffer[0]
 
@@ -219,17 +217,17 @@ class WatchWindowContextChangeEvent(Event):
         vdebug.log.Log("Context name: %s" % context_name,\
                 vdebug.log.Logger.DEBUG)
         if context_name[0] == '*':
-            runner.ui.say("This context is already showing")
+            self._session.ui().say("This context is already showing")
             return False
 
         context_id = self.__determine_context_id(\
-                runner.context_names,context_name)
+                self._session.context_names, context_name)
 
         if context_id == -1:
             raise EventError("Could not resolve context name")
             return False
         else:
-            runner.get_context(context_id)
+            self._session.get_context(context_id)
             return True
 
     def __get_word_end(self,line,column):
@@ -243,7 +241,7 @@ class WatchWindowContextChangeEvent(Event):
             i += 1
         return tab_end_pos
 
-    def __get_word_start(self,line,column):
+    def __get_word_start(self, line, column):
         tab_start_pos = -1
         j = column
         while j >= 0:
@@ -253,11 +251,11 @@ class WatchWindowContextChangeEvent(Event):
             j -= 1
         return tab_start_pos
 
-    def __determine_context_id(self,context_names,context_name):
+    def __determine_context_id(self, context_names, context_name):
         found_id = -1
         for id in context_names.keys():
             name = context_names[id]
-            vdebug.log.Log(name +", "+context_name)
+            vdebug.log.Log("%s, %s" % (name, context_name))
             if name == context_name:
                 found_id = id
                 break
@@ -265,3 +263,86 @@ class WatchWindowContextChangeEvent(Event):
 
 class EventError(Exception):
     pass
+
+class RunEvent(Event):
+    def dispatch(self):
+        vdebug.log.Log("Running")
+        self._session.ui().statuswin.set_status("running")
+        res = self._session.api().run()
+        self._session.refresh(res)
+
+class StepOverEvent(Event):
+    def dispatch(self):
+        vdebug.log.Log("Stepping over")
+        self._session.ui().statuswin.set_status("running")
+        res = self._session.api().step_over()
+        self._session.refresh(res)
+
+class StepIntoEvent(Event):
+    def dispatch(self):
+        vdebug.log.Log("Stepping into statement")
+        self._session.ui().statuswin.set_status("running")
+        res = self._session.api().step_into()
+        self._session.refresh(res)
+
+class StepOutEvent(Event):
+    def dispatch(self):
+        vdebug.log.Log("Stepping out of statement")
+        self._session.ui().statuswin.set_status("running")
+        res = self._session.api().step_out()
+        self._session.refresh(res)
+
+class RunToCursorEvent(Event):
+    def dispatch(self):
+        row = self._session.ui().get_current_row()
+        file = self._session.ui().get_current_file()
+        if file != self._session.ui().sourcewin.get_file():
+            self._session.ui().error("Run to cursor only works in the source window!")
+            return
+        vdebug.log.Log("Running to position: line %s of %s" %(row, file))
+        bp = vdebug.breakpoint.TemporaryLineBreakpoint(self._session.ui(), file, row)
+        self._session.api().breakpoint_set(bp.get_cmd())
+        self._session.dispatch_event("run")
+
+class EvalEvent(Event):
+    def dispatch(self, code):
+        try:
+            vdebug.log.Log("Evaluating code: %s" % code)
+            context_res = self._session.api().eval(code)
+            rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                    context_res,\
+                    "Eval of: '%s'" % context_res.get_code())
+            self._session.ui().watchwin.clean()
+            self._session.ui().watchwin.accept_renderer(rend)
+        except vdebug.dbgp.EvalError:
+            self._session.ui().error("Failed to evaluate invalid code, '%s'" % code)
+
+class SetBreakpointEvent(Event):
+    def dispatch(self, args):
+        bp = vdebug.breakpoint.Breakpoint.parse(self._session.ui(), args)
+        if bp.type == "line":
+            id = self._session.breakpoints().find_breakpoint(\
+                    bp.get_file(),\
+                    bp.get_line())
+            if id is not None:
+                self._session.breakpoints().remove_breakpoint_by_id(id)
+                return
+        self._session.breakpoints().add_breakpoint(bp)
+
+class RemoveBreakpointEvent(Event):
+    def dispatch(self, args):
+        if args is None:
+            args = ""
+        args = args.strip()
+        if len(args) == 0:
+            self._session.ui().error("ID or '*' required to remove a breakpoint: run "+\
+                    "':breakpointWindow' to see breakpoints and their IDs")
+            return
+
+        if args == '*':
+            self._session.breakpoints().clear_breakpoints()
+        else:
+            arg_parts = args.split(" ")
+            for id in arg_parts:
+                self._session.breakpoints().remove_breakpoint_by_id(id)
+

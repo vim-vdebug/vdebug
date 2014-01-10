@@ -177,7 +177,7 @@ class Api:
     conn = None
     transID = 0
 
-    def __init__(self,connection):
+    def __init__(self, connection):
         """Create a new Api using a Connection object.
 
         The Connection object specifies the debugger connection,
@@ -194,6 +194,9 @@ class Api:
         if self.conn.isconnected() == 0:
             self.conn.open()
         self.__parse_init_msg(self.conn.recv_msg())
+
+    def __del__(self):
+        self.conn.close()
 
     def __parse_init_msg(self,msg):
         """Parse the init message from the debugger"""

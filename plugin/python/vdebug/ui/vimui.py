@@ -9,10 +9,10 @@ class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
     """
 
-    def __init__(self,breakpoints):
+    def __init__(self):
         vdebug.ui.interface.Ui.__init__(self)
         self.is_open = False
-        self.breakpoint_store = breakpoints
+        #self.breakpoint_store = breakpoints
         self.emptybuffer = None
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
         self.current_tab = "1"
@@ -228,11 +228,12 @@ class SourceWindow(vdebug.ui.interface.Window):
         if file == self.file:
             return
         self.file = file
-        vdebug.log.Log("Setting source file: "+file,vdebug.log.Logger.INFO)
+        vdebug.log.Log("Setting source file: %s" % file,vdebug.log.Logger.INFO)
         self.focus()
         vim.command('call vdebug:edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self,lineno):
+        vdebug.log.Log("Setting source line number: %s" % lineno,vdebug.log.Logger.DEBUG)
         self.focus()
         vim.command("normal %sgg" % str(lineno))
 
@@ -375,11 +376,11 @@ class BreakpointWindow(Window):
         self.clean()
         self.write(self.header)
         self.command('setlocal syntax=debugger_breakpoint')
-        for bp in self.ui.breakpoint_store.get_sorted_list():
-            self.add_breakpoint(bp)
+        #for bp in self.ui.breakpoint_store.get_sorted_list():
+        #    self.add_breakpoint(bp)
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.breakpointwin.is_open = False' % cmd)
+            vim.command('%s | python debugger.session.ui().breakpointwin.is_open = False' % cmd)
 
     def add_breakpoint(self,breakpoint):
         bp_str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
@@ -429,7 +430,7 @@ class StackWindow(Window):
         self.command('setlocal syntax=debugger_stack')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.stackwin.is_open = False' % cmd)
+            vim.command('%s | python debugger.session.ui().stackwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -447,7 +448,7 @@ class WatchWindow(Window):
         self.command('setlocal syntax=debugger_watch')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.watchwin.is_open = False' % cmd)
+            vim.command('%s | python debugger.session.ui().watchwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -467,7 +468,7 @@ class StatusWindow(Window):
         self.command('setlocal syntax=debugger_status')
         if self.creation_count == 1:
             cmd = 'au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.statuswin.is_open = False' % cmd)
+            vim.command('%s | python debugger.session.ui().statuswin.is_open = False' % cmd)
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)

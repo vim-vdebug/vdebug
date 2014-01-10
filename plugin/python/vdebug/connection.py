@@ -91,11 +91,9 @@ class BackgroundSocketCreator(threading.Thread):
         self.__host = host
         self.__port = port
         threading.Thread.__init__(self)
-        self.__log = open('queueserver.log','w')
 
     def log(self, message):
-        self.__log.write(message+"\n")
-        self.__log.flush()
+        vdebug.log.Log(message, vdebug.log.Logger.DEBUG)
 
     def run(self):
         self.log("Started")
@@ -103,6 +101,7 @@ class BackgroundSocketCreator(threading.Thread):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.setblocking(0)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.__host, self.__port))
             s.listen(5)
             while 1:
@@ -119,11 +118,8 @@ class BackgroundSocketCreator(threading.Thread):
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
         finally:
-            self.__shutdown(s)
-
-    def __shutdown(self, server):
-        server.close()
-        self.__log.close()
+            self.log("Finishing socket server")
+            s.close()
 
     def __peek_for_exit(self):
         try:
@@ -139,8 +135,7 @@ class BackgroundSocketCreator(threading.Thread):
 class SocketServer:
     def __init__(self):
         self.__message_q = Queue.Queue(0)
-        self.__socket_q = Queue.Queue(0)
-        self.__sock = None
+        self.__socket_q = Queue.Queue(1)
         self.__thread = None
 
     def __del__(self):
@@ -153,29 +148,17 @@ class SocketServer:
                                                     self.__message_q,
                                                     self.__socket_q)
             self.__thread.start()
-            print "Started queue server thread"
 
     def is_alive(self):
         return self.__thread and self.__thread.is_alive()
 
-    def status(self):
-        if self.is_alive():
-            print "Running"
-        else:
-            print "Stopped"
+    def has_socket(self):
+        return self.__socket_q.full()
 
     def socket(self):
-        if not self.__sock:
-            try:
-                self.__sock = self.__socket_q.get_nowait()
-            except Queue.Empty:
-                pass
-        return self.__sock
+        return self.__socket_q.get_nowait()
 
     def stop(self):
         if self.is_alive():
-            #print "Sending exit message"
             self.__message_q.put_nowait("exit")
-            #print "Joining threads"
             self.__thread.join(3000)
-            #print "Stopped"

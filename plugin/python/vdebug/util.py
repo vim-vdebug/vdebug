@@ -3,13 +3,97 @@ import vdebug.log
 import vim
 import re
 import os
+import sys
+import socket
 import urllib
+
+class ExceptionHandler:
+    def __init__(self, session):
+        self._session = session
+
+    """ Exception handlers """
+
+    def handle_timeout(self):
+        """Handle a timeout, which is pretty normal. 
+        """
+        self._session.close()
+        self._session.ui().say("No connection was made")
+
+    def handle_interrupt(self):
+        """Handle a user interrupt, which is pretty normal. 
+        """
+        self._session.close()
+        self._session.ui().say("Connection cancelled")
+
+    def handle_socket_end(self):
+        """Handle a socket closing, which is pretty normal.
+        """
+        self._session.ui().say("Connection to the debugger has been closed")
+        self._session.close_connection()
+
+    def handle_vim_error(self,e):
+        """Handle a VIM error.
+
+        This should NOT occur under normal circumstances.
+        """
+        self._session.ui().error("A Vim error occured: %s\n%s"\
+                        % (str(e), traceback.format_exc()))
+
+    def handle_readable_error(self,e):
+        """Simply print an error, since it is human readable enough.
+        """
+        self._session.ui().error(str(e))
+
+    def handle_dbgp_error(self,e):
+        """Simply print an error, since it is human readable enough.
+        """
+        self._session.ui().error(str(e.args[0]))
+
+    def handle_general_exception(self):
+        """Handle an unknown error of any kind.
+        """
+        self._session.ui().error("An error occured: %s\n%s"\
+                        % (str(sys.exc_info()[0]), traceback.format_exc()))
+
+    def handle(self, e):
+        """Switch on the exception type to work out how to handle it.
+        """
+        if isinstance(e, vdebug.dbgp.TimeoutError):
+            self.handle_timeout()
+        elif isinstance(e, vdebug.util.UserInterrupt):
+            try:
+                self.handle_interrupt()
+            except:
+                pass
+        elif isinstance(e, vdebug.event.EventError):
+            self.handle_readable_error(e)
+        elif isinstance(e, vdebug.breakpoint.BreakpointError):
+            self.handle_readable_error(e)
+        elif isinstance(e, vdebug.log.LogError):
+            self.handle_readable_error(e)
+        elif isinstance(e, vdebug.dbgp.DBGPError):
+            self.handle_dbgp_error(e)
+        elif isinstance(e, (EOFError,socket.error)):
+            self.handle_socket_end()
+        elif isinstance(e, KeyboardInterrupt):
+            print "Keyboard interrupt - debugging session cancelled"
+            try:
+                self._session.close()
+            except:
+                pass
+        else:
+            self.handle_general_exception()
+        """
+        elif isinstance(e,vim.error):
+            self.handle_vim_error(e)
+        """
+
 
 class Keymapper:
     """Map and unmap key commands for the Vim user interface.
     """
 
-    exclude = ["run","set_breakpoint","eval_visual"]
+    exclude = ["run", "close", "set_breakpoint", "eval_visual"]
 
     def __init__(self):
         self.keymaps = vim.eval("g:vdebug_keymap")
@@ -186,6 +270,16 @@ class RemoteFilePath(FilePath):
         Uses the "local_path" and "remote_path" options.
         """
         return f
+
+class Environment:
+    @staticmethod
+    def reload():
+        vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
+
+        if vdebug.opts.Options.isset('debug_file'):
+            vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
+                    vdebug.opts.Options.get('debug_file_level'),\
+                    vdebug.opts.Options.get('debug_file')))
 
 class FilePathError(Exception):
     pass

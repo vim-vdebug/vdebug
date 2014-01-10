@@ -7,9 +7,8 @@ class Listener:
         self.__server = vdebug.connection.SocketServer()
 
     def start(self):
-        self.__server.start(\
-                    vdebug.opts.Options.get('server'),\
-                    vdebug.opts.Options.get('port',int))
+        self.__server.start(vdebug.opts.Options.get('server'),
+                            vdebug.opts.Options.get('port',int))
 
     def stop(self):
         self.__server.stop()
@@ -25,7 +24,10 @@ class Listener:
             return "inactive"
 
     def is_ready(self):
-        return self.__server.socket() is not None
+        return self.__server.has_socket()
+
+    def is_listening(self):
+        return not self.is_ready() and self.__server.is_alive()
 
     def create_connection(self):
         handler = vdebug.connection.ConnectionHandler(*self.__server.socket())

@@ -108,10 +108,11 @@ let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
 let g:vdebug_leader_key = ""
 
 " Create the top dog
-python debugger = DebuggerInterface()
+python debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Mappings allowed in non-debug mode
 exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
+exe "noremap ".g:vdebug_keymap["close"]." :python debugger.close()<cr>"
 exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
 
 " Exceptional case for visual evaluation
@@ -131,6 +132,8 @@ hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff g
 hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+
+autocmd VimLeavePre * python debugger.close()
 
 function! s:OptionNames(A,L,P)
     let arg_to_cursor = strpart(a:L,10,a:P)
@@ -160,13 +163,12 @@ function! vdebug:edit(filename)
     try
         execute 'buffer' fnameescape(a:filename)
     catch /^Vim\%((\a\+)\)\=:E94/
-        execute 'silent edit' fnameescape(a:filename)
+        execute 'silent view' fnameescape(a:filename)
     endtry
 endfunction
 
 function! vdebug:statusline()
-    python debugger.start_if_ready()
-    return pyeval("debugger.status()")
+    return pyeval("debugger.status_for_statusline()")
 endfunction
 
 silent doautocmd User VdebugPost
