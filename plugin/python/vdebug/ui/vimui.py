@@ -261,11 +261,18 @@ class Window(vdebug.ui.interface.Window):
     open_cmd = "new"
     creation_count = 0
 
-    def __init__(self,ui,open_cmd):
+    def __init__(self, ui, open_cmd):
         self.buffer = None
         self.ui = ui
         self.open_cmd = open_cmd
         self.is_open = False
+        self.hidden_buffer = []
+
+    def toggle(self):
+        if self.is_open:
+            self.destroy()
+        else:
+            self.create()
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
@@ -291,6 +298,10 @@ class Window(vdebug.ui.interface.Window):
         self.command(after)
         if return_focus:
             vim.command('%swincmd W' % prev_win)
+
+    def __write_hidden(self, msg):
+        pass
+
 
     def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
         if not self.is_open:
