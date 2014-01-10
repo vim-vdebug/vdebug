@@ -9,10 +9,10 @@ class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
     """
 
-    def __init__(self):
+    def __init__(self, breakpoints):
         vdebug.ui.interface.Ui.__init__(self)
         self.is_open = False
-        #self.breakpoint_store = breakpoints
+        self.breakpoint_store = breakpoints
         self.emptybuffer = None
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
         self.current_tab = "1"
@@ -376,8 +376,8 @@ class BreakpointWindow(Window):
         self.clean()
         self.write(self.header)
         self.command('setlocal syntax=debugger_breakpoint')
-        #for bp in self.ui.breakpoint_store.get_sorted_list():
-        #    self.add_breakpoint(bp)
+        for bp in self.ui.breakpoint_store.get_sorted_list():
+            self.add_breakpoint(bp)
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
             vim.command('%s | python debugger.session.ui().breakpointwin.is_open = False' % cmd)
@@ -412,7 +412,8 @@ class LogWindow(Window):
     def on_create(self):
         self.command('setlocal syntax=debugger_log')
         if self.creation_count == 1:
-            vim.command('silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name))
+            vim.command('silent! au BufWinLeave %s :silent! bdelete %s' \
+                    %(self.name, self.name))
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg,return_focus=True)

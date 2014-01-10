@@ -96,7 +96,7 @@ class Session:
                     self.cur_file,\
                     self.cur_lineno)
 
-            self.__get_context(0)
+            self.get_context(0)
 
     def close_connection(self, stop = True):
         """ Close the connection to the debugger.
@@ -201,7 +201,7 @@ class Session:
                 str(self.context_names), vdebug.log.Logger.DEBUG)
 
 
-    def __get_context(self, context_id = 0):
+    def get_context(self, context_id = 0):
         self.__ui.watchwin.clean()
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)

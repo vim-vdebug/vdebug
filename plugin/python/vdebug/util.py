@@ -4,6 +4,7 @@ import vim
 import re
 import os
 import sys
+import traceback
 import socket
 import urllib
 
