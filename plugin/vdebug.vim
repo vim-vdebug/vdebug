@@ -118,7 +118,7 @@ exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoi
 exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
 
 " Commands
-command! -nargs=? Breakpoint python debugger.set_breakpoint(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
@@ -131,6 +131,16 @@ hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff g
 hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+
+function! s:BreakpointTypes(A,L,P)
+    let arg_to_cursor = strpart(a:L,11,a:P)
+    let space_idx = stridx(arg_to_cursor,' ')
+    if space_idx == -1
+        return filter(['conditional ','exception ','return ','call ','watch '],'v:val =~ "^".a:A.".*"')
+    else
+        return []
+    endif
+endfunction
 
 function! s:OptionNames(A,L,P)
     let arg_to_cursor = strpart(a:L,10,a:P)
