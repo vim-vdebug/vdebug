@@ -1,5 +1,7 @@
 import vdebug.opts
 import vdebug.log
+import vdebug.session
+import vdebug.breakpoint
 import vim
 import re
 import os
@@ -11,6 +13,12 @@ import urllib
 class ExceptionHandler:
     def __init__(self, session):
         self._session = session
+        self.readable_errors = (vdebug.event.EventError,
+                vdebug.breakpoint.BreakpointError,
+                vdebug.log.LogError,
+                vdebug.session.NoConnectionError,
+                vdebug.session.ModifiedBufferError)
+
 
     """ Exception handlers """
 
@@ -66,11 +74,7 @@ class ExceptionHandler:
                 self.handle_interrupt()
             except:
                 pass
-        elif isinstance(e, vdebug.event.EventError):
-            self.handle_readable_error(e)
-        elif isinstance(e, vdebug.breakpoint.BreakpointError):
-            self.handle_readable_error(e)
-        elif isinstance(e, vdebug.log.LogError):
+        elif isinstance(e, self.readable_errors):
             self.handle_readable_error(e)
         elif isinstance(e, vdebug.dbgp.DBGPError):
             self.handle_dbgp_error(e)

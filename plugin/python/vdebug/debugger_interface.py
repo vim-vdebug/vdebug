@@ -115,26 +115,36 @@ class DebuggerInterface:
         """
         return self.event_dispatcher.eval_under_cursor(self.session)
 
+    def mark_window_as_closed(self, window):
+        self.session.ui().mark_window_as_closed(window)
+
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
 
         The window appears as a horizontal split below the
         currently selected window."""
-        if self.session.ui().breakpointwin.is_open:
-            self.session.ui().breakpointwin.destroy()
-        else:
-            self.session.ui().breakpointwin.create()
+        self.session.ui().breakpointwin.toggle()
 
     def toggle_status_window(self):
         """Open or close the status window.
 
         The window appears as a horizontal split below the
         currently selected window."""
-        if self.session.ui().statuswin.is_open:
-            self.session.ui().statuswin.destroy()
-        else:
-            self.session.ui().statuswin.create()
+        self.session.ui().statuswin.toggle()
 
+    def toggle_stack_window(self):
+        """Open or close the stack window.
+
+        The window appears as a horizontal split below the
+        currently selected window."""
+        self.session.ui().stackwin.toggle()
+
+    def toggle_watch_window(self):
+        """Open or close the watch window.
+
+        The window appears as a horizontal split below the
+        currently selected window."""
+        self.session.ui().watchwin.toggle()
 
     def set_breakpoint(self,args = None):
         """Set a breakpoint, specified by args.
