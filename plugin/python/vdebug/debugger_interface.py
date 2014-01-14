@@ -9,7 +9,6 @@ import vim
 class DebuggerInterface:
     """Provides all methods used to control the debugger."""
     def __init__(self):
-        self.listener = vdebug.listener.Listener()
         self.event_dispatcher = vdebug.event.Dispatcher()
         breakpoints = vdebug.breakpoint.Store()
         self.ui = vdebug.ui.vimui.Ui()
@@ -42,7 +41,7 @@ class DebuggerInterface:
 
     def listen(self):
         if self.listener.is_listening():
-            print "Already waiting for a connection: none found so far"
+            print "Waiting for a connection: none found so far"
         elif self.listener.is_ready():
             print "Found connection, starting debugger"
             self.session.start(self.listener.create_connection())
@@ -52,6 +51,7 @@ class DebuggerInterface:
                 self.session.ui().set_status("listening")
             self.__reload_environment()
             self.listener.start()
+            self.start_if_ready()
 
     def run(self):
         """Tell the debugger to run, until the next breakpoint or end of script.
@@ -158,3 +158,4 @@ class DebuggerInterface:
 
     def __reload_environment(self):
         vdebug.util.Environment.reload()
+        self.listener = vdebug.listener.Listener.create()

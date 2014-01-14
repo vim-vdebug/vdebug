@@ -94,6 +94,7 @@ let g:vdebug_options_defaults = {
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
 \    "continuous_mode"  : 0,
+\    "background_listener" : 1,
 \    "auto_start" : 1,
 \    "window_commands" : {
 \        "DebuggerWatch" : "vertical belowright new",
@@ -140,8 +141,6 @@ hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff g
 hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 
-autocmd VimLeavePre * python debugger.close()
-
 function! s:OptionNames(A,L,P)
     let arg_to_cursor = strpart(a:L,10,a:P)
     let space_idx = stridx(arg_to_cursor,' ')
@@ -179,3 +178,5 @@ function! vdebug:statusline()
 endfunction
 
 silent doautocmd User VdebugPost
+autocmd VimLeavePre * python debugger.close()
+

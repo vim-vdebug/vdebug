@@ -1,4 +1,5 @@
 import socket
+import time
 import sys
 import os
 import Queue
@@ -83,6 +84,67 @@ class ConnectionHandler:
         cmd -- command to send
         """
         self.sock.send(cmd + '\0')
+
+class SocketCreator:
+    def __init__(self, input_stream = None):
+        """Create a new Connection.
+
+        The connection is not established until open() is called.
+
+        input_stream -- object for checking input stream and user interrupts (default None)
+        """
+        self.__sock = None
+        self.input_stream = input_stream
+
+    def start(self, host = '', port = 9000, timeout = 30):
+        """Listen for a connection from the debugger. Listening for the actual
+        connection is handled by self.listen()
+
+        host -- host name where debugger is running (default '')
+        port -- port number which debugger is listening on (default 9000)
+        timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
+."""
+        print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', timeout, ' seconds...)'
+        serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            serv.setblocking(0)
+            serv.bind((host, port))
+            serv.listen(5)
+            self.__sock = self.listen(serv, timeout)
+        except socket.timeout:
+            raise TimeoutError("Timeout waiting for connection")
+        finally:
+            serv.close()
+
+    def listen(self, serv, timeout):
+        """Non-blocking listener. Provides support for keyboard interrupts from
+        the user. Although it's non-blocking, the user interface will still
+        block until the timeout is reached.
+
+        serv -- Socket server to listen to.
+        timeout -- Seconds before timeout.
+        """
+        start = time.time()
+        while True:
+            if (time.time() - start) > timeout:
+                raise socket.timeout
+            try:
+                """Check for user interrupts"""
+                if self.input_stream is not None:
+                    self.input_stream.probe()
+                return serv.accept()
+            except socket.error:
+                pass
+
+    def clear(self):
+        self.__sock = None
+
+    def socket(self):
+        return self.__sock
+
+    def has_socket(self):
+        return self.__sock is not None
 
 class BackgroundSocketCreator(threading.Thread):
     def __init__(self, host, port, message_q, output_q):
