@@ -1,5 +1,6 @@
 import vdebug.connection
 import vdebug.opts
+import vim
 
 class Listener:
 
@@ -7,10 +8,16 @@ class Listener:
         self.__server = vdebug.connection.SocketServer()
 
     def start(self):
+        if vdebug.opts.Options.get("auto_start", bool):
+            vim.command('au CursorHold * python debugger.start_if_ready()')
+            vim.command('au CursorMoved * python debugger.start_if_ready()')
         self.__server.start(vdebug.opts.Options.get('server'),
                             vdebug.opts.Options.get('port',int))
 
     def stop(self):
+        if vdebug.opts.Options.get("auto_start", bool):
+            vim.command('au! CursorHold *')
+            vim.command('au! CursorMoved *')
         self.__server.stop()
 
     def status(self):
@@ -31,5 +38,5 @@ class Listener:
 
     def create_connection(self):
         handler = vdebug.connection.ConnectionHandler(*self.__server.socket())
-        self.__server.stop()
+        self.stop()
         return handler

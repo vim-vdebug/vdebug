@@ -12,7 +12,7 @@ class DebuggerInterface:
         self.listener = vdebug.listener.Listener()
         self.event_dispatcher = vdebug.event.Dispatcher()
         breakpoints = vdebug.breakpoint.Store()
-        self.ui = vdebug.ui.vimui.Ui(breakpoints)
+        self.ui = vdebug.ui.vimui.Ui()
         self.__reload_environment()
 
         self.session = vdebug.session.Session(self.ui,
@@ -33,7 +33,9 @@ class DebuggerInterface:
         return "vdebug(%s)" % self.status()
 
     def start_if_ready(self):
-        if not self.session.is_connected() and self.listener.is_ready():
+        if self.listener.is_ready():
+            print "Found connection, starting debugger"
+            self.session.start(self.listener.create_connection())
             return True
         else:
             return False

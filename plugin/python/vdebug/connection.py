@@ -162,3 +162,6 @@ class SocketServer:
         if self.is_alive():
             self.__message_q.put_nowait("exit")
             self.__thread.join(3000)
+        if self.has_socket():
+            self.socket()[0].close()
+

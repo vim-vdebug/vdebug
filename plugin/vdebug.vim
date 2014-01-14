@@ -94,6 +94,7 @@ let g:vdebug_options_defaults = {
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
 \    "continuous_mode"  : 0,
+\    "auto_start" : 1,
 \    "window_commands" : {
 \        "DebuggerWatch" : "vertical belowright new",
 \        "DebuggerStack" : "belowright new",

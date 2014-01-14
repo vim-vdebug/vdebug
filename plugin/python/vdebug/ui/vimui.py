@@ -76,10 +76,9 @@ class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
     """
 
-    def __init__(self, breakpoints):
+    def __init__(self):
         vdebug.ui.interface.Ui.__init__(self)
         self.is_open = False
-        self.breakpoint_store = breakpoints
         self.emptybuffer = None
         self.windows = WindowManager()
         self.current_tab = "1"
@@ -310,7 +309,6 @@ class VimBuffer:
         self._buffer = buffer
 
     def overwrite(self, content):
-        print content
         self._buffer[:] = content
 
     def line(self, number):
@@ -520,8 +518,6 @@ class BreakpointWindow(Window):
         if self.creation_count == 1:
             self.insert(self.header, 0)
         self.command('setlocal syntax=debugger_breakpoint')
-        #for bp in self.ui.breakpoint_store.get_sorted_list():
-        #    self.add_breakpoint(bp)
 
     def add_breakpoint(self,breakpoint):
         bp_str = " %-7i | %-11s | " %(breakpoint.id, breakpoint.type)

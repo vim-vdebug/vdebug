@@ -93,7 +93,6 @@ class ExceptionHandler:
             self.handle_vim_error(e)
         """
 
-
 class Keymapper:
     """Map and unmap key commands for the Vim user interface.
     """
