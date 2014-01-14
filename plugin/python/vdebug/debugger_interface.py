@@ -47,7 +47,7 @@ class DebuggerInterface:
         else:
             print "Vdebug will wait for a connection in the background"
             if self.session.is_open():
-                self.session.ui().statuswin.set_status("listening")
+                self.session.ui().set_status("listening")
             self.__reload_environment()
             self.listener.start()
 
@@ -120,6 +120,9 @@ class DebuggerInterface:
 
     def toggle_window(self, name):
         self.session.ui().toggle_window(name)
+
+    def toggle_breakpoint_window(self):
+        self.session.ui().toggle_window("DebuggerBreakpoints")
 
     def set_breakpoint(self,args = None):
         """Set a breakpoint, specified by args.

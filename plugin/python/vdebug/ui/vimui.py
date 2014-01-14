@@ -310,7 +310,11 @@ class VimBuffer:
         self._buffer = buffer
 
     def overwrite(self, content):
+        print content
         self._buffer[:] = content
+
+    def line(self, number):
+        return self._buffer[number]
 
     def write(self, msg, return_focus, after_callback):
         if return_focus:
@@ -375,13 +379,16 @@ class HiddenBuffer:
         vdebug.log.Log("Creating hidden buffer: %s" % buffer,
                 vdebug.log.Logger.DEBUG)
 
+    def line(self, number):
+        return self._buffer[number]
+
     def write(self, msg, return_focus, after):
         if self.is_empty():
             # If empty
             self._buffer[:] = str(msg).split('\n')
         else:
-            # Otherwise append
-            self._buffer.append(str(msg).split('\n'))
+            # Otherwise add to the end
+            self._buffer.extend(str(msg).split('\n'))
 
     def insert(self, msg, lineno, overwrite, allowEmpty, after_callback):
         """ insert into current position in buffer"""
@@ -456,6 +463,9 @@ class Window(vdebug.ui.interface.Window):
 
     def delete(self, start_line, end_line = None):
         self._buffer.delete(start_line, end_line)
+
+    def line_at(self, line):
+        return self._buffer.line(line)
 
     def create(self, open_cmd):
         """ create window """

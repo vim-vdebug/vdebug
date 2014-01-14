@@ -37,7 +37,7 @@ class Dispatcher:
             lineno = vim.current.window.cursor[0]
             vdebug.log.Log("User action in watch window, line %s" % lineno,
                             vdebug.log.Logger.DEBUG)
-            line = session.ui().windows.watch().buffer[lineno-1].strip()
+            line = session.ui().windows.watch().line_at(lineno - 1).strip()
             if lineno == 1:
                 return WatchWindowContextChangeEvent(session)
             elif line.startswith(vdebug.opts.Options.get('marker_closed_tree')):
@@ -133,7 +133,7 @@ class StackWindowLineSelectEvent(Event):
 
         vdebug.log.Log("User action in stack window, line %s" % lineno,\
                 vdebug.log.Logger.DEBUG)
-        line = self._session.ui().windows.stack().buffer[lineno-1]
+        line = self._session.ui().windows.stack().line_at(lineno - 1)
         if line.find(" @ ") == -1:
             return False
         filename_pos = line.find(" @ ") + 3
