@@ -22,12 +22,16 @@ class Session:
         "remove_breakpoint": vdebug.event.RemoveBreakpointEvent
     }
 
-    def __init__(self, ui, breakpoints, keymapper):
+    def __init__(self, ui, breakpoints, keymapper, on_close):
         self.__ui = ui
         self.__breakpoints = breakpoints
         self.__keymapper = keymapper
         self.__api = None
         self.__ex_handler = vdebug.util.ExceptionHandler(self)
+        self.__on_close = on_close
+
+    def on_close(self, callback):
+        self.__on_close = callback
 
     def ui(self):
         return self.__ui
@@ -79,9 +83,7 @@ class Session:
             self.__ui.say("Debugging session has ended")
             self.__breakpoints.unlink_api()
             self.close_connection(False)
-            if vdebug.opts.Options.get('continuous_mode', int) != 0:
-                self.open()
-                return
+            self.__on_close()
         else:
             vdebug.log.Log("Getting stack information")
             self.__ui.set_status(status)

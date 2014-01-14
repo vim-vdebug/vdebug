@@ -93,7 +93,7 @@ let g:vdebug_options_defaults = {
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
-\    "continuous_mode"  : 0,
+\    "continuous_mode"  : 1,
 \    "background_listener" : 1,
 \    "auto_start" : 1,
 \    "window_commands" : {

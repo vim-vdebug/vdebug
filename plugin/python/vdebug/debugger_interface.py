@@ -4,6 +4,7 @@ import vdebug.session
 import vdebug.util
 import vdebug.breakpoint
 import vdebug.ui.vimui
+import vdebug.opts
 import vim
 
 class DebuggerInterface:
@@ -16,7 +17,8 @@ class DebuggerInterface:
 
         self.session = vdebug.session.Session(self.ui,
                 breakpoints,
-                vdebug.util.Keymapper())
+                vdebug.util.Keymapper(),
+                self.__on_close)
 
     def __del__(self):
         self.session.close()
@@ -155,6 +157,11 @@ class DebuggerInterface:
             self.session.close()
         else:
             self.listener.stop()
+
+    def __on_close(self):
+        if vdebug.opts.Options.get('continuous_mode', int) != 0:
+            self.run()
+            return
 
     def __reload_environment(self):
         vdebug.util.Environment.reload()
