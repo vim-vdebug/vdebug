@@ -33,18 +33,18 @@ class Dispatcher:
             return None
 
         window_name = m.group(1)
-        if window_name == session.ui().watchwin.name:
+        if window_name == session.ui().windows.watch().name:
             lineno = vim.current.window.cursor[0]
             vdebug.log.Log("User action in watch window, line %s" % lineno,
                             vdebug.log.Logger.DEBUG)
-            line = session.ui().watchwin.buffer[lineno-1].strip()
+            line = session.ui().windows.watch().buffer[lineno-1].strip()
             if lineno == 1:
                 return WatchWindowContextChangeEvent(session)
             elif line.startswith(vdebug.opts.Options.get('marker_closed_tree')):
                 return WatchWindowPropertyGetEvent(session)
             elif line.startswith(vdebug.opts.Options.get('marker_open_tree')):
                 return WatchWindowHideEvent(session)
-        elif window_name == session.ui().stackwin.name:
+        elif window_name == session.ui().windows.stack().name:
             return StackWindowLineSelectEvent(session)
 
 class Event:
@@ -133,7 +133,7 @@ class StackWindowLineSelectEvent(Event):
 
         vdebug.log.Log("User action in stack window, line %s" % lineno,\
                 vdebug.log.Logger.DEBUG)
-        line = self._session.ui().stackwin.buffer[lineno-1]
+        line = self._session.ui().windows.stack().buffer[lineno-1]
         if line.find(" @ ") == -1:
             return False
         filename_pos = line.find(" @ ") + 3
@@ -163,8 +163,8 @@ class WatchWindowPropertyGetEvent(Event):
         context_res = self._session.api().property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
-        self._session.ui().watchwin.delete(lineno,lineno+1)
-        self._session.ui().watchwin.insert(output.rstrip(),lineno-1,True)
+        self._session.ui().windows.watch().delete(lineno,lineno+1)
+        self._session.ui().windows.watch().insert(output.rstrip(),lineno-1,True)
 
 class WatchWindowHideEvent(Event):
     """Close a tree node in the watch window.
@@ -182,12 +182,12 @@ class WatchWindowHideEvent(Event):
             if char != " ":
                 end_lineno = i - 1
                 break
-        self._session.ui().watchwin.delete(lineno, end_lineno+1)
+        self._session.ui().windows.watch().delete(lineno, end_lineno+1)
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':
             append = "\n" + "".rjust(pointer_index) + "|"
         else:
             append = ""
-        self._session.ui().watchwin.insert(line.replace(\
+        self._session.ui().windows.watch().insert(line.replace(\
                     vdebug.opts.Options.get('marker_open_tree'),\
                     vdebug.opts.Options.get('marker_closed_tree'),1) + \
                 append,lineno-1,True)
@@ -267,28 +267,28 @@ class EventError(Exception):
 class RunEvent(Event):
     def dispatch(self):
         vdebug.log.Log("Running")
-        self._session.ui().statuswin.set_status("running")
+        self._session.ui().set_status("running")
         res = self._session.api().run()
         self._session.refresh(res)
 
 class StepOverEvent(Event):
     def dispatch(self):
         vdebug.log.Log("Stepping over")
-        self._session.ui().statuswin.set_status("running")
+        self._session.ui().set_status("running")
         res = self._session.api().step_over()
         self._session.refresh(res)
 
 class StepIntoEvent(Event):
     def dispatch(self):
         vdebug.log.Log("Stepping into statement")
-        self._session.ui().statuswin.set_status("running")
+        self._session.ui().set_status("running")
         res = self._session.api().step_into()
         self._session.refresh(res)
 
 class StepOutEvent(Event):
     def dispatch(self):
         vdebug.log.Log("Stepping out of statement")
-        self._session.ui().statuswin.set_status("running")
+        self._session.ui().set_status("running")
         res = self._session.api().step_out()
         self._session.refresh(res)
 
@@ -312,8 +312,8 @@ class EvalEvent(Event):
             rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                     context_res,\
                     "Eval of: '%s'" % context_res.get_code())
-            self._session.ui().watchwin.clean()
-            self._session.ui().watchwin.accept_renderer(rend)
+            self._session.ui().windows.watch().clean()
+            self._session.ui().windows.watch().accept_renderer(rend)
         except vdebug.dbgp.EvalError:
             self._session.ui().error("Failed to evaluate invalid code, '%s'" % code)
 
@@ -336,7 +336,7 @@ class RemoveBreakpointEvent(Event):
         args = args.strip()
         if len(args) == 0:
             self._session.ui().error("ID or '*' required to remove a breakpoint: run "+\
-                    "':breakpointWindow' to see breakpoints and their IDs")
+                    "':BreakpointWindow' to see breakpoints and their IDs")
             return
 
         if args == '*':

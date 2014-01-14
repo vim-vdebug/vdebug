@@ -93,7 +93,13 @@ let g:vdebug_options_defaults = {
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
-\    "continuous_mode"  : 0
+\    "continuous_mode"  : 0,
+\    "window_commands" : {
+\        "DebuggerWatch" : "vertical belowright new",
+\        "DebuggerStack" : "belowright new",
+\        "DebuggerStatus" : "belowright new"
+\    },
+\    "window_arrangement" : ["DebuggerWatch", "DebuggerStatus", "DebuggerStack"]
 \}
 
 " Different symbols for non unicode Vims

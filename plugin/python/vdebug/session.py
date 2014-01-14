@@ -75,7 +75,7 @@ class Session:
             self.__breakpoints.unlink_api()
             self.close_connection()
         elif str(status) in ("stopping","stopped"):
-            self.__ui.statuswin.set_status("stopped")
+            self.__ui.set_status("stopped")
             self.__ui.say("Debugging session has ended")
             self.__breakpoints.unlink_api()
             self.close_connection(False)
@@ -84,7 +84,7 @@ class Session:
                 return
         else:
             vdebug.log.Log("Getting stack information")
-            self.__ui.statuswin.set_status(status)
+            self.__ui.set_status(status)
             stack_res = self.__update_stack()
             stack = stack_res.get_stack()
 
@@ -188,10 +188,10 @@ class Session:
     def __update_stack(self):
         """Update the stack window with the current stack info.
         """
-        self.__ui.stackwin.clean()
+        self.__ui.windows.stack().clean()
         res = self.__api.stack_get()
         renderer = vdebug.ui.vimui.StackGetResponseRenderer(res)
-        self.__ui.stackwin.accept_renderer(renderer)
+        self.__ui.windows.stack().accept_renderer(renderer)
         return res
 
     def __collect_context_names(self):
@@ -202,7 +202,7 @@ class Session:
 
 
     def get_context(self, context_id = 0):
-        self.__ui.watchwin.clean()
+        self.__ui.windows.watch().clean()
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.__api.context_get(context_id)
@@ -211,5 +211,5 @@ class Session:
                 "%s at %s:%s" %(name, self.__ui.sourcewin.file,self.cur_lineno),\
                 self.context_names,\
                 context_id)
-        self.__ui.watchwin.accept_renderer(rend)
+        self.__ui.windows.watch().accept_renderer(rend)
 
