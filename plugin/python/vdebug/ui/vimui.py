@@ -532,7 +532,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)
-        return " ".join(res) + "\n\n"
+        if res:
+            return " ".join(res) + "\n\n"
+        else:
+            return ""
 
     def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" \
