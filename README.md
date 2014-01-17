@@ -16,9 +16,19 @@ It's written in Python, and has an object-oriented interface that is easy to ext
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
+# Getting help
+
+If you're having trouble with Vdebug in any way, here are the steps you can take to get help (in the right order):
+
+  1. [Check the issues][3] to see whether it's already come up.
+  2. Visit the **#vdebug** irc channel on freenode, someone is normally there.
+  3. [Open a new issue.][4]
+
 # News
 
-Vdebug now has an irc channel on freenode! If you're running into problems installing, configuring or running vdebug, or you just want to ask a general question, join us on **#vdebug**.
+**19/07/2013:** there's a known issue with Vdebug and Vim 7.4. Take a look at [issue #98][5] to follow updates and fixes.
+
+**11/06/2013:** Vdebug now has an irc channel on freenode! If you're running into problems installing, configuring or running vdebug, or you just want to ask a general question, join us on **#vdebug**.
 
 # Recent version (version 1.4.1)
 
@@ -160,3 +170,6 @@ This plugin is released under the [MIT License][1].
 
 [1]: https://raw.github.com/joonty/vdebug/master/LICENCE
 [2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[3]: https://github.com/joonty/vdebug/issues/
+[4]: https://github.com/joonty/vdebug/issues/new
+[5]: https://github.com/joonty/vdebug/issues/98
