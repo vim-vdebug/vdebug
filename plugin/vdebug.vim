@@ -90,6 +90,8 @@ let g:vdebug_options_defaults = {
 \    "debug_file" : "",
 \    "path_maps" : {},
 \    "watch_window_style" : 'expanded',
+\    "watch_window_height" : 20,
+\    "status_window_height" : 5,
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
