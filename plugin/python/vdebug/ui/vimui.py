@@ -59,6 +59,7 @@ class Ui(vdebug.ui.interface.Ui):
             self.statuswin.set_status("loading")
 
             self.watchwin.set_height(20)
+            self.watchwin.command('setlocal foldmethod=manual')
             self.statuswin.set_height(5)
 
             logwin = LogWindow(self,'rightbelow 6new')
