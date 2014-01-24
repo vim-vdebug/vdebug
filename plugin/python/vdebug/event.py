@@ -175,12 +175,19 @@ class WatchWindowHideEvent(Event):
         lineno = vim.current.window.cursor[0]
         line = vim.current.buffer[lineno-1]
         pointer_index = line.find(vdebug.opts.Options.get('marker_open_tree'))
+        vdebug.log.Log("Pointer index: %d" % pointer_index,
+                vdebug.log.Logger.DEBUG)
 
         buf_len = len(vim.current.buffer)
         end_lineno = buf_len - 1
         for i in range(lineno,end_lineno):
             buf_line = vim.current.buffer[i]
+            vdebug.log.Log("Line %d: '%s'" %(i, buf_line),
+                    vdebug.log.Logger.DEBUG)
             char = buf_line[pointer_index]
+            vdebug.log.Log("Character at index %d: '%s'" %(pointer_index, char),
+                    vdebug.log.Logger.DEBUG)
+
             if char != " ":
                 end_lineno = i - 1
                 break
