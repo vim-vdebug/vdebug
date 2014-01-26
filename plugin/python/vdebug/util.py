@@ -4,6 +4,7 @@ import vim
 import re
 import os
 import urllib
+import time
 
 class Keymapper:
     """Map and unmap key commands for the Vim user interface.
@@ -198,6 +199,7 @@ class InputStream:
     def probe(self):
         try:
             vim.eval("getchar(0)")
+            time.sleep(0.1)
         except: # vim.error
             raise UserInterrupt()
 
