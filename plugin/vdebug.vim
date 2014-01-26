@@ -118,6 +118,7 @@ exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoi
 exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
 
 " Commands
+command! VdebugStart python debugger.run()
 command! -nargs=? Breakpoint python debugger.set_breakpoint(<q-args>)
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
