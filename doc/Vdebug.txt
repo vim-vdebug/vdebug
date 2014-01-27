@@ -717,7 +717,7 @@ You can evaluate code snippets at the current point of execution, which can be
 used to see the result of a condition, arithmetic expressions, etc. These
 snippets are written in the language that's being debugged. There are two ways
 of evaluating expresions: you can either write them yourself
-(|VdebugEvalExpression) or use visual highlighting to select an expression from
+(|VdebugEvalExpression|) or use visual highlighting to select an expression from
 the source window.
 
 On evaluating an expression, the result is shown in the watch window. To return
