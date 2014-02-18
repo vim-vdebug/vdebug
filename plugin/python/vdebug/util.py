@@ -219,16 +219,13 @@ class InputStream:
         self.pydbgp = pydbgp 
 
     def probe(self):
-        if self.pydbgp:
-            t = Thread(target=autocmd,args=(self.pydbgp,))
-        else:
-            t = Thread(target=autocmd)
 
         try:
             vim.eval("getchar(0)")
             time.sleep(0.1)
 
-            t.start()
+            if self.pydbgp:
+                Thread(target=autocmd,args=(self.pydbgp,)).start()
 
         except: # vim.error
             raise UserInterrupt()

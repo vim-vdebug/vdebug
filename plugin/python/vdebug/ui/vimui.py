@@ -262,6 +262,7 @@ class SourceWindow(vdebug.ui.interface.Window):
             self.prevline = int(vim.eval("line('.')"))
             if int(vim.eval("line('.')")) > 15:
                 vim.command('exe "normal 4\<C-e>"')
+                vim.command('redraw!')
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
