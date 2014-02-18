@@ -122,7 +122,7 @@ class Runner:
                         self.cur_file,\
                         self.cur_lineno)
 
-                self.get_context(0)
+                self.get_context(2)
 
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
