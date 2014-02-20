@@ -26,6 +26,8 @@ If you're having trouble with Vdebug in any way, here are the steps you can take
 
 # News
 
+Follow me on Twitter, [http://twitter.com/joonty](@joonty), for Vdebug updates and release news.
+
 **19/07/2013:** there's a known issue with Vdebug and Vim 7.4. Take a look at [issue #98][5] to follow updates and fixes.
 
 **11/06/2013:** Vdebug now has an irc channel on freenode! If you're running into problems installing, configuring or running vdebug, or you just want to ask a general question, join us on **#vdebug**.
