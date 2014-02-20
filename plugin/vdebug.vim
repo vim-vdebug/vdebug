@@ -64,6 +64,10 @@ if !exists("g:vdebug_features")
     let g:vdebug_features = {}
 endif
 
+if !exists("g:vdebug_leader_key")
+    let g:vdebug_leader_key = ""
+endif
+
 let g:vdebug_keymap_defaults = {
 \    "run" : "<F5>",
 \    "run_to_cursor" : "<F9>",
@@ -103,19 +107,8 @@ if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults["marker_open_tree"] = '-'
 endif
 
-let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
-let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
-let g:vdebug_leader_key = ""
-
 " Create the top dog
 python debugger = DebuggerInterface()
-
-" Mappings allowed in non-debug mode
-exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
-exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
-
-" Exceptional case for visual evaluation
-exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
 
 " Commands
 command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
@@ -127,6 +120,7 @@ command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.h
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
 sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
+
 hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
@@ -140,6 +134,42 @@ function! s:BreakpointTypes(A,L,P)
     else
         return []
     endif
+endfunction
+
+" Reload options dictionary, by merging with default options.
+"
+" This should be called if you want to update the options after vdebug has
+" been loaded.
+function! vdebug:load_options(options)
+    " Merge options with defaults
+    let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+endfunction
+
+" Assign keymappings, and merge with defaults.
+"
+" This should be called if you want to update the keymappings after vdebug has
+" been loaded.
+function! vdebug:load_keymaps(keymaps)
+    " Unmap existing keys, if applicable
+    if has_key(g:vdebug_keymap, "run")
+        exe "silent! nunmap ".g:vdebug_keymap["run"]
+    endif
+    if has_key(g:vdebug_keymap, "set_breakpoint")
+        exe "silent! nunmap ".g:vdebug_keymap["set_breakpoint"]
+    endif
+    if has_key(g:vdebug_keymap, "eval_visual")
+        exe "silent! vunmap ".g:vdebug_keymap["eval_visual"]
+    endif
+
+    " Merge keymaps with defaults
+    let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
+
+    " Mappings allowed in non-debug mode
+    exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
+    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
+
+    " Exceptional case for visual evaluation
+    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -175,3 +205,5 @@ function! vdebug:edit(filename)
 endfunction
 
 silent doautocmd User VdebugPost
+call vdebug:load_options(g:vdebug_options)
+call vdebug:load_keymaps(g:vdebug_keymap)

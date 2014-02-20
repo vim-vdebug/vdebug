@@ -34,7 +34,7 @@ class Runner:
                 self.ui.error("Modified buffers must be saved before debugging")
                 return
             vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
-            
+
             if vdebug.opts.Options.isset('debug_file'):
                 vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
                         vdebug.opts.Options.get('debug_file_level'),\
