@@ -26,7 +26,7 @@ If you're having trouble with Vdebug in any way, here are the steps you can take
 
 # News
 
-Follow me on Twitter, [http://twitter.com/joonty](@joonty), for Vdebug updates and release news.
+Follow me on Twitter, [@joonty](http://twitter.com/joonty), for Vdebug updates and release news.
 
 **19/07/2013:** there's a known issue with Vdebug and Vim 7.4. Take a look at [issue #98][5] to follow updates and fixes.
 
