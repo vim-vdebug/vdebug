@@ -17,8 +17,8 @@ class DebuggerInterface:
     Most methods are just redirected to the Runner class. Fatal 
     exceptions are caught and handled here.
     """
-    def __init__(self):
-        self.runner = vdebug.runner.Runner()
+    def __init__(self,pydbgp=None):
+        self.runner = vdebug.runner.Runner(pydbgp)
         self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
@@ -29,6 +29,7 @@ class DebuggerInterface:
         """
         try:
             self.runner.run()
+
         except Exception as e:
             self.handle_exception(e)
 

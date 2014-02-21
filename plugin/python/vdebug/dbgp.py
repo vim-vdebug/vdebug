@@ -381,7 +381,7 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
+    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None, pydbgp=None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
@@ -395,6 +395,7 @@ class Connection:
         self.host = host
         self.timeout = timeout
         self.input_stream = input_stream
+        self.pydbgp = pydbgp 
 
     def __del__(self):
         """Make sure the connection is closed."""
@@ -404,6 +405,7 @@ class Connection:
         """Whether the connection has been established."""
         return self.isconned
 
+
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
@@ -411,11 +413,14 @@ class Connection:
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+
             serv.setblocking(0)
             serv.bind((self.host, self.port))
             serv.listen(5)
             (self.sock, self.address) = self.listen(serv, self.timeout)
             self.sock.settimeout(None)
+
         except socket.timeout:
             serv.close()
             raise TimeoutError("Timeout waiting for connection")
@@ -439,9 +444,13 @@ class Connection:
             if (time.time() - start) > timeout:
                 raise socket.timeout
             try:
+
                 """Check for user interrupts"""
                 if self.input_stream is not None:
                     self.input_stream.probe()
+
+                    time.sleep(1)
+
                 return serv.accept()
             except socket.error:
                 pass

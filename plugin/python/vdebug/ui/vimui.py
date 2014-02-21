@@ -211,6 +211,7 @@ class SourceWindow(vdebug.ui.interface.Window):
     file = None
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
+    prevline = 0 
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -247,10 +248,21 @@ class SourceWindow(vdebug.ui.interface.Window):
     def place_pointer(self,line):
         vdebug.log.Log("Placing pointer sign on line "+str(line),\
                 vdebug.log.Logger.INFO)
-        self.remove_pointer()
+
+        vim.command('sign undefine current')
+        vim.command('sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine')
+
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
                 ' file='+self.file)
+
+        overmargin = abs(  self.prevline - int(  vim.eval("line('.')")  )  ) > 10
+        if overmargin:
+            vim.command('exe "normal zz"')
+            self.prevline = int(vim.eval("line('.')"))
+            if int(vim.eval("line('.')")) > 15:
+                vim.command('exe "normal 4\<C-e>"')
+                vim.command('redraw!')
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)

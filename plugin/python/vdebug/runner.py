@@ -16,12 +16,13 @@ class Runner:
     an interface that Vim can use to send commands.
     """
 
-    def __init__(self):
+    def __init__(self,pydbgp=None):
         self.api = None
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         self.breakpoints = vdebug.breakpoint.Store()
         self.keymapper = vdebug.util.Keymapper()
         self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
+        self.pydbgp = pydbgp 
 
     def open(self):
         """ Open the connection and debugging vdebug.ui.
@@ -125,6 +126,7 @@ class Runner:
 
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
+
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
@@ -271,7 +273,7 @@ class Runner:
                     check_ide_key = False
                     
                 connection = vdebug.dbgp.Connection(server,port,\
-                        timeout,vdebug.util.InputStream())
+                        timeout,vdebug.util.InputStream(pydbgp=self.pydbgp))
 
                 self.api = vdebug.dbgp.Api(connection)
                 if check_ide_key and ide_key != self.api.idekey:

@@ -44,13 +44,21 @@ else
 endif
 
 " Nice characters get screwed up on windows
-if has('win32') || has('win64')
-    let g:vdebug_force_ascii = 1
-elseif has('multi_byte') == 0
-    let g:vdebug_force_ascii = 1
+if !exists('g:vimrc_vdebug_force_ascii')
+    if has('win32') || has('win64')
+        let g:vdebug_force_ascii = 1
+    elseif has('multi_byte') == 0
+        let g:vdebug_force_ascii = 1
+    else
+        let g:vdebug_force_ascii = 0
+    end
 else
-    let g:vdebug_force_ascii = 0
-end
+    if g:vimrc_vdebug_force_ascii == 1
+        let g:vdebug_force_ascii = 1
+    else
+        let g:vdebug_force_ascii = 0
+    endif
+endif
 
 if !exists("g:vdebug_options")
     let g:vdebug_options = {}
@@ -90,17 +98,18 @@ let g:vdebug_options_defaults = {
 \    "debug_file" : "",
 \    "path_maps" : {},
 \    "watch_window_style" : 'expanded',
-\    "marker_default" : 'â¬¦',
-\    "marker_closed_tree" : 'â–¸',
-\    "marker_open_tree" : 'â–¾',
 \    "continuous_mode"  : 0
 \}
 
 " Different symbols for non unicode Vims
 if g:vdebug_force_ascii == 1
-    let g:vdebug_options_defaults["marker_default"] = '*'
+    let g:vdebug_options_defaults["marker_default"]     = '*'
     let g:vdebug_options_defaults["marker_closed_tree"] = '+'
-    let g:vdebug_options_defaults["marker_open_tree"] = '-'
+    let g:vdebug_options_defaults["marker_open_tree"]   = '-'
+else
+    let g:vdebug_options_defaults["marker_default"]     = '¢Ü'
+    let g:vdebug_options_defaults["marker_closed_tree"] = '¢º'
+    let g:vdebug_options_defaults["marker_open_tree"]   = '¡ä'
 endif
 
 let g:vdebug_options = extend(g:vdebug_options_defaults,g:vdebug_options)
@@ -108,7 +117,23 @@ let g:vdebug_keymap = extend(g:vdebug_keymap_defaults,g:vdebug_keymap)
 let g:vdebug_leader_key = ""
 
 " Create the top dog
-python debugger = DebuggerInterface()
+" python debugger = DebuggerInterface()
+
+if exists("g:vdebug_pydbgp_default")
+    let g:pydbgp_configured = 1 
+else
+    let g:pydbgp_configured = 0
+endif
+python << EOF
+import vim
+configured = vim.eval("g:pydbgp_configured") 
+if configured is '1':
+    pydbgp = vim.eval("g:vdebug_pydbgp_default") 
+else:
+    pydbgp = None 
+
+debugger = DebuggerInterface(pydbgp)
+EOF
 
 " Mappings allowed in non-debug mode
 exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
@@ -128,8 +153,8 @@ command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.h
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
 sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
-hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
-hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Cyan guifg=#ffffff guibg=#004020
+hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#004020
 hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 

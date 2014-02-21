@@ -196,10 +196,26 @@ class InputStream:
 
     Used to check for keyboard interrupts."""
 
+
+    def  __init__(self,pydbgp=None):
+        self.pydbgp = pydbgp 
+
     def probe(self):
+
         try:
             vim.eval("getchar(0)")
             time.sleep(0.1)
+
+            if self.pydbgp:
+
+                import subprocess
+
+                fname  = vim.current.buffer.name
+                pydbgp = self.pydbgp
+
+                _autocmd = 'pythonw -S ' + self.pydbgp + ' -d localhost:9000 ' + fname 
+                subprocess.Popen((_autocmd))
+            
         except: # vim.error
             raise UserInterrupt()
 
