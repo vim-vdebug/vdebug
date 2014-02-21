@@ -1,0 +1,15911 @@
+cscope 15 $HOME\.vim\bundle\vdebug\plugin\python\vdebug"               0000070408
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\__init__.py
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\breakpoint.py
+
+1 
+impÜt
+ 
+ba£64
+
+
+2 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+4 
+şass
+ 
+	gStÜe
+:
+
+6 
+def
+ 
+	$__š™__
+(
+£lf
+):
+
+7 
+£lf
+.
+b»akpošts
+ = {
+	}
+}
+
+8 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+10 
+def
+ 
+	$lšk_­i
+(
+£lf
+,
+­i
+):
+
+11 
+£lf
+.
+­i
+ =‡pi
+
+12 
+num_bps
+ = 
+	$Ën
+(
+£lf
+.
+b»akpošts
+)
+
+13 
+num_bps
+ > 0:
+
+14 
+vdebug
+.
+log
+.
+	`Log
+("Regi¡”šg %˜b»akpošt w™hhdebugg”" % 
+num_bps
+)
+
+15 
+id
+, 
+bp
+ 
+š
+ 
+£lf
+.
+b»akpošts
+.
+	$™”™ems
+():
+
+16 
+»s
+ = 
+£lf
+.
+­i
+.
+	`b»akpošt_£t
+(
+bp
+.
+	$g‘_cmd
+())
+
+17 
+bp
+.
+	`£t_debugg”_id
+(
+»s
+.
+	$g‘_id
+())
+
+19 #Upd©
+lše
+-
+ba£d
+ 
+b»akpošts
+ 
+w™h
+ 
+a
+ 
+diù
+ 
+of
+ 
+IDs
+ 
+ªd
+ 
+lšes
+
+
+20 
+def
+ 
+	$upd©e_lšes
+(
+£lf
+,
+lšes
+):
+
+21 
+id
+, 
+lše
+ 
+š
+ 
+lšes
+.
+	$™”™ems
+():
+
+22 
+Œy
+:
+
+23 
+£lf
+.
+b»akpošts
+[
+id
+].
+	$£t_lše
+(
+lše
+)
+
+24 
+vdebug
+.
+log
+.
+	`Log
+("Updated†ine‚umber of breakpoint %so %s"\
+
+25 %(
+	`¡r
+(
+id
+),
+	$¡r
+(
+lše
+)) )
+
+26 
+exû±
+ 
+V®ueE¼Ü
+:
+
+27 
+·ss
+
+
+28 #NØ
+m‘hod
+ 
+£t_lše
+, 
+nÙ
+ 
+a
+ 
+lše
+ 
+b»akpošt
+
+
+30 
+def
+ 
+	$uÆšk_­i
+(
+£lf
+):
+
+31 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+33 
+def
+ 
+	$add_b»akpošt
+(
+£lf
+,
+b»akpošt
+):
+
+34 
+vdebug
+.
+log
+.
+	`Log
+("Addšg " + 
+	$¡r
+(
+b»akpošt
+))
+
+35 
+£lf
+.
+b»akpošts
+[
+	`¡r
+(
+b»akpošt
+.
+	`g‘_id
+())] = breakpoint
+
+36 
+b»akpošt
+.
+	$Ú_add
+()
+
+37 
+£lf
+.
+­i
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+38 
+»s
+ = 
+£lf
+.
+­i
+.
+	`b»akpošt_£t
+(
+b»akpošt
+.
+	$g‘_cmd
+())
+
+39 
+b»akpošt
+.
+	`£t_debugg”_id
+(
+»s
+.
+	$g‘_id
+())
+
+41 
+def
+ 
+	$»move_b»akpošt
+(
+£lf
+,
+b»akpošt
+):
+
+42 
+£lf
+.
+	`»move_b»akpošt_by_id
+(\
+
+43 
+b»akpošt
+.
+	$g‘_id
+())
+
+45 
+def
+ 
+	$»move_b»akpošt_by_id
+(
+£lf
+,
+id
+):
+
+46 
+id
+ = 
+	$¡r
+(
+id
+)
+
+47 
+id
+ 
+nÙ
+ 
+š
+ 
+£lf
+.
+b»akpošts
+:
+
+48 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("NØb»akpošˆm©chšg ID %s" % 
+id
+)
+
+49 
+vdebug
+.
+log
+.
+	`Log
+("Removšg b»akpošˆid %s" % 
+id
+)
+
+50 
+£lf
+.
+­i
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+51 
+dbg_id
+ = 
+£lf
+.
+b»akpošts
+[
+id
+].
+	$g‘_debugg”_id
+()
+
+52 
+dbg_id
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+53 
+£lf
+.
+­i
+.
+	$b»akpošt_»move
+(
+dbg_id
+)
+
+54 
+£lf
+.
+b»akpošts
+[
+id
+].
+	$Ú_»move
+()
+
+55 
+d–
+ 
+£lf
+.
+b»akpošts
+[
+id
+]
+
+57 
+def
+ 
+	$ş—r_b»akpošts
+(
+£lf
+):
+
+58 
+id
+ 
+š
+ 
+£lf
+.
+b»akpošts
+.
+	$keys
+():
+
+59 
+£lf
+.
+	$»move_b»akpošt_by_id
+(
+id
+)
+
+60 
+£lf
+.
+b»akpošts
+ = {
+	}
+}
+
+62 
+def
+ 
+	$fšd_b»akpošt
+(
+£lf
+,
+fe
+,
+lše
+):
+
+63 
+found
+ = 
+NÚe
+
+
+64 
+id
+, 
+bp
+ 
+š
+ 
+£lf
+.
+b»akpošts
+.
+	$™”™ems
+():
+
+65 
+bp
+.
+ty³
+ == "line":
+
+66 
+bp
+.
+	`g‘_fe
+(è=ğ
+fe
+ 
+ªd
+\
+
+67 
+bp
+.
+	`g‘_lše
+(è=ğ
+lše
+:
+
+68 
+found
+ = 
+bp
+.
+	$g‘_id
+()
+
+70  
+found
+
+
+72 
+def
+ 
+	$g‘_sÜ‹d_li¡
+(
+£lf
+):
+
+73 
+keys
+ = 
+£lf
+.
+b»akpošts
+.
+	$keys
+()
+
+74 
+keys
+.
+	$sÜt
+()
+
+75  
+	$m­
+(
+£lf
+.
+b»akpošts
+.
+g‘
+,
+keys
+)
+
+77 
+şass
+ 
+	$B»akpoštE¼Ü
+(
+Exû±iÚ
+):
+
+78 
+·ss
+
+
+80 
+şass
+ 
+B»akpošt
+:
+
+83 
+U£
+ 
+the
+ 
+şass
+ 
+m‘hod
+ 
+·r£
+ 
+to
+ 
+ü—‹
+ 
+a
+ 
+cÚü‘e
+ 
+subşass
+
+
+84 
+of
+ 
+a
+ 
+¥ecific
+ 
+ty³
+.
+
+86 
+ty³
+ = 
+NÚe
+
+
+87 
+id
+ = 11000
+
+88 
+dbg_id
+ = 
+NÚe
+
+
+90 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+):
+
+91 
+£lf
+.
+id
+ = 
+B»akpošt
+.id
+
+92 
+B»akpošt
+.
+id
+ += 1
+
+93 
+£lf
+.
+ui
+ = ui
+
+95 
+def
+ 
+	$g‘_id
+(
+£lf
+):
+
+96  
+£lf
+.
+id
+
+
+98 
+def
+ 
+	$£t_debugg”_id
+(
+£lf
+,
+dbg_id
+):
+
+99 
+£lf
+.
+dbg_id
+ = dbg_id
+
+101 
+def
+ 
+	$g‘_debugg”_id
+(
+£lf
+):
+
+102  
+£lf
+.
+dbg_id
+
+
+104 
+def
+ 
+	$Ú_add
+(
+£lf
+):
+
+105 
+£lf
+.
+ui
+.
+	$»gi¡”_b»akpošt
+(
+£lf
+)
+
+107 
+def
+ 
+	$Ú_»move
+(
+£lf
+):
+
+108 
+£lf
+.
+ui
+.
+	`»move_b»akpošt
+(self)
+
+110 @
+şassm‘hod
+
+
+111 
+def
+ 
+	$·r£
+(
+£lf
+,
+ui
+,
+¬gs
+):
+
+112 
+¬gs
+ 
+is
+ 
+NÚe
+:
+
+113 
+¬gs
+ = ""
+
+114 
+¬gs
+ =‡rgs.
+	$¡r
+()
+
+115 
+	`Ën
+(
+¬gs
+) == 0:
+
+117 
+row
+ = 
+ui
+.
+	$g‘_cu¼’t_row
+()
+
+118 
+Œy
+:
+
+119 
+fe
+ = 
+ui
+.
+	$g‘_cu¼’t_fe
+()
+
+120 
+lše
+ = 
+ui
+.
+	$g‘_cu¼’t_lše
+()
+
+121 
+	`Ën
+(
+lše
+.
+	`¡r
+()) == 0:
+
+122 
+¿i£
+ 
+	`B»akpoštE¼Ü
+('Cannot set‡ breakpoint ' +\
+
+124 
+exû±
+ 
+vdebug
+.
+ut
+.
+FeP©hE¼Ü
+:
+
+125 
+¿i£
+ 
+	`B»akpoštE¼Ü
+('No file, cannot set breakpoint')
+
+126  
+	$LšeB»akpošt
+(
+ui
+,
+fe
+,
+row
+)
+
+128 
+¬g_·¹s
+ = 
+¬gs
+.
+	`¥l™
+(' ')
+
+129 
+ty³
+ = 
+¬g_·¹s
+.
+	$pİ
+(0)
+
+130 
+ty³
+.
+	$low”
+()
+
+131 
+ty³
+ == 'conditional':
+
+132 
+row
+ = 
+ui
+.
+	$g‘_cu¼’t_row
+()
+
+133 
+fe
+ = 
+ui
+.
+	$g‘_cu¼’t_fe
+()
+
+134 
+	`Ën
+(
+¬g_·¹s
+) == 0:
+
+135 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Conditional breakpoints " +\
+
+137 
+cÚd
+ = " ".
+	$još
+(
+¬g_·¹s
+)
+
+138  
+	$CÚd™iÚ®B»akpošt
+(
+ui
+,
+fe
+,
+row
+,
+cÚd
+)
+
+139 
+–if
+ 
+ty³
+ == 'watch':
+
+140 
+	`Ën
+(
+¬g_·¹s
+) == 0:
+
+141 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Watch breakpoints " +\
+
+143 
+ex´
+ = " ".
+	$još
+(
+¬g_·¹s
+)
+
+144 
+vdebug
+.
+log
+.
+	`Log
+("Ex´essiÚ: %s"%
+ex´
+)
+
+145  
+	$W©chB»akpošt
+(
+ui
+,
+ex´
+)
+
+146 
+–if
+ 
+ty³
+ == 'exception':
+
+147 
+	`Ën
+(
+¬g_·¹s
+) == 0:
+
+148 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Exception breakpoints " +\
+
+150  
+	$Exû±iÚB»akpošt
+(
+ui
+,
+¬g_·¹s
+[0])
+
+151 
+–if
+ 
+ty³
+ == 'return':
+
+152 
+l
+ = 
+	$Ën
+(
+¬g_·¹s
+)
+
+153 
+l
+ == 0:
+
+154 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Return breakpoints " +\
+
+156  
+	$R‘uºB»akpošt
+(
+ui
+,
+¬g_·¹s
+[0])
+
+157 
+–if
+ 
+ty³
+ == 'call':
+
+158 
+l
+ = 
+	$Ën
+(
+¬g_·¹s
+)
+
+159 
+l
+ == 0:
+
+160 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Call breakpoints " +\
+
+162  
+	$C®lB»akpošt
+(
+ui
+,
+¬g_·¹s
+[0])
+
+164 
+¿i£
+ 
+	`B»akpoštE¼Ü
+("Unknown breakpointype, " +\
+
+168 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+169 
+·ss
+
+
+171 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+172  "% b»akpošt, id %i" %(
+£lf
+.
+ty³
+,£lf.
+id
+)
+
+174 
+şass
+ 
+	$LšeB»akpošt
+(
+B»akpošt
+):
+
+175 
+ty³
+ = "line"
+
+177 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+fe
+,
+lše
+):
+
+178 
+B»akpošt
+.
+	$__š™__
+(
+£lf
+,
+ui
+)
+
+179 
+£lf
+.
+fe
+ = file
+
+180 
+£lf
+.
+lše
+ =†ine
+
+182 
+def
+ 
+	$g‘_lše
+(
+£lf
+):
+
+183  
+£lf
+.
+lše
+
+
+185 
+def
+ 
+	$£t_lše
+(
+£lf
+,
+lše
+):
+
+186 
+£lf
+.
+lše
+ = (line)
+
+188 
+def
+ 
+	$g‘_fe
+(
+£lf
+):
+
+189  
+£lf
+.
+fe
+
+
+191 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+192 
+cmd
+ = "-ˆ" + 
+£lf
+.
+ty³
+
+
+193 
+cmd
+ +ğ" -à" + 
+£lf
+.
+fe
+.
+	$as_»mÙe
+()
+
+194 
+cmd
+ +ğ" -À" + 
+	$¡r
+(
+£lf
+.
+lše
+)
+
+195 
+cmd
+ += " -sƒnabled"
+
+197  
+cmd
+
+
+199 
+şass
+ 
+	$TempÜ¬yLšeB»akpošt
+(
+LšeB»akpošt
+):
+
+200 
+def
+ 
+	$Ú_add
+(
+£lf
+):
+
+201 
+·ss
+
+
+203 
+def
+ 
+	$Ú_»move
+(
+£lf
+):
+
+204 
+·ss
+
+
+206 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+207 
+cmd
+ = 
+LšeB»akpošt
+.
+	$g‘_cmd
+(
+£lf
+)
+
+208  
+cmd
+ + " -r 1"
+
+210 
+şass
+ 
+	$CÚd™iÚ®B»akpošt
+(
+LšeB»akpošt
+):
+
+211 
+ty³
+ = "conditional"
+
+213 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+fe
+,
+lše
+,
+cÚd™iÚ
+):
+
+214 
+LšeB»akpošt
+.
+	$__š™__
+(
+£lf
+,
+ui
+,
+fe
+,
+lše
+)
+
+215 
+£lf
+.
+cÚd™iÚ
+ = condition
+
+217 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+218 
+cmd
+ = 
+LšeB»akpošt
+.
+	$g‘_cmd
+(
+£lf
+)
+
+219 
+cmd
+ +ğ" -- " + 
+ba£64
+.
+	$’code¡ršg
+(
+£lf
+.
+cÚd™iÚ
+)
+
+220  
+cmd
+
+
+222 
+şass
+ 
+	$W©chB»akpošt
+(
+B»akpošt
+):
+
+223 
+ty³
+ = "watch"
+
+225 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+ex´
+):
+
+226 
+B»akpošt
+.
+	$__š™__
+(
+£lf
+,
+ui
+)
+
+227 
+£lf
+.
+ex´
+ =ƒxpr
+
+229 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+230 
+cmd
+ = "-ˆ" + 
+£lf
+.
+ty³
+
+
+231 
+cmd
+ +ğ" -- " + 
+ba£64
+.
+	$’code¡ršg
+(
+£lf
+.
+ex´
+)
+
+232  
+cmd
+
+
+235 
+şass
+ 
+	$Exû±iÚB»akpošt
+(
+B»akpošt
+):
+
+236 
+ty³
+ = "exception"
+
+238 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+exû±iÚ
+):
+
+239 
+B»akpošt
+.
+	$__š™__
+(
+£lf
+,
+ui
+)
+
+240 
+£lf
+.
+exû±iÚ
+ =ƒxception
+
+242 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+243 
+cmd
+ = "-ˆ" + 
+£lf
+.
+ty³
+
+
+244 
+cmd
+ +ğ" -x " + 
+£lf
+.
+exû±iÚ
+
+
+245 
+cmd
+ += " -sƒnabled"
+
+246  
+cmd
+
+
+248 
+şass
+ 
+	$C®lB»akpošt
+(
+B»akpošt
+):
+
+249 
+ty³
+ = "call"
+
+251 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+funùiÚ
+):
+
+252 
+B»akpošt
+.
+	$__š™__
+(
+£lf
+,
+ui
+)
+
+253 
+£lf
+.
+funùiÚ
+ = function
+
+255 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+256 
+cmd
+ = "-ˆ" + 
+£lf
+.
+ty³
+
+
+257 
+cmd
+ +ğ" -m %s" % 
+£lf
+.
+funùiÚ
+
+
+258 
+cmd
+ += " -sƒnabled"
+
+259  
+cmd
+
+
+261 
+şass
+ 
+	$R‘uºB»akpošt
+(
+C®lB»akpošt
+):
+
+262 
+ty³
+ = "return"
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\dbgp.py
+
+1 
+impÜt
+ 
+	gxml
+.
+	g‘»e
+.
+EËm’tT»e
+ 
+as
+ 
+ET
+
+
+2 
+impÜt
+ 
+sock‘
+
+
+3 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+4 
+impÜt
+ 
+ba£64
+
+
+5 
+impÜt
+ 
+	gtime
+
+
+9 
+şass
+ 
+	gRe¥Ú£
+:
+
+11 
+ns
+ = '{urn:debugger_protocol_v1}'
+
+13 
+def
+ 
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+,
+cmd
+,
+cmd_¬gs
+,
+­i
+):
+
+14 
+£lf
+.
+»¥Ú£
+ =„esponse
+
+15 
+£lf
+.
+cmd
+ = cmd
+
+16 
+£lf
+.
+cmd_¬gs
+ = cmd_args
+
+17 
+£lf
+.
+xml
+ = 
+NÚe
+
+
+18 
+£lf
+.
+­i
+ =‡pi
+
+19 "<”rÜ" 
+š
+ 
+£lf
+.
+»¥Ú£
+:
+
+20 
+£lf
+.
+	$__·r£_”rÜ
+()
+
+22 
+def
+ 
+	$__·r£_”rÜ
+(
+£lf
+):
+
+24 
+š
+ 
+the
+ 
+»¥Ú£
+, 
+th’
+ 
+¿i£
+ 
+™
+ 
+as
+ 
+a
+ 
+DBGPE¼Ü
+."""
+
+25 
+xml
+ = 
+£lf
+.
+	$as_xml
+()
+
+26 
+”r_–
+ = 
+xml
+.
+	`fšd
+('%£¼Ü' % 
+£lf
+.
+ns
+)
+
+27 
+”r_–
+ 
+is
+ 
+NÚe
+:
+
+28 
+¿i£
+ 
+	`DBGPE¼Ü
+("Could‚ot…arseƒrror from„eturn XML",1)
+
+30 
+code
+ = 
+”r_–
+.
+	`g‘
+("code")
+
+31 
+code
+ 
+is
+ 
+NÚe
+:
+
+32 
+¿i£
+ 
+	`Re¥Ú£E¼Ü
+(
+
+34 
+£lf
+.
+»¥Ú£
+)
+
+35 
+–if
+ (
+code
+) == 4:
+
+36 
+¿i£
+ 
+	`CmdNÙIm¶em’‹dE¼Ü
+('Command‚ot implemented')
+
+37 
+msg_–
+ = 
+”r_–
+.
+	`fšd
+('%smes§ge' % 
+£lf
+.
+ns
+)
+
+38 
+msg_–
+ 
+is
+ 
+NÚe
+:
+
+39 
+¿i£
+ 
+	`Re¥Ú£E¼Ü
+(
+
+41 
+£lf
+.
+»¥Ú£
+)
+
+42 
+¿i£
+ 
+	$DBGPE¼Ü
+(
+msg_–
+.
+‹xt
+,
+code
+)
+
+44 
+def
+ 
+	$g‘_cmd
+(
+£lf
+):
+
+46  
+£lf
+.
+cmd
+
+
+48 
+def
+ 
+	$g‘_cmd_¬gs
+(
+£lf
+):
+
+50  
+£lf
+.
+cmd_¬gs
+
+
+52 
+def
+ 
+	$as_¡ršg
+(
+£lf
+):
+
+55 
+Th”e
+ 
+is
+ 
+a
+ 
+__¡r__
+ 
+m‘hod
+, 
+which
+ 
+wl
+ 
+»nd”
+ 
+the
+
+
+56 
+whŞe
+ 
+objeù
+ 
+as
+ 
+a
+ 
+¡ršg
+ 
+ªd
+ 
+should
+ 
+be
+ 
+u£d
+ 
+
+57 
+di¥Ïyšg
+.
+
+59  
+£lf
+.
+»¥Ú£
+
+
+61 
+def
+ 
+	$as_xml
+(
+£lf
+):
+
+64 
+R‘uºs
+ 
+ª
+ 
+xml
+.
+‘»e
+.
+EËm’tT»e
+.
+EËm’t
+ 
+objeù
+.
+
+66 
+£lf
+.
+xml
+ =ğ
+NÚe
+:
+
+67 
+£lf
+.
+xml
+ = 
+ET
+.
+	$äom¡ršg
+(
+£lf
+.
+»¥Ú£
+)
+
+68 
+£lf
+.
+	$__d‘”mše_ns
+()
+
+69  
+£lf
+.
+xml
+
+
+71 
+def
+ 
+	$__d‘”mše_ns
+(
+£lf
+):
+
+72 
+g_»´
+ = 
+	$¡r
+(
+£lf
+.
+xml
+.
+g
+)
+
+73 
+g_»´
+[0] != '{':
+
+74 
+¿i£
+ 
+	`DBGPE¼Ü
+('Invalid or missing XML‚amespace',1)
+
+76 
+ns_·¹s
+ = 
+g_»´
+.
+	`¥l™
+('}')
+
+77 
+£lf
+.
+ns
+ = 
+ns_·¹s
+[0] + '}'
+
+79 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+80  
+£lf
+.
+	$as_¡ršg
+()
+
+82 
+şass
+ 
+	$CÚ‹xtNamesRe¥Ú£
+(
+Re¥Ú£
+):
+
+83 
+def
+ 
+	$Çmes
+(
+£lf
+):
+
+84 
+Çmes
+ = {
+	}
+}
+
+85 
+c
+ 
+š
+ 
+li¡
+(
+£lf
+.
+	$as_xml
+()):
+
+86 
+Çmes
+[(
+c
+.
+	`g‘
+('id'))] = c.get('name')
+
+87  
+Çmes
+
+
+89 
+şass
+ 
+	$StusRe¥Ú£
+(
+Re¥Ú£
+):
+
+92 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+93  
+£lf
+.
+	`as_xml
+().
+	`g‘
+('status')
+
+95 
+şass
+ 
+	$SckG‘Re¥Ú£
+(
+Re¥Ú£
+):
+
+98 
+def
+ 
+	$g‘_¡ack
+(
+£lf
+):
+
+99  
+	`li¡
+(
+£lf
+.
+	$as_xml
+())
+
+101 
+şass
+ 
+	$CÚ‹xtG‘Re¥Ú£
+(
+Re¥Ú£
+):
+
+104 
+The
+ 
+´İ”ty
+ 
+nodes
+ 
+¬e
+ 
+cÚv”‹d
+ 
+što
+ 
+CÚ‹xtPrİ”ty
+
+
+105 
+objeùs
+, 
+which
+ 
+¬e
+ 
+much
+ 
+—s›r
+ 
+to
+ 
+u£
+."""
+
+107 
+def
+ 
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+,
+cmd
+,
+cmd_¬gs
+,
+­i
+):
+
+108 
+Re¥Ú£
+.
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+,
+cmd
+,
+cmd_¬gs
+,
+­i
+)
+
+109 
+£lf
+.
+´İ”t›s
+ = []
+
+111 
+def
+ 
+	$g‘_cÚ‹xt
+(
+£lf
+):
+
+112 
+c
+ 
+š
+ 
+	`li¡
+(
+£lf
+.
+	$as_xml
+()):
+
+113 
+£lf
+.
+	`ü—‹_´İ”t›s
+(
+	$CÚ‹xtPrİ”ty
+(
+c
+))
+
+115  
+£lf
+.
+´İ”t›s
+
+
+117 
+def
+ 
+	$ü—‹_´İ”t›s
+(
+£lf
+,
+´İ”ty
+):
+
+118 
+£lf
+.
+´İ”t›s
+.
+	$­³nd
+(
+´İ”ty
+)
+
+119 
+p
+ 
+š
+ 
+´İ”ty
+.
+chd»n
+:
+
+120 
+£lf
+.
+	$ü—‹_´İ”t›s
+(
+p
+)
+
+122 
+şass
+ 
+	$Ev®Re¥Ú£
+(
+CÚ‹xtG‘Re¥Ú£
+):
+
+124 
+def
+ 
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+,
+cmd
+,
+cmd_¬gs
+,
+­i
+):
+
+125 
+Œy
+:
+
+126 
+CÚ‹xtG‘Re¥Ú£
+.
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+,
+cmd
+,
+cmd_¬gs
+,
+­i
+)
+
+127 
+exû±
+ 
+DBGPE¼Ü
+ 
+as
+ 
+e
+:
+
+128 (
+e
+.
+¬gs
+[1]) == 206:
+
+129 
+¿i£
+ 
+	$Ev®E¼Ü
+()
+
+131 
+¿i£
+ 
+e
+
+
+133 
+def
+ 
+	$g‘_cÚ‹xt
+(
+£lf
+):
+
+134 
+code
+ = 
+£lf
+.
+	$g‘_code
+()
+
+135 
+c
+ 
+š
+ 
+	`li¡
+(
+£lf
+.
+	$as_xml
+()):
+
+136 
+£lf
+.
+	`ü—‹_´İ”t›s
+(
+	$Ev®Prİ”ty
+(
+c
+,
+code
+,
+£lf
+.
+­i
+.
+Ïnguage
+))
+
+138  
+£lf
+.
+´İ”t›s
+
+
+140 
+def
+ 
+	$g‘_code
+(
+£lf
+):
+
+141 
+cmd
+ = 
+£lf
+.
+	$g‘_cmd_¬gs
+()
+
+142 
+·¹s
+ = 
+cmd
+.
+	`¥l™
+('-- ')
+
+143  
+ba£64
+.
+	$decode¡ršg
+(
+·¹s
+[1])
+
+146 
+şass
+ 
+	$B»akpoštS‘Re¥Ú£
+(
+Re¥Ú£
+):
+
+149 
+def
+ 
+	$g‘_id
+(
+£lf
+):
+
+150  (
+£lf
+.
+	`as_xml
+().
+	`g‘
+('id'))
+
+152 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+153  
+£lf
+.
+	`as_xml
+().
+	`g‘
+('id')
+
+155 
+şass
+ 
+	$F—tu»G‘Re¥Ú£
+(
+Re¥Ú£
+):
+
+158 
+def
+ 
+	$is_suµÜ‹d
+(
+£lf
+):
+
+160 
+xml
+ = 
+£lf
+.
+	$as_xml
+()
+
+161  (
+xml
+.
+	`g‘
+('supported'))
+
+163 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+164 
+£lf
+.
+	$is_suµÜ‹d
+():
+
+165 
+xml
+ = 
+£lf
+.
+	$as_xml
+()
+
+166  
+xml
+.
+‹xt
+
+
+170 
+şass
+ 
+Api
+:
+
+173 
+U£s
+ 
+a
+ 
+CÚÃùiÚ
+ 
+objeù
+ 
+to
+ 
+»ad
+ 
+ªd
+ 
+wr™e
+ 
+w™h
+ 
+the
+ 
+debugg”
+,
+
+174 
+ªd
+ 
+buds
+ 
+commªds
+‡nd 
+»tuºs
+ 
+the
+ 
+»suÉs
+.
+
+177 
+cÚn
+ = 
+NÚe
+
+
+178 
+ŒªsID
+ = 0
+
+180 
+def
+ 
+	$__š™__
+(
+£lf
+,
+cÚÃùiÚ
+):
+
+183 
+The
+ 
+CÚÃùiÚ
+ 
+objeù
+ 
+¥ecif›s
+ 
+the
+ 
+debugg”
+ 
+cÚÃùiÚ
+,
+
+184 
+ªd
+ 
+the
+ 
+PrÙocŞ
+ 
+´ovides
+ 
+a
+ 
+OO
+ 
+­i
+ 
+to
+ 
+š‹¿ùšg
+
+
+185 
+w™h
+ 
+™
+.
+
+187 
+cÚÃùiÚ
+ -- 
+The
+ 
+CÚÃùiÚ
+ 
+objeù
+ 
+to
+ 
+u£
+
+
+189 
+£lf
+.
+Ïnguage
+ = 
+NÚe
+
+
+190 
+£lf
+.
+´ÙocŞ
+ = 
+NÚe
+
+
+191 
+£lf
+.
+idekey
+ = 
+NÚe
+
+
+192 
+£lf
+.
+¡¬tfe
+ = 
+NÚe
+
+
+193 
+£lf
+.
+cÚn
+ = 
+cÚÃùiÚ
+
+
+194 
+£lf
+.
+cÚn
+.
+	`iscÚÃùed
+() == 0:
+
+195 
+£lf
+.
+cÚn
+.
+	$İ’
+()
+
+196 
+£lf
+.
+	`__·r£_š™_msg
+(£lf.
+cÚn
+.
+	$»cv_msg
+())
+
+198 
+def
+ 
+	$__·r£_š™_msg
+(
+£lf
+,
+msg
+):
+
+200 
+xml
+ = 
+ET
+.
+	$äom¡ršg
+(
+msg
+)
+
+201 
+£lf
+.
+Ïnguage
+ = 
+xml
+.
+	`g‘
+("language")
+
+202 
+£lf
+.
+Ïnguage
+ 
+is
+ 
+NÚe
+:
+
+203 
+¿i£
+ 
+	`Re¥Ú£E¼Ü
+(
+
+205 
+msg
+)
+
+206 
+£lf
+.
+Ïnguage
+ = s–f.Ïnguage.
+	$low”
+()
+
+207 
+£lf
+.
+idekey
+ = 
+xml
+.
+	`g‘
+("idekey")
+
+208 
+£lf
+.
+v”siÚ
+ = 
+xml
+.
+	`g‘
+("api_version")
+
+209 
+£lf
+.
+¡¬tfe
+ = 
+xml
+.
+	`g‘
+("fileuri")
+
+211 
+def
+ 
+	`£nd_cmd
+(
+£lf
+,
+cmd
+,
+¬gs
+ = '',
+
+212 
+»s_şs
+ = 
+Re¥Ú£
+):
+
+215 
+This
+ 
+m‘hod
+ 
+autom©iÿÎy
+ 
+adds
+ 
+a
+ 
+unique
+ 
+Œª§ùiÚ
+
+
+216 
+ID
+ 
+to
+ 
+the
+ 
+commªd
+ 
+which
+ 
+is
+ 
+»quœed
+ 
+by
+h
+debugg”
+.
+
+218 
+R‘uºs
+ 
+a
+ 
+Re¥Ú£
+ 
+objeù
+, 
+which
+ 
+cÚšs
+ 
+the
+
+
+219 
+»¥Ú£
+ 
+mes§ge
+ 
+ªd
+ 
+commªd
+.
+
+221 
+cmd
+ -- 
+the
+ 
+commªd
+ 
+Çme
+, 
+e
+.
+g
+. 'status'
+
+222 
+¬gs
+ -- 
+¬gum’ts
+ 
+the
+ 
+commªd
+, 
+which
+ 
+is
+ 
+İtiÚ®
+
+
+223 
+û¹aš
+ 
+	`commªds
+ ( '')
+
+225 
+¬gs
+ =‡rgs.
+	$¡r
+()
+
+226 
+£nd
+ = 
+cmd
+.
+	$¡r
+()
+
+227 
+£lf
+.
+ŒªsID
+ += 1
+
+228 
+£nd
+ +ğ' -˜'+ 
+	$¡r
+(
+£lf
+.
+ŒªsID
+)
+
+229 
+	`Ën
+(
+¬gs
+) > 0:
+
+230 
+£nd
+ +ğ' ' + 
+¬gs
+
+
+231 
+vdebug
+.
+log
+.
+	`Log
+("Commªd: "+
+£nd
+,\
+
+232 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+233 
+£lf
+.
+cÚn
+.
+	$£nd_msg
+(
+£nd
+)
+
+234 
+msg
+ = 
+£lf
+.
+cÚn
+.
+	$»cv_msg
+()
+
+235 
+vdebug
+.
+log
+.
+	`Log
+("Re¥Ú£: "+
+msg
+,\
+
+236 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+237  
+	$»s_şs
+(
+msg
+,
+cmd
+,
+¬gs
+,
+£lf
+)
+
+239 
+def
+ 
+	$¡©us
+(
+£lf
+):
+
+242 
+R‘uºs
+ 
+a
+ 
+Re¥Ú£
+ 
+objeù
+.
+
+244  
+£lf
+.
+	`£nd_cmd
+('¡©us','',
+StusRe¥Ú£
+)
+
+246 
+def
+ 
+	$ã©u»_g‘
+(
+£lf
+,
+Çme
+):
+
+249 
+S“
+ 
+the
+ 
+DBGP
+ 
+docum’tiÚ
+ 
+a
+ 
+li¡
+ 
+of
+ 
+ã©u»s
+.
+
+251 
+R‘uºs
+ 
+a
+ 
+F—tu»G‘Re¥Ú£
+ 
+objeù
+.
+
+253 
+Çme
+ --‚am
+of
+ 
+the
+ 
+ã©u»
+, 
+e
+.
+g
+. 
+’codšg
+
+
+255  
+£lf
+.
+	`£nd_cmd
+(
+
+257 '-À'+
+	`¡r
+(
+Çme
+),
+
+258 
+F—tu»G‘Re¥Ú£
+)
+
+260 
+def
+ 
+	$ã©u»_£t
+(
+£lf
+,
+Çme
+,
+v®ue
+):
+
+263 
+S“
+ 
+the
+ 
+DBGP
+ 
+docum’tiÚ
+ 
+a
+ 
+li¡
+ 
+of
+ 
+ã©u»s
+.
+
+265 
+R‘uºs
+ 
+a
+ 
+Re¥Ú£
+ 
+objeù
+.
+
+267 
+Çme
+ --‚am
+of
+ 
+the
+ 
+ã©u»
+, 
+e
+.
+g
+. 
+’codšg
+
+
+268 
+v®ue
+ -- 
+Ãw
+ v®u
+the
+ 
+ã©u»
+
+
+270  
+£lf
+.
+	`£nd_cmd
+(
+
+272 '-À' + 
+	`¡r
+(
+Çme
+è+ ' -v ' + 
+	$¡r
+(
+v®ue
+))
+
+274 
+def
+ 
+	$run
+(
+£lf
+):
+
+276 
+executiÚ
+."""
+
+277  
+£lf
+.
+	`£nd_cmd
+('run','',
+StusRe¥Ú£
+)
+
+279 
+def
+ 
+	$ev®
+(
+£lf
+,
+code
+):
+
+281 
+executiÚ
+."""
+
+282 
+code_’c
+ = 
+ba£64
+.
+	$’code¡ršg
+(
+code
+)
+
+283 
+¬gs
+ = '-- %s' % 
+code_’c
+
+
+286 
+£lf
+.
+Ïnguage
+ == 'python':
+
+287 
+¬gs
+ = ("-È%˜" % 
+	`Ën
+(
+code_’c
+) ) +‡rgs"""
+
+289  
+£lf
+.
+	`£nd_cmd
+('ev®',
+¬gs
+,
+Ev®Re¥Ú£
+)
+
+291 
+def
+ 
+	$¡•_što
+(
+£lf
+):
+
+293 
+¡©em’t
+.
+
+295 
+If
+ 
+th”e
+'s‡ function call,he debuggerƒngine
+
+296 
+wl
+  
+Ú
+ 
+the
+ 
+fœ¡
+ 
+¡©em’t
+ 
+š
+h
+funùiÚ
+.
+
+298  
+£lf
+.
+	`£nd_cmd
+('¡•_što','',
+StusRe¥Ú£
+)
+
+300 
+def
+ 
+	$¡•_ov”
+(
+£lf
+):
+
+302 
+¡©em’t
+.
+
+304 
+If
+ 
+th”e
+'s‡ function call,he debuggerƒngine
+
+305 
+wl
+ 
+¡İ
+ 
+©
+ 
+the
+ 
+Ãxt
+ 
+¡©em’t
+ 
+aá”
+h
+funùiÚ
+ 
+ÿÎ
+.
+
+307  
+£lf
+.
+	`£nd_cmd
+('¡•_ov”','',
+StusRe¥Ú£
+)
+
+309 
+def
+ 
+	$¡•_out
+(
+£lf
+):
+
+312 
+The
+ 
+debugg”
+ 
+wl
+ 
+¡•
+ 
+out
+ 
+of
+ 
+the
+ 
+cu¼’t
+ 
+scİe
+.
+
+314  
+£lf
+.
+	`£nd_cmd
+('¡•_out','',
+StusRe¥Ú£
+)
+
+316 
+def
+ 
+	$¡İ
+(
+£lf
+):
+
+319 
+The
+ 
+süt
+ 
+is
+ 
+‹rmš©ed
+ 
+immedŸ‹ly
+."""
+
+320  
+£lf
+.
+	`£nd_cmd
+('¡İ','',
+StusRe¥Ú£
+)
+
+322 
+def
+ 
+	$¡ack_g‘
+(
+£lf
+):
+
+325  
+£lf
+.
+	`£nd_cmd
+('¡ack_g‘','',
+SckG‘Re¥Ú£
+)
+
+327 
+def
+ 
+	$cÚ‹xt_g‘
+(
+£lf
+,
+cÚ‹xt
+ = 0):
+
+330  
+£lf
+.
+	`£nd_cmd
+('context_get',\
+
+331 '-ø%i' % (
+cÚ‹xt
+),\
+
+332 
+CÚ‹xtG‘Re¥Ú£
+)
+
+334 
+def
+ 
+	$cÚ‹xt_Çmes
+(
+£lf
+):
+
+337  
+£lf
+.
+	`£nd_cmd
+('cÚ‹xt_Çmes','',
+CÚ‹xtNamesRe¥Ú£
+)
+
+339 
+def
+ 
+	$´İ”ty_g‘
+(
+£lf
+,
+Çme
+):
+
+342  
+£lf
+.
+	`£nd_cmd
+('´İ”ty_g‘','-À% -d 0' % 
+Çme
+,
+CÚ‹xtG‘Re¥Ú£
+)
+
+344 
+def
+ 
+	$d‘ach
+(
+£lf
+):
+
+346 
+ş›Á
+.
+
+348 
+The
+ 
+süt
+ 
+is
+ 
+nÙ
+ 
+‹rmš©ed
+, 
+but
+ 
+runs
+ 
+as
+ 
+nÜm®
+
+
+349 
+äom
+ 
+this
+ 
+pošt
+."""
+
+350 
+»t
+ = 
+£lf
+.
+	`£nd_cmd
+('d‘ach','',
+StusRe¥Ú£
+)
+
+351 
+£lf
+.
+cÚn
+.
+	$şo£
+()
+
+352  
+»t
+
+
+354 
+def
+ 
+	$b»akpošt_£t
+(
+£lf
+,
+cmd_¬gs
+):
+
+357 
+The
+ 
+b»akpošt
+ 
+ty³
+ 
+is
+ 
+defšed
+ 
+by
+ 
+the
+ 
+¬gum’ts
+, 
+£e
+he
+
+358 
+B»akpošt
+ 
+şass
+ 
+mÜe
+ 
+d‘a
+."""
+
+359  
+£lf
+.
+	`£nd_cmd
+('b»akpošt_£t',
+cmd_¬gs
+,\
+
+360 
+B»akpoštS‘Re¥Ú£
+)
+
+362 
+def
+ 
+	$b»akpošt_li¡
+(
+£lf
+):
+
+363  
+£lf
+.
+	`£nd_cmd
+('breakpoint_list')
+
+365 
+def
+ 
+	$b»akpošt_»move
+(
+£lf
+,
+id
+):
+
+368 
+The
+ 
+ID
+ 
+is
+ 
+th©
+ 
+»tuºed
+ 
+š
+ 
+the
+ 
+»¥Ú£
+ 
+äom
+ 
+b»akpošt_£t
+."""
+
+369  
+£lf
+.
+	`£nd_cmd
+('b»akpošt_»move','-d %i' % 
+id
+,
+Re¥Ú£
+)
+
+372 
+b‘w“n
+ 
+this
+ 
+ş›Á
+ 
+ªd
+ 
+the
+ 
+debugg”
+."""
+
+374 
+şass
+ 
+CÚÃùiÚ
+:
+
+377 
+The
+ 
+ho¡
+, 
+pÜt
+ 
+ªd
+ 
+sock‘
+ 
+timeout
+ 
+¬e
+ 
+cÚfigu¿bË
+ 
+Ú
+ 
+objeù
+ 
+cÚ¡ruùiÚ
+.
+
+380 
+sock
+ = 
+NÚe
+
+
+381 
+add»ss
+ = 
+NÚe
+
+
+382 
+iscÚÃd
+ = 0
+
+384 
+def
+ 
+	`__š™__
+(
+£lf
+, 
+ho¡
+ = '', 
+pÜt
+ = 9000, 
+timeout
+ = 30, 
+šput_¡»am
+ = 
+NÚe
+, 
+pydbgp
+=None):
+
+387 
+The
+ 
+cÚÃùiÚ
+ 
+is
+ 
+nÙ
+ 
+e¡ablished
+ 
+uÁ
+ 
+	$İ’
+(è
+is
+ 
+ÿÎed
+.
+
+389 
+ho¡
+ -- ho¡ 
+Çme
+ 
+wh”e
+ 
+debugg”
+ 
+is
+ 
+	`ruÂšg
+ ( '')
+
+390 
+pÜt
+ --…Üˆ
+numb”
+ 
+which
+ 
+debugg”
+ 
+is
+ 
+li¡’šg
+ 
+	$Ú
+ ( 9000)
+
+391 
+timeout
+ -- 
+time
+ 
+š
+ 
+£cÚds
+ 
+to
+ 
+wa™
+ 
+a
+ 
+debugg”
+ 
+cÚÃùiÚ
+ 
+befÜe
+ 
+givšg
+ 
+	$up
+ ( 30)
+
+392 
+šput_¡»am
+ -- 
+objeù
+ 
+checkšg
+ 
+šput
+ 
+¡»am
+ 
+ªd
+ 
+u£r
+ 
+	`š‹¼u±s
+ ( 
+NÚe
+)
+
+394 
+£lf
+.
+pÜt
+ =…ort
+
+395 
+£lf
+.
+ho¡
+ = host
+
+396 
+£lf
+.
+timeout
+ =imeout
+
+397 
+£lf
+.
+šput_¡»am
+ = input_stream
+
+398 
+£lf
+.
+pydbgp
+ =…ydbgp
+
+400 
+def
+ 
+	$__d–__
+(
+£lf
+):
+
+402 
+£lf
+.
+	$şo£
+()
+
+404 
+def
+ 
+	$iscÚÃùed
+(
+£lf
+):
+
+406  
+£lf
+.
+iscÚÃd
+
+
+409 
+def
+ 
+	$İ’
+(
+£lf
+):
+
+411 
+cÚÃùiÚ
+ 
+is
+ 
+hªdËd
+ 
+by
+ 
+£lf
+.
+	`li¡’
+()."""
+
+412 
+´št
+ 'Wa™šg fÜ‡ cÚÃùiÚ (CŒl-CØÿnûl,hi mes§gwÈ£lf-de¡ruù iÀ',
+£lf
+.
+timeout
+,' seconds...)'
+
+413 
+£rv
+ = 
+sock‘
+.
+	$sock‘
+(
+sock‘
+.
+AF_INET
+, sock‘.
+SOCK_STREAM
+)
+
+414 
+Œy
+:
+
+415 
+£rv
+.
+	$£tsockİt
+(
+sock‘
+.
+SOL_SOCKET
+, sock‘.
+SO_REUSEADDR
+, 1)
+
+418 
+£rv
+.
+	$£tblockšg
+(0)
+
+419 
+£rv
+.
+	`bšd
+((
+£lf
+.
+ho¡
+, s–f.
+pÜt
+))
+
+420 
+£rv
+.
+	$li¡’
+(5)
+
+421 (
+£lf
+.
+sock
+, s–f.
+add»ss
+èğ£lf.
+	$li¡’
+(
+£rv
+, 
+£lf
+.
+timeout
+)
+
+422 
+£lf
+.
+sock
+.
+	$£‰imeout
+(
+NÚe
+)
+
+424 
+exû±
+ 
+sock‘
+.
+timeout
+:
+
+425 
+£rv
+.
+	$şo£
+()
+
+426 
+¿i£
+ 
+	`TimeoutE¼Ü
+("Timeout waiting for connection")
+
+427 
+exû±
+:
+
+428 
+£rv
+.
+	$şo£
+()
+
+429 
+¿i£
+
+
+431 
+£lf
+.
+iscÚÃd
+ = 1
+
+432 
+£rv
+.
+	$şo£
+()
+
+434 
+def
+ 
+	$li¡’
+(
+£lf
+, 
+£rv
+, 
+timeout
+):
+
+436 
+the
+ 
+u£r
+. 
+AÉhough
+ 
+™
+'s‚on-blocking,he user interface will still
+
+437 
+block
+ 
+uÁ
+ 
+the
+ 
+timeout
+ 
+is
+ 
+»ached
+.
+
+439 
+£rv
+ -- 
+Sock‘
+ 
+£rv”
+ 
+to
+ 
+li¡’
+o.
+
+440 
+timeout
+ -- 
+SecÚds
+ 
+befÜe
+imeout.
+
+442 
+¡¬t
+ = 
+time
+.
+	$time
+()
+
+443 
+True
+:
+
+444 ià(
+time
+.
+	`time
+(è- 
+¡¬t
+è> 
+timeout
+:
+
+445 
+¿i£
+ 
+sock‘
+.
+timeout
+
+
+446 
+Œy
+:
+
+449 
+£lf
+.
+šput_¡»am
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+450 
+£lf
+.
+šput_¡»am
+.
+	$´obe
+()
+
+452 
+time
+.
+	$¦“p
+(1)
+
+454  
+£rv
+.
+	$acû±
+()
+
+455 
+exû±
+ 
+sock‘
+.
+”rÜ
+:
+
+456 
+·ss
+
+
+458 
+def
+ 
+	$şo£
+(
+£lf
+):
+
+460 
+£lf
+.
+sock
+ !ğ
+NÚe
+:
+
+461 
+vdebug
+.
+log
+.
+	`Log
+("Closinghe socket",\
+
+462 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+463 
+£lf
+.
+sock
+.
+	$şo£
+()
+
+464 
+£lf
+.
+sock
+ = 
+NÚe
+
+
+465 
+£lf
+.
+iscÚÃd
+ = 0
+
+467 
+def
+ 
+	$__»cv_Ëngth
+(
+£lf
+):
+
+469 
+Ëngth
+ = ''
+
+471 
+c
+ = 
+£lf
+.
+sock
+.
+	$»cv
+(1)
+
+472 
+c
+ == '':
+
+473 
+£lf
+.
+	$şo£
+()
+
+474 
+¿i£
+ 
+	`EOFE¼Ü
+('Socket Closed')
+
+475 
+c
+ == '\0':
+
+476  (
+Ëngth
+)
+
+477 
+c
+.
+	$isdig™
+():
+
+478 
+Ëngth
+ =†’gth + 
+c
+
+
+480 
+def
+ 
+	$__»cv_nuÎ
+(
+£lf
+):
+
+483 
+c
+ = 
+£lf
+.
+sock
+.
+	$»cv
+(1)
+
+484 
+c
+ == '':
+
+485 
+£lf
+.
+	$şo£
+()
+
+486 
+¿i£
+ 
+	`EOFE¼Ü
+('Socket Closed')
+
+487 
+c
+ == '\0':
+
+490 
+def
+ 
+	$__»cv_body
+(
+£lf
+, 
+to_»cv
+):
+
+493 
+to_»cv
+ -- 
+Ëngth
+ 
+of
+ 
+the
+ 
+mes§ge
+ 
+to
+ 
+»ûive
+
+
+495 
+body
+ = ''
+
+496 
+to_»cv
+ > 0:
+
+497 
+buf
+ = 
+£lf
+.
+sock
+.
+	$»cv
+(
+to_»cv
+)
+
+498 
+buf
+ == '':
+
+499 
+£lf
+.
+	$şo£
+()
+
+500 
+¿i£
+ 
+	`EOFE¼Ü
+('Socket Closed')
+
+501 
+to_»cv
+ -ğ
+	$Ën
+(
+buf
+)
+
+502 
+body
+ = body + 
+buf
+
+
+503  
+body
+
+
+505 
+def
+ 
+	$»cv_msg
+(
+£lf
+):
+
+508 
+R‘uºs
+ 
+a
+ 
+¡ršg
+, 
+which
+ 
+is
+ 
+ex³ùed
+ 
+to
+ 
+be
+ 
+XML
+.
+
+510 
+Ëngth
+ = 
+£lf
+.
+	$__»cv_Ëngth
+()
+
+511 
+body
+ = 
+£lf
+.
+	$__»cv_body
+(
+Ëngth
+)
+
+512 
+£lf
+.
+	$__»cv_nuÎ
+()
+
+513  
+body
+
+
+515 
+def
+ 
+	$£nd_msg
+(
+£lf
+, 
+cmd
+):
+
+518 
+cmd
+ -- 
+commªd
+ 
+to
+ 
+£nd
+
+
+520 
+£lf
+.
+sock
+.
+	`£nd
+(
+cmd
+ + '\0')
+
+522 
+şass
+ 
+CÚ‹xtPrİ”ty
+:
+
+524 
+ns
+ = '{urn:debugger_protocol_v1}'
+
+526 
+def
+ 
+	$__š™__
+(
+£lf
+,
+node
+,
+·»Á
+ = 
+NÚe
+,
+d•th
+ = 0):
+
+527 
+£lf
+.
+·»Á
+ =…arent
+
+528 
+£lf
+.
+	$__d‘”mše_ty³
+(
+node
+)
+
+529 
+£lf
+.
+	$_d‘”mše_di¥ÏyÇme
+(
+node
+)
+
+530 
+£lf
+.
+’codšg
+ = 
+node
+.
+	`g‘
+('encoding')
+
+531 
+£lf
+.
+d•th
+ = depth
+
+533 
+£lf
+.
+size
+ = 
+node
+.
+	`g‘
+('size')
+
+534 
+£lf
+.
+v®ue
+ = ""
+
+535 
+£lf
+.
+is_Ï¡_chd
+ = 
+F®£
+
+
+537 
+£lf
+.
+	$_d‘”mše_chd»n
+(
+node
+)
+
+538 
+£lf
+.
+	$__d‘”mše_v®ue
+(
+node
+)
+
+539 
+£lf
+.
+	$__š™_chd»n
+(
+node
+)
+
+540 
+£lf
+.
+ty³
+ == 'scalar':
+
+541 
+£lf
+.
+size
+ = 
+	`Ën
+(£lf.
+v®ue
+) - 2
+
+543 
+def
+ 
+	$__d‘”mše_v®ue
+(
+£lf
+,
+node
+):
+
+544 
+£lf
+.
+has_chd»n
+:
+
+545 
+£lf
+.
+v®ue
+ = ""
+
+548 
+£lf
+.
+v®ue
+ = s–f.
+	`_g‘_’c_node_‹xt
+(
+node
+,'value')
+
+549 
+£lf
+.
+v®ue
+ 
+is
+ 
+NÚe
+:
+
+550 
+£lf
+.
+’codšg
+ == 'base64':
+
+551 
+node
+.
+‹xt
+ 
+is
+ 
+NÚe
+:
+
+552 
+£lf
+.
+v®ue
+ = ""
+
+554 
+£lf
+.
+v®ue
+ = 
+ba£64
+.
+	$decode¡ršg
+(
+node
+.
+‹xt
+)
+
+555 
+–if
+ 
+nÙ
+ 
+£lf
+.
+	`is_unš™Ÿlized
+() \
+
+556 
+ªd
+ 
+nÙ
+ 
+£lf
+.
+has_chd»n
+:
+
+557 
+£lf
+.
+v®ue
+ = 
+node
+.
+‹xt
+
+
+559 
+£lf
+.
+v®ue
+ 
+is
+ 
+NÚe
+:
+
+560 
+£lf
+.
+v®ue
+ = ""
+
+562 
+£lf
+.
+num_üs
+ = s–f.
+v®ue
+.
+	`couÁ
+('\n')
+
+563 
+£lf
+.
+ty³
+.
+	$low”
+(è
+	`š
+ ("string","str","scalar"):
+
+564 
+£lf
+.
+v®ue
+ = '`%s`' % s–f.v®ue.
+	`»¶aû
+('`','\\`')
+
+566 
+def
+ 
+	$__d‘”mše_ty³
+(
+£lf
+,
+node
+):
+
+567 
+ty³
+ = 
+node
+.
+	`g‘
+('classname')
+
+568 
+ty³
+ 
+is
+ 
+NÚe
+:
+
+569 
+ty³
+ = 
+node
+.
+	`g‘
+('type')
+
+570 
+ty³
+ 
+is
+ 
+NÚe
+:
+
+571 
+ty³
+ = 'unknown'
+
+572 
+£lf
+.
+ty³
+ =ype
+
+574 
+def
+ 
+	$_d‘”mše_di¥ÏyÇme
+(
+£lf
+,
+node
+):
+
+575 
+di¥Ïy_Çme
+ = 
+node
+.
+	`g‘
+('fullname')
+
+576 
+di¥Ïy_Çme
+ =ğ
+NÚe
+:
+
+577 
+di¥Ïy_Çme
+ = 
+£lf
+.
+	`_g‘_’c_node_‹xt
+(
+node
+,'fullname',"")
+
+578 
+di¥Ïy_Çme
+ == '::':
+
+579 
+di¥Ïy_Çme
+ = 
+£lf
+.
+ty³
+
+
+580 
+£lf
+.
+di¥Ïy_Çme
+ = display_name
+
+582 
+def
+ 
+	$_g‘_’c_node_‹xt
+(
+£lf
+,
+node
+,
+Çme
+, =
+
+583 
+NÚe
+):
+
+584 
+n
+ = 
+node
+.
+	`fšd
+('%s%s' %(
+£lf
+.
+ns
+, 
+Çme
+))
+
+585 
+n
+ 
+is
+ 
+nÙ
+ 
+NÚe
+ 
+ªd
+‚.
+‹xt
+ is‚ot None:
+
+586 
+n
+.
+	`g‘
+('encoding') == 'base64':
+
+587 
+v®
+ = 
+ba£64
+.
+	$decode¡ršg
+(
+n
+.
+‹xt
+)
+
+589 
+v®
+ = 
+n
+.
+‹xt
+
+
+591 
+v®
+ = 
+NÚe
+
+
+592 
+v®
+ 
+is
+ 
+NÚe
+:
+
+595  
+v®
+
+
+597 
+def
+ 
+	$_d‘”mše_chd»n
+(
+£lf
+,
+node
+):
+
+598 
+chd»n
+ = 
+node
+.
+	`g‘
+('numchildren')
+
+599 
+chd»n
+ 
+is
+ 
+NÚe
+:
+
+600 
+chd»n
+ = 
+node
+.
+	`g‘
+('children')
+
+601 
+chd»n
+ 
+is
+ 
+NÚe
+:
+
+602 
+chd»n
+ = 0
+
+604 
+chd»n
+ = (children)
+
+605 
+£lf
+.
+num_deş¬ed_chd»n
+ = 
+chd»n
+
+
+606 
+£lf
+.
+has_chd»n
+ = 
+True
+ 
+chd»n
+ > 0 
+F®£
+
+
+607 
+£lf
+.
+chd»n
+ = []
+
+609 
+def
+ 
+	$__š™_chd»n
+(
+£lf
+,
+node
+):
+
+610 
+£lf
+.
+has_chd»n
+:
+
+611 
+idx
+ = 0
+
+612 
+gÇme
+ = '%¥rİ”ty' % 
+£lf
+.
+ns
+
+
+613 
+chd»n
+ = 
+	$li¡
+(
+node
+)
+
+614 
+chd»n
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+615 
+c
+ 
+š
+ 
+chd»n
+:
+
+616 
+c
+.
+g
+ =ğ
+gÇme
+:
+
+617 
+idx
+ += 1
+
+618 
+p
+ = 
+£lf
+.
+	`_ü—‹_chd
+(
+c
+,£lf,£lf.
+d•th
++1)
+
+619 
+£lf
+.
+chd»n
+.
+	$­³nd
+(
+p
+)
+
+620 
+idx
+ =ğ
+£lf
+.
+num_deş¬ed_chd»n
+:
+
+621 
+p
+.
+	$m¬k_as_Ï¡_chd
+()
+
+623 
+def
+ 
+	$_ü—‹_chd
+(
+£lf
+,
+node
+,
+·»Á
+,
+d•th
+):
+
+624  
+	$CÚ‹xtPrİ”ty
+(
+node
+,
+·»Á
+,
+d•th
+)
+
+626 
+def
+ 
+	$m¬k_as_Ï¡_chd
+(
+£lf
+):
+
+627 
+£lf
+.
+is_Ï¡_chd
+ = 
+True
+
+
+629 
+def
+ 
+	$is_unš™Ÿlized
+(
+£lf
+):
+
+630 
+£lf
+.
+ty³
+ == 'uninitialized':
+
+631  
+True
+
+
+633  
+F®£
+
+
+635 
+def
+ 
+	$chd_couÁ
+(
+£lf
+):
+
+636  
+	$Ën
+(
+£lf
+.
+chd»n
+)
+
+638 
+def
+ 
+	$ty³_ªd_size
+(
+£lf
+):
+
+639 
+size
+ = 
+NÚe
+
+
+640 
+£lf
+.
+has_chd»n
+:
+
+641 
+size
+ = 
+£lf
+.
+num_deş¬ed_chd»n
+
+
+642 
+–if
+ 
+£lf
+.
+size
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+643 
+size
+ = 
+£lf
+.size
+
+645 
+size
+ 
+is
+ 
+NÚe
+:
+
+646  
+£lf
+.
+ty³
+
+
+648  "% [%s]" %(
+£lf
+.
+ty³
+,
+size
+)
+
+650 
+şass
+ 
+	$Ev®Prİ”ty
+(
+CÚ‹xtPrİ”ty
+):
+
+651 
+def
+ 
+	$__š™__
+(
+£lf
+,
+node
+,
+code
+,
+Ïnguage
+,
+·»Á
+=
+NÚe
+,
+d•th
+=0):
+
+652 
+£lf
+.
+code
+ = code
+
+653 
+£lf
+.
+Ïnguage
+ =†ªguage.
+	$low”
+()
+
+654 
+·»Á
+ 
+is
+ 
+NÚe
+:
+
+655 
+£lf
+.
+is_·»Á
+ = 
+True
+
+
+657 
+£lf
+.
+is_·»Á
+ = 
+F®£
+
+
+658 
+CÚ‹xtPrİ”ty
+.
+	$__š™__
+(
+£lf
+,
+node
+,
+·»Á
+,
+d•th
+)
+
+660 
+def
+ 
+	$_ü—‹_chd
+(
+£lf
+,
+node
+,
+·»Á
+,
+d•th
+):
+
+661  
+	$Ev®Prİ”ty
+(
+node
+,
+£lf
+.
+code
+,£lf.
+Ïnguage
+,
+·»Á
+,
+d•th
+)
+
+663 
+def
+ 
+	$_d‘”mše_di¥ÏyÇme
+(
+£lf
+,
+node
+):
+
+664 
+£lf
+.
+is_·»Á
+:
+
+665 
+£lf
+.
+di¥Ïy_Çme
+ = s–f.
+code
+
+
+667 
+£lf
+.
+Ïnguage
+ =ğ'php' 
+Ü
+ \
+
+668 
+£lf
+.
+Ïnguage
+ == 'perl':
+
+669 
+£lf
+.
+·»Á
+.
+ty³
+ == 'array':
+
+670 
+£lf
+.
+di¥Ïy_Çme
+ = s–f.
+·»Á
+.display_name + \
+
+671 "['%s']" % 
+node
+.
+	`g‘
+('name')
+
+673 
+£lf
+.
+di¥Ïy_Çme
+ = s–f.
+·»Á
+.display_name + \
+
+674 "->"+
+node
+.
+	`g‘
+('name')
+
+676 
+Çme
+ = 
+node
+.
+	`g‘
+('name')
+
+677 
+Çme
+ 
+is
+ 
+NÚe
+:
+
+678 
+Çme
+ = "?"
+
+679 
+Çme
+ = 
+£lf
+.
+	`_g‘_’c_node_‹xt
+(
+node
+,'name','?')
+
+680 
+£lf
+.
+·»Á
+.
+ty³
+ == 'list':
+
+681 
+£lf
+.
+di¥Ïy_Çme
+ = s–f.
+·»Á
+.di¥Ïy_Çm+ 
+Çme
+
+
+683 
+£lf
+.
+di¥Ïy_Çme
+ = s–f.
+·»Á
+.display_name + \
+
+684 "." + 
+Çme
+
+
+688 
+şass
+ 
+	$TimeoutE¼Ü
+(
+Exû±iÚ
+):
+
+689 
+·ss
+
+
+691 
+şass
+ 
+	$DBGPE¼Ü
+(
+Exû±iÚ
+):
+
+693 
+·ss
+
+
+695 
+şass
+ 
+	$CmdNÙIm¶em’‹dE¼Ü
+(
+Exû±iÚ
+):
+
+697 
+·ss
+
+
+699 
+şass
+ 
+	$Ev®E¼Ü
+(
+Exû±iÚ
+):
+
+701 
+·ss
+
+
+703 
+şass
+ 
+	$Re¥Ú£E¼Ü
+(
+Exû±iÚ
+):
+
+705 
+	`debugg”
+ (
+e
+.
+g
+. 
+šv®id
+ 
+fÜm©
+ 
+XML
+)."""
+
+706 
+·ss
+
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\event.py
+
+1 #codšg=
+utf
+-8
+
+2 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+3 
+impÜt
+ 
+	gvdebug
+.
+İts
+
+
+4 
+impÜt
+ 
+vim
+
+
+5 
+impÜt
+ 
+»
+
+
+7 
+şass
+ 
+	gDi¥©ch”
+:
+
+8 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ruÂ”
+):
+
+9 
+£lf
+.
+ruÂ”
+ =„unner
+
+11 
+def
+ 
+	$visu®_ev®
+(
+£lf
+):
+
+12 
+£lf
+.
+ruÂ”
+.
+	$is_®ive
+():
+
+13 
+ev’t
+ = 
+	$Visu®Ev®Ev’t
+()
+
+14  
+ev’t
+.
+	$execu‹
+(
+£lf
+.
+ruÂ”
+)
+
+16 
+def
+ 
+	$ev®_und”_cursÜ
+(
+£lf
+):
+
+17 
+£lf
+.
+ruÂ”
+.
+	$is_®ive
+():
+
+18 
+ev’t
+ = 
+	$CursÜEv®Ev’t
+()
+
+19  
+ev’t
+.
+	$execu‹
+(
+£lf
+.
+ruÂ”
+)
+
+21 
+def
+ 
+	$by_pos™iÚ
+(
+£lf
+):
+
+22 
+£lf
+.
+ruÂ”
+.
+	$is_®ive
+():
+
+23 
+ev’t
+ = 
+£lf
+.
+	$_g‘_ev’t_by_pos™iÚ
+()
+
+24 
+ev’t
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+25  
+ev’t
+.
+	$execu‹
+(
+£lf
+.
+ruÂ”
+)
+
+27 
+vdebug
+.
+log
+.
+	`Log
+("Noƒxecutableƒvent found‡t current cursor…osition",\
+
+28 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+29  
+F®£
+
+
+31 
+def
+ 
+	$_g‘_ev’t_by_pos™iÚ
+(
+£lf
+):
+
+32 
+buf_Çme
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+.
+Çme
+
+
+33 
+p
+ = 
+»
+.
+	`compe
+('.*[\\\/]([^\\\/]+)')
+
+34 
+m
+ = 
+p
+.
+	$m©ch
+(
+buf_Çme
+)
+
+35 
+m
+ 
+is
+ 
+NÚe
+:
+
+36  
+NÚe
+
+
+38 
+wšdow_Çme
+ = 
+m
+.
+	$group
+(1)
+
+39 
+wšdow_Çme
+ =ğ
+£lf
+.
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+Çme
+:
+
+40 
+lš’o
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+41 
+vdebug
+.
+log
+.
+	`Log
+("U£¸aùiÚ iÀw©ch wšdow,†š%s" % 
+lš’o
+,\
+
+42 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+43 
+lše
+ = 
+£lf
+.
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+bufãr
+[
+lš’o
+-1].
+	$¡r
+()
+
+44 
+lš’o
+ == 1:
+
+45  
+	$W©chWšdowCÚ‹xtChªgeEv’t
+()
+
+46 
+–if
+ 
+lše
+.
+	`¡¬tsw™h
+(
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_closed_tree')):
+
+47  
+	$W©chWšdowPrİ”tyG‘Ev’t
+()
+
+48 
+–if
+ 
+lše
+.
+	`¡¬tsw™h
+(
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_open_tree')):
+
+49  
+	$W©chWšdowHideEv’t
+()
+
+50 
+–if
+ 
+wšdow_Çme
+ =ğ
+£lf
+.
+ruÂ”
+.
+ui
+.
+¡ackwš
+.
+Çme
+:
+
+51  
+	$SckWšdowLšeS–eùEv’t
+()
+
+53 
+şass
+ 
+Ev’t
+:
+
+56 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+57 
+·ss
+
+
+59 
+şass
+ 
+	$Visu®Ev®Ev’t
+(
+Ev’t
+):
+
+62 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+63 
+£ËùiÚ
+ = 
+vim
+.
+	`ev®
+("vdebug:get_visual_selection()")
+
+64 
+ruÂ”
+.
+	$ev®
+(
+£ËùiÚ
+)
+
+65  
+True
+
+
+67 
+şass
+ 
+	$CursÜEv®Ev’t
+(
+Ev’t
+):
+
+70 
+ch¬_»gex
+ = {
+
+75 
+	}
+}
+
+77 
+v¬_»gex
+ = {
+
+84 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+85 
+lš’o
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+86 
+cŞno
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[1]
+
+87 
+lše
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+[
+lš’o
+-1]
+
+88 
+Ïng
+ = 
+ruÂ”
+.
+­i
+.
+Ïnguage
+
+
+89 
+Ïng
+ 
+š
+ 
+£lf
+.
+ch¬_»gex
+:
+
+90 
+»g
+ = 
+£lf
+.
+ch¬_»gex
+[
+Ïng
+]
+
+92 
+»g
+ = 
+£lf
+.
+ch¬_»gex
+['default']
+
+94 
+p
+ = 
+»
+.
+	`compe
+('['+
+»g
++']')
+
+95 
+v¬
+ = ""
+
+96 
+lš–’
+ = 
+	$Ën
+(
+lše
+)
+
+98 
+i
+ 
+š
+ 
+	$¿nge
+(
+cŞno
+,
+lš–’
+):
+
+99 ğ
+lše
+[
+i
+]
+
+100 
+p
+.
+	$m©ch
+():
+
+101 
+v¬
+ += 
+
+105 
+cŞno
+ > 0:
+
+106 
+i
+ 
+š
+ 
+	`¿nge
+(
+cŞno
+-1,-1,-1):
+
+107 ğ
+lše
+[
+i
+]
+
+108 
+p
+.
+	$m©ch
+():
+
+109 
+v¬
+ = + var
+
+113 
+Ïng
+ 
+š
+ 
+£lf
+.
+v¬_»gex
+:
+
+114 
+»g
+ = 
+£lf
+.
+v¬_»gex
+[
+Ïng
+]
+
+116 
+»g
+ = 
+£lf
+.
+v¬_»gex
+["default"]
+
+118 
+f
+ = 
+»
+.
+	$compe
+(
+»g
+)
+
+119 
+f
+.
+	$m©ch
+(
+v¬
+è
+is
+ 
+NÚe
+:
+
+120 
+ruÂ”
+.
+ui
+.
+	`”rÜ
+("Cannot find‡ valid variable underhe cursor")
+
+121  
+F®£
+
+
+123 
+	$Ën
+(
+v¬
+):
+
+124 
+ruÂ”
+.
+	$ev®
+(
+v¬
+)
+
+125  
+True
+
+
+127 
+ruÂ”
+.
+ui
+.
+	`”rÜ
+("Cannot find‡ valid variable underhe cursor")
+
+128  
+F®£
+
+
+130 
+şass
+ 
+	$SckWšdowLšeS–eùEv’t
+(
+Ev’t
+):
+
+133 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+134 
+lš’o
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+136 
+vdebug
+.
+log
+.
+	`Log
+("U£¸aùiÚ iÀ¡ack wšdow,†š%s" % 
+lš’o
+,\
+
+137 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+138 
+lše
+ = 
+ruÂ”
+.
+ui
+.
+¡ackwš
+.
+bufãr
+[
+lš’o
+-1]
+
+139 
+lše
+.
+	`fšd
+(" @ ") == -1:
+
+140  
+F®£
+
+
+141 
+f’ame_pos
+ = 
+lše
+.
+	`fšd
+(" @ ") + 3
+
+142 
+fe_ªd_lše
+ = 
+lše
+[
+f’ame_pos
+:]
+
+143 
+lše_pos
+ = 
+fe_ªd_lše
+.
+	`rfšd
+(":")
+
+144 
+fe
+ = 
+vdebug
+.
+ut
+.
+	$LoÿlFeP©h
+(
+fe_ªd_lše
+[:
+lše_pos
+])
+
+145 
+lš’o
+ = 
+fe_ªd_lše
+[
+lše_pos
++1:]
+
+146 
+ruÂ”
+.
+ui
+.
+sourûwš
+.
+	$£t_fe
+(
+fe
+)
+
+147 
+ruÂ”
+.
+ui
+.
+sourûwš
+.
+	$£t_lše
+(
+lš’o
+)
+
+149 
+şass
+ 
+	$W©chWšdowPrİ”tyG‘Ev’t
+(
+Ev’t
+):
+
+152 
+This
+ 
+»Œ›ves
+ 
+the
+ 
+chd
+ 
+nodes
+ 
+ªd
+ 
+di¥Ïys
+ 
+them
+ 
+und”Ã©h
+.
+
+154 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+155 
+lš’o
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+156 
+lše
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+[
+lš’o
+-1]
+
+157 
+poš‹r_šdex
+ = 
+lše
+.
+	`fšd
+(
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_closed_tree'))
+
+158 
+¡•
+ = 
+	`Ën
+(
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_closed_tree')) + 1
+
+160 
+eq_šdex
+ = 
+lše
+.
+	`fšd
+('=')
+
+161 
+eq_šdex
+ == -1:
+
+162 
+¿i£
+ 
+	`Ev’tE¼Ü
+("Cannot„eadhe selected…roperty")
+
+164 
+Çme
+ = 
+lše
+[
+poš‹r_šdex
++
+¡•
+:
+eq_šdex
+-1]
+
+165 
+cÚ‹xt_»s
+ = 
+ruÂ”
+.
+­i
+.
+	$´İ”ty_g‘
+(
+Çme
+)
+
+166 
+»nd
+ = 
+vdebug
+.
+ui
+.
+vimui
+.
+	$CÚ‹xtG‘Re¥Ú£R’d””
+(
+cÚ‹xt_»s
+)
+
+167 
+ouut
+ = 
+»nd
+.
+	`»nd”
+(
+poš‹r_šdex
+ - 1)
+
+168 
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+	`d–‘e
+(
+lš’o
+,lineno+1)
+
+169 
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+	`š£¹
+(
+ouut
+.
+	`r¡r
+(),
+lš’o
+-1,
+True
+)
+
+171 
+şass
+ 
+	$W©chWšdowHideEv’t
+(
+Ev’t
+):
+
+174 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+175 
+lš’o
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+176 
+lše
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+[
+lš’o
+-1]
+
+177 
+poš‹r_šdex
+ = 
+lše
+.
+	`fšd
+(
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_open_tree'))
+
+179 
+buf_Ën
+ = 
+	$Ën
+(
+vim
+.
+cu¼’t
+.
+bufãr
+)
+
+180 
+’d_lš’o
+ = 
+buf_Ën
+ - 1
+
+181 
+i
+ 
+š
+ 
+	$¿nge
+(
+lš’o
+,
+’d_lš’o
+):
+
+182 
+buf_lše
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+[
+i
+]
+
+183 ğ
+buf_lše
+[
+poš‹r_šdex
+]
+
+185 
+’d_lš’o
+ = 
+i
+ - 1
+
+187 
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+	`d–‘e
+(
+lš’o
+,
+’d_lš’o
++1)
+
+188 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('watch_window_style') == 'expanded':
+
+189 
+­³nd
+ = "\n" + "".
+	`rju¡
+(
+poš‹r_šdex
+) + "|"
+
+191 
+­³nd
+ = ""
+
+192 
+ruÂ”
+.
+ui
+.
+w©chwš
+.
+	`š£¹
+(
+lše
+.
+	`»¶aû
+(\
+
+193 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_open_tree'),\
+
+194 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_closed_tree'),1) + \
+
+195 
+­³nd
+,
+lš’o
+-1,
+True
+)
+
+197 
+şass
+ 
+	$W©chWšdowCÚ‹xtChªgeEv’t
+(
+Ev’t
+):
+
+200 
+The
+ 
+wÜd
+ 
+und”
+ 
+the
+ 
+VIM
+ 
+cursÜ
+ 
+is
+ 
+»Œ›ved
+, 
+ªd
+ 
+cÚ‹xt_g‘
+ 
+ÿÎed
+ 
+w™h
+he
+
+201 
+Ãw
+ 
+cÚ‹xt
+ 
+Çme
+.
+
+204 
+def
+ 
+	$execu‹
+(
+£lf
+,
+ruÂ”
+):
+
+205 
+cŞumn
+ = 
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[1]
+
+206 
+lše
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+[0]
+
+208 
+vdebug
+.
+log
+.
+	`Log
+("Fšdšg cÚ‹xˆÇm© cŞumÀ%s" % 
+cŞumn
+,\
+
+209 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+211 
+b_’d_pos
+ = 
+£lf
+.
+	$__g‘_wÜd_’d
+(
+lše
+,
+cŞumn
+)
+
+212 
+b_¡¬t_pos
+ = 
+£lf
+.
+	$__g‘_wÜd_¡¬t
+(
+lše
+,
+cŞumn
+)
+
+214 
+b_’d_pos
+ =ğ-1 
+Ü
+ \
+
+215 
+b_¡¬t_pos
+ == -1:
+
+216 
+¿i£
+ 
+	`Ev’tE¼Ü
+("Failedo find context‚ame under cursor")
+
+218 
+cÚ‹xt_Çme
+ = 
+lše
+[
+b_¡¬t_pos
+:
+b_’d_pos
+]
+
+219 
+vdebug
+.
+log
+.
+	`Log
+("CÚ‹xˆÇme: %s" % 
+cÚ‹xt_Çme
+,\
+
+220 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+221 
+cÚ‹xt_Çme
+[0] == '*':
+
+222 
+ruÂ”
+.
+ui
+.
+	`§y
+("This context is‡lready showing")
+
+223  
+F®£
+
+
+225 
+cÚ‹xt_id
+ = 
+£lf
+.
+	`__d‘”mše_cÚ‹xt_id
+(\
+
+226 
+ruÂ”
+.
+cÚ‹xt_Çmes
+,
+cÚ‹xt_Çme
+)
+
+228 
+cÚ‹xt_id
+ == -1:
+
+229 
+¿i£
+ 
+	`Ev’tE¼Ü
+("Could‚ot„esolve context‚ame")
+
+230  
+F®£
+
+
+232 
+ruÂ”
+.
+	$g‘_cÚ‹xt
+(
+cÚ‹xt_id
+)
+
+233  
+True
+
+
+235 
+def
+ 
+	$__g‘_wÜd_’d
+(
+£lf
+,
+lše
+,
+cŞumn
+):
+
+236 
+b_’d_pos
+ = -1
+
+237 
+lše_Ën
+ = 
+	$Ën
+(
+lše
+)
+
+238 
+i
+ = 
+cŞumn
+
+
+239 
+i
+ < 
+lše_Ën
+:
+
+240 
+lše
+[
+i
+] == ']':
+
+241 
+b_’d_pos
+ = 
+i
+-1
+
+243 
+i
+ += 1
+
+244  
+b_’d_pos
+
+
+246 
+def
+ 
+	$__g‘_wÜd_¡¬t
+(
+£lf
+,
+lše
+,
+cŞumn
+):
+
+247 
+b_¡¬t_pos
+ = -1
+
+248 
+j
+ = 
+cŞumn
+
+
+249 
+j
+ >= 0:
+
+250 
+lše
+[
+j
+] == '[':
+
+251 
+b_¡¬t_pos
+ = 
+j
++2
+
+253 
+j
+ -= 1
+
+254  
+b_¡¬t_pos
+
+
+256 
+def
+ 
+	$__d‘”mše_cÚ‹xt_id
+(
+£lf
+,
+cÚ‹xt_Çmes
+,
+cÚ‹xt_Çme
+):
+
+257 
+found_id
+ = -1
+
+258 
+id
+ 
+š
+ 
+cÚ‹xt_Çmes
+.
+	$keys
+():
+
+259 
+Çme
+ = 
+cÚ‹xt_Çmes
+[
+id
+]
+
+260 
+vdebug
+.
+log
+.
+	`Log
+(
+Çme
+ +", "+
+cÚ‹xt_Çme
+)
+
+261 
+Çme
+ =ğ
+cÚ‹xt_Çme
+:
+
+262 
+found_id
+ = 
+id
+
+
+264  
+found_id
+
+
+266 
+şass
+ 
+	$Ev’tE¼Ü
+(
+Exû±iÚ
+):
+
+267 
+·ss
+
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\log.py
+
+1 
+impÜt
+ 
+time
+
+
+2 
+impÜt
+ 
+sys
+
+
+3 
+impÜt
+ 
+os
+
+
+5 
+şass
+ 
+	gLogg”
+:
+
+8 
+CÚü‘e
+ 
+şas£s
+ 
+wl
+ 
+log
+ 
+mes§ges
+ 
+usšg
+ 
+v¬ious
+ 
+m‘hods
+,
+
+9 
+	ge
+.
+	gg
+. 
+wr™e
+ 
+to
+ 
+a
+ 
+	gfe
+.
+
+12 (
+	gERROR
+,
+	gINFO
+,
+	gDEBUG
+) = (0,1,2)
+
+13 
+	gTYPES
+ = ("ERROR","Info","Debug")
+
+14 
+	gdebug_Ëv–
+ = 
+ERROR
+
+
+16 
+def
+ 
+	$__š™__
+(
+£lf
+,
+debug_Ëv–
+):
+
+17 
+·ss
+
+
+19 
+def
+ 
+	$log
+(
+£lf
+, 
+¡ršg
+, 
+Ëv–
+):
+
+21 
+·ss
+
+
+23 
+def
+ 
+	$shutdown
+(
+£lf
+):
+
+25 
+·ss
+
+
+27 
+def
+ 
+	$time
+(
+£lf
+):
+
+29  
+time
+.
+	`¡ráime
+("%a %d %Y %H:%M:%S", \
+
+30 
+time
+.
+	$loÿÉime
+())
+
+32 
+def
+ 
+	$fÜm©
+(
+£lf
+,
+¡ršg
+,
+Ëv–
+):
+
+33 
+di¥Ïy_Ëv–
+ = 
+£lf
+.
+TYPES
+[
+Ëv–
+]
+
+35  "- [%s] {%s} %s" %(
+di¥Ïy_Ëv–
+, 
+£lf
+.
+	`time
+(), 
+	$¡r
+(
+¡ršg
+))
+
+38 
+şass
+ 
+	$WšdowLogg”
+(
+Logg”
+):
+
+41 
+The
+ 
+wšdow
+ 
+objeù
+ 
+is
+ 
+·s£d
+ 
+š
+ 
+Ú
+ 
+cÚ¡ruùiÚ
+, 
+but
+
+
+42 
+Úly
+ 
+ü—‹d
+ 
+a
+ 
+mes§ge
+ 
+is
+ 
+wr™‹n
+.
+
+44 
+def
+ 
+	$__š™__
+(
+£lf
+,
+debug_Ëv–
+,
+wšdow
+):
+
+45 
+£lf
+.
+wšdow
+ = window
+
+46 
+£lf
+.
+debug_Ëv–
+ = (debug_level)
+
+48 
+def
+ 
+	$shutdown
+(
+£lf
+):
+
+49 
+£lf
+.
+wšdow
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+50 
+£lf
+.
+wšdow
+.
+	$de¡roy
+()
+
+52 
+def
+ 
+	$log
+(
+£lf
+, 
+¡ršg
+, 
+Ëv–
+):
+
+53 
+Ëv–
+ > 
+£lf
+.
+debug_Ëv–
+:
+
+55 
+nÙ
+ 
+£lf
+.
+wšdow
+.
+is_İ’
+:
+
+56 
+£lf
+.
+wšdow
+.
+	$ü—‹
+()
+
+57 
+£lf
+.
+wšdow
+.
+	`wr™e
+(\
+
+58 
+£lf
+.
+	`fÜm©
+(
+¡ršg
+,
+Ëv–
+)+"\n")
+
+61 
+şass
+ 
+	$FeLogg”
+(
+Logg”
+):
+
+64 
+The
+ 
+wšdow
+ 
+objeù
+ 
+is
+ 
+·s£d
+ 
+š
+ 
+Ú
+ 
+cÚ¡ruùiÚ
+, 
+but
+
+
+65 
+Úly
+ 
+ü—‹d
+ 
+a
+ 
+mes§ge
+ 
+is
+ 
+wr™‹n
+.
+
+67 
+def
+ 
+	$__š™__
+(
+£lf
+,
+debug_Ëv–
+,
+f’ame
+):
+
+68 
+£lf
+.
+f’ame
+ = 
+os
+.
+·th
+.
+	$ex·ndu£r
+(
+f’ame
+)
+
+69 
+£lf
+.
+f
+ = 
+NÚe
+
+
+70 
+£lf
+.
+debug_Ëv–
+ = (debug_level)
+
+72 
+def
+ 
+	$__İ’
+(
+£lf
+):
+
+73 
+Œy
+:
+
+74 
+£lf
+.
+f
+ = 
+	`İ’
+(£lf.
+f’ame
+,'w')
+
+75 
+exû±
+ 
+IOE¼Ü
+ 
+as
+ 
+e
+:
+
+76 
+¿i£
+ 
+	`LogE¼Ü
+("Invalid file‚ame '%s' for†og file: %s" \
+
+77 %(
+£lf
+.
+f’ame
+,
+	$¡r
+(
+e
+)))
+
+78 
+exû±
+:
+
+79 
+¿i£
+ 
+	`LogE¼Ü
+("Error using file '%s'‡s‡†og file: %s" \
+
+80 %(
+£lf
+.
+f’ame
+,
+sys
+.
+	`exc_šfo
+()[0]))
+
+83 
+def
+ 
+	$shutdown
+(
+£lf
+):
+
+84 
+£lf
+.
+f
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+85 
+£lf
+.
+f
+.
+	$şo£
+()
+
+87 
+def
+ 
+	$log
+(
+£lf
+, 
+¡ršg
+, 
+Ëv–
+):
+
+88 
+Ëv–
+ > 
+£lf
+.
+debug_Ëv–
+:
+
+90 
+£lf
+.
+f
+ 
+is
+ 
+NÚe
+:
+
+91 
+£lf
+.
+	$__İ’
+()
+
+92 
+£lf
+.
+f
+.
+	`wr™e
+(\
+
+93 
+£lf
+.
+	`fÜm©
+(
+¡ršg
+,
+Ëv–
+)+"\n")
+
+94 
+£lf
+.
+f
+.
+	$æush
+()
+
+96 
+şass
+ 
+Log
+:
+
+98 
+logg”s
+ = {
+	}
+}
+
+100 
+def
+ 
+	$__š™__
+(
+£lf
+,
+¡ršg
+,
+Ëv–
+ = 
+Logg”
+.
+INFO
+):
+
+101 
+Log
+.
+	`log
+(
+¡ršg
+,
+Ëv–
+)
+
+103 @
+şassm‘hod
+
+
+104 
+def
+ 
+	$log
+(
+şs
+, 
+¡ršg
+, 
+Ëv–
+ = 
+Logg”
+.
+INFO
+):
+
+105 
+k
+, 
+l
+ 
+š
+ 
+şs
+.
+logg”s
+.
+	$™”™ems
+():
+
+106 
+l
+.
+	`log
+(
+¡ršg
+,
+Ëv–
+)
+
+108 @
+şassm‘hod
+
+
+109 
+def
+ 
+	$£t_logg”
+(
+şs
+, 
+logg”
+):
+
+110 
+k
+ = 
+logg”
+.
+__şass__
+.
+__Çme__
+
+
+111 
+k
+ 
+š
+ 
+şs
+.
+logg”s
+:
+
+112 
+şs
+.
+logg”s
+[
+k
+].
+	$shutdown
+()
+
+113 
+şs
+.
+logg”s
+[
+k
+] = 
+logg”
+
+
+115 @
+şassm‘hod
+
+
+116 
+def
+ 
+	$»move_logg”
+(
+şs
+, 
+ty³
+):
+
+117 
+ty³
+ 
+š
+ 
+şs
+.
+logg”s
+.
+	$™”™ems
+():
+
+118 
+şs
+.
+logg”s
+[
+ty³
+].
+	$shutdown
+()
+
+119 
+d–
+ 
+şs
+.
+logg”s
+[
+ty³
+]
+
+120  
+True
+
+
+121  
+F®£
+
+
+123 @
+şassm‘hod
+
+
+124 
+def
+ 
+	$shutdown
+(
+şs
+):
+
+125 
+k
+, 
+l
+ 
+š
+ 
+şs
+.
+logg”s
+.
+	$™”™ems
+():
+
+126 
+l
+.
+	$shutdown
+()
+
+127 
+şs
+.
+logg”s
+ = {
+	}
+}
+
+129 
+şass
+ 
+	$LogE¼Ü
+(
+Exû±iÚ
+):
+
+130 
+·ss
+
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\opts.py
+
+2 
+şass
+ 
+	gO±iÚs
+:
+
+3 
+š¡ªû
+ = 
+NÚe
+
+
+5 
+def
+ 
+	$__š™__
+(
+£lf
+,
+İtiÚs
+):
+
+6 
+£lf
+.
+İtiÚs
+ = options
+
+8 @
+şassm‘hod
+
+
+9 
+def
+ 
+	$£t
+(
+şs
+,
+İtiÚs
+):
+
+11 
+İtiÚs
+"""
+
+12 
+şs
+.
+š¡ªû
+ = 
+	`O±iÚs
+(
+İtiÚs
+)
+
+14 @
+şassm‘hod
+
+
+15 
+def
+ 
+	$š¡
+(
+şs
+):
+
+18 
+şs
+.
+š¡ªû
+ 
+is
+ 
+NÚe
+:
+
+19 
+¿i£
+ 
+	`O±iÚsE¼Ü
+("No options have been set")
+
+20  
+şs
+.
+š¡ªû
+
+
+22 @
+şassm‘hod
+
+
+23 
+def
+ 
+	$g‘
+(
+şs
+,
+Çme
+,
+as_ty³
+ = 
+¡r
+):
+
+26 
+Rai£s
+ 
+ª
+ 
+O±iÚsE¼Ü
+ 
+the
+ 
+İtiÚ
+ 
+dÛ¢
+'tƒxist.
+
+28 
+š¡
+ = 
+şs
+.
+	$š¡
+()
+
+29 
+Çme
+ 
+š
+ 
+š¡
+.
+İtiÚs
+:
+
+30  
+	$as_ty³
+(
+š¡
+.
+İtiÚs
+[
+Çme
+])
+
+32 
+¿i£
+ 
+	`O±iÚsE¼Ü
+("NØİtiÚ w™h key '%s'" % 
+Çme
+)
+
+34 @
+şassm‘hod
+
+
+35 
+def
+ 
+	$ov”wr™e
+(
+şs
+,
+Çme
+,
+v®ue
+):
+
+36 
+š¡
+ = 
+şs
+.
+	$š¡
+()
+
+37 
+š¡
+.
+İtiÚs
+[
+Çme
+] = 
+v®ue
+
+
+39 @
+şassm‘hod
+
+
+40 
+def
+ 
+	$is£t
+(
+şs
+,
+Çme
+):
+
+43 
+By
+ 
+£t
+, 
+™
+ 
+m—ns
+ 
+wh‘h”
+ 
+the
+ 
+İtiÚ
+ 
+has
+ 
+Ëngth
+. 
+AÎ
+he option
+
+44 
+v®ues
+ 
+¬e
+ 
+¡ršgs
+.
+
+46 
+š¡
+ = 
+şs
+.
+	$š¡
+()
+
+47 
+Çme
+ 
+š
+ 
+š¡
+.
+İtiÚs
+ 
+ªd
+ \
+
+48 
+	`Ën
+(
+š¡
+.
+İtiÚs
+[
+Çme
+]) > 0:
+
+49  
+True
+
+
+51  
+F®£
+
+
+53 
+şass
+ 
+	$O±iÚsE¼Ü
+(
+Exû±iÚ
+):
+
+54 
+·ss
+
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\runner.py
+
+1 #codšg=
+utf
+-8
+
+3 
+impÜt
+ 
+	gvdebug
+.
+dbgp
+
+
+4 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+5 
+impÜt
+ 
+	gvdebug
+.
+	gui
+.
+vimui
+
+
+6 
+impÜt
+ 
+sock‘
+
+
+7 
+impÜt
+ 
+vim
+
+
+8 
+impÜt
+ 
+	gvdebug
+.
+b»akpošt
+
+
+9 
+impÜt
+ 
+	gvdebug
+.
+İts
+
+
+10 
+impÜt
+ 
+	gvdebug
+.
+ut
+
+
+12 
+şass
+ 
+	gRuÂ”
+:
+
+15 
+This
+ 
+š¡ªtŸ‹s
+ 
+the
+ 
+cÚÃùiÚ
+ 
+ªd
+ 
+debugg”
+ 
+vdebug
+.
+ui
+,‡nd 
+´ovides
+
+
+16 
+ª
+ 
+š‹rçû
+ 
+th©
+ 
+Vim
+ 
+ÿn
+ 
+u£
+ 
+to
+ 
+£nd
+ 
+	gcommªds
+.
+
+19 
+def
+ 
+	$__š™__
+(
+£lf
+,
+pydbgp
+=
+NÚe
+):
+
+20 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+21 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`£t
+(
+vim
+.
+	`ev®
+('g:vdebug_options'))
+
+22 
+£lf
+.
+b»akpošts
+ = 
+vdebug
+.
+b»akpošt
+.
+	$StÜe
+()
+
+23 
+£lf
+.
+keym­³r
+ = 
+vdebug
+.
+ut
+.
+	$Keym­³r
+()
+
+24 
+£lf
+.
+ui
+ = 
+vdebug
+.ui.
+vimui
+.
+	$Ui
+(
+£lf
+.
+b»akpošts
+)
+
+25 
+£lf
+.
+pydbgp
+ =…ydbgp
+
+27 
+def
+ 
+	$İ’
+(
+£lf
+):
+
+30 
+If
+ 
+e™h”
+ 
+of
+ 
+the£
+ 
+¬e
+ 
+®»ady
+ 
+İ’
+, 
+the
+ 
+cu¼’t
+
+
+31 
+cÚÃùiÚ
+ 
+Ü
+ 
+vdebug
+.
+ui
+ 
+is
+ 
+u£d
+.
+
+33 
+Œy
+:
+
+34 
+£lf
+.
+ui
+.
+	$is_modif›d
+():
+
+35 
+£lf
+.
+ui
+.
+	`”rÜ
+("Modified buffers must be saved before debugging")
+
+37 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`£t
+(
+vim
+.
+	`ev®
+('g:vdebug_options'))
+
+39 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`is£t
+('debug_file'):
+
+40 
+vdebug
+.
+log
+.
+Log
+.
+	`£t_logg”
+(vdebug.log.
+	`FeLogg”
+(\
+
+41 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('debug_file_level'),\
+
+42 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('debug_file')))
+
+43 
+£lf
+.
+	`li¡’
+(\
+
+44 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('server'),\
+
+45 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('port',),\
+
+46 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('timeout',))
+
+48 
+£lf
+.
+ui
+.
+	$İ’
+()
+
+49 
+£lf
+.
+keym­³r
+.
+	$m­
+()
+
+50 
+£lf
+.
+ui
+.
+	`£t_li¡’”_d‘as
+(\
+
+51 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('server'),\
+
+52 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('port'),\
+
+53 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('ide_key'))
+
+55 
+addr
+ = 
+£lf
+.
+­i
+.
+cÚn
+.
+add»ss
+
+
+56 
+vdebug
+.
+log
+.
+	`Log
+("Found cÚÃùiÚ from " + 
+	`¡r
+(
+addr
+),vdebug.log.
+Logg”
+.
+INFO
+)
+
+57 
+£lf
+.
+ui
+.
+	$£t_cÚn_d‘as
+(
+addr
+[0],addr[1])
+
+59 
+£lf
+.
+	$£t_ã©u»s
+()
+
+60 
+£lf
+.
+b»akpošts
+.
+	`upd©e_lšes
+(£lf.
+ui
+.
+	$g‘_b»akpošt_sign_pos™iÚs
+())
+
+61 
+£lf
+.
+b»akpošts
+.
+	$lšk_­i
+(
+£lf
+.
+­i
+)
+
+63 
+ú_»s
+ = 
+£lf
+.
+­i
+.
+	$cÚ‹xt_Çmes
+()
+
+64 
+£lf
+.
+cÚ‹xt_Çmes
+ = 
+ú_»s
+.
+	$Çmes
+()
+
+65 
+vdebug
+.
+log
+.
+	`Log
+("Available context‚ames: %s" %\
+
+66 
+	`¡r
+(
+£lf
+.
+cÚ‹xt_Çmes
+),
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+68 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('break_on_open',) == 1:
+
+69 
+¡©us
+ = 
+£lf
+.
+­i
+.
+	$¡•_što
+()
+
+71 
+¡©us
+ = 
+£lf
+.
+­i
+.
+	$run
+()
+
+72 
+£lf
+.
+	$»äesh
+(
+¡©us
+)
+
+73 
+exû±
+ 
+Exû±iÚ
+:
+
+74 
+£lf
+.
+	$şo£
+()
+
+75 
+¿i£
+
+
+77 
+def
+ 
+	$£t_ã©u»s
+(
+£lf
+):
+
+80 
+E¼Üs
+ 
+¬e
+ 
+ÿught
+ 
+the
+ 
+debugg”
+ 
+dÛ¢
+'t†ikehe feature‚ame or
+
+81 
+v®ue
+. 
+This
+ 
+dÛ¢
+'t breakhe†oop, so multiple features can be set
+
+82 
+ev’
+ 
+š
+ 
+the
+ 
+of
+ 
+ª
+ 
+”rÜ
+."""
+
+83 
+ã©u»s
+ = 
+vim
+.
+	`ev®
+('g:vdebug_features')
+
+84 
+Çme
+, 
+v®ue
+ 
+š
+ 
+ã©u»s
+.
+	$™”™ems
+():
+
+85 
+Œy
+:
+
+86 
+£lf
+.
+­i
+.
+	$ã©u»_£t
+(
+Çme
+, 
+v®ue
+)
+
+87 
+exû±
+ 
+vdebug
+.
+dbgp
+.
+DBGPE¼Ü
+ 
+as
+ 
+e
+:
+
+88 
+”rÜ_¡r
+ = "FaedØ£ˆã©u» %s: %s" %(
+Çme
+,
+	$¡r
+(
+e
+.
+¬gs
+[0]))
+
+89 
+£lf
+.
+ui
+.
+	$”rÜ
+(
+”rÜ_¡r
+)
+
+91 
+def
+ 
+	$»äesh
+(
+£lf
+,
+¡©us
+):
+
+94 
+Upd©es
+ 
+the
+ 
+¡©us
+ 
+wšdow
+, 
+cu¼’t
+ 
+¡ack
+, 
+sourû
+
+
+95 
+fe
+ 
+ªd
+ 
+lše
+‡nd 
+w©ch
+ 
+wšdow
+."""
+
+96 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+97 
+£lf
+.
+ui
+.
+	`”rÜ
+("Cannot update:‚o connection")
+
+100 
+	`¡r
+(
+¡©us
+) == "interactive":
+
+101 
+£lf
+.
+ui
+.
+	`”rÜ
+("Debuggerƒngine says it is in interactive mode,"+\
+
+103 
+£lf
+.
+	$şo£_cÚÃùiÚ
+()
+
+104 
+–if
+ 
+	$¡r
+(
+¡©us
+è
+	`š
+ ("stopping","stopped"):
+
+105 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	`£t_¡©us
+("stopped")
+
+106 
+£lf
+.
+ui
+.
+	`§y
+("Debugging session hasƒnded")
+
+107 
+£lf
+.
+	$şo£_cÚÃùiÚ
+(
+F®£
+)
+
+108 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('continuous_mode', ) != 0:
+
+109 
+£lf
+.
+	$İ’
+()
+
+112 
+vdebug
+.
+log
+.
+	`Log
+("Getting stack information")
+
+113 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	$£t_¡©us
+(
+¡©us
+)
+
+114 
+¡ack_»s
+ = 
+£lf
+.
+	$upd©e_¡ack
+()
+
+115 
+¡ack
+ = 
+¡ack_»s
+.
+	$g‘_¡ack
+()
+
+117 
+£lf
+.
+cur_fe
+ = 
+vdebug
+.
+ut
+.
+	`RemÙeFeP©h
+(
+¡ack
+[0].
+	`g‘
+('filename'))
+
+118 
+£lf
+.
+cur_lš’o
+ = 
+¡ack
+[0].
+	`g‘
+('lineno')
+
+120 
+vdebug
+.
+log
+.
+	`Log
+("Movingo current…osition in source window")
+
+121 
+£lf
+.
+ui
+.
+	`£t_sourû_pos™iÚ
+(\
+
+122 
+£lf
+.
+cur_fe
+,\
+
+123 
+£lf
+.
+cur_lš’o
+)
+
+125 
+£lf
+.
+	$g‘_cÚ‹xt
+(0)
+
+127 
+def
+ 
+	$g‘_cÚ‹xt
+(
+£lf
+,
+cÚ‹xt_id
+ = 0):
+
+128 
+£lf
+.
+ui
+.
+w©chwš
+.
+	$ş—n
+()
+
+130 
+Çme
+ = 
+£lf
+.
+cÚ‹xt_Çmes
+[
+cÚ‹xt_id
+]
+
+131 
+vdebug
+.
+log
+.
+	`Log
+("G‘tšg % v¬ŸbËs" % 
+Çme
+)
+
+132 
+cÚ‹xt_»s
+ = 
+£lf
+.
+­i
+.
+	$cÚ‹xt_g‘
+(
+cÚ‹xt_id
+)
+
+133 
+»nd
+ = 
+vdebug
+.
+ui
+.
+vimui
+.
+	`CÚ‹xtG‘Re¥Ú£R’d””
+(\
+
+134 
+cÚ‹xt_»s
+,"%s‡t %s:%s" \
+
+135 %(
+Çme
+,
+£lf
+.
+ui
+.
+sourûwš
+.
+fe
+,£lf.
+cur_lš’o
+),\
+
+136 
+£lf
+.
+cÚ‹xt_Çmes
+, 
+cÚ‹xt_id
+)
+
+137 
+£lf
+.
+ui
+.
+w©chwš
+.
+	$acû±_»nd””
+(
+»nd
+)
+
+139 
+def
+ 
+	$toggË_b»akpošt_wšdow
+(
+£lf
+):
+
+142 
+The
+ 
+wšdow
+ 
+­³¬s
+ 
+as
+ 
+a
+ 
+hÜizÚl
+ 
+¥l™
+ 
+b–ow
+ 
+the
+
+
+143 
+cu¼’y
+ 
+£Ëùed
+ 
+wšdow
+."""
+
+144 
+£lf
+.
+ui
+.
+b»akpoštwš
+.
+is_İ’
+:
+
+145 
+£lf
+.
+ui
+.
+b»akpoštwš
+.
+	$de¡roy
+()
+
+147 
+£lf
+.
+ui
+.
+b»akpoštwš
+.
+	$ü—‹
+()
+
+149 
+def
+ 
+	$is_®ive
+(
+£lf
+):
+
+151 
+£lf
+.
+­i
+ 
+is
+ 
+nÙ
+ 
+NÚe
+ 
+ªd
+ \
+
+152 
+£lf
+.
+­i
+.
+cÚn
+.
+	$iscÚÃùed
+():
+
+153  
+True
+
+
+154  
+F®£
+
+
+156 
+def
+ 
+	$run
+(
+£lf
+):
+
+159 
+It
+ 
+wl
+ 
+run
+ 
+uÁ
+ 
+the
+ 
+’d
+ 
+of
+h
+executiÚ
+ 
+Ü
+ uÁ 
+a
+
+
+160 
+b»akpošt
+ 
+is
+ 
+»ached
+."""
+
+161 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+162 
+£lf
+.
+	$İ’
+()
+
+164 
+vdebug
+.
+log
+.
+	`Log
+("Running")
+
+165 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	`£t_¡©us
+("running")
+
+166 
+»s
+ = 
+£lf
+.
+­i
+.
+	$run
+()
+
+167 
+£lf
+.
+	$»äesh
+(
+»s
+)
+
+169 
+def
+ 
+	$¡•_ov”
+(
+£lf
+):
+
+171 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+172 
+£lf
+.
+	$İ’
+()
+
+174 
+vdebug
+.
+log
+.
+	`Log
+("Stepping over")
+
+175 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	`£t_¡©us
+("running")
+
+176 
+»s
+ = 
+£lf
+.
+­i
+.
+	$¡•_ov”
+()
+
+177 
+£lf
+.
+	$»äesh
+(
+»s
+)
+
+179 
+def
+ 
+	$¡•_što
+(
+£lf
+):
+
+181 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+182 
+£lf
+.
+	$İ’
+()
+
+184 
+vdebug
+.
+log
+.
+	`Log
+("Stepping into statement")
+
+185 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	`£t_¡©us
+("running")
+
+186 
+»s
+ = 
+£lf
+.
+­i
+.
+	$¡•_što
+()
+
+187 
+£lf
+.
+	$»äesh
+(
+»s
+)
+
+189 
+def
+ 
+	$¡•_out
+(
+£lf
+):
+
+191 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+192 
+£lf
+.
+	$İ’
+()
+
+194 
+vdebug
+.
+log
+.
+	`Log
+("Stepping out of statement")
+
+195 
+£lf
+.
+ui
+.
+¡©uswš
+.
+	`£t_¡©us
+("running")
+
+196 
+»s
+ = 
+£lf
+.
+­i
+.
+	$¡•_out
+()
+
+197 
+£lf
+.
+	$»äesh
+(
+»s
+)
+
+199 
+def
+ 
+	$»move_b»akpošt
+(
+£lf
+,
+¬gs
+):
+
+201 
+¬gs
+ 
+is
+ 
+NÚe
+:
+
+202 
+¬gs
+ = ""
+
+203 
+¬gs
+ =‡rgs.
+	$¡r
+()
+
+204 
+	`Ën
+(
+¬gs
+) == 0:
+
+205 
+£lf
+.
+ui
+.
+	`”rÜ
+("ID or '*'„equiredo„emove‡ breakpoint:„un "+\
+
+209 
+¬gs
+ == '*':
+
+210 
+£lf
+.
+b»akpošts
+.
+	$ş—r_b»akpošts
+()
+
+212 
+¬g_·¹s
+ = 
+¬gs
+.
+	`¥l™
+(" ")
+
+213 
+id
+ 
+š
+ 
+¬g_·¹s
+:
+
+214 
+£lf
+.
+b»akpošts
+.
+	$»move_b»akpošt_by_id
+(
+id
+)
+
+216 
+def
+ 
+	$£t_b»akpošt
+(
+£lf
+,
+¬gs
+):
+
+217 
+bp
+ = 
+vdebug
+.
+b»akpošt
+.
+B»akpošt
+.
+	$·r£
+(
+£lf
+.
+ui
+,
+¬gs
+)
+
+218 
+bp
+.
+ty³
+ == "line":
+
+219 
+id
+ = 
+£lf
+.
+b»akpošts
+.
+	`fšd_b»akpošt
+(\
+
+220 
+bp
+.
+	`g‘_fe
+(),\
+
+221 
+bp
+.
+	$g‘_lše
+())
+
+222 
+id
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+223 
+£lf
+.
+b»akpošts
+.
+	$»move_b»akpošt_by_id
+(
+id
+)
+
+225 
+£lf
+.
+b»akpošts
+.
+	$add_b»akpošt
+(
+bp
+)
+
+227 
+def
+ 
+	$ev®
+(
+£lf
+,
+code
+):
+
+230 
+Œy
+:
+
+231 
+vdebug
+.
+log
+.
+	`Log
+("Ev®u©šg code: "+
+code
+)
+
+232 
+cÚ‹xt_»s
+ = 
+£lf
+.
+­i
+.
+	$ev®
+(
+code
+)
+
+233 
+»nd
+ = 
+vdebug
+.
+ui
+.
+vimui
+.
+	`CÚ‹xtG‘Re¥Ú£R’d””
+(\
+
+234 
+cÚ‹xt_»s
+,"Eval of: '%s'" \
+
+235 %
+cÚ‹xt_»s
+.
+	$g‘_code
+())
+
+236 
+£lf
+.
+ui
+.
+w©chwš
+.
+	$ş—n
+()
+
+237 
+£lf
+.
+ui
+.
+w©chwš
+.
+	$acû±_»nd””
+(
+»nd
+)
+
+238 
+exû±
+ 
+vdebug
+.
+dbgp
+.
+Ev®E¼Ü
+:
+
+239 
+£lf
+.
+ui
+.
+	`”rÜ
+("FaedØev®u©šv®id code, '%s'" % 
+code
+)
+
+241 
+def
+ 
+	$run_to_cursÜ
+(
+£lf
+):
+
+244 
+This
+ 
+çs
+ 
+the
+ 
+cu¼’t
+ 
+wšdow
+ 
+is
+ 
+nÙ
+h
+sourû
+ window.
+
+246 
+row
+ = 
+£lf
+.
+ui
+.
+	$g‘_cu¼’t_row
+()
+
+247 
+fe
+ = 
+£lf
+.
+ui
+.
+	$g‘_cu¼’t_fe
+()
+
+248 
+vdebug
+.
+log
+.
+	$Log
+(
+fe
+)
+
+249 
+vdebug
+.
+log
+.
+	`Log
+(
+£lf
+.
+ui
+.
+sourûwš
+.
+	$g‘_fe
+())
+
+250 
+fe
+ !ğ
+£lf
+.
+ui
+.
+sourûwš
+.
+	$g‘_fe
+():
+
+251 
+£lf
+.
+ui
+.
+	`”rÜ
+("Runo cursor only works inhe source window!")
+
+253 
+vdebug
+.
+log
+.
+	`Log
+("RuÂšgØpos™iÚ:†š% oà%s" %(
+row
+,
+fe
+))
+
+254 
+bp
+ = 
+vdebug
+.
+b»akpošt
+.
+	$TempÜ¬yLšeB»akpošt
+(
+£lf
+.
+ui
+,
+fe
+,
+row
+)
+
+255 
+£lf
+.
+­i
+.
+	`b»akpošt_£t
+(
+bp
+.
+	$g‘_cmd
+())
+
+256 
+£lf
+.
+	$run
+()
+
+258 
+def
+ 
+	$li¡’
+(
+£lf
+,
+£rv”
+,
+pÜt
+,
+timeout
+):
+
+261 
+U£s
+ 
+exi¡šg
+ 
+cÚÃùiÚ
+ 
+possibË
+.
+
+263 
+£lf
+.
+	$is_®ive
+():
+
+264 
+vdebug
+.
+log
+.
+	`Log
+("Cannot open‡‚ew connection \
+ one‡lreadyƒxists",\
+
+266 
+vdebug
+.
+log
+.
+Logg”
+.
+ERROR
+)
+
+269 
+True
+:
+
+270 
+ide_key
+ = 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('ide_key')
+
+271 
+check_ide_key
+ = 
+True
+
+
+272 
+	`Ën
+(
+ide_key
+) == 0:
+
+273 
+check_ide_key
+ = 
+F®£
+
+
+275 
+cÚÃùiÚ
+ = 
+vdebug
+.
+dbgp
+.
+	`CÚÃùiÚ
+(
+£rv”
+,
+pÜt
+,\
+
+276 
+timeout
+,
+vdebug
+.
+ut
+.
+	$IÅutSŒ—m
+(
+pydbgp
+=
+£lf
+.pydbgp))
+
+278 
+£lf
+.
+­i
+ = 
+vdebug
+.
+dbgp
+.
+	$Api
+(
+cÚÃùiÚ
+)
+
+279 
+check_ide_key
+ 
+ªd
+ 
+ide_key
+ !ğ
+£lf
+.
+­i
+.
+idekey
+:
+
+280 
+´št
+ "Ignoring debugger connection with IDE key '%s'" \
+
+281 % 
+£lf
+.
+­i
+.
+idekey
+
+
+282 
+£lf
+.
+­i
+.
+	$d‘ach
+()
+
+286 
+def
+ 
+	$upd©e_¡ack
+(
+£lf
+):
+
+289 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+290 
+£lf
+.
+ui
+.
+	`”rÜ
+("Cannot updatehe stack:‚o debugger connection")
+
+292 
+£lf
+.
+ui
+.
+¡ackwš
+.
+	$ş—n
+()
+
+293 
+»s
+ = 
+£lf
+.
+­i
+.
+	$¡ack_g‘
+()
+
+294 
+»nd””
+ = 
+vdebug
+.
+ui
+.
+vimui
+.
+	$SckG‘Re¥Ú£R’d””
+(
+»s
+)
+
+295 
+£lf
+.
+ui
+.
+¡ackwš
+.
+	$acû±_»nd””
+(
+»nd””
+)
+
+296  
+»s
+
+
+298 
+def
+ 
+	$d‘ach
+(
+£lf
+):
+
+301 
+nÙ
+ 
+£lf
+.
+	$is_®ive
+():
+
+302 
+£lf
+.
+ui
+.
+	`”rÜ
+("Cannot detach:‚o debugger connection")
+
+304 
+£lf
+.
+ui
+.
+	`§y
+("Detachinghe debugger")
+
+305 
+£lf
+.
+­i
+.
+	$d‘ach
+()
+
+307 
+def
+ 
+	$şo£_cÚÃùiÚ
+(
+£lf
+,
+¡İ
+ = 
+True
+):
+
+310 
+£lf
+.
+b»akpošts
+.
+	$uÆšk_­i
+()
+
+311 
+£lf
+.
+ui
+.
+	$m¬k_as_¡İ³d
+()
+
+312 
+Œy
+:
+
+313 
+£lf
+.
+	$is_®ive
+():
+
+314 
+vdebug
+.
+log
+.
+	`Log
+("Closinghe connection")
+
+315 
+¡İ
+:
+
+316 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('on_close') == 'detach':
+
+317 
+Œy
+:
+
+318 
+£lf
+.
+­i
+.
+	$d‘ach
+()
+
+319 
+exû±
+ 
+vdebug
+.
+dbgp
+.
+CmdNÙIm¶em’‹dE¼Ü
+:
+
+320 
+£lf
+.
+ui
+.
+	`”rÜ
+('Detach is‚ot supported byhe debugger, stopping instead')
+
+321 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`ov”wr™e
+('on_close','stop')
+
+322 
+£lf
+.
+­i
+.
+	$¡İ
+()
+
+324 
+£lf
+.
+­i
+.
+	$¡İ
+()
+
+325 
+£lf
+.
+­i
+.
+cÚn
+.
+	$şo£
+()
+
+326 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+328 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+329 
+exû±
+ 
+EOFE¼Ü
+:
+
+330 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+331 
+£lf
+.
+ui
+.
+	`§y
+("Connection has been closed")
+
+332 
+exû±
+ 
+sock‘
+.
+”rÜ
+:
+
+333 
+£lf
+.
+­i
+ = 
+NÚe
+
+
+334 
+£lf
+.
+ui
+.
+	`§y
+("Connection has been closed")
+
+336 
+def
+ 
+	$şo£
+(
+£lf
+):
+
+339 
+£lf
+.
+	$şo£_cÚÃùiÚ
+()
+
+340 
+£lf
+.
+ui
+.
+	$şo£
+()
+
+341 
+£lf
+.
+keym­³r
+.
+	`unm­
+()
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\__init__.py
+
+1 
+	g__®l__
+ = ["interface","vimui"]
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\interface.py
+
+1 
+şass
+ 
+	$Ui
+():
+
+4 
+w©chwš
+ = 
+NÚe
+
+
+5 
+¡ackwš
+ = 
+NÚe
+
+
+6 
+¡©uswš
+ = 
+NÚe
+
+
+7 
+logwš
+ = 
+NÚe
+
+
+8 
+sourûwš
+ = 
+NÚe
+
+
+10 
+def
+ 
+	$__š™__
+(
+£lf
+):
+
+11 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+13 
+def
+ 
+	$__d–__
+(
+£lf
+):
+
+14 
+£lf
+.
+	$şo£
+()
+
+16 
+def
+ 
+	$İ’
+(
+£lf
+):
+
+17 
+·ss
+
+
+19 
+def
+ 
+	$§y
+(
+£lf
+,
+¡ršg
+):
+
+20 
+·ss
+
+
+22 
+def
+ 
+	$şo£
+(
+£lf
+):
+
+23 
+·ss
+
+
+25 
+def
+ 
+	$log
+(
+£lf
+):
+
+26 
+·ss
+
+
+28 
+şass
+ 
+Wšdow
+:
+
+31 
+Çme
+ = "WINDOW"
+
+32 
+is_İ’
+ = 
+F®£
+
+
+34 
+def
+ 
+	$__d–__
+(
+£lf
+):
+
+35 
+£lf
+.
+	$de¡roy
+()
+
+37 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+39 
+·ss
+
+
+41 
+def
+ 
+	$ü—‹
+(
+£lf
+):
+
+43 
+·ss
+
+
+45 
+def
+ 
+	$wr™e
+(
+£lf
+, 
+msg
+):
+
+47 
+·ss
+
+
+49 
+def
+ 
+	$š£¹
+(
+£lf
+, 
+msg
+, 
+pos™iÚ
+ = 
+NÚe
+):
+
+51 
+·ss
+
+
+53 
+def
+ 
+	$de¡roy
+(
+£lf
+):
+
+55 
+·ss
+
+
+57 
+def
+ 
+	$ş—n
+(
+£lf
+):
+
+59 
+·ss
+
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\vimui.py
+
+1 #codšg=
+utf
+-8
+
+2 
+impÜt
+ 
+	gvdebug
+.
+	gui
+.
+š‹rçû
+
+
+3 
+impÜt
+ 
+	gvdebug
+.
+ut
+
+
+4 
+impÜt
+ 
+vim
+
+
+5 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+6 
+impÜt
+ 
+	gvdebug
+.
+İts
+
+
+8 
+şass
+ 
+	$Ui
+(
+vdebug
+.
+ui
+.
+š‹rçû
+.
+Ui
+):
+
+12 
+def
+ 
+	$__š™__
+(
+£lf
+,
+b»akpošts
+):
+
+13 
+vdebug
+.
+ui
+.
+š‹rçû
+.
+Ui
+.
+	$__š™__
+(
+£lf
+)
+
+14 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+15 
+£lf
+.
+b»akpošt_¡Üe
+ = 
+b»akpošts
+
+
+16 
+£lf
+.
+em±ybufãr
+ = 
+NÚe
+
+
+17 
+£lf
+.
+b»akpoštwš
+ = 
+	`B»akpoštWšdow
+(self,'rightbelow 7new')
+
+18 
+£lf
+.
+cu¼’t_b
+ = "1"
+
+19 
+£lf
+.
+bÄ
+ = 
+NÚe
+
+
+21 
+def
+ 
+	$is_modif›d
+(
+£lf
+):
+
+22 
+modif›d
+ = (
+vim
+.
+	`ev®
+('&mod'))
+
+23 
+modif›d
+:
+
+24  
+True
+
+
+26  
+F®£
+
+
+28 
+def
+ 
+	$İ’
+(
+£lf
+):
+
+29 
+£lf
+.
+is_İ’
+:
+
+31 
+£lf
+.
+is_İ’
+ = 
+True
+
+
+33 
+Œy
+:
+
+34 
+exi¡šg_bufãr
+ = 
+True
+
+
+35 
+cur_buf_Çme
+ = 
+vim
+.
+	`ev®
+("bufname('%')")
+
+36 
+cur_buf_Çme
+ 
+is
+ 
+NÚe
+:
+
+37 
+exi¡šg_bufãr
+ = 
+F®£
+
+
+38 
+cur_buf_Çme
+ = ''
+
+40 
+£lf
+.
+cu¼’t_b
+ = 
+vim
+.
+	`ev®
+("tabpagenr()")
+
+42 
+vim
+.
+	`commªd
+('silentabnew')
+
+43 
+£lf
+.
+em±y_buf_num
+ = 
+vim
+.
+	`ev®
+('bufnr("%")')
+
+44 
+exi¡šg_bufãr
+:
+
+45 
+vim
+.
+	`commªd
+('ÿÎ vdebug:ed™("%s")' % 
+cur_buf_Çme
+)
+
+47 
+£lf
+.
+bÄ
+ = 
+vim
+.
+	`ev®
+("tabpagenr()")
+
+49 
+¤cwš_Çme
+ = 
+£lf
+.
+	$__g‘_¤cwš_Çme
+()
+
+51 
+£lf
+.
+w©chwš
+ = 
+	`W©chWšdow
+(self,'vertical belowright‚ew')
+
+52 
+£lf
+.
+w©chwš
+.
+	$ü—‹
+()
+
+54 
+£lf
+.
+¡ackwš
+ = 
+	`SckWšdow
+(self,'belowright‚ew')
+
+55 
+£lf
+.
+¡ackwš
+.
+	$ü—‹
+()
+
+57 
+£lf
+.
+¡©uswš
+ = 
+	`StusWšdow
+(self,'belowright‚ew')
+
+58 
+£lf
+.
+¡©uswš
+.
+	$ü—‹
+()
+
+59 
+£lf
+.
+¡©uswš
+.
+	`£t_¡©us
+("loading")
+
+61 
+£lf
+.
+w©chwš
+.
+	$£t_height
+(20)
+
+62 
+£lf
+.
+¡©uswš
+.
+	$£t_height
+(5)
+
+64 
+logwš
+ = 
+	`LogWšdow
+(
+£lf
+,'rightbelow 6new')
+
+65 
+vdebug
+.
+log
+.
+Log
+.
+	`£t_logg”
+(\
+
+66 
+vdebug
+.
+log
+.
+	`WšdowLogg”
+(\
+
+67 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('debug_window_level'),\
+
+68 
+logwš
+))
+
+70 
+wšÄ
+ = 
+£lf
+.
+	$__g‘_¤cwšno_by_Çme
+(
+¤cwš_Çme
+)
+
+71 
+£lf
+.
+sourûwš
+ = 
+	$SourûWšdow
+(
+£lf
+,
+wšÄ
+)
+
+72 
+£lf
+.
+sourûwš
+.
+	$focus
+()
+
+73 
+exû±
+ 
+Exû±iÚ
+ 
+as
+ 
+e
+:
+
+74 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+75 
+¿i£
+ 
+e
+
+
+77 
+def
+ 
+	$£t_sourû_pos™iÚ
+(
+£lf
+,
+fe
+,
+lš’o
+):
+
+78 
+£lf
+.
+sourûwš
+.
+	$£t_fe
+(
+fe
+)
+
+79 
+£lf
+.
+sourûwš
+.
+	$£t_lše
+(
+lš’o
+)
+
+80 
+£lf
+.
+sourûwš
+.
+	$¶aû_poš‹r
+(
+lš’o
+)
+
+82 
+def
+ 
+	$m¬k_as_¡İ³d
+(
+£lf
+):
+
+83 
+£lf
+.
+is_İ’
+:
+
+84 
+£lf
+.
+sourûwš
+:
+
+85 
+£lf
+.
+sourûwš
+.
+	$»move_poš‹r
+()
+
+86 
+£lf
+.
+¡©uswš
+:
+
+87 
+£lf
+.
+¡©uswš
+.
+	`£t_¡©us
+("stopped")
+
+88 
+£lf
+.
+	$»move_cÚn_d‘as
+()
+
+90 
+def
+ 
+	$£t_cÚn_d‘as
+(
+£lf
+,
+addr
+,
+pÜt
+):
+
+91 
+£lf
+.
+¡©uswš
+.
+	`š£¹
+("CÚÃùedØ%s:%s" %(
+addr
+,
+pÜt
+),2,
+True
+)
+
+93 
+def
+ 
+	$»move_cÚn_d‘as
+(
+£lf
+):
+
+94 
+£lf
+.
+¡©uswš
+.
+	`š£¹
+("NÙ cÚÃùed",2,
+True
+)
+
+96 
+def
+ 
+	$£t_li¡’”_d‘as
+(
+£lf
+,
+addr
+,
+pÜt
+,
+idekey
+):
+
+97 
+d‘as
+ = "Li¡’šg oÀ%s:%s" %(
+addr
+,
+pÜt
+)
+
+98 
+	$Ën
+(
+idekey
+):
+
+99 
+d‘as
+ +ğ" (IDE key: %s)" % 
+idekey
+
+
+100 
+£lf
+.
+¡©uswš
+.
+	$š£¹
+(
+d‘as
+,1,
+True
+)
+
+102 
+def
+ 
+	$g‘_cu¼’t_fe
+(
+£lf
+):
+
+103  
+vdebug
+.
+ut
+.
+	$LoÿlFeP©h
+(
+vim
+.
+cu¼’t
+.
+bufãr
+.
+Çme
+)
+
+105 
+def
+ 
+	$g‘_cu¼’t_row
+(
+£lf
+):
+
+106  
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+[0]
+
+108 
+def
+ 
+	$g‘_cu¼’t_lše
+(
+£lf
+):
+
+109  
+£lf
+.
+	`g‘_lše
+(£lf.
+	$g‘_cu¼’t_row
+())
+
+111 
+def
+ 
+	$g‘_lše
+(
+£lf
+,
+row
+):
+
+112  
+vim
+.
+	`ev®
+("g‘lše(" + 
+	`¡r
+(
+row
+) + ")")
+
+114 
+def
+ 
+	$»gi¡”_b»akpošt
+(
+£lf
+,
+b»akpošt
+):
+
+115 
+b»akpošt
+.
+ty³
+ == 'line':
+
+116 
+£lf
+.
+	`¶aû_b»akpošt
+(
+b»akpošt
+.
+id
+,\
+
+117 
+b»akpošt
+.
+fe
+,b»akpošt.
+lše
+)
+
+118 
+£lf
+.
+b»akpoštwš
+.
+is_İ’
+:
+
+119 
+£lf
+.
+b»akpoštwš
+.
+	$add_b»akpošt
+(
+b»akpošt
+)
+
+121 
+def
+ 
+	$¶aû_b»akpošt
+(
+£lf
+,
+sign_id
+,
+fe
+,
+lše
+):
+
+122 
+vim
+.
+	`commªd
+('sigÀ¶aû '+
+	`¡r
+(
+sign_id
+)+\
+
+123 '‚ame=b»ak±†še='+
+	`¡r
+(
+lše
+)+\
+
+124 ' fe='+
+fe
+.
+	$as_loÿl
+())
+
+126 
+def
+ 
+	$»move_b»akpošt
+(
+£lf
+,
+b»akpošt
+):
+
+127 
+id
+ = 
+b»akpošt
+.id
+
+128 
+vim
+.
+	`commªd
+('sigÀuÅÏû %i' % 
+id
+)
+
+129 
+£lf
+.
+b»akpoštwš
+.
+is_İ’
+:
+
+130 
+£lf
+.
+b»akpoštwš
+.
+	$»move_b»akpošt
+(
+id
+)
+
+132 
+def
+ 
+	$g‘_b»akpošt_sign_pos™iÚs
+(
+£lf
+):
+
+133 
+sign_lšes
+ = 
+£lf
+.
+	`commªd
+('sigÀ¶aû').
+	`¥l™
+("\n")
+
+134 
+pos™iÚs
+ = {
+	}
+}
+
+135 
+lše
+ 
+š
+ 
+sign_lšes
+:
+
+136 "Çme=b»ak±" 
+š
+ 
+lše
+:
+
+137 
+©Œibu‹s
+ = 
+lše
+.
+¡r
+().
+	$¥l™
+()
+
+138 
+lšešfo
+ = 
+©Œibu‹s
+[0].
+	`¥l™
+('=')
+
+139 
+idšfo
+ = 
+©Œibu‹s
+[1].
+	`¥l™
+('=')
+
+140 
+pos™iÚs
+[
+idšfo
+[1]] = 
+lšešfo
+[1]
+
+141  
+pos™iÚs
+
+
+143 #Execu‹ 
+a
+ 
+vim
+ 
+commªd
+ 
+ªd
+  
+the
+ 
+ouut
+.
+
+144 
+def
+ 
+	$commªd
+(
+£lf
+,
+cmd
+):
+
+145 
+vim
+.
+	`commªd
+('redir => _tmp')
+
+146 
+vim
+.
+	`commªd
+('s’ˆ%s' % 
+cmd
+)
+
+147 
+vim
+.
+	`commªd
+('redir END')
+
+148  
+vim
+.
+	`ev®
+('_tmp')
+
+150 
+def
+ 
+	$§y
+(
+£lf
+,
+¡ršg
+):
+
+152 
+´št
+ 
+	$¡r
+(
+¡ršg
+)
+
+153 
+vdebug
+.
+log
+.
+	$Log
+(
+¡ršg
+,
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+)
+
+155 
+def
+ 
+	$”rÜ
+(
+£lf
+,
+¡ršg
+):
+
+156 
+vim
+.
+	`commªd
+('echohl Error |ƒcho "'+\
+
+157 
+	`¡r
+(
+¡ršg
+).
+	`»¶aû
+('"','\\"')+\
+
+159 
+vdebug
+.
+log
+.
+	$Log
+(
+¡ršg
+,
+vdebug
+.
+log
+.
+Logg”
+.
+ERROR
+)
+
+161 
+def
+ 
+	$şo£
+(
+£lf
+):
+
+162 
+nÙ
+ 
+£lf
+.
+is_İ’
+:
+
+164 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+166 
+vdebug
+.
+log
+.
+Log
+.
+	`»move_logg”
+('WindowLogger')
+
+167 
+£lf
+.
+bÄ
+:
+
+168 
+vim
+.
+	`commªd
+('s’t! '+
+£lf
+.
+bÄ
++'tabc!')
+
+169 
+£lf
+.
+cu¼’t_b
+:
+
+170 
+vim
+.
+	`commªd
+('bÀ'+
+£lf
+.
+cu¼’t_b
+)
+
+172 
+£lf
+.
+em±y_buf_num
+:
+
+173 
+vim
+.
+	`commªd
+('bw' + 
+£lf
+.
+em±y_buf_num
+)
+
+175 
+£lf
+.
+w©chwš
+:
+
+176 
+£lf
+.
+w©chwš
+.
+	$de¡roy
+()
+
+177 
+£lf
+.
+¡ackwš
+:
+
+178 
+£lf
+.
+¡ackwš
+.
+	$de¡roy
+()
+
+179 
+£lf
+.
+¡©uswš
+:
+
+180 
+£lf
+.
+¡©uswš
+.
+	$de¡roy
+()
+
+182 
+£lf
+.
+w©chwš
+ = 
+NÚe
+
+
+183 
+£lf
+.
+¡ackwš
+ = 
+NÚe
+
+
+184 
+£lf
+.
+¡©uswš
+ = 
+NÚe
+
+
+187 
+def
+ 
+	$__g‘_¤cwš_Çme
+(
+£lf
+):
+
+188  
+vim
+.
+cu¼’t
+.
+bufãr
+.
+Çme
+
+
+190 
+def
+ 
+	$__g‘_¤cwšno_by_Çme
+(
+£lf
+,
+Çme
+):
+
+191 
+i
+ = 1
+
+192 
+vdebug
+.
+log
+.
+	`Log
+("S—rchšg fÜ wš by‚am%s" % 
+Çme
+,\
+
+193 
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+)
+
+194 
+w
+ 
+š
+ 
+vim
+.
+wšdows
+:
+
+195 
+vdebug
+.
+log
+.
+	`Log
+("Wš %d,‚am%s" %(
+i
+,
+w
+.
+bufãr
+.
+Çme
+),\
+
+196 
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+)
+
+197 
+w
+.
+bufãr
+.
+Çme
+ ==‚ame:
+
+200 
+i
+ += 1
+
+202 
+vdebug
+.
+log
+.
+	`Log
+("R‘uºšg wšdow‚umb” %d" % 
+i
+,\
+
+203 
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+)
+
+204  
+i
+
+
+206 
+def
+ 
+	$__g‘_buf_li¡
+(
+£lf
+):
+
+207  
+vim
+.
+	`ev®
+("range(1, bufnr('$'))")
+
+209 
+şass
+ 
+	$SourûWšdow
+(
+vdebug
+.
+ui
+.
+š‹rçû
+.
+Wšdow
+):
+
+211 
+fe
+ = 
+NÚe
+
+
+212 
+poš‹r_sign_id
+ = '6145'
+
+213 
+b»akpošt_sign_id
+ = '6146'
+
+214 
+´evlše
+ = 0
+
+216 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+wšno
+):
+
+217 
+£lf
+.
+wšno
+ = 
+	$¡r
+(
+wšno
+)
+
+219 
+def
+ 
+	$focus
+(
+£lf
+):
+
+220 
+vim
+.
+	`commªd
+(
+£lf
+.
+wšno
++"wincmd w")
+
+222 
+def
+ 
+	$commªd
+(
+£lf
+,
+cmd
+,
+s’t
+ = 
+True
+):
+
+223 
+£lf
+.
+	$focus
+()
+
+224 
+´•’d
+ = "s’ˆ" 
+s’t
+ ""
+
+225 
+commªd_¡r
+ = 
+´•’d
+ + 
+£lf
+.
+wšno
+ + "wšcmd " + 
+cmd
+
+
+226 
+vim
+.
+	$commªd
+(
+commªd_¡r
+)
+
+228 
+def
+ 
+	$£t_fe
+(
+£lf
+,
+fe
+):
+
+229 
+fe
+ =ğ
+£lf
+.file:
+
+231 
+£lf
+.
+fe
+ = file
+
+232 
+vdebug
+.
+log
+.
+	`Log
+("S‘tšg sourû fe: "+
+fe
+,vdebug.log.
+Logg”
+.
+INFO
+)
+
+233 
+£lf
+.
+	$focus
+()
+
+234 
+vim
+.
+	`commªd
+('ÿÎ vdebug:ed™("%s")' % 
+	`¡r
+(
+fe
+).
+	`»¶aû
+("\\", "\\\\"))
+
+236 
+def
+ 
+	$£t_lše
+(
+£lf
+,
+lš’o
+):
+
+237 
+£lf
+.
+	$focus
+()
+
+238 
+vim
+.
+	`commªd
+("nÜm® %sgg" % 
+	$¡r
+(
+lš’o
+))
+
+240 
+def
+ 
+	$g‘_fe
+(
+£lf
+):
+
+241 
+£lf
+.
+	$focus
+()
+
+242 
+£lf
+.
+fe
+ = 
+vdebug
+.
+ut
+.
+	`LoÿlFeP©h
+(
+vim
+.
+	`ev®
+("expand('%:p')"))
+
+243  
+£lf
+.
+fe
+
+
+245 
+def
+ 
+	$ş—r_signs
+(
+£lf
+):
+
+246 
+vim
+.
+	`commªd
+('sign unplace *')
+
+248 
+def
+ 
+	$¶aû_poš‹r
+(
+£lf
+,
+lše
+):
+
+249 
+vdebug
+.
+log
+.
+	`Log
+("PÏcšg…oš‹¸sigÀÚ†š"+
+	`¡r
+(
+lše
+),\
+
+250 
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+)
+
+252 
+vim
+.
+	`commªd
+('sign undefine current')
+
+253 
+vim
+.
+	`commªd
+('sign define currentext=->exthl=DbgCurrentSign†inehl=DbgCurrentLine')
+
+255 
+vim
+.
+	`commªd
+('sigÀ¶aû '+
+£lf
+.
+poš‹r_sign_id
++\
+
+256 '‚ame=cu¼’ˆlše='+
+	`¡r
+(
+lše
+)+\
+
+257 ' fe='+
+£lf
+.
+fe
+)
+
+259 
+ov”m¬gš
+ = 
+	`abs
+Ğ
+£lf
+.
+´evlše
+ - Ğ
+vim
+.
+	`ev®
+("line('.')") ) ) > 10
+
+260 
+ov”m¬gš
+:
+
+261 
+vim
+.
+	`commªd
+('exe "normal zz"')
+
+262 
+£lf
+.
+´evlše
+ = (
+vim
+.
+	`ev®
+("line('.')"))
+
+263 (
+vim
+.
+	`ev®
+("line('.')")) > 15:
+
+264 
+vim
+.
+	`commªd
+('exe "normal 4\<C-e>"')
+
+265 
+vim
+.
+	`commªd
+('redraw!')
+
+267 
+def
+ 
+	$»move_poš‹r
+(
+£lf
+):
+
+268 
+vim
+.
+	`commªd
+('sigÀuÅÏû %s' % 
+£lf
+.
+poš‹r_sign_id
+)
+
+270 
+şass
+ 
+	$Wšdow
+(
+vdebug
+.
+ui
+.
+š‹rçû
+.
+Wšdow
+):
+
+271 
+Çme
+ = "WINDOW"
+
+272 
+İ’_cmd
+ = "new"
+
+273 
+ü—tiÚ_couÁ
+ = 0
+
+275 
+def
+ 
+	$__š™__
+(
+£lf
+,
+ui
+,
+İ’_cmd
+):
+
+276 
+£lf
+.
+bufãr
+ = 
+NÚe
+
+
+277 
+£lf
+.
+ui
+ = ui
+
+278 
+£lf
+.
+İ’_cmd
+ = open_cmd
+
+279 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+281 
+def
+ 
+	$g‘wšÄ
+(
+£lf
+):
+
+282  (
+vim
+.
+	`ev®
+("bufwšÄ('"+
+£lf
+.
+Çme
++"')"))
+
+284 
+def
+ 
+	$£t_height
+(
+£lf
+,
+height
+):
+
+285 
+height
+ = (height)
+
+286 
+mšheight
+ = (
+vim
+.
+	`ev®
+("&winminheight"))
+
+287 
+height
+ < 
+mšheight
+:
+
+288 
+height
+ = 
+mšheight
+
+
+289 
+height
+ <= 0:
+
+290 
+height
+ = 1
+
+291 
+£lf
+.
+	`commªd
+('£ˆwšheight=%i' % 
+height
+)
+
+293 
+def
+ 
+	`wr™e
+(
+£lf
+, 
+msg
+, 
+»tuº_focus
+ = 
+True
+, 
+aá”
+ = "normal G"):
+
+294 
+nÙ
+ 
+£lf
+.
+is_İ’
+:
+
+295 
+£lf
+.
+	$ü—‹
+()
+
+296 
+»tuº_focus
+:
+
+297 
+´ev_wš
+ = 
+vim
+.
+	`ev®
+('winnr()')
+
+298 
+£lf
+.
+	$bufãr_em±y
+():
+
+299 
+£lf
+.
+bufãr
+[:] = 
+	`¡r
+(
+msg
+).
+	`¥l™
+('\n')
+
+301 
+£lf
+.
+bufãr
+.
+	`­³nd
+(
+	`¡r
+(
+msg
+).
+	`¥l™
+('\n'))
+
+302 
+£lf
+.
+	$commªd
+(
+aá”
+)
+
+303 
+»tuº_focus
+:
+
+304 
+vim
+.
+	`commªd
+('%swšcmd W' % 
+´ev_wš
+)
+
+306 
+def
+ 
+	$š£¹
+(
+£lf
+, 
+msg
+, 
+lš’o
+ = 
+NÚe
+, 
+ov”wr™e
+ = 
+F®£
+, 
+®lowEm±y
+ = False):
+
+307 
+nÙ
+ 
+£lf
+.
+is_İ’
+:
+
+308 
+£lf
+.
+	`ü—‹
+()
+
+310 
+	`Ën
+(
+msg
+è=ğ0 
+ªd
+ 
+®lowEm±y
+ =ğ
+F®£
+:
+
+312 
+£lf
+.
+	$bufãr_em±y
+():
+
+313 
+£lf
+.
+bufãr
+[:] = 
+	`¡r
+(
+msg
+).
+	`¥l™
+('\n')
+
+315 
+lš’o
+ =ğ
+NÚe
+:
+
+316 (
+lš’o
+, 
+rŞ
+èğ
+vim
+.
+cu¼’t
+.
+wšdow
+.
+cursÜ
+
+
+317 
+»maššg_bufãr
+ = 
+	`¡r
+(
+msg
+).
+	`¥l™
+('\n')
+
+318 
+ov”wr™e
+:
+
+319 
+läom
+ = 
+lš’o
+ + 1
+
+321 
+läom
+ = 
+lš’o
+
+
+322 
+»maššg_bufãr
+.
+	$ex‹nd
+(
+£lf
+.
+bufãr
+[
+läom
+:])
+
+323 
+d–
+ 
+£lf
+.
+bufãr
+[
+lš’o
+:]
+
+324 
+£lf
+.
+	$bufãr_em±y
+():
+
+325 
+£lf
+.
+bufãr
+[:] = 
+»maššg_bufãr
+
+
+327 
+lše
+ 
+š
+ 
+»maššg_bufãr
+:
+
+328 
+£lf
+.
+bufãr
+.
+	$­³nd
+(
+lše
+)
+
+329 
+£lf
+.
+	`commªd
+(
+	$¡r
+(
+läom
+))
+
+331 
+def
+ 
+	$d–‘e
+(
+£lf
+,
+¡¬t_lše
+,
+’d_lše
+):
+
+332 
+Œy
+:
+
+333 
+£lf
+.
+bufãr
+[
+’d_lše
+]
+
+334 
+»maššg_bufãr
+ = 
+£lf
+.
+bufãr
+[
+’d_lše
+:]
+
+335 
+d–
+ 
+£lf
+.
+bufãr
+[
+¡¬t_lše
+:]
+
+336 
+£lf
+.
+bufãr
+.
+	$­³nd
+(
+»maššg_bufãr
+)
+
+337 
+exû±
+ 
+IndexE¼Ü
+:
+
+338 
+d–
+ 
+£lf
+.
+bufãr
+[
+¡¬t_lše
+:]
+
+340 
+def
+ 
+	$bufãr_em±y
+(
+£lf
+):
+
+341 
+	`Ën
+(
+£lf
+.
+bufãr
+) == 1 \
+
+342 
+ªd
+ 
+	`Ën
+(
+£lf
+.
+bufãr
+[0]) == 0:
+
+343  
+True
+
+
+345  
+F®£
+
+
+347 
+def
+ 
+	$ü—‹
+(
+£lf
+):
+
+349 
+vim
+.
+	`commªd
+('s’ˆ' + 
+£lf
+.
+İ’_cmd
+ + ' ' + s–f.
+Çme
+)
+
+350 
+vim
+.
+	`commªd
+("setlocal buftype=nofile modifiable "+ \
+
+352 
+£lf
+.
+bufãr
+ = 
+vim
+.
+cu¼’t
+.buffer
+
+353 
+£lf
+.
+is_İ’
+ = 
+True
+
+
+354 
+£lf
+.
+ü—tiÚ_couÁ
+ += 1
+
+355 
+£lf
+.
+	$Ú_ü—‹
+()
+
+357 
+def
+ 
+	$de¡roy
+(
+£lf
+):
+
+359 
+£lf
+.
+bufãr
+ =ğ
+NÚe
+ 
+Ü
+ 
+	`Ën
+(
+	`dœ
+(self.buffer)) == 0:
+
+361 
+£lf
+.
+is_İ’
+ = 
+F®£
+
+
+362 (
+vim
+.
+	`ev®
+('bufãr_exi¡s("'+
+£lf
+.
+Çme
++'")')) == 1:
+
+363 
+vim
+.
+	`commªd
+('bweouˆ' + 
+£lf
+.
+Çme
+)
+
+365 
+def
+ 
+	$ş—n
+(
+£lf
+):
+
+367 
+£lf
+.
+bufãr
+[:] = []
+
+369 
+def
+ 
+	$commªd
+(
+£lf
+, 
+cmd
+):
+
+371 
+wšÄ
+ = 
+£lf
+.
+	$g‘wšÄ
+()
+
+372 
+wšÄ
+ !ğ(
+vim
+.
+	`ev®
+("winnr()")):
+
+373 
+vim
+.
+	`commªd
+(
+	`¡r
+(
+wšÄ
+) + 'wincmd w')
+
+374 
+vim
+.
+	$commªd
+(
+cmd
+)
+
+376 
+def
+ 
+	$acû±_»nd””
+(
+£lf
+,
+»nd””
+):
+
+377 
+£lf
+.
+	`wr™e
+(
+»nd””
+.
+	$»nd”
+())
+
+379 
+şass
+ 
+	$B»akpoštWšdow
+(
+Wšdow
+):
+
+380 
+Çme
+ = "DebuggerBreakpoints"
+
+381 
+is_visibË
+ = 
+F®£
+
+
+382 
+h—d”
+ = """===========================================================
+
+383 
+ID
+ | 
+TYPE
+ | 
+DATA
+
+
+386 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+387 
+£lf
+.
+	$ş—n
+()
+
+388 
+£lf
+.
+	$wr™e
+(
+£lf
+.
+h—d”
+)
+
+389 
+£lf
+.
+	`commªd
+('setlocal syntax=debugger_breakpoint')
+
+390 
+bp
+ 
+š
+ 
+£lf
+.
+ui
+.
+b»akpošt_¡Üe
+.
+	$g‘_sÜ‹d_li¡
+():
+
+391 
+£lf
+.
+	$add_b»akpošt
+(
+bp
+)
+
+392 
+£lf
+.
+ü—tiÚ_couÁ
+ == 1:
+
+393 
+cmd
+ = 's’t!‡u BufWšL—v% :s’t! bd–‘%s' %(
+£lf
+.
+Çme
+,self.name)
+
+394 
+vim
+.
+	`commªd
+('% |…ythÚ debugg”.ruÂ”.ui.b»akpoštwš.is_İ’ = F®£' % 
+cmd
+)
+
+396 
+def
+ 
+	$add_b»akpošt
+(
+£lf
+,
+b»akpošt
+):
+
+397 
+bp_¡r
+ = " %-7˜| %-11 | " %(
+b»akpošt
+.
+id
+,b»akpošt.
+ty³
+)
+
+398 
+b»akpošt
+.
+ty³
+ == 'line':
+
+399 
+bp_¡r
+ +ğ"%s:%s" %(
+b»akpošt
+.
+fe
+,
+	$¡r
+(
+b»akpošt
+.
+lše
+))
+
+400 
+–if
+ 
+b»akpošt
+.
+ty³
+ == 'conditional':
+
+401 
+bp_¡r
+ += "%s:%s when (%s)" \
+
+402 %(
+b»akpošt
+.
+fe
+,
+	`¡r
+(b»akpošt.
+lše
+),b»akpošt.
+cÚd™iÚ
+)
+
+403 
+–if
+ 
+b»akpošt
+.
+ty³
+ == 'exception':
+
+404 
+bp_¡r
+ +ğ"Exû±iÚ: %s" % 
+b»akpošt
+.
+exû±iÚ
+
+
+405 
+–if
+ 
+b»akpošt
+.
+ty³
+ =ğ'ÿÎ' 
+Ü
+ \
+
+406 
+b»akpošt
+.
+ty³
+ == 'return':
+
+407 
+bp_¡r
+ +ğ"FunùiÚ: %s" % 
+b»akpošt
+.
+funùiÚ
+
+
+409 
+£lf
+.
+	$wr™e
+(
+bp_¡r
+)
+
+411 
+def
+ 
+	$»move_b»akpošt
+(
+£lf
+,
+b»akpošt_id
+):
+
+412 
+i
+ = 0
+
+413 
+l
+ 
+š
+ 
+£lf
+.
+bufãr
+:
+
+414 
+bp_¡r
+ = " %˜" % 
+b»akpošt_id
+
+
+415 
+bp_id_Ën
+ = 
+	$Ën
+(
+bp_¡r
+)
+
+416 
+l
+[:
+bp_id_Ën
+] =ğ
+bp_¡r
+:
+
+417 
+d–
+ 
+£lf
+.
+bufãr
+[
+i
+]
+
+418 
+i
+ += 1
+
+420 
+şass
+ 
+	$LogWšdow
+(
+Wšdow
+):
+
+421 
+Çme
+ = "DebuggerLog"
+
+423 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+424 
+£lf
+.
+	`commªd
+('setlocal syntax=debugger_log')
+
+425 
+£lf
+.
+ü—tiÚ_couÁ
+ == 1:
+
+426 
+vim
+.
+	`commªd
+('s’t!‡u BufWšL—v% :s’t! bd–‘%s' %(
+£lf
+.
+Çme
+,self.name))
+
+428 
+def
+ 
+	$wr™e
+(
+£lf
+, 
+msg
+, 
+»tuº_focus
+ = 
+True
+):
+
+429 
+Wšdow
+.
+	$wr™e
+(
+£lf
+, 
+msg
+,
+»tuº_focus
+=
+True
+)
+
+431 
+şass
+ 
+	$SckWšdow
+(
+Wšdow
+):
+
+432 
+Çme
+ = "DebuggerStack"
+
+434 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+435 
+£lf
+.
+	`commªd
+('inoremap <buffer> <cr> <esc>'+\
+
+437 
+£lf
+.
+	`commªd
+('nnoremap <buffer> <cr> '+\
+
+439 
+£lf
+.
+	`commªd
+('nnoremap <buffer> <2-LeftMouse> '+\
+
+441 
+£lf
+.
+	`commªd
+('setlocal syntax=debugger_stack')
+
+442 
+£lf
+.
+ü—tiÚ_couÁ
+ == 1:
+
+443 
+cmd
+ = 's’t!‡u BufWšL—v% :s’t! bd–‘%s' %(
+£lf
+.
+Çme
+,self.name)
+
+444 
+vim
+.
+	`commªd
+('% |…ythÚ debugg”.ruÂ”.ui.¡ackwš.is_İ’ = F®£' % 
+cmd
+)
+
+446 
+def
+ 
+	$wr™e
+(
+£lf
+, 
+msg
+, 
+»tuº_focus
+ = 
+True
+):
+
+447 
+Wšdow
+.
+	`wr™e
+(
+£lf
+, 
+msg
+, 
+aá”
+="normal gg")
+
+449 
+şass
+ 
+	$W©chWšdow
+(
+Wšdow
+):
+
+450 
+Çme
+ = "DebuggerWatch"
+
+452 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+453 
+£lf
+.
+	`commªd
+('inoremap <buffer> <cr> <esc>'+\
+
+455 
+£lf
+.
+	`commªd
+('nnoremap <buffer> <cr> '+\
+
+457 
+£lf
+.
+	`commªd
+('nnoremap <buffer> <2-LeftMouse> '+\
+
+459 
+£lf
+.
+	`commªd
+('setlocal syntax=debugger_watch')
+
+460 
+£lf
+.
+ü—tiÚ_couÁ
+ == 1:
+
+461 
+cmd
+ = 's’t!‡u BufWšL—v% :s’t! bd–‘%s' %(
+£lf
+.
+Çme
+,self.name)
+
+462 
+vim
+.
+	`commªd
+('% |…ythÚ debugg”.ruÂ”.ui.w©chwš.is_İ’ = F®£' % 
+cmd
+)
+
+464 
+def
+ 
+	$wr™e
+(
+£lf
+, 
+msg
+, 
+»tuº_focus
+ = 
+True
+):
+
+465 
+Wšdow
+.
+	`wr™e
+(
+£lf
+, 
+msg
+, 
+aá”
+="normal gg")
+
+467 
+şass
+ 
+	$StusWšdow
+(
+Wšdow
+):
+
+468 
+Çme
+ = "DebuggerStatus"
+
+470 
+def
+ 
+	$Ú_ü—‹
+(
+£lf
+):
+
+471 
+keys
+ = 
+vdebug
+.
+ut
+.
+	$Keym­³r
+()
+
+472 
+ouut
+ = "Status: starting\nListening on…ort\nNot connected\n\n"
+
+473 
+ouut
+ +ğ"P»s % tØ¡¬ˆdebuggšg, " %(
+keys
+.
+	$run_key
+())
+
+474 
+ouut
+ +ğ"% tØ¡İ/şo£. " %(
+keys
+.
+	$şo£_key
+())
+
+475 
+ouut
+ += "Type :help Vdebug for more information."
+
+477 
+£lf
+.
+	$wr™e
+(
+ouut
+)
+
+479 
+£lf
+.
+	`commªd
+('setlocal syntax=debugger_status')
+
+480 
+£lf
+.
+ü—tiÚ_couÁ
+ == 1:
+
+481 
+cmd
+ = 'au BufWšL—v% :s’t! bd–‘%s' %(
+£lf
+.
+Çme
+,self.name)
+
+482 
+vim
+.
+	`commªd
+('% |…ythÚ debugg”.ruÂ”.ui.¡©uswš.is_İ’ = F®£' % 
+cmd
+)
+
+484 
+def
+ 
+	$£t_¡©us
+(
+£lf
+,
+¡©us
+):
+
+485 
+£lf
+.
+	`š£¹
+("Stus: "+
+	`¡r
+(
+¡©us
+),0,
+True
+)
+
+488 
+şass
+ 
+Re¥Ú£R’d””
+:
+
+489 
+def
+ 
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+):
+
+490 
+£lf
+.
+»¥Ú£
+ =„esponse
+
+492 
+def
+ 
+	$»nd”
+(
+£lf
+):
+
+493 
+·ss
+
+
+495 
+şass
+ 
+	$SckG‘Re¥Ú£R’d””
+(
+Re¥Ú£R’d””
+):
+
+496 
+def
+ 
+	$»nd”
+(
+£lf
+):
+
+497 
+¡ack
+ = 
+£lf
+.
+»¥Ú£
+.
+	$g‘_¡ack
+()
+
+498 
+¡ršg
+ = ""
+
+499 
+s
+ 
+š
+ 
+¡ack
+:
+
+500 
+wh”e
+ = 
+s
+.
+	`g‘
+('where') s.get('where') 'main'
+
+501 
+fe
+ = 
+vdebug
+.
+ut
+.
+	`LoÿlFeP©h
+(
+s
+.
+	`g‘
+('filename'))
+
+502 
+lše
+ = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
+
+503 %{'num':
+s
+.
+	`g‘
+('Ëv–'),'wh”e':
+wh”e
+,\
+
+504 'fe':
+	`¡r
+(
+fe
+),'lše':
+s
+.
+	`g‘
+('lš’o')
+	}
+}
+
+505 
+¡ršg
+ +ğ
+lše
+ + "\n"
+
+506  
+¡ršg
+
+
+509 
+şass
+ 
+	$CÚ‹xtG‘Re¥Ú£R’d””
+(
+Re¥Ú£R’d””
+):
+
+511 
+def
+ 
+	`__š™__
+(
+£lf
+,
+»¥Ú£
+,
+t™Ë
+ = 
+NÚe
+,
+cÚ‹xts
+ = {
+	}
+},
+	gcu¼’t_cÚ‹xt
+ = 0):
+
+512 
+Re¥Ú£R’d””
+.
+	$__š™__
+(
+£lf
+,
+»¥Ú£
+)
+
+513 
+£lf
+.
+t™Ë
+ =itle
+
+514 
+£lf
+.
+cÚ‹xts
+ = contexts
+
+515 
+£lf
+.
+cu¼’t_cÚ‹xt
+ = current_context
+
+517 
+def
+ 
+	$»nd”
+(
+£lf
+,
+šd’t
+ = 0):
+
+518 
+»s
+ = 
+£lf
+.
+	$__ü—‹_bs
+()
+
+520 
+£lf
+.
+t™Ë
+:
+
+521 
+»s
+ +ğ"- %s\n\n" % 
+£lf
+.
+t™Ë
+
+
+523 
+´İ”t›s
+ = 
+£lf
+.
+»¥Ú£
+.
+	$g‘_cÚ‹xt
+()
+
+524 
+num_´İs
+ = 
+	$Ën
+(
+´İ”t›s
+)
+
+525 
+vdebug
+.
+log
+.
+	`Log
+("Wr™šg %˜´İ”t› tØthcÚ‹xˆwšdow" % 
+num_´İs
+,\
+
+526 
+vdebug
+.
+log
+.
+Logg”
+.
+INFO
+ )
+
+527 
+idx
+, 
+´İ
+ 
+š
+ 
+	$’um”©e
+(
+´İ”t›s
+):
+
+528 
+fš®
+ = 
+F®£
+
+
+529 
+Œy
+:
+
+530 
+Ãxt_´İ
+ = 
+´İ”t›s
+[
+idx
++1]
+
+531 
+exû±
+ 
+IndexE¼Ü
+:
+
+532 
+fš®
+ = 
+True
+
+
+533 
+Ãxt_´İ
+ = 
+NÚe
+
+
+534 
+»s
+ +ğ
+£lf
+.
+	$__»nd”_´İ”ty
+(
+´İ
+,
+Ãxt_´İ
+,
+fš®
+,
+šd’t
+)
+
+536 
+vdebug
+.
+log
+.
+	`Log
+("Wr™šgØcÚ‹xˆwšdow:\n"+
+»s
+,vdebug.log.
+Logg”
+.
+DEBUG
+)
+
+538  
+»s
+
+
+540 
+def
+ 
+	$__ü—‹_bs
+(
+£lf
+):
+
+541 
+»s
+ = []
+
+542 
+£lf
+.
+cÚ‹xts
+:
+
+543 
+id
+,
+Çme
+ 
+š
+ 
+£lf
+.
+cÚ‹xts
+.
+	$™”™ems
+():
+
+544 
+£lf
+.
+cu¼’t_cÚ‹xt
+ =ğ
+id
+:
+
+545 
+Çme
+ = "*"+name
+
+546 
+»s
+.
+	`­³nd
+("[ % ]" % 
+Çme
+)
+
+547 
+»s
+:
+
+548  " ".
+	`još
+(
+»s
+) + "\n\n"
+
+552 
+def
+ 
+	$__»nd”_´İ”ty
+(
+£lf
+,
+p
+,
+Ãxt_p
+,
+Ï¡
+ = 
+F®£
+,
+šd’t
+ = 0):
+
+553 
+lše
+ = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" \
+
+554 %{'šd’t':"".
+	`rju¡
+((
+p
+.
+d•th
+ * 2)+
+šd’t
+),\
+
+555 'm¬k”':
+£lf
+.
+	`__g‘_m¬k”
+(
+p
+),'Çme':p.
+di¥Ïy_Çme
+.
+	`’code
+('latin1'),\
+
+556 'ty³':
+p
+.
+	`ty³_ªd_size
+(),'v®ue': " " +….
+v®ue
+}
+
+557 
+lše
+ =†še.
+r¡r
+() + "\n"
+
+559 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+g‘
+('watch_window_style') == 'expanded':
+
+560 
+d•th
+ = 
+p
+.depth
+
+561 
+Ãxt_p
+ 
+ªd
+ 
+nÙ
+ 
+Ï¡
+:
+
+562 
+Ãxt_d•th
+ = 
+Ãxt_p
+.
+d•th
+
+
+563 
+d•th
+ =ğ
+Ãxt_d•th
+:
+
+564 
+Ãxt_£p
+ = "|"
+
+565 
+num_¥aûs
+ = 
+d•th
+ * 2
+
+566 
+–if
+ 
+d•th
+ > 
+Ãxt_d•th
+:
+
+567 
+Ãxt_£p
+ = "/"
+
+568 
+num_¥aûs
+ = (
+d•th
+ * 2) - 1
+
+570 
+Ãxt_£p
+ = "\\"
+
+571 
+num_¥aûs
+ = (
+d•th
+ * 2) + 1
+
+573 
+lše
+ +ğ"".
+rju¡
+(
+num_¥aûs
++
+šd’t
+è+ " " + 
+Ãxt_£p
+ + "\n"
+
+574 
+–if
+ 
+d•th
+ > 0:
+
+575 
+lše
+ +ğ"".
+rju¡
+((
+d•th
+ * 2è- 1 + 
+šd’t
+) + " /" + "\n"
+
+576  
+lše
+
+
+578 
+def
+ 
+	$__g‘_m¬k”
+(
+£lf
+,
+´İ”ty
+):
+
+579 ğ
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_default')
+
+580 
+´İ”ty
+.
+has_chd»n
+:
+
+581 
+´İ”ty
+.
+	`chd_couÁ
+() == 0:
+
+582 ğ
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_closed_tree')
+
+584 ğ
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('marker_open_tree')
+
+	@C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\util.py
+
+1 
+impÜt
+ 
+	gvdebug
+.
+İts
+
+
+2 
+impÜt
+ 
+	gvdebug
+.
+log
+
+
+3 
+impÜt
+ 
+vim
+
+
+4 
+impÜt
+ 
+»
+
+
+5 
+impÜt
+ 
+os
+
+
+6 
+impÜt
+ 
+u¾lib
+
+
+7 
+impÜt
+ 
+time
+
+
+9 
+şass
+ 
+	gKeym­³r
+:
+
+13 
+exşude
+ = ["run","set_breakpoint","eval_visual"]
+
+15 
+def
+ 
+	$__š™__
+(
+£lf
+):
+
+16 
+£lf
+.
+keym­s
+ = 
+vim
+.
+	`ev®
+("g:vdebug_keymap")
+
+17 
+£lf
+.
+Ëad”
+ = 
+vim
+.
+	`ev®
+("g:vdebug_leader_key")
+
+18 
+£lf
+.
+is_m­³d
+ = 
+F®£
+
+
+19 
+£lf
+.
+exi¡šg
+ = []
+
+21 
+def
+ 
+	$run_key
+(
+£lf
+):
+
+22  
+£lf
+.
+keym­s
+['run']
+
+24 
+def
+ 
+	$şo£_key
+(
+£lf
+):
+
+25  
+£lf
+.
+keym­s
+['close']
+
+27 
+def
+ 
+	$m­
+(
+£lf
+):
+
+28 
+£lf
+.
+is_m­³d
+:
+
+30 
+£lf
+.
+	$_¡Üe_Şd_m­
+()
+
+31 
+func
+ 
+š
+ 
+£lf
+.
+keym­s
+:
+
+32 
+func
+ 
+nÙ
+ 
+š
+ 
+£lf
+.
+exşude
+:
+
+33 
+key
+ = 
+£lf
+.
+keym­s
+[
+func
+]
+
+34 
+m­_cmd
+ = "noremap %s%s :python debugger.%s()<cr>" %\
+
+35 (
+£lf
+.
+Ëad”
+,
+key
+,
+func
+)
+
+36 
+vim
+.
+	$commªd
+(
+m­_cmd
+)
+
+37 
+£lf
+.
+is_m­³d
+ = 
+True
+
+
+39 
+def
+ 
+	$_¡Üe_Şd_m­
+(
+£lf
+):
+
+40 
+vim
+.
+	`commªd
+('letempfile=tempname()')
+
+41 
+‹mpfe
+ = 
+vim
+.
+	`ev®
+("tempfile")
+
+42 
+vim
+.
+	`commªd
+('mkexrc! %s' % (
+‹mpfe
+))
+
+43 
+»gex
+ = 
+»
+.
+	`compe
+(
+r
+'^([nvxsoilc]|)(nore)?map!?')
+
+44 
+¥l™_»gex
+ = 
+»
+.
+	`compe
+(
+r
+'\s+')
+
+45 
+keys
+ = 
+	`£t
+(
+v
+ 
+k
+,vè
+š
+ 
+£lf
+.
+keym­s
+.
+	$™ems
+(è
+k
+ 
+nÙ
+ 
+š
+ 
+£lf
+.
+exşude
+)
+
+46 
+¥ecŸl
+ = 
+	`£t
+(["<buffer>", "<silent>", "<special>", "<script>", "<expr>", "<unique>"])
+
+47 
+lše
+ 
+š
+ 
+	`İ’
+(
+‹mpfe
+, 'r'):
+
+48 
+nÙ
+ 
+»gex
+.
+	$m©ch
+(
+lše
+):
+
+50 
+·¹s
+ = 
+¥l™_»gex
+.
+	`¥l™
+(
+lše
+)[1:]
+
+51 
+p
+ 
+š
+ 
+·¹s
+:
+
+52 
+p
+ 
+š
+ 
+¥ecŸl
+:
+
+54 
+–if
+ 
+p
+ 
+š
+ 
+keys
+:
+
+55 
+vdebug
+.
+log
+.
+	`Log
+("StÜšgƒxi¡šg key m­pšg, '%s' " % 
+lše
+,
+
+56 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+57 
+£lf
+.
+exi¡šg
+.
+	$­³nd
+(
+lše
+)
+
+60 
+os
+.
+	$»move
+(
+‹mpfe
+)
+
+62 
+def
+ 
+	$unm­
+(
+£lf
+):
+
+63 
+£lf
+.
+is_m­³d
+:
+
+64 
+£lf
+.
+is_m­³d
+ = 
+F®£
+
+
+66 
+func
+ 
+š
+ 
+£lf
+.
+keym­s
+:
+
+67 
+key
+ = 
+£lf
+.
+keym­s
+[
+func
+]
+
+68 
+func
+ 
+nÙ
+ 
+š
+ 
+£lf
+.
+exşude
+:
+
+69 
+vim
+.
+	`commªd
+("unm­ %s%s" %(
+£lf
+.
+Ëad”
+,
+key
+))
+
+70 
+m­pšg
+ 
+š
+ 
+£lf
+.
+exi¡šg
+:
+
+71 
+vdebug
+.
+log
+.
+	`Log
+("Rem­pšg key w™h '%s' " % 
+m­pšg
+,\
+
+72 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+73 
+vim
+.
+	$commªd
+(
+m­pšg
+)
+
+75 
+şass
+ 
+FeP©h
+:
+
+76 
+is_wš
+ = 
+F®£
+
+
+80 
+def
+ 
+	$__š™__
+(
+£lf
+,
+f’ame
+):
+
+81 
+f’ame
+ 
+is
+ 
+NÚe
+ 
+Ü
+ \
+
+82 
+	`Ën
+(
+f’ame
+) == 0:
+
+83 
+¿i£
+ 
+	`FeP©hE¼Ü
+("Missing or invalid file‚ame")
+
+84 
+f’ame
+ = 
+u¾lib
+.
+	$unquÙe
+(
+f’ame
+)
+
+85 
+f’ame
+.
+	`¡¬tsw™h
+('file:'):
+
+86 
+f’ame
+ = filename[5:]
+
+87 
+f’ame
+.
+	`¡¬tsw™h
+('///'):
+
+88 
+f’ame
+ = filename[2:]
+
+90 
+p
+ = 
+»
+.
+	`compe
+('^/?[a-zA-Z]:')
+
+91 
+p
+.
+	$m©ch
+(
+f’ame
+):
+
+92 
+£lf
+.
+is_wš
+ = 
+True
+
+
+93 
+f’ame
+[0] == "/":
+
+94 
+f’ame
+ = filename[1:]
+
+96 
+£lf
+.
+loÿl
+ = s–f.
+	$_ü—‹_loÿl
+(
+f’ame
+)
+
+97 
+£lf
+.
+»mÙe
+ = s–f.
+	$_ü—‹_»mÙe
+(
+f’ame
+)
+
+99 
+def
+ 
+	$_ü—‹_loÿl
+(
+£lf
+,
+f
+):
+
+102 
+U£s
+ 
+the
+ "loÿl_·th" 
+ªd
+ "»mÙe_·th" 
+İtiÚs
+.
+
+104 
+»t
+ = 
+f
+
+
+105 
+»t
+[2] == "/":
+
+106 
+»t
+ =„‘.
+	`»¶aû
+("/","\\")
+
+108 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`is£t
+('path_maps'):
+
+109 
+»mÙe
+, 
+loÿl
+ 
+š
+ 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('·th_m­s', 
+diù
+).
+	$™ems
+():
+
+110 
+»mÙe
+ 
+š
+ 
+»t
+:
+
+111 
+vdebug
+.
+log
+.
+	`Log
+("R•Ïcšg„emÙ·th (%sè" % 
+»mÙe
+ +\
+
+112 "w™h†oÿÈ·th (%s)" % 
+loÿl
+ ,\
+
+113 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+114 
+»t
+ =„‘.
+	$»¶aû
+(
+»mÙe
+,
+loÿl
+)
+
+116  
+»t
+
+
+118 
+def
+ 
+	$_ü—‹_»mÙe
+(
+£lf
+,
+f
+):
+
+121 
+U£s
+ 
+the
+ "loÿl_·th" 
+ªd
+ "»mÙe_·th" 
+İtiÚs
+.
+
+123 
+»t
+ = 
+f
+
+
+125 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`is£t
+('path_maps'):
+
+126 
+»mÙe
+, 
+loÿl
+ 
+š
+ 
+vdebug
+.
+İts
+.
+O±iÚs
+.
+	`g‘
+('·th_m­s', 
+diù
+).
+	$™ems
+():
+
+127 
+loÿl
+ 
+š
+ 
+»t
+:
+
+128 
+vdebug
+.
+log
+.
+	`Log
+("R•Ïcšg†oÿÈ·th (%sè" % 
+loÿl
+ +\
+
+129 "w™h„emÙ·th (%s)" % 
+»mÙe
+ ,\
+
+130 
+vdebug
+.
+log
+.
+Logg”
+.
+DEBUG
+)
+
+131 
+»t
+ =„‘.
+	$»¶aû
+(
+loÿl
+,
+»mÙe
+)
+
+134 
+»t
+[2] == "\\":
+
+135 
+»t
+ =„‘.
+	`»¶aû
+("\\","/")
+
+137 
+£lf
+.
+is_wš
+:
+
+138  "fe:///"+
+»t
+
+
+140  "fe://"+
+»t
+
+
+142 
+def
+ 
+	$as_loÿl
+(
+£lf
+,
+quÙe
+ = 
+F®£
+):
+
+143 
+quÙe
+:
+
+144  
+u¾lib
+.
+	$quÙe
+(
+£lf
+.
+loÿl
+)
+
+146  
+£lf
+.
+loÿl
+
+
+148 
+def
+ 
+	$as_»mÙe
+(
+£lf
+):
+
+149  
+£lf
+.
+»mÙe
+
+
+151 
+def
+ 
+	$__eq__
+(
+£lf
+,
+Ùh”
+):
+
+152 
+	$isš¡ªû
+(
+Ùh”
+,
+FeP©h
+):
+
+153 
+Ùh”
+.
+	`as_loÿl
+(è=ğ
+£lf
+.
+	$as_loÿl
+():
+
+154  
+True
+
+
+155  
+F®£
+
+
+157 
+def
+ 
+	$__Ã__
+(
+£lf
+,
+Ùh”
+):
+
+158 
+	$isš¡ªû
+(
+Ùh”
+,
+FeP©h
+):
+
+159 
+Ùh”
+.
+	`as_loÿl
+(è=ğ
+£lf
+.
+	$as_loÿl
+():
+
+160  
+F®£
+
+
+161  
+True
+
+
+163 
+def
+ 
+	$__add__
+(
+£lf
+,
+Ùh”
+):
+
+164  
+£lf
+.
+	`as_loÿl
+(è+ 
+Ùh”
+
+
+166 
+def
+ 
+	$__¿dd__
+(
+£lf
+,
+Ùh”
+):
+
+167  
+Ùh”
+ + 
+£lf
+.
+	$as_loÿl
+()
+
+169 
+def
+ 
+	$__¡r__
+(
+£lf
+):
+
+170  
+£lf
+.
+	$as_loÿl
+()
+
+172 
+def
+ 
+	$__»´__
+(
+£lf
+):
+
+173  
+	$¡r
+(
+£lf
+)
+
+175 
+şass
+ 
+	$LoÿlFeP©h
+(
+FeP©h
+):
+
+176 
+def
+ 
+	$_ü—‹_loÿl
+(
+£lf
+,
+f
+):
+
+179 
+U£s
+ 
+the
+ "loÿl_·th" 
+ªd
+ "»mÙe_·th" 
+İtiÚs
+.
+
+181  
+f
+
+
+183 
+şass
+ 
+	$RemÙeFeP©h
+(
+FeP©h
+):
+
+184 
+def
+ 
+	$_ü—‹_»mÙe
+(
+£lf
+,
+f
+):
+
+187 
+U£s
+ 
+the
+ "loÿl_·th" 
+ªd
+ "»mÙe_·th" 
+İtiÚs
+.
+
+189  
+f
+
+
+191 
+şass
+ 
+	$FeP©hE¼Ü
+(
+Exû±iÚ
+):
+
+192 
+·ss
+
+
+194 
+impÜt
+ 
+vim
+
+
+195 
+impÜt
+ 
+os
+
+
+196 
+äom
+ 
+th»adšg
+ 
+impÜt
+ 
+Th»ad
+
+
+197 
+def
+ 
+	$autocmd
+(
+pydbgp
+=
+NÚe
+):
+
+198 
+âame
+ = 
+vim
+.
+cu¼’t
+.
+bufãr
+.
+Çme
+
+
+199 
+nÙ
+ 
+âame
+:
+
+200 
+´št
+ 'File‚otƒxists!'
+
+203 
+pydbgp
+ 
+is
+ 
+nÙ
+ 
+NÚe
+:
+
+204 
+_autocmd
+ = 'pythÚ -S ' + 
+pydbgp
+ + ' -d†oÿlho¡:9000 ' + 
+âame
+
+
+205 
+´št
+ 
+autocmd
+
+
+206 
+vim
+.
+	`commªd
+Ğ"Ëˆcmd=sy¡em('%s')" % 
+_autocmd
+ )
+
+207 #vim.
+os
+.
+	`sy¡em
+(
+autocmd
+)
+
+209 
+şass
+ 
+IÅutSŒ—m
+:
+
+212 
+U£d
+ 
+to
+ 
+check
+ 
+keybßrd
+ 
+š‹¼u±s
+."""
+
+215 
+def
+ 
+	$__š™__
+(
+£lf
+,
+pydbgp
+=
+NÚe
+):
+
+216 
+£lf
+.
+pydbgp
+ =…ydbgp
+
+218 
+def
+ 
+	$´obe
+(
+£lf
+):
+
+220 
+Œy
+:
+
+221 
+vim
+.
+	`ev®
+("getchar(0)")
+
+222 
+time
+.
+	$¦“p
+(1.1)
+
+223 #time.
+	`¦“p
+(0.1)
+
+225 
+£lf
+.
+pydbgp
+:
+
+226 
+	$autocmd
+(
+£lf
+.
+pydbgp
+)
+
+227 #ˆğ
+	`Th»ad
+(
+rg‘
+=
+autocmd
+,
+¬gs
+=(
+£lf
+.
+pydbgp
+,))
+
+228 #t.
+	`¡¬t
+()
+
+230 
+exû±
+: #vim.
+”rÜ
+
+
+231 
+¿i£
+ 
+	$U£rIÁ”ru±
+()
+
+233 
+şass
+ 
+	$U£rIÁ”ru±
+(
+Exû±iÚ
+):
+
+	@
+1
+.
+0
+11
+746
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\__init__.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\breakpoint.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\dbgp.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\event.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\log.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\opts.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\runner.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\__init__.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\interface.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\ui\vimui.py
+C:\Users\escher9\.vim\bundle\vdebug\plugin\python\vdebug\util.py

@@ -191,6 +191,7 @@ class RemoteFilePath(FilePath):
 class FilePathError(Exception):
     pass
 
+import subprocess
 class InputStream:
     """Get a character from Vim's input stream.
 
@@ -207,8 +208,6 @@ class InputStream:
             time.sleep(0.1)
 
             if self.pydbgp:
-
-                import subprocess
 
                 fname  = vim.current.buffer.name
                 pydbgp = self.pydbgp
