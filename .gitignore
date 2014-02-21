@@ -1,2 +1,6 @@
 *.pyc
+*.files
+*.out
+*.bak
+*.tags
 doc/tags
