@@ -143,10 +143,12 @@ see section 3, |VdebugSetUp|.
 2. Installing the plugin                                  *VdebugInstallation*
 
 Please note that you must have VIM 7+ for this plugin to work, and it must be
-compiled with tabs, signs and Python support.
+compiled with tabs, signs and Python support. If you're using Windows, some
+reports have said that Python must be installed separately to allow VIM to use
+it.
 
 The Github page for the plugin is https://github.com/joonty/vdebug, and the VIM
-scripts URL is XXX.
+scripts URL is http://www.vim.org/scripts/script.php?script_id=4170.
 
 By far the easiest way to install is by using a plugin manager, e.g. vundle
 (https://github.com/gmarik/vundle/) or pathogen 
