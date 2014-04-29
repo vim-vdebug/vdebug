@@ -148,7 +148,7 @@ function! s:OptionNames(A,L,P)
     endif
 endfunction
 
-function! vdebug:get_visual_selection()
+function! Vdebug_get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
   let lines = getline(lnum1, lnum2)
@@ -157,7 +157,7 @@ function! vdebug:get_visual_selection()
   return join(lines, "\n")
 endfunction
 
-function! vdebug:edit(filename)
+function! Vdebug_edit(filename)
     try
         execute 'buffer' fnameescape(a:filename)
     catch /^Vim\%((\a\+)\)\=:E94/
