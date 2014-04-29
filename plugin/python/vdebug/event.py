@@ -60,7 +60,7 @@ class VisualEvalEvent(Event):
     """Evaluate a block of code given by visual selection in Vim.
     """
     def execute(self,runner):
-        selection = vim.eval("vdebug:get_visual_selection()")
+        selection = vim.eval("Vdebug_get_visual_selection()")
         runner.eval(selection)
         return True
 
