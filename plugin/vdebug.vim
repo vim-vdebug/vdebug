@@ -112,6 +112,7 @@ python debugger = DebuggerInterface()
 
 " Commands
 command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
+command! VdebugStart python debugger.run()
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
@@ -140,7 +141,7 @@ endfunction
 "
 " This should be called if you want to update the options after vdebug has
 " been loaded.
-function! vdebug:load_options(options)
+function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
 endfunction
@@ -149,7 +150,7 @@ endfunction
 "
 " This should be called if you want to update the keymappings after vdebug has
 " been loaded.
-function! vdebug:load_keymaps(keymaps)
+function! Vdebug_load_keymaps(keymaps)
     " Unmap existing keys, if applicable
     if has_key(g:vdebug_keymap, "run")
         exe "silent! nunmap ".g:vdebug_keymap["run"]
@@ -187,7 +188,7 @@ function! s:OptionNames(A,L,P)
     endif
 endfunction
 
-function! vdebug:get_visual_selection()
+function! Vdebug_get_visual_selection()
   let [lnum1, col1] = getpos("'<")[1:2]
   let [lnum2, col2] = getpos("'>")[1:2]
   let lines = getline(lnum1, lnum2)
@@ -196,7 +197,7 @@ function! vdebug:get_visual_selection()
   return join(lines, "\n")
 endfunction
 
-function! vdebug:edit(filename)
+function! Vdebug_edit(filename)
     try
         execute 'buffer' fnameescape(a:filename)
     catch /^Vim\%((\a\+)\)\=:E94/
@@ -205,5 +206,5 @@ function! vdebug:edit(filename)
 endfunction
 
 silent doautocmd User VdebugPost
-call vdebug:load_options(g:vdebug_options)
-call vdebug:load_keymaps(g:vdebug_keymap)
+call Vdebug_load_options(g:vdebug_options)
+call Vdebug_load_keymaps(g:vdebug_keymap)
