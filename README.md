@@ -28,8 +28,8 @@ If you're having trouble with Vdebug in any way, here are the steps you can take
 
 Follow me on Twitter, [@joonty](http://twitter.com/joonty), for Vdebug updates and release news.
 
-**15/05/2014:** Version 1.4.2 was released. This fixes major problems with the latest version of Vim, which has stricter rules around function naming. See [this pull request for more details][5]
-**12/04/2014:** My son was born! Hence no contact or work on Vdebug for the following month.
+* **15/05/2014:** Version 1.4.2 was released. This fixes major problems with the latest version of Vim, which has stricter rules around function naming. See [this pull request for more details][5]
+* **12/04/2014:** My son was born! Hence no contact or work on Vdebug for the following month.
 
 
 # Recent version (version 1.4.2)
