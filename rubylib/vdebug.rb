@@ -15,7 +15,7 @@ class Vdebug
     write_lock_file!
     clear_buffer_cache!
     vim.server.remote_send ":python debugger.run()<CR>"
-    sleep 1
+    sleep 2
   end
 
   def messages
@@ -118,6 +118,7 @@ class Vdebug
 protected
   def write_lock_file!
     while File.exists?(@lock_file)
+      puts "Waiting for lock to be removed"
       sleep 0.1
     end
     puts "Creating lock file for #{@instance_id}"
