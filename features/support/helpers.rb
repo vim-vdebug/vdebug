@@ -13,7 +13,10 @@ module VdebugHelper
     if @vim
       @vim.kill
       @vim = nil
-      @vdebug = nil
+      if @vdebug
+        @vdebug.remove_lock_file!
+        @vdebug = nil
+      end
     end
   end
 end
