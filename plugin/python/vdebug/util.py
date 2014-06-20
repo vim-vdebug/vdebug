@@ -110,7 +110,8 @@ class FilePath:
             ret = ret.replace("/","\\")
 
         if vdebug.opts.Options.isset('path_maps'):
-            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            for remote, local in sorted_path_maps:
                 if remote in ret:
                     vdebug.log.Log("Replacing remote path (%s) " % remote +\
                             "with local path (%s)" % local ,\
@@ -127,7 +128,8 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            for remote, local in sorted_path_maps:
                 if local in ret:
                     vdebug.log.Log("Replacing local path (%s) " % local +\
                             "with remote path (%s)" % remote ,\
