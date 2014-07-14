@@ -58,7 +58,7 @@ class VisualEvalEvent(Event):
     """Evaluate a block of code given by visual selection in Vim.
     """
     def dispatch(self):
-        selection = vim.eval("vdebug:get_visual_selection()")
+        selection = vim.eval("Vdebug_get_visual_selection()")
         self._session.dispatch_event("eval", selection)
         return True
 

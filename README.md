@@ -26,18 +26,28 @@ If you're having trouble with Vdebug in any way, here are the steps you can take
 
 # News
 
-**19/07/2013:** there's a known issue with Vdebug and Vim 7.4. Take a look at [issue #98][5] to follow updates and fixes.
+Follow me on Twitter, [@joonty](http://twitter.com/joonty), for Vdebug updates and release news.
 
-**11/06/2013:** Vdebug now has an irc channel on freenode! If you're running into problems installing, configuring or running vdebug, or you just want to ask a general question, join us on **#vdebug**.
+* **15/05/2014:** Version 1.4.2 was released. This fixes major problems with the latest version of Vim, which has stricter rules around function naming. See [this pull request for more details][5]
+* **12/04/2014:** My son was born! Hence no contact or work on Vdebug for the following month.
 
-# Recent version (version 1.4.1)
 
- * Fix folds being forgotten after debugging (issue #56)
- * Don't overwrite features array if it exists (issue #59)
- * Mapping of single modes (thanks @xbot, #66)
- * Stop empty buffers from being created (issue #70)
- * Fix ElementTree deprecation warning (thanks @InFog, #89)
- * And more... check out the HISTORY file
+# Recent version (version 1.4.2)
+
+### Bug fixes:
+ * Allow overriding of options dictionary after sourcing vdebug (issues #112, #113)
+ * Show local file path in stack window if using path mapping (issue #118)
+ * Change function names for stricter rules introduced in Vim v.7.4.260 (thanks @BlackEagle, #158 and #155)
+
+### Documentation:
+ * Various fixes
+ * Mention vim-nox package for Debian (thanks @henningda, #138)
+ * Add Python installation for Windows information (issue #135)
+
+### Features:
+ * Add completion to :Breakpoint command (thanks @tommcdo, #124)
+ * Add VdebugStart command (thanks @blueyed, #132)
+ * Sleep for 100ms in wait loop, don't consume as much CPU (thanks @blueyed, #133)
 
 # How to use
 
@@ -78,7 +88,7 @@ where the path supplied is vdebug's doc directory. This should enable vdebug's h
 
 **Requirements**:
 
-  * Vim compiled with Python 2.6+ support, tabs and signs
+  * Vim compiled with Python 2.6+ support, tabs and signs (for Debian/Ubuntu this is provided in the vim-nox package)
   * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
     Perl, NodeJS, Tcl...
 
@@ -172,4 +182,4 @@ This plugin is released under the [MIT License][1].
 [2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [3]: https://github.com/joonty/vdebug/issues/
 [4]: https://github.com/joonty/vdebug/issues/new
-[5]: https://github.com/joonty/vdebug/issues/98
+[5]: https://github.com/joonty/vdebug/issues/158

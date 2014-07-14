@@ -1,4 +1,21 @@
-=== Vdebug 1.4.2 / 2013-11-11
+=== Vdebug 1.4.2b / 2014-05-15
+
+Bug fixes:
+ * Allow overriding of options dictionary after sourcing vdebug (issues #112, #113)
+ * Show local file path in stack window if using path mapping (issue #118)
+ * Change function names for stricter rules introduced in Vim v.7.4.260 (thanks @BlackEagle, #158 and #155)
+
+Documentation:
+ * Various fixes
+ * Mention vim-nox package for Debian (thanks @henningda, #138)
+ * Add Python installation for Windows information (issue #135)
+
+Features:
+ * Add completion to :Breakpoint command (thanks @tommcdo, #124)
+ * Add VdebugStart command (thanks @blueyed, #132)
+ * Sleep for 100ms in wait loop, don't consume as much CPU (thanks @blueyed, #133)
+
+=== Vdebug 1.4.2a / 2013-11-11
 
 Bug fixes:
  * Add compatibility fix for Python debugging (due to incorrect "file:/" prefix) (issue #68, #102)

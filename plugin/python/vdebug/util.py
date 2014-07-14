@@ -9,6 +9,7 @@ import sys
 import traceback
 import socket
 import urllib
+import time
 
 class ExceptionHandler:
     def __init__(self, session):
@@ -100,8 +101,7 @@ class Keymapper:
     exclude = ["run", "close", "set_breakpoint", "eval_visual"]
 
     def __init__(self):
-        self.keymaps = vim.eval("g:vdebug_keymap")
-        self.leader = vim.eval("g:vdebug_leader_key")
+        self._reload_keys()
         self.is_mapped = False
         self.existing = []
 
@@ -115,6 +115,7 @@ class Keymapper:
         if self.is_mapped:
             return
         self._store_old_map()
+        self._reload_keys()
         for func in self.keymaps:
             if func not in self.exclude:
                 key = self.keymaps[func]
@@ -122,6 +123,10 @@ class Keymapper:
                     (self.leader,key,func)
                 vim.command(map_cmd)
         self.is_mapped = True
+
+    def _reload_keys(self):
+        self.keymaps = vim.eval("g:vdebug_keymap")
+        self.leader = vim.eval("g:vdebug_leader_key")
 
     def _store_old_map(self):
         vim.command('let tempfile=tempname()')
@@ -193,7 +198,8 @@ class FilePath:
             ret = ret.replace("/","\\")
 
         if vdebug.opts.Options.isset('path_maps'):
-            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            for remote, local in sorted_path_maps:
                 if remote in ret:
                     vdebug.log.Log("Replacing remote path (%s) " % remote +\
                             "with local path (%s)" % local ,\
@@ -210,7 +216,8 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            for remote, local in sorted_path_maps:
                 if local in ret:
                     vdebug.log.Log("Replacing local path (%s) " % local +\
                             "with remote path (%s)" % remote ,\
@@ -296,6 +303,7 @@ class InputStream:
     def probe(self):
         try:
             vim.eval("getchar(0)")
+            time.sleep(0.1)
         except: # vim.error
             raise UserInterrupt()
 

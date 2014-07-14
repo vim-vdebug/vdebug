@@ -117,7 +117,7 @@ class Ui(vdebug.ui.interface.Ui):
             vim.command('silent tabnew')
             self.empty_buf_num = vim.eval('bufnr("%")')
             if existing_buffer:
-                vim.command('call vdebug:edit("%s")' % cur_buf_name)
+                vim.command('call Vdebug_edit("%s")' % cur_buf_name)
 
             self.tabnr = vim.eval("tabpagenr()")
 
@@ -278,7 +278,7 @@ class SourceWindow(vdebug.ui.interface.Window):
         self.file = file
         vdebug.log.Log("Setting source file: %s" % file,vdebug.log.Logger.INFO)
         self.focus()
-        vim.command('call vdebug:edit("%s")' % str(file).replace("\\", "\\\\"))
+        vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self,lineno):
         vdebug.log.Log("Setting source line number: %s" % lineno,vdebug.log.Logger.DEBUG)
@@ -621,10 +621,10 @@ class StackGetResponseRenderer(ResponseRenderer):
         string = ""
         for s in stack:
             where = s.get('where') if s.get('where') else 'main'
-            file = vdebug.util.LocalFilePath(s.get('filename'))
+            file = vdebug.util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\
-                    'file':str(file),'line':s.get('lineno')}
+                    'file':str(file.as_local()),'line':s.get('lineno')}
             string += line + "\n"
         return string
 
@@ -667,7 +667,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)
-        return " ".join(res) + "\n\n"
+        if res:
+            return " ".join(res) + "\n\n"
+        else:
+            return ""
 
     def __render_property(self,p,next_p,last = False,indent = 0):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" \
