@@ -4,7 +4,7 @@ import os
 
 class Logger:
     """ Abstract class for all logger implementations.
-    
+
     Concrete classes will log messages using various methods,
     e.g. write to a file.
     """
@@ -41,7 +41,7 @@ class WindowLogger(Logger):
     The window object is passed in on construction, but
     only created if a message is written.
     """
-    def __init__(self,debug_level,window):
+    def __init__(self, debug_level, window):
         self.window = window
         self.debug_level = int(debug_level)
 
@@ -53,7 +53,7 @@ class WindowLogger(Logger):
         if level > self.debug_level:
             return
         if not self.window.is_open:
-            self.window.create()
+            self.window.create("rightbelow 6new")
         self.window.write(\
                 self.format(string,level)+"\n")
 

@@ -266,10 +266,17 @@ class EventError(Exception):
 
 class RunEvent(Event):
     def dispatch(self):
-        vdebug.log.Log("Running")
-        self._session.ui().set_status("running")
-        res = self._session.api().run()
-        self._session.refresh(res)
+        if self._session.is_connected():
+            vdebug.log.Log("Running")
+            self._session.ui().set_status("running")
+            res = self._session.api().run()
+            self._session.refresh(res)
+        else:
+            self._session.dispatch_event("listen")
+
+class ListenEvent(Event):
+    def dispatch(self):
+        self._session.listen()
 
 class StepOverEvent(Event):
     def dispatch(self):

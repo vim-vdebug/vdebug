@@ -152,6 +152,7 @@ endfunction
 function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+    exe ":python debugger.reload()"
 endfunction
 
 " Assign keymappings, and merge with defaults.
@@ -175,6 +176,7 @@ function! Vdebug_load_keymaps(keymaps)
 
     " Mappings allowed in non-debug mode
     exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
+    exe "noremap ".g:vdebug_keymap["close"]." :python debugger.close()<cr>"
     exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
 
     " Exceptional case for visual evaluation
@@ -213,7 +215,7 @@ function! Vdebug_edit(filename)
     endtry
 endfunction
 
-function! vdebug:statusline()
+function! Vdebug_statusline()
     return pyeval("debugger.status_for_statusline()")
 endfunction
 

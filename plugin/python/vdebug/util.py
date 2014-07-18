@@ -101,8 +101,8 @@ class Keymapper:
     exclude = ["run", "close", "set_breakpoint", "eval_visual"]
 
     def __init__(self):
-        self._reload_keys()
         self.is_mapped = False
+        self._reload_keys()
         self.existing = []
 
     def run_key(self):
@@ -123,6 +123,11 @@ class Keymapper:
                     (self.leader,key,func)
                 vim.command(map_cmd)
         self.is_mapped = True
+
+    def reload(self):
+        self.is_mapped = False
+        self._reload_keys()
+        self.map()
 
     def _reload_keys(self):
         self.keymaps = vim.eval("g:vdebug_keymap")

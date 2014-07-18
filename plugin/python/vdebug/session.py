@@ -2,6 +2,7 @@ import vdebug.util
 import vdebug.opts
 import vdebug.log
 import vdebug.dbgp
+import vdebug.listener
 import vim
 
 class ModifiedBufferError(Exception):
@@ -10,9 +11,10 @@ class ModifiedBufferError(Exception):
 class NoConnectionError(Exception):
     pass
 
-class Session:
+class SessionHandler:
     events = {
         "run": vdebug.event.RunEvent,
+        "listen": vdebug.event.ListenEvent,
         "step_over": vdebug.event.StepOverEvent,
         "step_into": vdebug.event.StepIntoEvent,
         "step_out": vdebug.event.StepOutEvent,
@@ -21,17 +23,18 @@ class Session:
         "set_breakpoint": vdebug.event.SetBreakpointEvent,
         "remove_breakpoint": vdebug.event.RemoveBreakpointEvent
     }
-
-    def __init__(self, ui, breakpoints, keymapper, on_close):
+    def __init__(self, ui, breakpoints):
         self.__ui = ui
         self.__breakpoints = breakpoints
-        self.__keymapper = keymapper
-        self.__api = None
         self.__ex_handler = vdebug.util.ExceptionHandler(self)
-        self.__on_close = on_close
+        self.__session = None
+        self.listener = None
 
-    def on_close(self, callback):
-        self.__on_close = callback
+    def dispatch_event(self, name, *args):
+        try:
+            SessionHandler.events[name](self.__session).dispatch(*args)
+        except Exception, e:
+            self.__ex_handler.handle(e)
 
     def ui(self):
         return self.__ui
@@ -39,11 +42,93 @@ class Session:
     def breakpoints(self):
         return self.__breakpoints
 
-    def dispatch_event(self, name, *args):
-        try:
-            Session.events[name](self).dispatch(*args)
-        except Exception, e:
-            self.__ex_handler.handle(e)
+    def listen(self):
+        if self.listener is None:
+            self.listener = vdebug.listener.Listener.create()
+        if self.listener.is_listening():
+            print "Waiting for a connection: none found so far"
+        elif self.listener.is_ready():
+            print "Found connection, starting debugger"
+            self.__new_session()
+        else:
+            print "Vdebug will wait for a connection in the background"
+            vdebug.util.Environment.reload()
+            if self.is_open():
+                self.ui().set_status("listening")
+            self.listener.start()
+            self.start_if_ready()
+
+    def stop_listening(self):
+        if self.listener:
+            self.listener.stop()
+            self.ui().say("Vdebug stopped waiting for a connection")
+
+    def run(self):
+        if self.is_connected():
+            self.dispatch_event("run")
+        else:
+            self.listen()
+
+    def stop(self):
+        if self.is_connected():
+            self.__session.close_connection()
+        elif self.is_open():
+            self.stop_listening()
+            self.__ui.close()
+        elif self.is_listening():
+            self.listener.stop()
+        else:
+            self.__ui.say("Vdebug is not running")
+
+    def is_connected(self):
+        return self.__session and self.__session.is_connected()
+
+    def is_listening(self):
+        return self.listener and self.listener.is_listening()
+
+    def is_open(self):
+        return self.__ui.is_open
+
+    def status(self):
+        if self.is_connected():
+            return "running"
+        else:
+            return self.listener.status()
+
+    def status_for_statusline(self):
+        return "vdebug(%s)" % self.status()
+
+    def start_if_ready(self):
+        if self.listener.is_ready():
+            print "Found connection, starting debugger"
+            self.__new_session()
+            return True
+        else:
+            return False
+
+    def __on_close(self):
+        if vdebug.opts.Options.get('continuous_mode', int) != 0:
+            self.dispatch_event("run")
+            return
+
+    def __new_session(self):
+        self.__session = Session(self.listener.create_connection(),
+                self.__ui,
+                self.__breakpoints,
+                vdebug.util.Keymapper(),
+                self.__on_close)
+
+class Session:
+    def __init__(self, connection, ui, breakpoints, keymapper, on_close):
+        self.__ui = ui
+        self.__breakpoints = breakpoints
+        self.__keymapper = keymapper
+        self.__api = None
+        self.__on_close = on_close
+        self.start(connection)
+
+    def on_close(self, callback):
+        self.__on_close = callback
 
     def api(self):
         if self.__api:
@@ -59,6 +144,9 @@ class Session:
 
     def is_open(self):
         return self.__ui.is_open
+
+    def ui(self):
+        return self.__ui
 
     def close(self):
         """ Close both the connection and vdebug.ui.
