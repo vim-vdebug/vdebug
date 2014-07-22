@@ -10,53 +10,31 @@ import vim
 class DebuggerInterface:
     """Provides all methods used to control the debugger."""
     def __init__(self):
-        self.event_dispatcher = vdebug.event.Dispatcher()
         self.breakpoints = vdebug.breakpoint.Store()
         self.ui = vdebug.ui.vimui.Ui()
 
         self.session_handler = vdebug.session.SessionHandler(self.ui,
                                     self.breakpoints)
+        self.event_dispatcher = vdebug.event.Dispatcher(self.session_handler)
 
     def __del__(self):
-        self.session_handler.close()
+        self.session_handler.stop()
         self.session_handler = None
 
-    def reload(self):
+    def reload_options(self):
         vdebug.util.Environment.reload()
+
+    def reload_keymappings(self):
+        self.session_handler.dispatch_event("reload_keymappings")
 
     def status(self):
         return self.session_handler.status()
-        #if self.session_handler.is_connected():
-        #    return "running"
-        #else:
-        #    return self.listener.status()
 
     def status_for_statusline(self):
-        #return "vdebug(%s)" % self.status()
         return self.session_handler.status_for_statusline()
 
     def start_if_ready(self):
         self.session_handler.start_if_ready()
-        #if self.listener.is_ready():
-        #    print "Found connection, starting debugger"
-        #    self.session_handler.start(self.listener.create_connection())
-        #    return True
-        #else:
-        #    return False
-
-    def _listen(self):
-        self.__reload_environment()
-        if self.listener.is_listening():
-            print "Waiting for a connection: none found so far"
-        elif self.listener.is_ready():
-            print "Found connection, starting debugger"
-            self.session_handler.start(self.listener.create_connection())
-        else:
-            print "Vdebug will wait for a connection in the background"
-            if self.session_handler.is_open():
-                self.session_handler.ui().set_status("listening")
-            self.listener.start()
-            self.start_if_ready()
 
     def listen(self):
         self.session_handler.listen()
@@ -144,7 +122,7 @@ class DebuggerInterface:
     def get_context(self):
         """Get all the variables in the default context
         """
-        self.session_handler.get_context()
+        self.session_handler.dispatch_event("get_context")
 
     def detach(self):
         """Detach the debugger, so the script runs to the end.
@@ -155,7 +133,3 @@ class DebuggerInterface:
         """Close the connection, or the UI if already closed.
         """
         self.session_handler.stop()
-
-    def __reload_environment(self):
-        vdebug.util.Environment.reload()
-        self.listener = vdebug.listener.Listener.create()

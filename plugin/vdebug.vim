@@ -152,7 +152,7 @@ endfunction
 function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
-    exe ":python debugger.reload()"
+    exe ":python debugger.reload_options()"
 endfunction
 
 " Assign keymappings, and merge with defaults.
@@ -181,6 +181,7 @@ function! Vdebug_load_keymaps(keymaps)
 
     " Exceptional case for visual evaluation
     exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
+    exe ":python debugger.reload_keymappings()"
 endfunction
 
 function! s:OptionNames(A,L,P)

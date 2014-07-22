@@ -12,8 +12,8 @@ import urllib
 import time
 
 class ExceptionHandler:
-    def __init__(self, session):
-        self._session = session
+    def __init__(self, session_handler):
+        self._session_handler = session_handler
         self.readable_errors = (vdebug.event.EventError,
                 vdebug.breakpoint.BreakpointError,
                 vdebug.log.LogError,
@@ -26,44 +26,44 @@ class ExceptionHandler:
     def handle_timeout(self):
         """Handle a timeout, which is pretty normal. 
         """
-        self._session.close()
-        self._session.ui().say("No connection was made")
+        self._session_handler.stop()
+        self._session_handler.ui().say("No connection was made")
 
     def handle_interrupt(self):
         """Handle a user interrupt, which is pretty normal. 
         """
-        self._session.close()
-        self._session.ui().say("Connection cancelled")
+        self._session_handler.stop()
+        self._session_handler.ui().say("Connection cancelled")
 
     def handle_socket_end(self):
         """Handle a socket closing, which is pretty normal.
         """
-        self._session.ui().say("Connection to the debugger has been closed")
-        self._session.close_connection()
+        self._session_handler.ui().say("Connection to the debugger has been closed")
+        self._session_handler.stop()
 
     def handle_vim_error(self,e):
         """Handle a VIM error.
 
         This should NOT occur under normal circumstances.
         """
-        self._session.ui().error("A Vim error occured: %s\n%s"\
+        self._session_handler.ui().error("A Vim error occured: %s\n%s"\
                         % (str(e), traceback.format_exc()))
 
     def handle_readable_error(self,e):
         """Simply print an error, since it is human readable enough.
         """
-        self._session.ui().error(str(e))
+        self._session_handler.ui().error(str(e))
 
     def handle_dbgp_error(self,e):
         """Simply print an error, since it is human readable enough.
         """
-        self._session.ui().error(str(e.args[0]))
+        self._session_handler.ui().error(str(e.args[0]))
 
     def handle_general_exception(self):
         """Handle an unknown error of any kind.
         """
-        self._session.ui().error("An error occured: %s\n%s"\
-                        % (str(sys.exc_info()[0]), traceback.format_exc()))
+        self._session_handler.ui().error("An error occured: %s\n%s"\
+                        % (str(sys.exc_info()[0]), traceback.format_exc(5)))
 
     def handle(self, e):
         """Switch on the exception type to work out how to handle it.
@@ -84,7 +84,7 @@ class ExceptionHandler:
         elif isinstance(e, KeyboardInterrupt):
             print "Keyboard interrupt - debugging session cancelled"
             try:
-                self._session.close()
+                self._session_handler.stop()
             except:
                 pass
         else:
