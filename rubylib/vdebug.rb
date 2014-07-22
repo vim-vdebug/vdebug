@@ -9,6 +9,7 @@ class Vdebug
 
   def start_listening
     clear_buffer_cache!
+    vim.command "VdebugOpt background_listener 0"
     vim.server.remote_send ":python debugger.run()<CR>"
     sleep 1
   end
@@ -58,10 +59,10 @@ class Vdebug
   end
 
   def connected?
-     is_connected = vim.command(
-       "python print debugger.runner.is_alive()"
+     status = vim.command(
+       "python print debugger.status()"
      )
-     is_connected == "True"
+     %w(break running).include? status
   end
 
   def watch_window_content

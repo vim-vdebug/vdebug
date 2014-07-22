@@ -64,7 +64,7 @@ class DebuggerInterface:
         """
         self.session_handler.dispatch_event("step_out")
 
-    def handle_opt(self,option,value = None):
+    def handle_opt(self, option, value = None):
         """Set an option, overwriting the existing value.
         """
         if value is None:
