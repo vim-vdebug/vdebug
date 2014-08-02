@@ -97,7 +97,7 @@ where the path supplied is vdebug's doc directory. This should enable vdebug's h
 Clone or download a tarball of the plugin and move its content in your
 `~/.vim/` directory.
 
-Your `~/.vim/plugins/` directory should now contain vdebug.vim and a directory
+Your `~/.vim/plugin/` directory should now contain vdebug.vim and a directory
 called "python".
 
 ## Using git and Pathogen
