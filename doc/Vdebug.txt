@@ -230,7 +230,7 @@ then use this instead of php when debugging. For instance, instead of "php
 myscript.php", run "php-xdebug myscript.php" to start the debugger session.
 
 You are now officially ready to start debugging with PHP. However, if you've
-become unstuck at any point then there are plenty of Google tutorials on
+become stuck at any point then there are plenty of Google tutorials on
 setting up Xdebug, or you can email me and I'll do my best to help.
 
 ------------------------------------------------------------------------------
