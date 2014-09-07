@@ -86,6 +86,12 @@ class ContextNamesResponse(Response):
             names[int(c.get('id'))] = c.get('name')
         return names
 
+class TraceResponse(Response):
+    """Response object returned by the status command."""
+
+    def __str__(self):
+        return self.as_xml().get('trace')
+
 class StatusResponse(Response):
     """Response object returned by the status command."""
 
@@ -219,7 +225,7 @@ class Api:
         response message and command.
 
         cmd -- the command name, e.g. 'status'
-        args -- arguments for the command, which is optional 
+        args -- arguments for the command, which is optional
                 for certain commands (default '')
         """
         args = args.strip()
@@ -285,7 +291,7 @@ class Api:
         """ The python engine incorrectly requires length.
         if self.language == 'python':
             args = ("-l %i " % len(code_enc) ) + args"""
-            
+
         return self.send_cmd('eval',args,EvalResponse)
 
     def step_into(self):
@@ -381,7 +387,7 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
+    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None, pydbgp=None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
@@ -395,6 +401,7 @@ class Connection:
         self.host = host
         self.timeout = timeout
         self.input_stream = input_stream
+        self.pydbgp = pydbgp
 
     def __del__(self):
         """Make sure the connection is closed."""
@@ -442,6 +449,7 @@ class Connection:
                 """Check for user interrupts"""
                 if self.input_stream is not None:
                     self.input_stream.probe()
+                    time.sleep(1)
                 return serv.accept()
             except socket.error:
                 pass
@@ -689,6 +697,10 @@ class CmdNotImplementedError(Exception):
 
 class EvalError(Exception):
     """Raised when some evaluated code is invalid."""
+    pass
+
+class TraceError(Exception):
+    """Raised when trace is out of domain."""
     pass
 
 class ResponseError(Exception):

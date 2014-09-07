@@ -16,12 +16,14 @@ class Runner:
     an interface that Vim can use to send commands.
     """
 
-    def __init__(self):
+    prev_trace_code_value = ''
+    def __init__(self,pydbgp=None):
         self.api = None
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
         self.breakpoints = vdebug.breakpoint.Store()
         self.keymapper = vdebug.util.Keymapper()
         self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
+        self.pydbgp = pydbgp
 
     def open(self):
         """ Open the connection and debugging vdebug.ui.
@@ -89,9 +91,9 @@ class Runner:
 
     def refresh(self,status):
         """The main action performed after a deubugger step.
-    
+
         Updates the status window, current stack, source
-        file and line and watch window."""    
+        file and line and watch window."""
         if not self.is_alive():
             self.ui.error("Cannot update: no connection")
         else:
@@ -125,6 +127,7 @@ class Runner:
 
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
+        self.ui.tracewin.clean()
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
@@ -133,6 +136,23 @@ class Runner:
                 %(name,self.ui.sourcewin.file,self.cur_lineno),\
                 self.context_names, context_id)
         self.ui.watchwin.accept_renderer(rend)
+
+        try:
+            if self.ui.tracewin.reserve_trace_code:
+                context_res = self.api.eval(self.ui.tracewin.reserve_trace_code)
+                rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                        context_res,"Trace of: '%s'" \
+                        %context_res.get_code())
+                rendered = rend.render()
+                self.ui.tracewin.accept_value(rendered)
+                self.ui.tracewin.last_context_rendered = rendered
+        except vdebug.dbgp.EvalError:
+            if self.ui.tracewin.last_context_rendered:
+                self.ui.tracewin.accept_value('(prev)'+str(self.ui.tracewin.last_context_rendered))
+            else:
+                self.ui.tracewin.accept_value(str(self.ui.tracewin.reserve_trace_code))
+
+
 
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
@@ -222,6 +242,21 @@ class Runner:
                 return
         self.breakpoints.add_breakpoint(bp)
 
+    def trace(self,code):
+        """Evaluate a snippet of code and show the response on the watch window.
+        """
+        self.ui.tracewin.clean()
+        try:
+            vdebug.log.Log("Tracing code: "+code)
+            context_res = self.api.eval(code)
+            rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                    context_res,"Eval of: '%s'" \
+                    %context_res.get_code())
+            self.ui.tracewin.accept_renderer(rend)
+        except vdebug.dbgp.EvalError:
+            self.ui.tracewin.accept_value('(not invalid)')
+        self.ui.tracewin.reserve_trace_code = code
+
     def eval(self,code):
         """Evaluate a snippet of code and show the response on the watch window.
         """
@@ -269,9 +304,9 @@ class Runner:
                 check_ide_key = True
                 if len(ide_key) == 0:
                     check_ide_key = False
-                    
+
                 connection = vdebug.dbgp.Connection(server,port,\
-                        timeout,vdebug.util.InputStream())
+                        timeout,vdebug.util.InputStream(pydbgp=self.pydbgp))
 
                 self.api = vdebug.dbgp.Api(connection)
                 if check_ide_key and ide_key != self.api.idekey:
@@ -321,6 +356,7 @@ class Runner:
                     else:
                         self.api.stop()
                 self.api.conn.close()
+                self.close()
                 self.api = None
             else:
                 self.api = None
@@ -337,3 +373,9 @@ class Runner:
         self.close_connection()
         self.ui.close()
         self.keymapper.unmap()
+        self.kill()
+
+    def kill(self):
+        import os
+        if os.name is 'nt' and self.pydbgp is not None:
+            os.popen("taskkill /F /IM python.exe")

@@ -14,20 +14,23 @@ import vim
 class DebuggerInterface:
     """Acts as a facade layer to the debugger client.
 
-    Most methods are just redirected to the Runner class. Fatal 
+    Most methods are just redirected to the Runner class. Fatal
     exceptions are caught and handled here.
     """
-    def __init__(self):
-        self.runner = vdebug.runner.Runner()
+    def __init__(self,pydbgp=None):
+        self.runner = vdebug.runner.Runner(pydbgp)
         self.event_dispatcher = vdebug.event.Dispatcher(self.runner)
 
     def __del__(self):
         self.runner.close_connection()
+        vim.command("set swapfile")
 
     def run(self):
         """Tell the debugger to run, until the next breakpoint or end of script.
         """
         try:
+            vim.command("set noswapfile")
+            vim.command("set bexpr=Vdebug_balloon()")
             self.runner.run()
         except Exception as e:
             self.handle_exception(e)
@@ -104,6 +107,14 @@ class DebuggerInterface:
         except Exception as e:
             self.handle_exception(e)
 
+    def handle_trace(self,args):
+        """Evaluate a code snippet specified by args.
+        """
+        try:
+            return self.runner.trace(args)
+        except Exception as e:
+            self.handle_exception(e)
+
     def handle_eval(self,args):
         """Evaluate a code snippet specified by args.
         """
@@ -173,13 +184,13 @@ class DebuggerInterface:
     """ Exception handlers """
 
     def handle_timeout(self):
-        """Handle a timeout, which is pretty normal. 
+        """Handle a timeout, which is pretty normal.
         """
         self.runner.close()
         self.runner.ui.say("No connection was made")
 
     def handle_interrupt(self):
-        """Handle a user interrupt, which is pretty normal. 
+        """Handle a user interrupt, which is pretty normal.
         """
         self.runner.close()
         self.runner.ui.say("Connection cancelled")
