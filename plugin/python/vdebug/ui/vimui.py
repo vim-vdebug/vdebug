@@ -48,7 +48,10 @@ class Ui(vdebug.ui.interface.Ui):
 
             srcwin_name = self.__get_srcwin_name()
 
-            self.watchwin = WatchWindow(self,'vertical belowright new')
+            self.tracewin = TraceWindow(self,'vertical belowright new')
+            self.tracewin.create()
+
+            self.watchwin = WatchWindow(self,'belowright new')
             self.watchwin.create()
 
             self.stackwin = StackWindow(self,'belowright new')
@@ -58,8 +61,10 @@ class Ui(vdebug.ui.interface.Ui):
             self.statuswin.create()
             self.statuswin.set_status("loading")
 
-            self.watchwin.set_height(20)
-            self.statuswin.set_height(5)
+            # self.tracewin.set_height(3)
+            self.watchwin.set_height(40)
+            # self.stackwin.set_height(3)
+            self.statuswin.set_height(3)
 
             logwin = LogWindow(self,'rightbelow 6new')
             vdebug.log.Log.set_logger(\
@@ -172,6 +177,8 @@ class Ui(vdebug.ui.interface.Ui):
         if self.empty_buf_num:
             vim.command('bw' + self.empty_buf_num)
 
+        if self.tracewin:
+            self.tracewin.destroy()
         if self.watchwin:
             self.watchwin.destroy()
         if self.stackwin:
@@ -179,9 +186,11 @@ class Ui(vdebug.ui.interface.Ui):
         if self.statuswin:
             self.statuswin.destroy()
 
-        self.watchwin = None
-        self.stackwin = None
+        self.tracewin  = None
+        self.watchwin  = None
+        self.stackwin  = None
         self.statuswin = None
+        vim.command('set bexpr=IPythonBalloonExpr()')
 
 
     def __get_srcwin_name(self):
@@ -211,6 +220,7 @@ class SourceWindow(vdebug.ui.interface.Window):
     file = None
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
+    prevline = 0
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -247,10 +257,21 @@ class SourceWindow(vdebug.ui.interface.Window):
     def place_pointer(self,line):
         vdebug.log.Log("Placing pointer sign on line "+str(line),\
                 vdebug.log.Logger.INFO)
-        self.remove_pointer()
+
+        vim.command('sign undefine current')
+        vim.command('sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine')
+
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
                 ' file='+self.file)
+
+        overmargin = abs(  self.prevline - int(  vim.eval("line('.')")  )  ) > 20
+        if overmargin:
+            vim.command('exe "normal zz"')
+            self.prevline = int(vim.eval("line('.')"))
+            if int(vim.eval("line('.')")) > 15:
+                vim.command('exe "normal 10\<C-e>"')
+                vim.command('redraw')
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
@@ -260,6 +281,7 @@ class Window(vdebug.ui.interface.Window):
     open_cmd = "new"
     creation_count = 0
 
+    context_sav = None
     def __init__(self,ui,open_cmd):
         self.buffer = None
         self.ui = ui
@@ -361,8 +383,18 @@ class Window(vdebug.ui.interface.Window):
             vim.command(str(winnr) + 'wincmd w')
         vim.command(cmd)
 
+    def accept_value(self,value):
+        self.write(value)
+
     def accept_renderer(self,renderer):
         self.write(renderer.render())
+
+    def redisplay(self):
+        if self.context_sav:
+            self.write(self.context_sav.render())
+        else:
+            self.write('')
+
 
 class BreakpointWindow(Window):
     name = "DebuggerBreakpoints"
@@ -430,6 +462,26 @@ class StackWindow(Window):
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
             vim.command('%s | python debugger.runner.ui.stackwin.is_open = False' % cmd)
+
+    def write(self, msg, return_focus = True):
+        Window.write(self, msg, after="normal gg")
+
+class TraceWindow(Window):
+    name = "TraceWindow"
+
+    reserve_trace_code    = None
+    last_context_rendered = None
+    def on_create(self):
+        self.command('inoremap <buffer> <cr> <esc>'+\
+                ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> '+\
+                ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <2-LeftMouse> '+\
+                ':python debugger.handle_double_click()<cr>')
+        self.command('setlocal syntax=debugger_watch')
+        if self.creation_count == 1:
+            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
+            vim.command('%s | python debugger.runner.ui.watchwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")

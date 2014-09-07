@@ -4,7 +4,7 @@ import os
 
 class Logger:
     """ Abstract class for all logger implementations.
-    
+
     Concrete classes will log messages using various methods,
     e.g. write to a file.
     """
