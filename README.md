@@ -1,4 +1,4 @@
-This is fork of Joonty/Vdebug. 
+This is fork of joonty/vdebug 
 
 # Quick Start
 
