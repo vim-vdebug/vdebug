@@ -13,7 +13,9 @@ In python code press \<F5\> key and debugger will start.
 
 3. Balloon tip showing value of variable on which mouse over
 
-4. VdebugTrace
+4. more comfortable focus while step into/over
+
+5. VdebugTrace
 
 will trace expression or variables of which you want to see continuous change.
 
