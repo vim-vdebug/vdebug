@@ -117,6 +117,7 @@ command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
+command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
 
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
