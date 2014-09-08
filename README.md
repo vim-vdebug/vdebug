@@ -1,28 +1,3 @@
-This is fork of joonty/vdebug 
-
-# Quick Start
-
-You are good to go if using python 2.7 and windows 7.
-In python code press \<F5\> key and debugger will start.
-
-# Added features
-
-1. Easy Start
-
-    KOMODO pydbgp (patch ver.) included
-
-3. Balloon tip showing value of variable on which mouse over
-
-4. more comfortable focus while step into/over
-
-5. VdebugTrace
-
-    will trace expression or variables of which you want to see continuous change.
-
-[usage]
-
-    :VdebugTrace {expression or variables} 
-
 # Vdebug
 
 [![Build Status](https://travis-ci.org/joonty/vdebug.png?branch=master)](https://travis-ci.org/joonty/vdebug)
@@ -122,7 +97,7 @@ where the path supplied is vdebug's doc directory. This should enable vdebug's h
 Clone or download a tarball of the plugin and move its content in your
 `~/.vim/` directory.
 
-Your `~/.vim/plugins/` directory should now contain vdebug.vim and a directory
+Your `~/.vim/plugin/` directory should now contain vdebug.vim and a directory
 called "python".
 
 ## Using git and Pathogen

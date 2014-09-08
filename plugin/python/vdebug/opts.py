@@ -4,7 +4,7 @@ class Options:
 
     def __init__(self,options):
         self.options = options
-
+    
     @classmethod
     def set(cls,options):
         """Create an Options instance with the provided dictionary of

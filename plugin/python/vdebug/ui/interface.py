@@ -1,7 +1,6 @@
 class Ui():
     """Abstract for the UI, used by the debugger
     """
-    tracewin = None 
     watchwin = None
     stackwin = None
     statuswin = None

@@ -9,7 +9,7 @@
 "               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
 "      Version: 1.4.1
-"               Inspired by the Xdebug plugin, which was originally written by
+"               Inspired by the Xdebug plugin, which was originally written by 
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
 "        Usage: Use :help Vdebug for information on how to configure and use
@@ -44,21 +44,13 @@ else
 endif
 
 " Nice characters get screwed up on windows
-if !exists('g:vimrc_vdebug_force_ascii')
-    if has('win32') || has('win64')
-        let g:vdebug_force_ascii = 1
-    elseif has('multi_byte') == 0
-        let g:vdebug_force_ascii = 1
-    else
-        let g:vdebug_force_ascii = 0
-    end
+if has('win32') || has('win64')
+    let g:vdebug_force_ascii = 1
+elseif has('multi_byte') == 0
+    let g:vdebug_force_ascii = 1
 else
-    if g:vimrc_vdebug_force_ascii == 1
-        let g:vdebug_force_ascii = 1
-    else
-        let g:vdebug_force_ascii = 0
-    endif
-endif
+    let g:vdebug_force_ascii = 0
+end
 
 if !exists("g:vdebug_options")
     let g:vdebug_options = {}
@@ -113,29 +105,10 @@ if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults["marker_default"] = '*'
     let g:vdebug_options_defaults["marker_closed_tree"] = '+'
     let g:vdebug_options_defaults["marker_open_tree"] = '-'
-else
-    let g:vdebug_options_defaults["marker_default"]     = '♪ '
-    let g:vdebug_options_defaults["marker_closed_tree"] = '▶ '
-    let g:vdebug_options_defaults["marker_open_tree"]   = '▽ '
 endif
 
-let g:vdebug_pydbgp_default = $HOME."/.vim/bundle/vdebug-python/komodo/bin/pydbgp"
 " Create the top dog
-if exists("g:vdebug_pydbgp_default")
-    let g:pydbgp_configured = 1
-else
-    let g:pydbgp_configured = 0
-endif
-python << EOF
-import vim
-configured = vim.eval("g:pydbgp_configured")
-if configured is '1':
-    pydbgp = vim.eval("g:vdebug_pydbgp_default")
-else:
-    pydbgp = None
-
-debugger = DebuggerInterface(pydbgp)
-EOF
+python debugger = DebuggerInterface()
 
 " Commands
 command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
@@ -143,7 +116,6 @@ command! VdebugStart python debugger.run()
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
 command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
-command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
 
 " Signs and highlighted lines for breakpoints, etc.
@@ -233,26 +205,6 @@ function! Vdebug_edit(filename)
     endtry
 endfunction
 
-function! Vdebug_balloon()
-python << EOF
-import vdebug.ui.vimui
-interest = vim.eval("v:beval_text")
-try:
-    var_eval = debugger.runner.api.eval(interest)
-    rend = vdebug.ui.vimui.ContextGetResponseRenderer(var_eval)
-    rendred = rend.render()
-    var_eval = str(rendred)
-except:
-    var_eval = "(cannot evaluate)"
-
-vim.command('let l:var = "' + var_eval + '"')
-
-EOF
-    return l:var
-endfunction
-
 silent doautocmd User VdebugPost
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)
-
-
