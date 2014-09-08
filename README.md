@@ -1,21 +1,25 @@
+This is fork of Joonty/Vdebug. 
+
 # Quick Start
 
 You are good to go if using python 2.7 and windows 7.
-In python code press <F5> and debugger will start.
+In python code press \<F5\> key and debugger will start.
 
-# Added command
+# Added features
 
-VdebugTrace
+1. Easy Start
 
-will trace expression or variables of which you want to watch continuous change.
+2. KOMODO pydbgp (patch ver.) included
+
+3. Balloon tip
+
+4. VdebugTrace
+
+will trace expression or variables which you want to see continuous change.
 
 [usage]
 
 :VdebugTrace {expression or variables} 
-
-# KOMODO pydbgp 
-
-(patch ver.) included
 
 # Vdebug
 
