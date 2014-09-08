@@ -11,7 +11,7 @@ In python code press \<F5\> key and debugger will start.
 
 2. KOMODO pydbgp (patch ver.) included
 
-3. Balloon tip
+3. Balloon tip showing value of variable on which mouse over
 
 4. VdebugTrace
 
