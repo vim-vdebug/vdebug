@@ -9,7 +9,7 @@ In python code press \<F5\> key and debugger will start.
 
 1. Easy Start
 
-2. KOMODO pydbgp (patch ver.) included
+    KOMODO pydbgp (patch ver.) included
 
 3. Balloon tip showing value of variable on which mouse over
 
@@ -17,11 +17,11 @@ In python code press \<F5\> key and debugger will start.
 
 5. VdebugTrace
 
-will trace expression or variables of which you want to see continuous change.
+    will trace expression or variables of which you want to see continuous change.
 
 [usage]
 
-:VdebugTrace {expression or variables} 
+    :VdebugTrace {expression or variables} 
 
 # Vdebug
 
