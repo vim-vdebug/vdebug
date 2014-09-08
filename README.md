@@ -15,7 +15,7 @@ In python code press \<F5\> key and debugger will start.
 
 4. VdebugTrace
 
-will trace expression or variables which you want to see continuous change.
+will trace expression or variables of which you want to see continuous change.
 
 [usage]
 
