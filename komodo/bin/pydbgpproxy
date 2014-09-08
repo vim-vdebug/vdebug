@@ -1,0 +1,527 @@
+#!/usr/bin/env python
+# a simple implementation of a dbgp proxy
+#
+# Copyright (c) 2003-2006 ActiveState Software Inc.
+#
+# The MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify,
+# merge, publish, distribute, sublicense, and/or sell copies of the
+# Software, and to permit persons to whom the Software is furnished
+# to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+#
+# Authors:
+#    Shane Caraveo <ShaneC@ActiveState.com>
+#    Trent Mick <TrentM@ActiveState.com>
+
+"""
+    pydbgpproxy -- a proxy for DBGP-based debugging
+
+    Usage:
+        pydbgpproxy -i IDE-PORT -d DEBUG-PORT
+    
+    Options:
+        -h, --help        Print this help and exit.
+        -V, --version     Print version info and exit.
+        -l LOGLEVEL       Control the logging verbosity. Accepted values are:
+                          CRITICAL, ERROR, WARN, INFO (default), DEBUG. 
+
+        -i hostname:port  listener port for IDE processes
+                          (defaults to '127.0.0.1:9001')
+        -d hostname:port  listener port for debug processes
+                          (defaults to '127.0.0.1:9000')
+
+    The proxy listens on two ports, one for debugger session
+    requests, and one for notifications from IDE's or other
+    debugger front end tools.  This allows multiuser systems
+    to provide a well defined port for debugger engines, while
+    each front end would be listening in a unique port.
+
+    Example usage:
+        pydbgpproxy -i localhost:9001 -d localhost:9000
+"""
+
+
+__revision__ = "$Revision: #1 $ $Change: 118914 $"
+__version_info__ = (1, 1, 0)
+__version__ = '.'.join(map(str, __version_info__))
+
+
+import re
+import getopt
+import string
+import os
+import time
+import socket
+import select
+import threading
+import sys
+
+
+if sys.version_info[0] <= 2:
+    pythonlib = "pythonlib"
+elif sys.version_info[0] == 3:
+    pythonlib = "python3lib"
+else:
+    import dbgp.common
+    raise dbgp.common.DBGPError("Unsupported Python version %d" % (sys.version_info[0],))
+
+def _get_dbgp_client_pythonlib_path():
+    """Find the DBGP Python client library in the common install
+    configuration. Returns None if it could not be found.
+    """
+    from os.path import dirname, join, abspath, exists
+    try:
+        this_dir = dirname(abspath(__file__))
+    except NameError:
+        this_dir = dirname(abspath(sys.argv[0]))
+    candidate_paths = [
+        dirname(this_dir), # Komodo source tree layout
+        join(dirname(this_dir), pythonlib),
+    ]
+    for candidate_path in candidate_paths:
+        landmark = join(candidate_path, "dbgp", "__init__.py")
+        if exists(landmark):
+            return candidate_path
+
+_p = (not hasattr(sys, "frozen") and _get_dbgp_client_pythonlib_path() or None)
+if _p: sys.path.insert(0, _p)
+try:
+    try:
+        import logging
+    except ImportError:
+        from dbgp import _logging as logging
+    import dbgp.serverBase
+    from dbgp.common import *
+finally:
+    if _p: del sys.path[0]
+
+
+
+#---- globals
+
+log = logging.getLogger("dbgp.proxy")
+IDENTCHARS = string.letters + string.digits + '_'
+
+
+
+#---- proxy implementation
+
+# the host class implements commands that the host can send
+# to the debugger target
+class sessionProxy(dbgp.serverBase.session):
+    def __init__(self, sessionHost):
+        dbgp.serverBase.session.__init__(self, sessionHost)
+        self._server = None
+        self._serverAddr = None
+
+    def __del__(self):
+        if self._socket:
+            self._socket.close()
+        if self._server:
+            self._server.close()
+        log.debug("destructor [%r]", self)
+
+    def _handleInitPacket(self):
+        log.debug("session getting data")
+        data = self._socket.recv(1024)
+        log.debug("   data: [%r]"%data)
+        eop = data.find('\0')
+        try:
+            size = long(data[:eop])
+        except:
+            # invalid protocol, close the socket
+            msg = "Closing connection, invalid protocol used"
+            log.info("%r %s", msg, self)
+            self.error(msg)
+            self._socket.close()
+            self.stop()
+            return
+        data = data[eop+1:] # skip \0
+        sizeLeft = size - len(data) + 1
+        while sizeLeft > 0:
+            log.debug("session getting more data size=%d", sizeLeft)
+            newdata = self._socket.recv(sizeLeft)
+            data = data + newdata
+            sizeLeft = sizeLeft - len(newdata)
+        
+        response = data[:size]
+        data = data[size+1:] # skip \0
+        log.debug("session dispatching call %r", response)
+        self._dispatch(size,response)
+
+    def start(self, socket, clientAddr):
+        if not self._sessionHost.onConnect(self, socket, clientAddr):
+            socket.close()
+            return 0
+        self._socket = socket
+        self._clientAddr = clientAddr
+        # create a new thread and initiate a debugger session
+        if not self._cmdthread or not self._cmdthread.isAlive():
+            self._cmdthread = threading.Thread(target = self._cmdloop)
+            self._cmdthread.setDaemon(True)
+            self._cmdthread.start()
+        return 1
+
+    def _cmdloop(self):
+        # first thing we expect is an init packet from the client
+        self._handleInitPacket()
+        if self._stop:
+            return
+
+        # We have the client and server sockets, lets send and receive for them
+        # by simply passing packets back and forth.
+        try:
+            socket_list = [self._socket, self._server]
+            while not self._stop:
+                r, w, exc = select.select(socket_list, [], socket_list)
+                # Iterate over the sockets that are ready to read.
+                for s in r:
+                    data = s.recv(8192)
+                    if not data:
+                        self._stop = 1
+                    else:
+                        if s == self._socket:
+                            self._server.send(data)
+                        else:
+                            self._socket.send(data)
+                # If any exception occured, log it and exit.
+                if exc:
+                    self._stop = 1
+                    log.exception("socket Exception in _cmdloop [%r]", self)
+        except Exception, ex:
+            log.warn("Exception in _cmdloop [%s]", ex)
+        self._cmdthread = None
+
+    def stop(self):
+        dbgp.serverBase.session.stop(self)
+        self._stop = 1
+        if self._socket:
+            self._socket.close()
+            self._socket = None
+        log.info('session stopped')
+    
+    def startServer(self, server, initNode):
+        self._serverAddr = server[0]
+        try:
+            self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._server.connect((self._serverAddr[0], self._serverAddr[1]))
+        except socket.error, details:
+            msg = "Unable to connect to the server listener %s:%d [%r]" % \
+                (self._serverAddr[0],self._serverAddr[1], self)
+            log.exception(msg)
+            self.error(msg)
+            self._server = None
+            self._serverAddr = None
+            return 0
+        # add a hostname if one is not already there
+        if not initNode.hasAttribute("hostname") or \
+           not initNode.getAttribute("hostname"):
+            initNode.setAttribute("hostname", self._clientAddr[0])
+        # pass the init packet through
+        response = u'<?xml version="1.0" encoding="UTF-8"?>\n'
+        response += initNode.toxml()
+        response = response.encode('utf-8')
+        l = len(response)
+        log.debug("Sending init to ide %d\0%r\0", l, response)
+        self._server.send('%d\0%s\0' % (l, response))
+        return 1
+    
+    def error(self, msg):
+        if not self._socket:
+            log.error(msg)
+            return
+        self.sendCommand(['proxyerror'], msg)
+
+class clientHandler(dbgp.serverBase.listener):
+    def __init__(self, manager, addr='127.0.0.1', port=9000):
+        dbgp.serverBase.listener.__init__(self, manager)
+        self._addr = addr
+        self._port = port
+        
+    def start(self):
+        dbgp.serverBase.listener.start(self, self._addr, self._port)
+
+    def startNewSession(self, client, addr):
+        # start a new thread that is the host connection
+        # for this debugger session
+        session = sessionProxy(self._session_host)
+        session.start(client, addr)
+
+class serverHandler(dbgp.serverBase.listener):
+    def __init__(self, manager, addr='127.0.0.1', port=9001, caddr='127.0.0.1', cport=9000):
+        self.manager = manager
+        self.caddr = caddr
+        self.cport = cport
+        dbgp.serverBase.listener.__init__(self, self)
+        self._addr = addr
+        self._port = port
+        
+    def start(self):
+        dbgp.serverBase.listener.start(self, self._addr, self._port)
+
+    def parseline(self, line):
+        line = line.strip()
+        if not line:
+            return None, None, line
+        elif line[0] == '?':
+            line = 'help ' + line[1:]
+        elif line[0] == '!':
+            if hasattr(self, 'do_shell'):
+                line = 'shell ' + line[1:]
+            else:
+                return None, None, line
+        i, n = 0, len(line)
+        while i < n and line[i] in IDENTCHARS: i = i+1
+        cmd, arg = line[:i], line[i:].strip()
+        arg = arg.split()
+        return cmd, arg, line
+
+    def startNewSession(self, client, addr):
+        # before any communication, we can decide if we want
+        # to allow the connection here.  return 0 to deny
+        data = client.recv(1024)
+        log.info("Server:onConnect %r [%s]", addr, data)
+        try:
+            data = data.decode('utf-8')
+        except (UnicodeEncodeError, UnicodeDecodeError), e:
+            try:
+                data = data.decode()
+            except (UnicodeEncodeError, UnicodeDecodeError), e:
+                pass
+        command, args, line = self.parseline(data)
+        func = 'do_' + command
+        try:
+            func = getattr(self, 'do_' + command)
+        except AttributeError, e:
+            self._error(client, addr, command, str(e))
+        try:
+            func(client, addr, args)
+        except Exception, e:
+            self._error(client, addr, command, str(e))
+        client.close()
+        return 0
+    
+    def do_proxyinit(self, client, addr, args):
+        opts, args = getopt.getopt(args, 'p:k:m:')
+        port = idekey = multi = None
+        for o, a in opts:
+            if o == '-p':
+                port = long(a)
+            elif o == '-k':
+                idekey = a
+            elif o == '-m':
+                multi = a
+        if not idekey or not port:
+            self._error(client,addr,'proxyinit','No port defined for proxy')
+            return
+        addr = [addr[0],port]
+        id = self.manager.addServer(idekey, addr, multi)
+        if id:
+            msg = u'<?xml version="1.0" encoding="UTF-8"?>\n<proxyinit success="1" idekey="%s" address="%s" port="%d"/>' %(id, self.caddr, self.cport)
+            client.send(msg.encode('utf-8'))
+        else:
+            self._error(client,addr,'proxyinit','IDE Key already exists')
+
+    def do_proxystop(self, client, addr, args):
+        opts, args = getopt.getopt(args, 'k:')
+        idekey = None
+        for o, a in opts:
+            if o == '-k':
+                idekey = a
+        if not idekey:
+            self._error(client,addr,'proxystop','No IDE key')
+            return
+        id = self.manager.removeServer(idekey)
+        msg = u'<?xml version="1.0" encoding="UTF-8"?>\n<proxystop success="1" idekey="%s"/>' % id
+        client.send(msg.encode('utf-8'))
+
+    def _error(self, client, addr, command, message):
+        _err = u'<?xml version="1.0" encoding="UTF-8"?>\n<%s success="0"><error id="%d"><message>%s</message></error></%s>' % (command,0,message,command)
+        client.send(_err.encode('utf-8'))
+
+class proxy:
+    _servers = {}
+    
+    def __init__(self, caddr='127.0.0.1', cport=9000,
+                       saddr='127.0.0.1', sport=9001):
+        log.info("starting proxy listeners.  appid: %d", os.getpid())
+        log.info("    dbgp listener on %s:%d", caddr, cport)
+        log.info("    IDE listener on  %s:%d", saddr, sport)
+        self._clientListener = clientHandler(self, caddr, cport)
+        self._serverListener = serverHandler(self, saddr, sport, caddr, cport)
+    
+    def addServer(self, idekey, addr, multi):
+        if self._servers.has_key(idekey):
+            return None
+        self._servers[idekey] = [addr, multi]
+        return idekey
+
+    def removeServer(self, idekey):
+        if self._servers.has_key(idekey):
+            del self._servers[idekey]
+            return idekey
+        return None
+
+    def getServer(self, idekey):
+        if self._servers.has_key(idekey):
+            return self._servers[idekey]
+        return None
+    
+    def waitForever(self):
+        try:
+            self._clientListener.start()
+            self._serverListener.start()
+            while 1:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            self._clientListener.stop()
+            self._serverListener.stop()
+        except Exception, e:
+            log.exception(e)
+            self._clientListener.stop()
+            self._serverListener.stop()
+
+    ##################################################################
+    # sessionProxy callback functions
+    ##################################################################
+
+    def onConnect(self, session, client, addr):
+        # here we can handle security, return zero to deny
+        # the connection.
+        log.info("connection from %s:%d [%r]", addr[0], addr[1], session)
+        return 1
+    
+    def initHandler(self, session, init):
+        # this is called once during a session, after the connection
+        # to provide initialization information.  initNode is a
+        # minidom node.
+        # 1. find the server the client wants
+        # 2. add data to the init node
+        # 3. call session.startServer
+        idekey = init.getAttribute('idekey')
+        server = self.getServer(idekey)
+        if not server:
+            msg = "No server with key [%s], stopping request [%r]"% (idekey, session)
+            log.warn(msg)
+            session.error(msg)
+            session.stop()
+            return
+        init.setAttribute('proxied','true')
+        if not session.startServer(server, init):
+            msg = "Unable to connect to server with key [%s], stopping request [%r]"% (idekey, session)
+            log.warn(msg)
+            self.removeServer(idekey)
+            session.error(msg)
+            session.stop()
+        
+    
+    def outputHandler(self, session, stream, text):
+        # We should never get called
+        msg = "outputHandler Closing connection, invalid protocol used"
+        log.info("%s %r", msg, self)
+        session.error(msg)
+        session.stop()
+
+    def responseHandler(self, session, response):
+        # We should never get called
+        msg = "responseHandler Closing connection, invalid protocol used"
+        log.info("%s %r", msg, self)
+        session.error(msg)
+        session.stop()
+
+
+
+#---- mainline
+
+def main(argv):
+    if sys.version_info < (2, 0):
+        exe = sys.executable
+        ver = '.'.join(map(str, sys.version_info[:3]))
+        sys.stderr.write("The proxy must be run with Python "
+                         "version 2.0 or greater. Your current "
+                         "python, '%s', is version '%s'\n"
+                         % (exe, ver))
+        sys.exit(1)
+    
+    try:
+        optlist, args = getopt.getopt(argv[1:], 'hVd:l:i:',
+            ['help', 'version', 'debug_port',
+             'log_level', 'ide_port'])
+    except getopt.GetoptError, msg:
+        sys.stderr.write("proxy: error: %s\n" % str(msg))
+        sys.stderr.write("See 'proxy --help'.\n")
+        return 1
+
+    idehost = dbghost = '127.0.0.1'
+    dbgport = 9000
+    ideport = 9001
+    logLevel = logging.INFO
+
+    for opt, optarg in optlist:
+        if optarg:
+            try:
+                optarg = optarg.decode()
+            except UnicodeDecodeError, e:
+                pass # nothing we can do if defaultlocale is wrong
+        if opt in ('-h', '--help'):
+            sys.stdout.write(__doc__+'\n')
+            return 0
+        elif opt in ('-V', '--version'):
+            kw = re.findall('\$(\w+):\s(.*?)\s\$', __revision__)
+            sys.stderr.write("pydbgpproxy %s (%s %s %s %s)\n"
+                             % (__version__, kw[0][0], kw[0][1],
+                                kw[1][0], kw[1][1]))
+            return 0
+        elif opt in ('-d', '--debug_port'):
+            if optarg.find(':') >= 0:
+                dbghost, dbgport = optarg.split(':')
+                dbgport = int(dbgport)
+            else:
+                dbghost = '127.0.0.1'
+                dbgport = int(optarg)
+        elif opt in ('-i', '--ide_port'):
+            if optarg.find(':') >= 0:
+                idehost, ideport = optarg.split(':')
+                ideport = int(ideport)
+            else:
+                idehost = '127.0.0.1'
+                ideport = int(optarg)
+        elif opt in ('-l', '--log_level'):
+            if optarg in logging._levelNames:
+                logLevel = logging._levelNames[optarg]
+            else:
+                sys.stderr.write("proxy: error: Invalid log level\n")
+                sys.stderr.write("See 'proxy --help'.\n")
+                return 1
+
+    configureLogging(log, logLevel)
+    configureLogging(dbgp.serverBase.log, logLevel)
+    try:
+        proxy(dbghost, dbgport, idehost, ideport).waitForever()
+    except Exception, e:
+        log.exception(e)
+        # Some exceptions will lock the console, such as an error to
+        # bind the address catching any exceptions allow us to exit
+        # without the lockup.
+        pass
+    return 1
+
+if __name__ == "__main__":
+    main(sys.argv)
+
