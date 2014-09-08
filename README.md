@@ -1,3 +1,22 @@
+# Quick Start
+
+You are good to go if using python 2.7 and windows 7.
+In python code press <F5> and debugger will start.
+
+# Added command
+
+VdebugTrace
+
+will trace expression or variables of which you want to watch continuous change.
+
+[usage]
+
+:VdebugTrace {expression or variables} 
+
+# KOMODO pydbgp 
+
+(patch ver.) included
+
 # Vdebug
 
 [![Build Status](https://travis-ci.org/joonty/vdebug.png?branch=master)](https://travis-ci.org/joonty/vdebug)
