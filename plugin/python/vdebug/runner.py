@@ -16,6 +16,14 @@ class Runner:
     an interface that Vim can use to send commands.
     """
 
+    ENDPOINT_ARGS = [
+        ('socket_type', str),
+        ('server', str),
+        ('port', int),
+        ('unix_path', str),
+        ('unix_group', str),
+        ('unix_permissions', int),
+    ]
     def __init__(self):
         self.api = None
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
@@ -39,21 +47,23 @@ class Runner:
                 vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
                         vdebug.opts.Options.get('debug_file_level'),\
                         vdebug.opts.Options.get('debug_file')))
+            endpoint = {}
+            for arg, pytype in Runner.ENDPOINT_ARGS:
+                if vdebug.opts.Options.isset(arg):
+                    endpoint[arg] = vdebug.opts.Options.get(arg, pytype)
             self.listen(\
-                    vdebug.opts.Options.get('server'),\
-                    vdebug.opts.Options.get('port',int),\
+                    endpoint,\
                     vdebug.opts.Options.get('timeout',int))
 
             self.ui.open()
             self.keymapper.map()
             self.ui.set_listener_details(\
-                    vdebug.opts.Options.get('server'),\
-                    vdebug.opts.Options.get('port'),\
+                    self.api.conn.address_description(),\
                     vdebug.opts.Options.get('ide_key'))
 
-            addr = self.api.conn.address
-            vdebug.log.Log("Found connection from " + str(addr),vdebug.log.Logger.INFO)
-            self.ui.set_conn_details(addr[0],addr[1])
+            addr = self.api.conn.peer_description()
+            vdebug.log.Log("Found connection from " + addr,vdebug.log.Logger.INFO)
+            self.ui.set_conn_details(addr)
 
             self.set_features()
             self.breakpoints.update_lines(self.ui.get_breakpoint_sign_positions())
@@ -253,7 +263,7 @@ class Runner:
         self.api.breakpoint_set(bp.get_cmd())
         self.run()
 
-    def listen(self,server,port,timeout):
+    def listen(self,endpoint,timeout):
         """Open the vdebug.dbgp API with connection.
 
         Uses existing connection if possible.
@@ -269,8 +279,8 @@ class Runner:
                 check_ide_key = True
                 if len(ide_key) == 0:
                     check_ide_key = False
-                    
-                connection = vdebug.dbgp.Connection(server,port,\
+
+                connection = vdebug.dbgp.Connection(endpoint,
                         timeout,vdebug.util.InputStream())
 
                 self.api = vdebug.dbgp.Api(connection)

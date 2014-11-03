@@ -785,8 +785,10 @@ retain option settings by adding them to your vimrc.
 
 The default options look like this: >
     let g:vdebug_options= {
+    \    "socket_type": "tcp",
     \    "port" : 9000,
     \    "server" : 'localhost',
+    \    "unix_permissions": 0700,
     \    "timeout" : 20,
     \    "on_close" : 'detach',
     \    "break_on_open" : 1,
@@ -810,6 +812,13 @@ if you don't set them.
 
 Here is a list of all the available options.
 
+                                                   *VdebugOptions-socket_type*
+g:vdebug_options["socket_type"] (default = "tcp")
+    This sets whether Vdebug waits over a TCP or an Unix-domain
+    socket. When set to "tcp" the listening address is configured via
+    the port and server options, when set to "unix" the listening path
+    is configured via the unix_path option.
+
                                                           *VdebugOptions-port*
 g:vdebug_options["port"] (default = 9000)                 
     This sets the port that Vdebug will use to listen for connections. Xdebug
@@ -822,6 +831,16 @@ g:vdebug_options["server"] (default = "localhost")
     defaults to localhost, as it assumes that the debugger engine will be
     running on the same machine and also connecting to localhost. If you want
     to debug a script on a different machine, look at |VdebugRemote|.
+
+                                                     *VdebugOptions-unix_path*
+g:vdebug_options["unix_path"] (default = empty)
+    This sets the path that Vdebug will use to listen for connections
+    when listening over an Unix-domain socket.
+
+                                              *VdebugOptions-unix_permissions*
+g:vdebug_options["unix_permissions"] (default = 0700)
+    This sets the permissions of the Unix-domain socket that Vdebug
+    will use to listen for connections.
 
                                                        *VdebugOptions-timeout*
 g:vdebug_options["timeout"] (default = 20)             

@@ -83,9 +83,11 @@ let g:vdebug_keymap_defaults = {
 \}
 
 let g:vdebug_options_defaults = {
+\    "socket_type": "tcp",
 \    "port" : 9000,
 \    "timeout" : 20,
 \    "server" : 'localhost',
+\    "unix_permissions": 0700,
 \    "on_close" : 'detach',
 \    "break_on_open" : 1,
 \    "ide_key" : '',
