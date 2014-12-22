@@ -33,8 +33,8 @@ class DebuggerInterface:
     def status_for_statusline(self):
         return self.session_handler.status_for_statusline()
 
-    def start_if_ready(self):
-        self.session_handler.start_if_ready()
+    def handle_periodically(self):
+        return self.session_handler.periodically()
 
     def listen(self):
         self.session_handler.listen()

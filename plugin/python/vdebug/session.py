@@ -4,6 +4,7 @@ import vdebug.log
 import vdebug.dbgp
 import vdebug.listener
 import vim
+import socket
 
 class ModifiedBufferError(Exception):
     pass
@@ -18,6 +19,7 @@ class SessionHandler:
         self.__ex_handler = vdebug.util.ExceptionHandler(self)
         self.__session = None
         self.listener = None
+        self.__is_waiting = False
 
     def dispatch_event(self, name, *args):
         vdebug.event.Dispatcher(self).dispatch_event(name, *args)
@@ -47,20 +49,34 @@ class SessionHandler:
         if self.is_open():
             self.ui().set_status("listening")
         self.listener.start()
-        self.start_if_ready()
+        self.dispatch_event("start_waiting")
 
     def stop_listening(self):
         if self.listener:
             self.listener.stop()
             self.ui().say("Vdebug stopped waiting for a connection")
 
+    def start_waiting(self):
+        if not self.__is_waiting:
+            vim.command('augroup VdebugWaiting')
+            vim.command('au CursorHold,CursorMoved,InsertLeave,FocusGained * python debugger.handle_periodically()')
+            vim.command('augroup END')
+            self.__is_waiting = True
+
+    def stop_waiting(self):
+        if self.__is_waiting:
+            vim.command('au! VdebugWaiting')
+            self.__is_waiting = False
+
     def run(self):
         if self.is_connected():
             self.dispatch_event("run")
+
         else:
             self.listen()
 
     def stop(self):
+        self.dispatch_event("stop_waiting")
         if self.is_connected():
             self.__session.close_connection()
         elif self.is_open():
@@ -72,6 +88,7 @@ class SessionHandler:
             self.__ui.say("Vdebug is not running")
 
     def close(self):
+        self.dispatch_event("stop_waiting")
         self.stop_listening()
         if self.is_connected():
             self.__session.close_connection()
@@ -96,10 +113,20 @@ class SessionHandler:
     def status_for_statusline(self):
         return "vdebug(%s)" % self.status()
 
-    def start_if_ready(self):
-        if self.listener.is_ready():
+    def periodically(self):
+        if self.listener and self.listener.is_ready():
             print "Found connection, starting debugger"
             self.__new_session()
+            return True
+        elif self.is_connected():
+            return self.async_refresh()
+        else:
+            return False
+
+    def async_refresh(self):
+        status = self.__session.async_status()
+        if status != None:
+            self.dispatch_event("refresh", status)
             return True
         else:
             return False
@@ -109,6 +136,7 @@ class SessionHandler:
                 self.__breakpoints,
                 vdebug.util.Keymapper())
 
+        self.dispatch_event("stop_waiting")
         status = self.__session.start(self.listener.create_connection())
         self.dispatch_event("refresh", status)
 
@@ -213,6 +241,11 @@ class Session:
         self.__ui.say("Detaching the debugger")
         self.__api.detach()
         self.close_connection(False)
+
+    def async_status(self):
+        """Query for status async
+        """
+        return self.__api.async_status()
 
     def __set_features(self):
         """Evaluate vim dictionary of features and pass to debugger.

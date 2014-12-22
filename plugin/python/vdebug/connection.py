@@ -68,15 +68,20 @@ class ConnectionHandler:
             body = body + buf
         return body
 
-    def recv_msg(self):
+    def recv_msg(self, timeout = None):
         """Receive a message from the debugger.
 
         Returns a string, which is expected to be XML.
         """
-        length = self.__recv_length()
-        body     = self.__recv_body(length)
-        self.__recv_null()
-        return body
+        self.sock.settimeout(timeout)
+        try:
+            length = self.__recv_length()
+            body   = self.__recv_body(length)
+            self.__recv_null()
+            return body
+        finally:
+            if self.sock != None:
+                self.sock.settimeout(None)
 
     def send_msg(self, cmd):
         """Send a message to the debugger.

@@ -581,6 +581,7 @@ class WatchWindow(Window):
 
 class StatusWindow(Window):
     name = "DebuggerStatus"
+    status = None
 
     def on_create(self):
         self.command('setlocal syntax=debugger_status')
@@ -601,6 +602,13 @@ class StatusWindow(Window):
 
     def set_conn_details(self, addr, port):
         self.insert("Connected to %s:%s" %(addr, port), 2, True)
+
+    def set_status(self,status):
+        self.insert("Status: "+str(status),0,True)
+        self.status = status
+
+    def get_status(self):
+        return self.status
 
     def set_listener_details(self, addr, port, idekey):
         details = "Listening on %s:%s" %(addr, port)

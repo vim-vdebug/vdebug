@@ -3,6 +3,7 @@ import socket
 import vdebug.log
 import base64
 import time
+import errno
 
 """ Response objects for the DBGP module."""
 
@@ -212,7 +213,7 @@ class Api:
         self.startfile = xml.get("fileuri")
 
     def send_cmd(self,cmd,args = '',
-            res_cls = Response):
+            res_cls = Response, timeout = None):
         """Send a command to the debugger.
 
         This method automatically adds a unique transaction
@@ -234,17 +235,40 @@ class Api:
         vdebug.log.Log("Command: "+send,\
                 vdebug.log.Logger.DEBUG)
         self.conn.send_msg(send)
-        msg = self.conn.recv_msg()
-        vdebug.log.Log("Response: "+msg,\
+
+        return self.recv_msg(cmd,args,res_cls,timeout)
+
+    def recv_msg(self,cmd,args = '',
+            res_cls = Response, timeout = None):
+        try:
+            msg = self.conn.recv_msg(timeout)
+            vdebug.log.Log("Response: "+str(msg),\
                 vdebug.log.Logger.DEBUG)
-        return res_cls(msg,cmd,args,self)
+            return res_cls(msg,cmd,args,self)
+        except socket.timeout:
+            if timeout != None:
+                return None
+            else:
+                raise
+        except socket.error, e:
+            if e.args[0] == errno.EWOULDBLOCK or e.args[0] == errno.EAGAIN:
+                if timeout != None:
+                    return None
+                else:
+                    raise
+            else:
+                raise
 
     def status(self):
         """Get the debugger status.
 
         Returns a Response object.
         """
-        return self.send_cmd('status','',StatusResponse)
+        return self.send_cmd('status','',StatusResponse, 1)
+
+    def async_status(self):
+        """Check for and returns a unhandled status response"""
+        return self.recv_msg('', '', StatusResponse, 0)
 
     def feature_get(self,name):
         """Get the value of a feature from the debugger.
@@ -277,7 +301,7 @@ class Api:
     def run(self):
         """Tell the debugger to start or resume
         execution."""
-        return self.send_cmd('run','',StatusResponse)
+        return self.send_cmd('run','',StatusResponse, 1)
 
     def eval(self,code):
         """Tell the debugger to start or resume
@@ -298,7 +322,7 @@ class Api:
         If there's a function call, the debugger engine
         will break on the first statement in the function.
         """
-        return self.send_cmd('step_into','',StatusResponse)
+        return self.send_cmd('step_into','',StatusResponse, 1)
 
     def step_over(self):
         """Tell the debugger to step to the next
@@ -307,14 +331,14 @@ class Api:
         If there's a function call, the debugger engine
         will stop at the next statement after the function call.
         """
-        return self.send_cmd('step_over','',StatusResponse)
+        return self.send_cmd('step_over','',StatusResponse, 1)
 
     def step_out(self):
         """Tell the debugger to step out of the statement.
 
         The debugger will step out of the current scope.
         """
-        return self.send_cmd('step_out','',StatusResponse)
+        return self.send_cmd('step_out','',StatusResponse, 1)
 
     def stop(self):
         """Tell the debugger to stop execution.
@@ -496,15 +520,20 @@ class Connection:
             body = body + buf
         return body
 
-    def recv_msg(self):
+    def recv_msg(self, timeout = None):
         """Receive a message from the debugger.
 
         Returns a string, which is expected to be XML.
         """
-        length = self.__recv_length()
-        body     = self.__recv_body(length)
-        self.__recv_null()
-        return body
+        self.sock.settimeout(timeout)
+        try:
+            length = self.__recv_length()
+            body   = self.__recv_body(length)
+            self.__recv_null()
+            return body
+        finally:
+            if self.sock != None:
+                self.sock.settimeout(None)
 
     def send_msg(self, cmd):
         """Send a message to the debugger.

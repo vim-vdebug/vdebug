@@ -4,6 +4,7 @@ if __name__ == "__main__":
 import unittest2 as unittest
 import vdebug.dbgp
 from mock import MagicMock, patch
+import socket
 
 class ApiTest(unittest.TestCase):      
     """Test the Api class in the vdebug.dbgp module."""
@@ -69,22 +70,14 @@ class ApiTest(unittest.TestCase):
         status_res = self.p.run()
         assert str(status_res) == "running"
 
+    def test_run_async_retval(self):
+        """Test that the run command returns None if running doesn't return before the timeout expires."""
+        self.p.conn.recv_msg.side_effect = socket.timeout
+        status_res = self.p.run()
+        assert status_res == None
+
     def test_step_into_retval(self):
         """Test that the step_into command receives a message from the api."""
-        self.p.conn.recv_msg.return_value = """<?xml
-            version="1.0" encoding="iso-8859-1"?>\n
-            <response command="step_into"
-                      xmlns="urn:debugger_api_v1"
-                      status="break"
-                      reason="ok"
-                      transaction_id="transaction_id">
-                message data
-            </response>"""
-        status_res = self.p.step_out()
-        assert str(status_res) == "break"
-
-    def test_step_over_retval(self):
-        """Test that the step_over command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
@@ -97,8 +90,14 @@ class ApiTest(unittest.TestCase):
         status_res = self.p.step_into()
         assert str(status_res) == "break"
 
-    def test_step_out_retval(self):
-        """Test that the step_out command receives a message from the api."""
+    def test_step_into_async_retval(self):
+        """Test that the step_info command returns None if stepping doesn't return before the timeout expires."""
+        self.p.conn.recv_msg.side_effect = socket.timeout
+        status_res = self.p.step_into()
+        assert status_res == None
+
+    def test_step_over_retval(self):
+        """Test that the step_over command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
             <response command="step_into"
@@ -110,6 +109,32 @@ class ApiTest(unittest.TestCase):
             </response>"""
         status_res = self.p.step_over()
         assert str(status_res) == "break"
+
+    def test_step_over_async_retval(self):
+        """Test that the step_over command returns None if stepping doesn't return before the timeout expires."""
+        self.p.conn.recv_msg.side_effect = socket.timeout
+        status_res = self.p.step_over()
+        assert status_res == None
+
+    def test_step_out_retval(self):
+        """Test that the step_out command receives a message from the api."""
+        self.p.conn.recv_msg.return_value = """<?xml
+            version="1.0" encoding="iso-8859-1"?>\n
+            <response command="step_into"
+                      xmlns="urn:debugger_api_v1"
+                      status="break"
+                      reason="ok"
+                      transaction_id="transaction_id">
+                message data
+            </response>"""
+        status_res = self.p.step_out()
+        assert str(status_res) == "break"
+
+    def test_step_out_async_retval(self):
+        """Test that the step_out command returns None if stepping doesn't return before the timeout expires."""
+        self.p.conn.recv_msg.side_effect = socket.timeout
+        status_res = self.p.step_out()
+        assert status_res == None
 
     def test_stop_retval(self):
         """Test that the stop command receives a message from the api."""

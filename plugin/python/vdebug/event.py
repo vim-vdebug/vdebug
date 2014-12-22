@@ -234,6 +234,12 @@ class EventError(Exception):
 
 class RefreshEvent(Event):
     def run(self, status):
+        if status == None:
+            self.dispatch("start_waiting")
+            return
+        else:
+            self.dispatch("stop_waiting")
+
         if str(status) == "interactive":
             self.ui.error("Debugger engine says it is in interactive mode,"+\
                     "which is not supported: closing connection")
@@ -380,6 +386,14 @@ class ReloadKeymappingsEvent(Event):
             print "Reloaded keymappings"
             self.session.keymapper().reload()
 
+class StartWaitingEvent(Event):
+    def run(self):
+        self.session_handler.start_waiting()
+
+class StopWaitingEvent(Event):
+    def run(self):
+        self.session_handler.stop_waiting()
+
 class Dispatcher:
     events = {
         "run": RunEvent,
@@ -393,7 +407,9 @@ class Dispatcher:
         "set_breakpoint": SetBreakpointEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
-        "remove_breakpoint": RemoveBreakpointEvent
+        "remove_breakpoint": RemoveBreakpointEvent,
+        "start_waiting": StartWaitingEvent,
+        "stop_waiting": StopWaitingEvent
     }
 
     def __init__(self, session_handler):
