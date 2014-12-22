@@ -288,6 +288,12 @@ class RunEvent(Event):
         else:
             self.dispatch("listen")
 
+class AsyncBreakEvent(Event):
+    def run(self):
+        vdebug.log.Log("Breaking")
+        res = self.api.break_async()
+        self.dispatch("refresh", res)
+
 class ListenEvent(Event):
     def run(self):
         self.session_handler.listen()
@@ -397,6 +403,7 @@ class StopWaitingEvent(Event):
 class Dispatcher:
     events = {
         "run": RunEvent,
+        "break_async": AsyncBreakEvent,
         "refresh": RefreshEvent,
         "listen": ListenEvent,
         "step_over": StepOverEvent,

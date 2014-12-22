@@ -74,6 +74,7 @@ let g:vdebug_keymap_defaults = {
 \    "step_over" : "<F2>",
 \    "step_into" : "<F3>",
 \    "step_out" : "<F4>",
+\    "break_async" : "<F8>",
 \    "close" : "<F6>",
 \    "detach" : "<F7>",
 \    "set_breakpoint" : "<F10>",

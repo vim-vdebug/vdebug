@@ -44,6 +44,11 @@ class DebuggerInterface:
         """
         self.session_handler.run()
 
+    def break_async(self):
+        """Tell the debugger to break
+        """
+        self.session_handler.dispatch_event("break_async")
+
     def run_to_cursor(self):
         """Run to the current VIM cursor position.
         """

@@ -340,6 +340,11 @@ class Api:
         """
         return self.send_cmd('step_out','',StatusResponse, 1)
 
+    def break_async(self):
+        """Tell the debugger to asynchronously break
+        """
+        return self.send_cmd('break','',StatusResponse, 1)
+
     def stop(self):
         """Tell the debugger to stop execution.
 
