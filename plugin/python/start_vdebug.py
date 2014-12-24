@@ -120,6 +120,14 @@ class DebuggerInterface:
         except Exception as e:
             self.handle_exception(e)
 
+    def save_eval(self,args):
+        """Save a code snippet for later display in the watch window.
+        """
+        try:
+            return self.runner.save_code(args)
+        except Exception as e:
+            self.handle_exception(e)
+
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
         """

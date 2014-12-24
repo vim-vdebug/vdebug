@@ -115,7 +115,7 @@ command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debug
 command! VdebugStart python debugger.run()
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
-command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
+command! -nargs=? -bang VdebugEval call s:HandleEval('<bang>', <q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
 
 " Signs and highlighted lines for breakpoints, etc.
@@ -134,6 +134,16 @@ function! s:BreakpointTypes(A,L,P)
         return filter(['conditional ','exception ','return ','call ','watch '],'v:val =~ "^".a:A.".*"')
     else
         return []
+    endif
+endfunction
+
+function! s:HandleEval(bang,code)
+    let code = escape(a:code,'"')
+    if strlen(a:bang)
+        execute 'python debugger.save_eval("'.code.'")'
+    endif
+    if strlen(a:code)
+        execute 'python debugger.handle_eval("'.code.'")'
     endif
 endfunction
 

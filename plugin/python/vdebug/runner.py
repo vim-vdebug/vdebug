@@ -22,6 +22,7 @@ class Runner:
         self.breakpoints = vdebug.breakpoint.Store()
         self.keymapper = vdebug.util.Keymapper()
         self.ui = vdebug.ui.vimui.Ui(self.breakpoints)
+        self.saved_code = ''
 
     def open(self):
         """ Open the connection and debugging vdebug.ui.
@@ -87,6 +88,12 @@ class Runner:
                 error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
                 self.ui.error(error_str)
 
+    def save_code(self,code):
+        """Save a code snippet for later display in the watch window.
+        """
+        self.saved_code = code
+        return code
+
     def refresh(self,status):
         """The main action performed after a deubugger step.
     
@@ -121,7 +128,10 @@ class Runner:
                         self.cur_file,\
                         self.cur_lineno)
 
-                self.get_context(0)
+                if self.saved_code != '':
+                    self.eval(self.saved_code)
+                else:
+                    self.get_context(0)
 
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
