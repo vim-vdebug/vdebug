@@ -80,7 +80,7 @@ class ApiTest(unittest.TestCase):
                       transaction_id="transaction_id">
                 message data
             </response>"""
-        status_res = self.p.run()
+        status_res = self.p.step_out()
         assert str(status_res) == "break"
 
     def test_step_over_retval(self):
@@ -94,7 +94,7 @@ class ApiTest(unittest.TestCase):
                       transaction_id="transaction_id">
                 message data
             </response>"""
-        status_res = self.p.run()
+        status_res = self.p.step_into()
         assert str(status_res) == "break"
 
     def test_step_out_retval(self):
@@ -108,7 +108,7 @@ class ApiTest(unittest.TestCase):
                       transaction_id="transaction_id">
                 message data
             </response>"""
-        status_res = self.p.run()
+        status_res = self.p.step_over()
         assert str(status_res) == "break"
 
     def test_stop_retval(self):
