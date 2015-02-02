@@ -13,6 +13,7 @@ Before do
 end
 
 After do
+  vdebug.close
   kill_vim
   Dir.chdir '..'
   system "rm -r tmpspace"

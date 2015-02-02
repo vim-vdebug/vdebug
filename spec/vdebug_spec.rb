@@ -6,6 +6,10 @@ describe Vdebug do
     @vimserver = double("vimserver")
     @vim = double("vim", server: @vimserver)
     @vdebug = Vdebug.new vim
+
+    vim.should_receive(:command).
+      with("python debugger.handle_periodically()").
+      at_most(:once)
   end
 
   let(:vimrunner) { @vim }
@@ -37,22 +41,26 @@ describe Vdebug do
     context "asking whether it's connected" do
       it "should query the vdebug api" do
         vim.should_receive(:command).
-          with("python print debugger.runner.is_alive()").
+          with("python print debugger.status()").
           and_return("True")
         vdebug.connected?
       end
 
-      context "when the vdebug api returns 'False'" do
+      context "when the vdebug api returns 'inactive'" do
         before do
-          vim.should_receive(:command).and_return("False")
+          vim.should_receive(:command).
+            with("python print debugger.status()").
+            and_return("inactive")
         end
         subject { vdebug.connected? }
         it { should be false }
       end
 
-      context "when the vdebug api returns 'True'" do
+      context "when the vdebug api returns 'break'" do
         before do
-          vim.should_receive(:command).and_return("True")
+          vim.should_receive(:command).
+            with("python print debugger.status()").
+            and_return("break")
         end
         subject { vdebug.connected? }
         it { should be true }

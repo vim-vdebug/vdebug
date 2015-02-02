@@ -9,9 +9,10 @@ class Vdebug
 
   def start_listening
     clear_buffer_cache!
-    vim.command "VdebugOpt background_listener 0"
+    #vim.command "VdebugOpt background_listener 0"
     vim.server.remote_send ":python debugger.run()<CR>"
     sleep 1
+    vim.command "python debugger.handle_periodically()"
   end
 
   def messages
@@ -48,6 +49,7 @@ class Vdebug
 
   # Has the vdebug GUI been opened?
   def gui_open?
+    vim.command "python debugger.handle_periodically()"
     names = buffers.values
     %w[DebuggerStack DebuggerStatus DebuggerWatch].all? { |b|
       names.include? b
@@ -59,10 +61,11 @@ class Vdebug
   end
 
   def connected?
-     status = vim.command(
-       "python print debugger.status()"
-     )
-     %w(break running).include? status
+    vim.command "python debugger.handle_periodically()"
+    status = vim.command(
+      "python print debugger.status()"
+    )
+    %w(break running).include? status
   end
 
   def watch_window_content
@@ -102,6 +105,10 @@ class Vdebug
 
   def status
     /Status: (\S+)/.match(status_window_content)[1]
+  end
+
+  def close
+    vim.command 'python debugger.close()'
   end
 
 protected
