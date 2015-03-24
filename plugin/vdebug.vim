@@ -92,7 +92,7 @@ let g:vdebug_options_defaults = {
 \    "debug_window_level" : 0,
 \    "debug_file_level" : 0,
 \    "debug_file" : "",
-\    "path_maps" : {},
+\    "path_maps" : [],
 \    "watch_window_style" : 'expanded',
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
