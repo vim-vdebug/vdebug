@@ -412,7 +412,7 @@ class Connection:
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             serv.setblocking(0)
-            serv.bind((self.host, self.port))
+            serv.bind(('', self.port))
             serv.listen(5)
             (self.sock, self.address) = self.listen(serv, self.timeout)
             self.sock.settimeout(None)
