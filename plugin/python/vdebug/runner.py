@@ -259,7 +259,7 @@ class Runner:
                     %context_res.get_code())
             self.ui.tracewin.accept_renderer(rend)
         except vdebug.dbgp.EvalError:
-            self.ui.tracewin.accept_value('(expression not currently valid)')
+            self.ui.tracewin.write('(expression not currently valid)')
         self.ui.tracewin.set_trace_expression(code)
 
     def eval(self,code):

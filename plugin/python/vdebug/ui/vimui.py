@@ -267,7 +267,6 @@ class Window(vdebug.ui.interface.Window):
     open_cmd = "new"
     creation_count = 0
 
-    context_sav = None 
     def __init__(self,ui,open_cmd):
         self.buffer = None
         self.ui = ui
@@ -373,9 +372,6 @@ class Window(vdebug.ui.interface.Window):
 
     def accept_renderer(self,renderer):
         self.write(renderer.render())
-
-    def accept_value(self,value):
-        self.write(value)
 
 class BreakpointWindow(Window):
     name = "DebuggerBreakpoints"
@@ -511,9 +507,9 @@ class TraceWindow(WatchWindow):
 
     def render_in_error_case(self):
         if self._last_context_rendered is None:
-            self.accept_value(str(self._trace_expression))
+            self.write(str(self._trace_expression))
         else:
-            self.accept_value('(prev)' + str(self._last_context_rendered))
+            self.write('(prev)' + str(self._last_context_rendered))
 
     def on_destroy(self):
         self._trace_expression = None
