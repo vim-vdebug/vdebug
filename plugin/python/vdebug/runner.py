@@ -16,7 +16,6 @@ class Runner:
     an interface that Vim can use to send commands.
     """
 
-    prev_trace_code_value = ''
     def __init__(self):
         self.api = None
         vdebug.opts.Options.set(vim.eval('g:vdebug_options'))
@@ -130,25 +129,23 @@ class Runner:
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
+
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                 context_res,"%s at %s:%s" \
                 %(name,self.ui.sourcewin.file,self.cur_lineno),\
                 self.context_names, context_id)
+
         self.ui.watchwin.accept_renderer(rend)
-        try:
-            if self.ui.tracewin.reserve_trace_code:
-                context_res = self.api.eval(self.ui.tracewin.reserve_trace_code)
+
+        if self.ui.tracewin.is_tracing():
+            try:
+                context_res = self.api.eval(self.ui.tracewin.get_trace_expression())
                 rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                         context_res,"Trace of: '%s'" \
                         %context_res.get_code())
-                rendered = rend.render()
-                self.ui.tracewin.accept_value(rendered)
-                self.ui.tracewin.last_context_rendered = rendered
-        except vdebug.dbgp.EvalError:
-            if self.ui.tracewin.last_context_rendered:
-                self.ui.tracewin.accept_value('(prev)'+str(self.ui.tracewin.last_context_rendered))
-            else:
-                self.ui.tracewin.accept_value(str(self.ui.tracewin.reserve_trace_code))
+                self.ui.tracewin.render(rend)
+            except vdebug.dbgp.EvalError:
+                self.ui.tracewin.render_in_error_case()
 
 
     def toggle_breakpoint_window(self):
@@ -242,7 +239,18 @@ class Runner:
     def trace(self,code):
         """Evaluate a snippet of code and show the response on the watch window.
         """
-        self.ui.tracewin.clean()
+        if not self.is_alive():
+            self.ui.error("Tracing an expression is only possible when Vdebug is running")
+            return
+        if not code:
+            self.ui.error("You must supply an expression to trace, with `:VdebugTrace expr`")
+            return
+
+        if self.ui.tracewin.is_open:
+            self.ui.tracewin.clean()
+        else:
+            self.ui.tracewin.create()
+
         try:
             vdebug.log.Log("Tracing code: "+code)
             context_res = self.api.eval(code)
@@ -251,12 +259,15 @@ class Runner:
                     %context_res.get_code())
             self.ui.tracewin.accept_renderer(rend)
         except vdebug.dbgp.EvalError:
-            self.ui.tracewin.accept_value('(invalid expression yet)')
-        self.ui.tracewin.reserve_trace_code = code
+            self.ui.tracewin.accept_value('(expression not currently valid)')
+        self.ui.tracewin.set_trace_expression(code)
 
     def eval(self,code):
         """Evaluate a snippet of code and show the response on the watch window.
         """
+        if not self.is_alive():
+            self.ui.error("Evaluating code is only possible when Vdebug is running")
+            return
         try:
             vdebug.log.Log("Evaluating code: "+code)
             context_res = self.api.eval(code)

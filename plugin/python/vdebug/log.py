@@ -47,7 +47,7 @@ class WindowLogger(Logger):
 
     def shutdown(self):
         if self.window is not None:
-            self.window.destroy()
+            self.window.is_open = False
 
     def log(self, string, level):
         if level > self.debug_level:
@@ -114,11 +114,12 @@ class Log:
 
     @classmethod
     def remove_logger(cls, type):
-        if type in cls.loggers.iteritems():
+        if type in cls.loggers:
             cls.loggers[type].shutdown()
-            del cls.loggers[type]
             return True
-        return False
+        else:
+            print "Failed to find logger %s in list of loggers" % type
+            return False
 
     @classmethod
     def shutdown(cls):

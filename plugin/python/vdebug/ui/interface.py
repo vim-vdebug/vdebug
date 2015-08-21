@@ -39,6 +39,10 @@ class Window:
         """ Callback for after the window is created """
         pass
 
+    def on_destroy(self):
+        """ Callback for after the window is destroyed """
+        pass
+
     def create(self):
         """ Create the window """
         pass
