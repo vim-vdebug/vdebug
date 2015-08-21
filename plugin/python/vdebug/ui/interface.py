@@ -1,11 +1,12 @@
 class Ui():
     """Abstract for the UI, used by the debugger
     """
-    watchwin = None
-    stackwin = None
+    watchwin  = None
+    stackwin  = None
     statuswin = None
-    logwin = None
+    logwin    = None
     sourcewin = None
+    tracewin  = None
 
     def __init__(self):
         self.is_open = False
