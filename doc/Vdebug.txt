@@ -39,6 +39,7 @@ CONTENTS                                                      *Vdebug-contents*
             4.2.4 The status window..................|VdebugStatusWindow|
             4.2.5 The breakpoint window..............|VdebugBreakpointWindow|
             4.2.6 The log window.....................|VdebugLogWindow|
+            4.2.7 The trace window...................|VdebugTraceWindow|
         4.3 Commands.................................|VdebugCommands|
             4.3.1 Run................................|VdebugCommandRun|
             4.3.2 Step over..........................|VdebugCommandStepOver|
@@ -56,6 +57,7 @@ CONTENTS                                                      *Vdebug-contents*
             4.5.1 Evaluating any expression..........|VdebugEvalExpression|
             4.5.2 Evaluating highlighted expressions.|VdebugEvalHighlighted|
             4.5.3 Evaluating variable under cursor   |VdebugEvalUnderCursor|
+        4.6 Tracing expressions......................|VdebugTrace|
     5. Options.......................................|VdebugOptions|
         5.1 Quickly setting options..................|VdebugOpt|
         5.2 List of options..........................|VdebugOptionList|
@@ -513,9 +515,8 @@ to go for help!
 ------------------------------------------------------------------------------
 4.2.5 The breakpoint window                           *VdebugBreakpointWindow*
 
-This is a bit of an odd one out, as it doesn't show by default and can be
-summoned at will. It lists all the breakpoints that have been set, and shows
-the IDs that can be used to remove them.
+This window doesn't show by default and can be summoned at will. It lists all
+the breakpoints that have been set, and shows the IDs that can be used to remove them.
 
 To open the window use the command :BreakpointWindow. It's in a table format,
 so hopefully it won't need any more explanation. To close the window again,
@@ -526,7 +527,7 @@ To see more about breakpoints see |VdebugBreakpoints|.
 ------------------------------------------------------------------------------
 4.2.6 The log window                                         *VdebugLogWindow*
 
-Another odd one out, this only appears in two situations:
+This window automatically appears in two situations:
     1. You have the "debug_window_level" option set to >= 1
     2. An error occurs
 
@@ -536,6 +537,16 @@ down. In the case of 2), the window will automatically open when an error happen
 
 If you want to log things, it's better to use file logging (see
 |VdebugLogFile|).
+
+------------------------------------------------------------------------------
+4.2.7 The trace window                                     *VdebugTraceWindow*
+
+This window will only show when using the :VdebugTrace command.
+
+It shows the evaluated expression that you pass to the command, each time the
+debugger changes position in the code.
+
+For more about this, see |VdebugTrace|.
 
 ------------------------------------------------------------------------------
 4.3 Commands                                                  *VdebugCommands*
@@ -750,6 +761,31 @@ You can evaluate the variable under the cursor in the watch window with <F12>
 (default key). Note that only variables before the current line will have a
 value, and trying to evaluate uninitialized variables may cause an error with
 some debugger engines.
+
+------------------------------------------------------------------------------
+4.6 Tracing expressions                                          *VdebugTrace*
+
+A large part of this work is thanks to escher9 on Github. See this pull
+request for the history: https://github.com/joonty/vdebug/pull/178.
+
+If you want to track an expression (any piece of code that can be evaluated)
+or clearly see how a single variable changes through your code's execution,
+you can trace it. At each point that the debugger stops in your code the
+expression will be re-evaluated and displayed in the trace window.
+
+To use this feature, when you're connected to the debugger use the command
+:VdebugTrace: >
+    :VdebugTrace <expression>
+<
+
+This reveals the trace window, which will stay open until you close it manually.
+It will track the result of your expression.
+
+A concrete example of usage is as follows: >
+    :VdebugTrace $x
+<
+
+This would track the variable "$x" as the code runs.
 
 ==============================================================================
 5. Options                                                     *VdebugOptions*
