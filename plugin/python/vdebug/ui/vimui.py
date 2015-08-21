@@ -486,7 +486,7 @@ class StackGetResponseRenderer(ResponseRenderer):
         string = ""
         for s in stack:
             where = s.get('where') if s.get('where') else 'main'
-            file = vdebug.util.RemoteFilePath(s.get('filename'))
+            file = vdebug.util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\
                     'file':str(file.as_local()),'line':s.get('lineno')}
