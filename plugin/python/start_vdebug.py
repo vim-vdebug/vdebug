@@ -104,6 +104,14 @@ class DebuggerInterface:
         except Exception as e:
             self.handle_exception(e)
 
+    def handle_trace(self,args = None):
+        """Trace a code snippet specified by args.
+        """
+        try:
+            return self.runner.trace(args)
+        except Exception as e:
+            self.handle_exception(e)
+
     def handle_eval(self,args):
         """Evaluate a code snippet specified by args.
         """

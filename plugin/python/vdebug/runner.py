@@ -89,9 +89,9 @@ class Runner:
 
     def refresh(self,status):
         """The main action performed after a deubugger step.
-    
+
         Updates the status window, current stack, source
-        file and line and watch window."""    
+        file and line and watch window."""
         if not self.is_alive():
             self.ui.error("Cannot update: no connection")
         else:
@@ -125,14 +125,28 @@ class Runner:
 
     def get_context(self,context_id = 0):
         self.ui.watchwin.clean()
+        self.ui.tracewin.clean()
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
+
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                 context_res,"%s at %s:%s" \
                 %(name,self.ui.sourcewin.file,self.cur_lineno),\
                 self.context_names, context_id)
+
         self.ui.watchwin.accept_renderer(rend)
+
+        if self.ui.tracewin.is_tracing():
+            try:
+                context_res = self.api.eval(self.ui.tracewin.get_trace_expression())
+                rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                        context_res,"Trace of: '%s'" \
+                        %context_res.get_code())
+                self.ui.tracewin.render(rend)
+            except vdebug.dbgp.EvalError:
+                self.ui.tracewin.render_in_error_case()
+
 
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
@@ -222,9 +236,38 @@ class Runner:
                 return
         self.breakpoints.add_breakpoint(bp)
 
+    def trace(self,code):
+        """Evaluate a snippet of code and show the response on the watch window.
+        """
+        if not self.is_alive():
+            self.ui.error("Tracing an expression is only possible when Vdebug is running")
+            return
+        if not code:
+            self.ui.error("You must supply an expression to trace, with `:VdebugTrace expr`")
+            return
+
+        if self.ui.tracewin.is_open:
+            self.ui.tracewin.clean()
+        else:
+            self.ui.tracewin.create()
+
+        try:
+            vdebug.log.Log("Tracing code: "+code)
+            context_res = self.api.eval(code)
+            rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                    context_res,"Eval of: '%s'" \
+                    %context_res.get_code())
+            self.ui.tracewin.accept_renderer(rend)
+        except vdebug.dbgp.EvalError:
+            self.ui.tracewin.write('(expression not currently valid)')
+        self.ui.tracewin.set_trace_expression(code)
+
     def eval(self,code):
         """Evaluate a snippet of code and show the response on the watch window.
         """
+        if not self.is_alive():
+            self.ui.error("Evaluating code is only possible when Vdebug is running")
+            return
         try:
             vdebug.log.Log("Evaluating code: "+code)
             context_res = self.api.eval(code)
@@ -269,7 +312,7 @@ class Runner:
                 check_ide_key = True
                 if len(ide_key) == 0:
                     check_ide_key = False
-                    
+
                 connection = vdebug.dbgp.Connection(server,port,\
                         timeout,vdebug.util.InputStream())
 

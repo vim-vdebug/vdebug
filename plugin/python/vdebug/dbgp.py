@@ -86,6 +86,13 @@ class ContextNamesResponse(Response):
             names[int(c.get('id'))] = c.get('name')
         return names
 
+class TraceResponse(Response):
+    """Response object returned by the trace command."""
+
+    def __str__(self):
+        return self.as_xml().get('trace')
+
+
 class StatusResponse(Response):
     """Response object returned by the status command."""
 
@@ -694,4 +701,8 @@ class EvalError(Exception):
 class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
+    pass
+
+class TraceError(Exception):
+    """Raised when trace is out of domain."""
     pass
