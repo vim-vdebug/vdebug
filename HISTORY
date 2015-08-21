@@ -1,3 +1,10 @@
+=== Vdebug 1.5.0 / 2015-08-28
+Bug fixes:
+ * Fix for remote and local file paths with a windows/unix setup (thanks @brothert, #130)
+
+Features:
+ * Add new VdebugTrace command for tracking individual variables and expressions (thanks @escher9, #178)
+
 === Vdebug 1.4.2 / 2014-05-15
 
 Bug fixes:
