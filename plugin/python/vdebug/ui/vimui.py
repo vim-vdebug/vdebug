@@ -552,6 +552,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
                     next_sep = "|"
                     num_spaces = depth * 2
                 elif depth > next_depth:
+                    if not p.is_last_child:
+                       line += "".rjust(depth * 2 +indent) + " |\n"
+                       line += "".rjust(depth * 2 +indent) + " ...\n"
                     next_sep = "/"
                     num_spaces = (depth * 2) - 1
                 else:
@@ -560,6 +563,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
                 line += "".rjust(num_spaces+indent) + " " + next_sep + "\n"
             elif depth > 0:
+                if not p.is_last_child:
+                   line += "".rjust(depth * 2 +indent) + " |\n"
+                   line += "".rjust(depth * 2 +indent) + " ...\n"
                 line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
         return line
 
