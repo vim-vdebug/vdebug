@@ -135,3 +135,57 @@ class RemotePathTest(unittest.TestCase):
         filename = "C:/local2/path/to/file"
         file = FilePath(filename)
         self.assertEqual("C:\\local2\\path\\to\\file",file.as_local())
+
+class RemoteWinLocalUnixPathTest(unittest.TestCase):
+    def setUp(self):
+        vdebug.opts.Options.set({'path_maps':{'G:\\remote\\path':'/local/path', 'G:\\remote2\\path':'/local2/path'}})
+
+    def test_as_local(self):
+        filename = "G:\\remote\\path\\to\\file"
+        file = FilePath(filename)
+        self.assertEqual("/local/path/to/file",file.as_local())
+
+        filename = "file:///G:/remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local2/path/to/file",file.as_local())
+
+    def test_as_local_does_nothing(self):
+        filename = "/the/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/the/path/to/file",file.as_local())
+
+    def test_as_remote(self):
+        filename = "/local/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///G:/remote/path/to/file",file.as_remote())
+
+        filename = "file:///local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///G:/remote2/path/to/file",file.as_remote())
+
+class RemoteUnixLocalWinPathTest(unittest.TestCase):
+    def setUp(self):
+        vdebug.opts.Options.set({'path_maps':{'/remote/path':'G:\\local\\path', '/remote2/path':'G:\\local2\\path'}})
+
+    def test_as_local(self):
+        filename = "/remote/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("G:\\local\\path\\to\\file",file.as_local())
+
+        filename = "file:///remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("G:\\local2\\path\\to\\file",file.as_local())
+
+    def test_as_local_does_nothing(self):
+        filename = "G:\\the\\path\\to\\file"
+        file = FilePath(filename)
+        self.assertEqual("G:\\the\\path\\to\\file",file.as_local())
+
+    def test_as_remote(self):
+        filename = "G:\\local\\path\\to\\file"
+        file = FilePath(filename)
+        self.assertEqual("file:///remote/path/to/file",file.as_remote())
+
+        filename = "file:///G:/local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///remote2/path/to/file",file.as_remote())
