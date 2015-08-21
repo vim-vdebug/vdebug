@@ -48,7 +48,10 @@ class Ui(vdebug.ui.interface.Ui):
 
             srcwin_name = self.__get_srcwin_name()
 
-            self.watchwin = WatchWindow(self,'vertical belowright new')
+            self.tracewin = TraceWindow(self,'vertical belowright new')
+            self.tracewin.create()
+
+            self.watchwin = WatchWindow(self,'belowright new')
             self.watchwin.create()
 
             self.stackwin = StackWindow(self,'belowright new')
@@ -60,6 +63,7 @@ class Ui(vdebug.ui.interface.Ui):
 
             self.watchwin.set_height(20)
             self.statuswin.set_height(5)
+            self.tracewin.set_height(5)
 
             logwin = LogWindow(self,'rightbelow 6new')
             vdebug.log.Log.set_logger(\
@@ -178,10 +182,13 @@ class Ui(vdebug.ui.interface.Ui):
             self.stackwin.destroy()
         if self.statuswin:
             self.statuswin.destroy()
+        if self.tracewin:
+            self.tracewin.destroy()
 
-        self.watchwin = None
-        self.stackwin = None
+        self.watchwin  = None
+        self.stackwin  = None
         self.statuswin = None
+        self.tracewin  = None
 
 
     def __get_srcwin_name(self):
@@ -260,6 +267,7 @@ class Window(vdebug.ui.interface.Window):
     open_cmd = "new"
     creation_count = 0
 
+    context_sav = None 
     def __init__(self,ui,open_cmd):
         self.buffer = None
         self.ui = ui
@@ -363,6 +371,9 @@ class Window(vdebug.ui.interface.Window):
 
     def accept_renderer(self,renderer):
         self.write(renderer.render())
+
+    def accept_value(self,value):
+        self.write(value)
 
 class BreakpointWindow(Window):
     name = "DebuggerBreakpoints"
@@ -471,6 +482,11 @@ class StatusWindow(Window):
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
+
+class TraceWindow(WatchWindow):
+    name = "TraceWindow"
+    reserve_trace_code    = None
+    last_context_rendered = None
 
 
 class ResponseRenderer:
