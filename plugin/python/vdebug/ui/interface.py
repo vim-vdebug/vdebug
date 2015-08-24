@@ -1,4 +1,4 @@
-class Ui():
+class Ui:
     """Abstract for the UI, used by the debugger
     """
     watchwin = None
