@@ -961,7 +961,7 @@ key map dictionary, g:vdebug_keymap: >
 
     let g:vdebug_keymap = {
     \    "run" : "<F5>",
-    \    "run_to_cursor" : "<F1>",
+    \    "run_to_cursor" : "<F9>",
     \    "step_over" : "<F2>",
     \    "step_into" : "<F3>",
     \    "step_out" : "<F4>",
