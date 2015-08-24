@@ -72,7 +72,7 @@ class FileLogger(Logger):
     def __open(self):
         try:
             self.f = open(self.filename,'w')
-        except IOError as e:
+        except IOError, e:
             raise LogError("Invalid file name '%s' for log file: %s" \
                     %(self.filename,str(e)))
         except:

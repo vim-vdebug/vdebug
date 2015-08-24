@@ -74,7 +74,7 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self,winnr)
             self.sourcewin.focus()
-        except Exception as e:
+        except Exception, e:
             self.is_open = False
             raise e
 
@@ -227,7 +227,10 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def command(self,cmd,silent = True):
         self.focus()
-        prepend = "silent " if silent else ""
+        if silent:
+            prepend = "silent "
+        else:
+            prepend = ""
         command_str = prepend + self.winno + "wincmd " + cmd
         vim.command(command_str)
 
@@ -528,7 +531,10 @@ class StackGetResponseRenderer(ResponseRenderer):
         stack = self.response.get_stack()
         string = ""
         for s in stack:
-            where = s.get('where') if s.get('where') else 'main'
+            if s.get('where'):
+                where = s.get('where')
+            else:
+                where = 'main'
             file = vdebug.util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\

@@ -83,7 +83,7 @@ class Runner:
         for name, value in features.iteritems():
             try:
                 self.api.feature_set(name, value)
-            except vdebug.dbgp.DBGPError as e:
+            except vdebug.dbgp.DBGPError, e:
                 error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
                 self.ui.error(error_str)
 
