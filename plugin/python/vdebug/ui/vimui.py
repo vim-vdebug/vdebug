@@ -87,14 +87,14 @@ class Ui(vdebug.ui.interface.Ui):
                 self.statuswin.set_status("stopped")
                 self.remove_conn_details()
 
-    def set_conn_details(self,addr,port):
-        self.statuswin.insert("Connected to %s:%s" %(addr,port),2,True)
+    def set_conn_details(self,description):
+        self.statuswin.insert("Connected to %s" %(description),2,True)
 
     def remove_conn_details(self):
         self.statuswin.insert("Not connected",2,True)
 
-    def set_listener_details(self,addr,port,idekey):
-        details = "Listening on %s:%s" %(addr,port)
+    def set_listener_details(self,description,idekey):
+        details = "Listening on %s" %(description)
         if len(idekey):
             details += " (IDE key: %s)" % idekey
         self.statuswin.insert(details,1,True)

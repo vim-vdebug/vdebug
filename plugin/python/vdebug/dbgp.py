@@ -3,6 +3,7 @@ import socket
 import vdebug.log
 import base64
 import time
+import os
 
 """ Response objects for the DBGP module."""
 
@@ -381,20 +382,31 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
+    def __init__(self, endpoint, timeout = 30, input_stream = None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
 
-        host -- host name where debugger is running (default '')
-        port -- port number which debugger is listening on (default 9000)
+        endpoint -- dictionary containing connection parameters
+          {
+            "socket_type": "tcp" (default)/"unix",
+            # for TCP sockets
+            "server": "localhost",
+            "port": 9000,
+            # for UNIX-domain sockets
+            "unix_path": "/path/to/socket",
+            "unix_permissions": 0777,
+          }
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
         input_stream -- object for checking input stream and user interrupts (default None)
+
+        Both "server" and "port" parameters are required for TCP sockets, for UNIX-domain sockets
+        only "unix_path" is required.
         """
-        self.port = port
-        self.host = host
+        self.endpoint = endpoint
         self.timeout = timeout
         self.input_stream = input_stream
+        self.address_type = self.endpoint['socket_type']
 
     def __del__(self):
         """Make sure the connection is closed."""
@@ -404,15 +416,41 @@ class Connection:
         """Whether the connection has been established."""
         return self.isconned
 
+    def address_description(self):
+        """Human-readable local address"""
+        if self.endpoint['socket_type'] == 'tcp':
+            return "%s:%s" %(self.endpoint['server'],self.endpoint['port'])
+        else:
+            return self.endpoint['unix_path']
+
+    def peer_description(self):
+        """Human-readable peer address"""
+        if self.endpoint['socket_type'] == 'tcp':
+            return "%s:%s" %(self.address[0],self.address[1])
+        else:
+            return self.endpoint['unix_path']
+
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
         print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ',self.timeout,' seconds...)'
-        serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if self.address_type == 'tcp':
+            serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            serv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
-            serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             serv.setblocking(0)
-            serv.bind((self.host, self.port))
+            if self.endpoint.get('socket_type', 'tcp') == 'tcp':
+                serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                serv.bind((self.endpoint['server'], self.endpoint['port']))
+            else:
+                path = self.endpoint['unix_path']
+                if os.path.exists(path):
+                    os.unlink(path)
+                serv.bind(path)
+                if self.endpoint.get('unix_permissions'):
+                    os.chmod(path, self.endpoint['unix_permissions']);
+
             serv.listen(5)
             (self.sock, self.address) = self.listen(serv, self.timeout)
             self.sock.settimeout(None)
