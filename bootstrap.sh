@@ -23,6 +23,7 @@ apt-get install locales-all git-core vim vim-nox php5 php5-cli php5-xdebug -y
 
 # Install ruby (http://blog.packager.io/post/101342252191/one-liner-to-get-a-precompiled-ruby-on-your-own)
 curl -s https://s3.amazonaws.com/pkgr-buildpack-ruby/current/debian-7/ruby-2.1.5.tgz -o - | sudo tar xzf - -C /usr/local
+gem install bundler
 
 cat <<'EOF' >> /etc/php5/conf.d/*-xdebug.ini
 xdebug.remote_enable=on
@@ -113,4 +114,6 @@ sudo -u vagrant bash << EOF
 mkdir -p /home/vagrant/.vim-tmp /home/vagrant/.vim/bundle
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 git clone https://github.com/joonty/vdebug.git ~/.vim/bundle/vdebug
+cd /vagrant
+bundle install
 EOF
