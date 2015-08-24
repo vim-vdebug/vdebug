@@ -791,7 +791,7 @@ The default options look like this: >
     \    "on_close" : 'detach',
     \    "break_on_open" : 1,
     \    "ide_key" : '',
-    \    "path_maps" : {},
+    \    "path_maps" : [],
     \    "debug_window_level" : 0,
     \    "debug_file_level" : 0,
     \    "debug_file" : "",
@@ -852,7 +852,7 @@ g:vdebug_options["ide_key"] (default = empty)
     |VdebugIDEKey| for more information.
 
                                                        *VdebugOptions-path_maps*
-g:vdebug_options["path_maps"] (default = {})          
+g:vdebug_options["path_maps"] (default = [])          
     This is only used for debugging a script on a remote machine. This is used
     to map remote file paths to local file paths, as they are very likely to be
     different. This is a VimL dictionary of mappings between remote files (keys)
@@ -999,7 +999,7 @@ use your machine's IP and debugger port, and you can pick up the remote
 connection.
 
 There are a couple of hurdles to overcome in doing this:
-    
+
     1. File paths are unlikely to be the same on the local and remote machines
     2. You need to bind Vdebug to the right address, and make sure there's a
        network route between the two machines.
@@ -1012,19 +1012,26 @@ Firstly, file paths aren't a problem. You can use the options "remote_path" and
 eachother.
 
 Let's say we're debugging a file on a remote machine, and the path is
-/home/user/scripts/myscript.php. On my machine the same script is located in
+/var/www/scripts/myscript.php. On my machine the same script is located in
 /home/jon/php/myscript.php. I would have to set the remote and local path
 options as so: >
 
-    let g:vdebug_options['path_maps'] = {"/home/user/scripts": "/home/jon/php"}
+    let g:vdebug_options['path_maps'] = [{"/var/www/scripts": "/home/jon/php"}]
 <
 When the debugger engine sends any file paths, a straight swap of the paths is
-done, so all instances of "/home/user/scripts" are replaced with
+done, so all instances of "/var/www/scripts" are replaced with
 "/home/jon/php". The opposite is done when sending file paths in the other
 direction.
 
-It is possible to have multiple file path mappings by adding more items in the
-"path_maps" dictionary.
+It is possible to have multiple file path mappings by adding more dictionaries 
+to the "path_maps" list. Path maps are matched in order, allowing more
+specific mappings to be matched before being modified by general mappings: >
+
+    let g:vdebug_options['path_maps'] = [
+        \ {"/var/www/libs/some-lib": "/home/jon/libs/some-lib/dist"},
+        \ {"/var/www": "/home/jon/project/www"}
+        \ ]
+<
 
 ------------------------------------------------------------------------------
 9.2 Connecting the two machines                       *VdebugRemoteConnection*
