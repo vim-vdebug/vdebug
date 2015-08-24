@@ -1,4 +1,8 @@
-import xml.etree.ElementTree as ET
+import sys
+if sys.hexversion >= 0x02050000:
+    import xml.etree.ElementTree as ET
+else:
+    import elementtree.ElementTree as ET
 import socket
 import vdebug.log
 import base64
@@ -124,7 +128,7 @@ class EvalResponse(ContextGetResponse):
     def __init__(self,response,cmd,cmd_args,api):
         try:
             ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
-        except DBGPError as e:
+        except DBGPError, e:
             if int(e.args[1]) == 206:
                 raise EvalError()
             else:
@@ -594,7 +598,7 @@ class ContextProperty:
         else:
             children = int(children)
         self.num_declared_children = children
-        self.has_children = True if children > 0 else False
+        self.has_children = children > 0
         self.children = []
 
     def __init_children(self,node):
