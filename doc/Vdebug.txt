@@ -325,7 +325,7 @@ Activestate, and working that out on your own is a bit of a pain.
 
 Fortunately, I'm going to make it easy for you and give you the exact version
 to download. Go to the archive at
-http://downloads.activestate.com/Komodo/releases/archive/4.x/4.4.1/remotedebugging
+http://downloads.activestate.com/Komodo/releases/archive/8.x/8.0.2/remotedebugging/
 and download the archive with "Perl" in the name that suits your operating system.
 
 Just a reminder that, from here, the instructions are for Linux. Activestate
