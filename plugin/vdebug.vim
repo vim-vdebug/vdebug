@@ -119,14 +119,22 @@ command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
 command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
 
+if hlexists("DbgCurrentLine") == 0
+    hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+end
+if hlexists("DbgCurrentSign") == 0
+    hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+end
+if hlexists("DbgBreakptLine") == 0
+    hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+end
+if hlexists("DbgBreakptSign") == 0
+    hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+end
+
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
 sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
-
-hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
-hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
-hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
-hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 
 function! s:BreakpointTypes(A,L,P)
     let arg_to_cursor = strpart(a:L,11,a:P)
