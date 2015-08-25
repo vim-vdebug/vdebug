@@ -69,7 +69,7 @@ class DebuggerInterface:
         """
         try:
             if value is None:
-                return self.runner.ui.say(vdebug.opts.Options.get(option))
+                return self.runner.ui.say(vdebug.opts.Options.get_for_print(option))
             else:
                 self.runner.ui.say("Setting vdebug option '%s' to: %s"\
                                     %(option,value))

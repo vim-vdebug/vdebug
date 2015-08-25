@@ -410,11 +410,12 @@ the message: >
 (If you don't get this message see the section on troubleshooting,
 |VdebugTroubleshooting|)
 
-Vdebug is now listening for an incoming connection, which will be started when
-a script is run with the debugger engine activated. View the section
-|VdebugSetUp| to see the necessary steps to start a script in this way. It will
-be obvious when a connection is made, because a new VIM tab opens with four
-windows, signalling the start of a new debugging session.
+Vdebug is now listening for an incoming connection (on all available interfaces
+by default), which will be started when a script is run with the debugger
+engine activated. View the section |VdebugSetUp| to see the necessary steps to
+start a script in this way. It will be obvious when a connection is made,
+because a new VIM tab opens with four windows, signalling the start of a new
+debugging session.
 
 If you are starting a script but Vdebug does not react, see the
 |VdebugTroubleshooting| section for information.
@@ -502,11 +503,13 @@ debugger's status, which is a message the engine sends to Vdebug. It will say
 when it's starting, running, breaking or stopping.
 
 The two lines below show the connection details. The first of these lines show
-which address and port Vdebug is binding itself to (defaults to localhost:9000)
-and the second shows the address and port that the engine has used to connect.
-If you're debugging a script on your machine then the IP address will be the
-same as localhost. It's only when you're debugging a script on a remote server
-that it will be any different. However, the port used will be, to all intents
+which address and port Vdebug is binding itself to (defaults to port 9000 on
+all available interfaces) and the second shows the address and port that the
+engine has used to connect.
+
+If you're debugging a script on your machine then the IP address will probably
+be shown as 127.0.0.1. When you're debugging a script on a remote server then
+it will be an external IP. However, the port displayed will be, to all intents
 and purposes, random.
 
 The bottom line is just a helpful message, reminding you how to start and where
@@ -822,7 +825,7 @@ retain option settings by adding them to your vimrc.
 The default options look like this: >
     let g:vdebug_options= {
     \    "port" : 9000,
-    \    "server" : 'localhost',
+    \    "server" : '',
     \    "timeout" : 20,
     \    "on_close" : 'detach',
     \    "break_on_open" : 1,
@@ -853,11 +856,13 @@ g:vdebug_options["port"] (default = 9000)
     you also change the port that the engine uses.
 
                                                         *VdebugOptions-server*
-g:vdebug_options["server"] (default = "localhost")
-    Sets the address that Vdebug will use to listen for connections. It
-    defaults to localhost, as it assumes that the debugger engine will be
-    running on the same machine and also connecting to localhost. If you want
-    to debug a script on a different machine, look at |VdebugRemote|.
+g:vdebug_options["server"] (default = "")
+    Sets the IP address or host name that Vdebug will use to listen for
+    connections. It defaults to a blank string, which corresponds to all
+    available interfaces. You can set this explicitly if you want to restrict
+    which address Vdebug will bind to, if that's a requirement. However,
+    allowing all interfaces by default takes one step out of the process of
+    debugging remote scripts (see |VdebugRemote|).
 
                                                        *VdebugOptions-timeout*
 g:vdebug_options["timeout"] (default = 20)
@@ -1069,21 +1074,24 @@ This part depends a lot upon your network set-up and firewall rules. But here's
 the basic information:
 
     * You need to bind Vdebug to an address that's visible to the remote
-      machine (i.e. not "localhost")
+      machine (i.e. not "localhost") - it will do this automatically unless
+      you've explicitly set the "server" option
     * You must have port 9000 allowed by any firewall you might have on your
       machine or router
 
 I'll give an example of my own here. I had two machines on an internal network,
 one was my desktop (192.168.1.1) and the other was a server (192.168.1.2) running
 the script that I wanted to debug on my desktop. I configured Xdebug on the
-server to use my desktop's IP address as the remote host. I then set the Vdebug
-server address to be "192.168.1.1" (NOT "localhost") in the options: >
+server to use my desktop's IP address as the remote host. The default "server"
+option in Vdebug is blank, which allows it to bind to all interfaces: >
 
-    let g:vdebug_options['server'] = "192.168.1.1"
+    let g:vdebug_options['server'] = ""
 <
-I also had to set an Xdebug option "remote_connect_back=on" in the INI file on
-the server. This combination of things allowed me to accept remote connections
-on my desktop.
+You can either leave this blank, or set the IP address explicitly.
+
+I also had to set an Xdebug option "remote_connect_back=on" in the Xdebug INI
+file on the server. This combination of things allowed me to accept remote
+connections on my desktop.
 
 The two machines don't have to be on an internal network, but if they aren't
 then I can all but guarantee that you will have to route port 9000 to your
@@ -1113,8 +1121,11 @@ it to this list.
         activate the engine when running the script (e.g. setting environment
         variables/URL variables). If the problem persists, check that the
         debugger engine is connecting the same port and address that Vdebug is
-        binding to (the 'port' and 'server' options). Also check that the IDE
-        key option is empty.
+        binding to (the 'port' and 'server' options). The server option is blank
+        by default, which means that it will connect to all available interfaces.
+        Unless you've changed this option, it's unlikely to be the issue. Also
+        check that the IDE key option is empty, as this will turn off IDE key
+        matching.
 
     Q. I can't debug a script on a remote machine, what's going on?
     A. Have you read the section on remote debugging, |VdebugRemote|? I mean,
