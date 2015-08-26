@@ -356,8 +356,13 @@ connect. This means you've set it up correctly.
 3.5 NodeJS set up                                          *VdebugSetUpNodejs*
 
 NodeJS is the easiest language to set up for debugging with Vdebug, as
-Activestate have made the debugger engine available through npm. All you need
-to do is run: >
+Activestate have made the debugger engine available through npm. The only catch
+is that the latest version (for Komodo 8) only supports nodejs version 0.10.x
+AND UNDER. Newer versions of nodejs simply won't work. They plan to fix this in
+future versions (see
+http://forum.komodoide.com/t/node-js-debugger-never-finishes-starting/1321/2)
+
+To install the debugger package, simply run: >
     npm install komodo-debug -g
 <
 
@@ -1126,6 +1131,11 @@ it to this list.
         Unless you've changed this option, it's unlikely to be the issue. Also
         check that the IDE key option is empty, as this will turn off IDE key
         matching.
+
+    Q. NodeJS debugging doesn't work, using the komodo-debug package.
+    A. Check that you're using nodejs version 0.10.x or less, as komodo-debug
+        won't work with anything newer. They plan to fix this in future
+        versions.
 
     Q. I can't debug a script on a remote machine, what's going on?
     A. Have you read the section on remote debugging, |VdebugRemote|? I mean,
