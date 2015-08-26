@@ -1,3 +1,5 @@
+notifications:
+  slack: vdebug:EDl4F31FiFIiA2C2dLxOWSrT
 language: python
 python:
   - "2.6"
