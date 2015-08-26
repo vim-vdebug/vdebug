@@ -93,7 +93,7 @@ where the path supplied is vdebug's doc directory. This should enable vdebug's h
 
 **Requirements**:
 
-  * Vim compiled with Python 2.6+ support, tabs and signs (for Debian/Ubuntu this is provided in the vim-nox package)
+  * Vim compiled with Python 2.4+ support, tabs and signs (for Debian/Ubuntu this is provided in the vim-nox package)
   * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
     Perl, NodeJS, Tcl...
 
