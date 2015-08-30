@@ -742,19 +742,25 @@ of evaluating expressions: you can either write them yourself
 the source window.
 
 On evaluating an expression, the result is shown in the watch window. To return
-back to the context view, press <F11> (default).
+back to the context view, press <F11> (default). Use |VdebugTrace| to show the
+result in a separate window instead.
 
 ------------------------------------------------------------------------------
-4.5.1 Evaluating any expression                         *VdebugEvalExpression*
+4.5.1 Evaluating any expression          *:VdebugEval!* *VdebugEvalExpression*
 
 To evaluate an expression, use the command :VdebugEval: >
     :VdebugEval <code>
 <
-
-The result is shown on the watch window. E.g: >
-    :VdebugEval $x + 2
+The result is shown on the watch window. When you run code and the watch
+window refreshes, it will show the default view. If you want to re-evaluate
+your expression and show the result in the watch window, then use
+:VdebugEval!: >
+    :VdebugEval! $x + 2
 <
-
+To return to the default contents of the watch window, use :VdebugEval!
+with no argument: >
+    :VdebugEval!
+<
 ------------------------------------------------------------------------------
 4.5.2 Evaluating highlighted expressions               *VdebugEvalHighlighted*
 
@@ -779,7 +785,8 @@ request for the history: https://github.com/joonty/vdebug/pull/178.
 If you want to track an expression (any piece of code that can be evaluated)
 or clearly see how a single variable changes through your code's execution,
 you can trace it. At each point that the debugger stops in your code the
-expression will be re-evaluated and displayed in the trace window.
+expression will be re-evaluated and displayed in the trace window. This is
+similar to using |:VdebugEval!| but preserves the default watch window.
 
 To use this feature, when you're connected to the debugger use the command
 :VdebugTrace: >
