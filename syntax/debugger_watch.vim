@@ -13,6 +13,7 @@ syn match debuggerWatchTabSel '\*[a-zA-Z\s]\+' contained
 syn match debuggerWatchTitle '^\-\s[A-Z].\+'
 syn match debuggerWatchMarker '^\s\+[^|\/]'
 syn match debuggerWatchJoiner '^\s\+[|\/^]'
+syn match debuggerWatchEllipsis '^\s\+\.\.\.'
 syn match debuggerWatchNumber '\d\+\.\=\d*'
 syn match debuggerWatchVarName '\s\zs.\+\ze\s=' contains=debuggerWatchStringKey,debuggerWatchObjectProperty
 syn match debuggerWatchStringKey '\'[^']\+\'' contained
@@ -34,5 +35,6 @@ hi def link debuggerWatchString String
 hi def link debuggerWatchStringKey String
 hi def link debuggerWatchVarName Identifier
 hi def link debuggerWatchJoiner Structure
+hi def link debuggerWatchEllipsis Structure
 hi def link debuggerWatchNumber Number
 hi def link debuggerWatchSize Number

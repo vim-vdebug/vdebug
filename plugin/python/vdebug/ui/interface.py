@@ -1,11 +1,12 @@
-class Ui():
+class Ui:
     """Abstract for the UI, used by the debugger
     """
-    watchwin = None
-    stackwin = None
+    watchwin  = None
+    stackwin  = None
     statuswin = None
-    logwin = None
+    logwin    = None
     sourcewin = None
+    tracewin  = None
 
     def __init__(self):
         self.is_open = False
@@ -36,6 +37,10 @@ class Window:
 
     def on_create(self):
         """ Callback for after the window is created """
+        pass
+
+    def on_destroy(self):
+        """ Callback for after the window is destroyed """
         pass
 
     def create(self):

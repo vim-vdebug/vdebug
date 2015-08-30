@@ -1,4 +1,8 @@
-import xml.etree.ElementTree as ET
+import sys
+if sys.hexversion >= 0x02050000:
+    import xml.etree.ElementTree as ET
+else:
+    import elementtree.ElementTree as ET
 import socket
 import vdebug.log
 import base64
@@ -86,6 +90,13 @@ class ContextNamesResponse(Response):
             names[int(c.get('id'))] = c.get('name')
         return names
 
+class TraceResponse(Response):
+    """Response object returned by the trace command."""
+
+    def __str__(self):
+        return self.as_xml().get('trace')
+
+
 class StatusResponse(Response):
     """Response object returned by the status command."""
 
@@ -124,7 +135,7 @@ class EvalResponse(ContextGetResponse):
     def __init__(self,response,cmd,cmd_args,api):
         try:
             ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
-        except DBGPError as e:
+        except DBGPError, e:
             if int(e.args[1]) == 206:
                 raise EvalError()
             else:
@@ -594,7 +605,7 @@ class ContextProperty:
         else:
             children = int(children)
         self.num_declared_children = children
-        self.has_children = True if children > 0 else False
+        self.has_children = children > 0
         self.children = []
 
     def __init_children(self,node):
@@ -694,4 +705,8 @@ class EvalError(Exception):
 class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
+    pass
+
+class TraceError(Exception):
+    """Raised when trace is out of domain."""
     pass
