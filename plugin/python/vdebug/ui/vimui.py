@@ -354,7 +354,7 @@ class Window(vdebug.ui.interface.Window):
 
     def destroy(self):
         """ destroy window """
-        if not self.is_open or len(dir(self.buffer)) == 0:
+        if self.buffer == None or len(dir(self.buffer)) == 0:
             return
         self.is_open = False
         if int(vim.eval('buffer_exists("'+self.name+'")')) == 1:
