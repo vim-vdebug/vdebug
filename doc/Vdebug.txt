@@ -751,14 +751,14 @@ result in a separate window instead.
 To evaluate an expression, use the command :VdebugEval: >
     :VdebugEval <code>
 <
-The result is shown on the watch window. When you run code and the watch
-window refreshes, it will show the default view. If you want to re-evaluate
-your expression and show the result in the watch window, then use
-:VdebugEval!: >
+The result is shown in the watch window. By default, when you run code and the
+watch window refreshes, it will return to the context view. If you want to
+change the default behavior, so that your expression is re-evaluated and shown
+in the watch window after running code, then use :VdebugEval!: >
     :VdebugEval! $x + 2
 <
-To return to the default contents of the watch window, use :VdebugEval!
-with no argument: >
+To return to the default behavior of the watch window, use :VdebugEval! with
+no argument: >
     :VdebugEval!
 <
 ------------------------------------------------------------------------------
