@@ -30,29 +30,21 @@ If you're having trouble with Vdebug in any way, here are the steps you can take
 
 Follow me on Twitter, [@joonty](http://twitter.com/joonty), for Vdebug updates and release news.
 
-* **26/08/2015:** Version 1.5.0 released. This has a whole series of fixes and even a couple of new features. See below for more information.
+* **07/09/2015:** Version 1.5.1 released. This adds a `:VdebugEval!` command and fixes issues with buffers not being wiped out. See below for more information.
+* **26/08/2015:** Version 1.5.0 released. This has a whole series of fixes and even a couple of new features.
 * **15/05/2014:** Version 1.4.2 released. This fixes major problems with the latest version of Vim, which has stricter rules around function naming. See [this pull request for more details][5]
 * **12/04/2014:** My son was born! Hence no contact or work on Vdebug for the following month.
 
-## Recent version (version 1.5.0)
+## Recent version (version 1.5.1)
 
 ### Bug fixes:
- * Fix for remote and local file paths with a windows/unix setup (thanks @brothert, #130)
- * Sort path maps by remote path length (thanks @ragol and @adambiggs, #153, #201)
- * Default "stop" behaviour (default <F6>) actually stops rather than detaches (issue #166)
- * Various documentation fixes (issue #172, issue #223, thanks @loonies for #210)
- * Add documentation to show that komodo-debug doesn't work with nodejs > 0.10 (#202, #223)
- * Don't override previously defined breakpoint highlights (#208)
+ * Fix buffers not being wiped out after ending a session (thanks @BlackIkeEagle, #226)
 
 ### Features:
- * Add support for Python 2.4 (thanks @mbarbon, #189)
- * Add Vagrantfile and bootstrap for easier local development
- * Add new VdebugTrace command for tracking individual variables and expressions (thanks @escher9, #178)
- * Show ellipses for truncated arrays in watch window (#177)
- * Bind to all available interfaces by default, instead of just localhost (#209, thanks @zolem)
+ * Add :VdebugEval! command, which remembers the eval expression when stepping
+ through, as an alternative to :VdebugTrace (thanks @benjifisher, #193)
 
-### Misc:
- * Changed HISTORY to CHANGELOG
+See the CHANGELOG for the full history of changes.
 
 ## How to use
 
