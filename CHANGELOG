@@ -1,3 +1,11 @@
+=== Vdebug 1.5.1 / 2015-09-07
+Bug fixes:
+ * Fix buffers not being wiped out after ending a session (thanks @BlackIkeEagle, #226)
+
+Features:
+ * Add :VdebugEval! command, which remembers the eval expression when stepping
+ through, as an alternative to :VdebugTrace (thanks @benjifisher, #193)
+
 === Vdebug 1.5.0 / 2015-08-28
 Bug fixes:
  * Fix for remote and local file paths with a windows/unix setup (thanks @brothert, #130)
@@ -22,7 +30,7 @@ Misc:
 Bug fixes:
  * Allow overriding of options dictionary after sourcing vdebug (issues #112, #113)
  * Show local file path in stack window if using path mapping (issue #118)
- * Change function names for stricter rules introduced in Vim v.7.4.260 (thanks @BlackEagle, #158 and #155)
+ * Change function names for stricter rules introduced in Vim v.7.4.260 (thanks @BlackIkeEagle, #158 and #155)
 
 Documentation:
  * Various fixes
