@@ -45,14 +45,22 @@ class BackgroundListener:
     def start(self):
         if vdebug.opts.Options.get("auto_start", int):
             vim.command('au CursorHold * python debugger.start_if_ready()')
+            vim.command('au CursorHoldI * python debugger.start_if_ready()')
             vim.command('au CursorMoved * python debugger.start_if_ready()')
+            vim.command('au CursorMovedI * python debugger.start_if_ready()')
+            vim.command('au FocusGained * python debugger.start_if_ready()')
+            vim.command('au FocusLost * python debugger.start_if_ready()')
         self.__server.start(vdebug.opts.Options.get('server'),
                             vdebug.opts.Options.get('port', int))
 
     def stop(self):
         if vdebug.opts.Options.get("auto_start", bool):
             vim.command('au! CursorHold *')
+            vim.command('au! CursorHoldI *')
             vim.command('au! CursorMoved *')
+            vim.command('au! CursorMovedI *')
+            vim.command('au! FocusGained *')
+            vim.command('au! FocusLost *')
         self.__server.stop()
 
     def status(self):
