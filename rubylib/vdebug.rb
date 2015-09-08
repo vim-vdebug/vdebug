@@ -1,17 +1,22 @@
+require 'securerandom'
+
 class Vdebug
   class BufferNotFound < StandardError; end;
 
   attr_reader :vim
 
   def initialize(vim)
+    @lock_file = "../vdebug.lock"
+    @instance_id = SecureRandom::hex(3)
     @vim = vim
   end
 
   def start_listening
+    write_lock_file!
     clear_buffer_cache!
     vim.command "VdebugOpt background_listener 0"
     vim.server.remote_send ":python debugger.run()<CR>"
-    sleep 1
+    sleep 2
   end
 
   def messages
@@ -104,7 +109,23 @@ class Vdebug
     /Status: (\S+)/.match(status_window_content)[1]
   end
 
+  def remove_lock_file!
+    if File.exists?(@lock_file) && File.read(@lock_file) == @instance_id
+      puts "Deleting lock file for #{@instance_id}"
+      File.delete(@lock_file)
+    end
+  end
+
 protected
+  def write_lock_file!
+    while File.exists?(@lock_file)
+      puts "Waiting for lock to be removed"
+      sleep 0.1
+    end
+    puts "Creating lock file for #{@instance_id}"
+    File.write(@lock_file, @instance_id)
+  end
+
   def fetch_buffer_content(name)
     bufnum = buffers.invert.fetch(name)
     vim.echo(%Q{join(getbufline(#{bufnum}, 1, "$"), "\\n")})

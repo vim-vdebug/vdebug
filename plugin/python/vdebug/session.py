@@ -97,12 +97,15 @@ class SessionHandler:
         return "vdebug(%s)" % self.status()
 
     def start_if_ready(self):
-        if self.listener.is_ready():
-            print "Found connection, starting debugger"
-            self.__new_session()
-            return True
-        else:
-            return False
+        try:
+            if self.listener.is_ready():
+                print "Found connection, starting debugger"
+                self.__new_session()
+                return True
+            else:
+                return False
+        except Exception, e:
+            print "Error starting Vdebug: %s" % self.__ex_handler.exception_to_string(e)
 
     def __new_session(self):
         self.__session = Session(self.__ui,

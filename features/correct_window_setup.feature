@@ -12,7 +12,7 @@ Feature: Correct window setup
             """
         When I start the debugger with the PHP script example.php
         Then the status should be break
-        And the status window should contain localhost:9000
+        And the status window should contain :9000
 
     Scenario: The watch window
         Given I have a file example.php containing

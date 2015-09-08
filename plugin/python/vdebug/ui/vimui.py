@@ -15,14 +15,16 @@ class WindowManager:
             "DebuggerStatus" : StatusWindow(),
             "DebuggerStack" : StackWindow(),
             "DebuggerBreakpoints" : BreakpointWindow(),
-            "DebuggerLog" : LogWindow()
+            "DebuggerLog" : LogWindow(),
+            "DebuggerTrace" : TraceWindow()
         }
         self._default_commands = {
             "DebuggerWatch" : "vertical belowright new",
             "DebuggerStatus" : "belowright new",
             "DebuggerStack" : "belowright new",
             "DebuggerBreakpoints" : "rightbelow 7new",
-            "DebuggerLog" : "rightbelow 6new"
+            "DebuggerLog" : "rightbelow 6new",
+            "DebuggerTrace" : 'rightbelow 7new'
         }
         self._commands = self._default_commands.copy()
 
@@ -53,6 +55,9 @@ class WindowManager:
 
     def log(self):
         return self.window("DebuggerLog")
+
+    def trace(self):
+        return self.window("DebuggerTrace")
 
     def window(self, name):
         try:
@@ -136,7 +141,7 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self, winnr)
             self.sourcewin.focus()
-        except Exception:
+        except Exception, e:
             self.is_open = False
             raise
 
@@ -268,7 +273,10 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def command(self,cmd,silent = True):
         self.focus()
-        prepend = "silent " if silent else ""
+        if silent:
+            prepend = "silent "
+        else:
+            prepend = ""
         command_str = prepend + self.winno + "wincmd " + cmd
         vim.command(command_str)
 
@@ -548,6 +556,12 @@ class LogWindow(Window):
 
     def on_create(self):
         self.command('setlocal syntax=debugger_log')
+        if self.creation_count == 1:
+            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
+            vim.command('%s | python vdebug.log.Log.remove_logger("WindowLogger")' % cmd)
+
+    def write(self, msg, return_focus = True):
+        Window.write(self, msg,return_focus=True)
 
 class StackWindow(Window):
     name = "DebuggerStack"
@@ -608,6 +622,40 @@ class StatusWindow(Window):
             details += " (IDE key: %s)" % idekey
         self.insert(details, 1, True)
 
+
+class TraceWindow(WatchWindow):
+    name = "DebuggerTrace"
+
+    def on_create(self):
+        if self.creation_count == 1:
+            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
+            vim.command('%s | python debugger.runner.ui.tracewin.is_open = False' % cmd)
+        self.command('setlocal syntax=debugger_watch')
+
+    def set_trace_expression(self, trace_expression):
+        self._trace_expression = trace_expression
+
+    def is_tracing(self):
+        if self.is_open:
+            return self._trace_expression is not None
+
+    def get_trace_expression(self):
+        return self._trace_expression
+
+    def render(self, renderer):
+        self._last_context_rendered = renderer
+        self.accept_renderer(renderer)
+
+    def render_in_error_case(self):
+        if self._last_context_rendered is None:
+            self.write(str(self._trace_expression))
+        else:
+            self.write('(prev)' + str(self._last_context_rendered))
+
+    def on_destroy(self):
+        self._trace_expression = None
+        self._last_context_rendered = None
+
 class ResponseRenderer:
     def __init__(self,response):
         self.response = response
@@ -620,7 +668,10 @@ class StackGetResponseRenderer(ResponseRenderer):
         stack = self.response.get_stack()
         string = ""
         for s in stack:
-            where = s.get('where') if s.get('where') else 'main'
+            if s.get('where'):
+                where = s.get('where')
+            else:
+                where = 'main'
             file = vdebug.util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\
@@ -687,6 +738,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
                     next_sep = "|"
                     num_spaces = depth * 2
                 elif depth > next_depth:
+                    if not p.is_last_child:
+                       line += "".rjust(depth * 2 +indent) + " |\n"
+                       line += "".rjust(depth * 2 +indent) + " ...\n"
                     next_sep = "/"
                     num_spaces = (depth * 2) - 1
                 else:
@@ -695,6 +749,9 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
                 line += "".rjust(num_spaces+indent) + " " + next_sep + "\n"
             elif depth > 0:
+                if not p.is_last_child:
+                   line += "".rjust(depth * 2 +indent) + " |\n"
+                   line += "".rjust(depth * 2 +indent) + " ...\n"
                 line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
         return line
 

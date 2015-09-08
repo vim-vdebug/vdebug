@@ -23,14 +23,21 @@ class ExceptionHandler:
 
     """ Exception handlers """
 
+    def exception_to_string(self, e):
+        if isinstance(e, self.readable_errors):
+            return str(e)
+        else:
+            return str(sys.exc_info()[0])
+
+
     def handle_timeout(self):
-        """Handle a timeout, which is pretty normal. 
+        """Handle a timeout, which is pretty normal.
         """
         self._session_handler.stop()
         self._session_handler.ui().say("No connection was made")
 
     def handle_interrupt(self):
-        """Handle a user interrupt, which is pretty normal. 
+        """Handle a user interrupt, which is pretty normal.
         """
         self._session_handler.stop()
         self._session_handler.ui().say("Connection cancelled")
@@ -189,6 +196,7 @@ class FilePath:
             self.is_win = True
             if filename[0] == "/":
                 filename = filename[1:]
+            filename = filename.replace('/', '\\')
 
         self.local = self._create_local(filename)
         self.remote = self._create_remote(filename)
@@ -199,8 +207,6 @@ class FilePath:
         Uses the "local_path" and "remote_path" options.
         """
         ret = f
-        if ret[2] == "/":
-            ret = ret.replace("/","\\")
 
         if vdebug.opts.Options.isset('path_maps'):
             sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
@@ -209,8 +215,15 @@ class FilePath:
                     vdebug.log.Log("Replacing remote path (%s) " % remote +\
                             "with local path (%s)" % local ,\
                             vdebug.log.Logger.DEBUG)
-                    ret = ret.replace(remote,local)
+                    ret = ret.replace(remote,local,1)
+
+                    # determine remote path separator and replace by local
+                    local_sep = self._findSeparator(local)
+                    remote_sep = self._findSeparator(remote)
+                    if local_sep and remote_sep and remote_sep != local_sep:
+                        ret = ret.replace(remote_sep, local_sep)
                     break
+
         return ret
 
     def _create_remote(self,f):
@@ -227,16 +240,15 @@ class FilePath:
                     vdebug.log.Log("Replacing local path (%s) " % local +\
                             "with remote path (%s)" % remote ,\
                             vdebug.log.Logger.DEBUG)
-                    ret = ret.replace(local,remote)
+                    ret = ret.replace(local,remote,1)
+                    # replace remaining local separators with URL '/' separators
+                    ret = ret.replace('\\', '/')
                     break
 
-        if ret[2] == "\\":
-            ret = ret.replace("\\","/")
-
-        if self.is_win:
-            return "file:///"+ret
-        else:
+        if ret.startswith('/'):
             return "file://"+ret
+        else:
+            return "file:///"+ret
 
     def as_local(self,quote = False):
         if quote:
@@ -246,6 +258,12 @@ class FilePath:
 
     def as_remote(self):
         return self.remote
+
+    def _findSeparator(self, path):
+        for sep in '\\/':
+            if sep in path:
+                return sep
+        return None
 
     def __eq__(self,other):
         if isinstance(other,FilePath):

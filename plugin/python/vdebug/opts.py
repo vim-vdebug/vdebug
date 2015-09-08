@@ -32,6 +32,19 @@ class Options:
             raise OptionsError("No option with key '%s'" % name)
 
     @classmethod
+    def get_for_print(cls, name):
+        """Get an option by name and for human readable output.
+
+        Raises an OptionsError if the option doesn't exist.
+        """
+        option = cls.get(name)
+        if len(option) == 0:
+            return "<empty>"
+        else:
+            return option
+
+
+    @classmethod
     def overwrite(cls,name,value):
         inst = cls.inst()
         inst.options[name] = value

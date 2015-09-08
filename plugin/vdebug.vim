@@ -85,8 +85,8 @@ let g:vdebug_keymap_defaults = {
 let g:vdebug_options_defaults = {
 \    "port" : 9000,
 \    "timeout" : 20,
-\    "server" : 'localhost',
-\    "on_close" : 'detach',
+\    "server" : '',
+\    "on_close" : 'stop',
 \    "break_on_open" : 1,
 \    "ide_key" : '',
 \    "debug_window_level" : 0,
@@ -123,17 +123,26 @@ command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debug
 command! VdebugStart python debugger.run()
 command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python debugger.toggle_breakpoint_window()
-command! -nargs=? VdebugEval python debugger.handle_eval(<q-args>)
+command! -nargs=? -bang VdebugEval call s:HandleEval('<bang>', <q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
+command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
+
+if hlexists("DbgCurrentLine") == 0
+    hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+end
+if hlexists("DbgCurrentSign") == 0
+    hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
+end
+if hlexists("DbgBreakptLine") == 0
+    hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+end
+if hlexists("DbgBreakptSign") == 0
+    hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
+end
 
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
 sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
-
-hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
-hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
-hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
-hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 
 function! s:BreakpointTypes(A,L,P)
     let arg_to_cursor = strpart(a:L,11,a:P)
@@ -142,6 +151,16 @@ function! s:BreakpointTypes(A,L,P)
         return filter(['conditional ','exception ','return ','call ','watch '],'v:val =~ "^".a:A.".*"')
     else
         return []
+    endif
+endfunction
+
+function! s:HandleEval(bang,code)
+    let code = escape(a:code,'"')
+    if strlen(a:bang)
+        execute 'python debugger.save_eval("'.code.'")'
+    endif
+    if strlen(a:code)
+        execute 'python debugger.handle_eval("'.code.'")'
     endif
 endfunction
 

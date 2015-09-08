@@ -95,6 +95,11 @@ class DebuggerInterface:
         """
         return self.session_handler.dispatch_event("eval", args)
 
+    def handle_trace(self,args = None):
+        """Trace a code snippet specified by args.
+        """
+        return self.session_handler.dispatch_event("trace", args)
+
     def eval_under_cursor(self):
         """Evaluate the property under the cursor.
         """
