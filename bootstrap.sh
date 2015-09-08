@@ -16,7 +16,7 @@ fi
 
 # Install packages
 apt-get update
-apt-get install locales-all git-core vim vim-nox php5 php5-cli php5-xdebug -y
+apt-get install locales-all git-core vim vim-gtk xvfb php5 php5-cli php5-xdebug -y
 
 # Fix locale
 /usr/sbin/update-locale LANG=en_US LC_ALL=en_US
@@ -37,6 +37,37 @@ cat <<'EOF' > /usr/local/bin/php-xdebug
 export XDEBUG_CONFIG="idekey=vdebug"
 /usr/bin/env php "$@"
 EOF
+
+cat <<'EOF' > /etc/init.d/xvfb
+XVFB=/usr/bin/Xvfb
+XVFBARGS=":0 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset"
+PIDFILE=/var/run/xvfb.pid
+case "$1" in
+  start)
+    echo -n "Starting virtual X frame buffer: Xvfb"
+    /sbin/start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --exec $XVFB -- $XVFBARGS
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping virtual X frame buffer: Xvfb"
+    /sbin/start-stop-daemon --stop --quiet --pidfile $PIDFILE
+    echo "."
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+        echo "Usage: /etc/init.d/xvfb {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
+EOF
+
+chmod +x /etc/init.d/xvfb
+update-rc.d xvfb defaults
+/etc/init.d/xvfb start
 
 chmod +x /usr/local/bin/php-xdebug
 
@@ -111,6 +142,8 @@ chown vagrant:vagrant /home/vagrant/.vimrc
 
 # Do things as the vagrant user
 sudo -u vagrant bash << EOF
+echo "export LANG=en_US.UTF-8" >> /home/vagrant/.bashrc
+echo "export DISPLAY=:0" >> /home/vagrant/.bashrc
 mkdir -p /home/vagrant/.vim-tmp /home/vagrant/.vim/bundle
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 git clone https://github.com/joonty/vdebug.git ~/.vim/bundle/vdebug
