@@ -270,6 +270,7 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def focus(self):
         vim.command(self.winno+"wincmd w")
+        vim.command("filetype detect")
 
     def command(self,cmd,silent = True):
         self.focus()
