@@ -15,6 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Forward the vdebug server port to the host
   config.vm.network :forwarded_port, guest: 9000, host: 9000
+  config.vm.network :forwarded_port, guest: 5900, host: 5901
 
   # Use a shell script to provision
   config.vm.provision :shell, path: "bootstrap.sh"
