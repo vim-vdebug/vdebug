@@ -322,13 +322,31 @@ class EvalEvent(Event):
     def run(self, code):
         try:
             vdebug.log.Log("Evaluating code: %s" % code)
+
             context_res = self.api.eval(code)
             rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                     context_res,\
                     "Eval of: '%s'" % context_res.get_code())
+
             self.ui.windows.watch().accept_renderer(rend)
         except vdebug.dbgp.EvalError:
             self.ui.error("Failed to evaluate invalid code, '%s'" % code)
+
+class SetEvalExpressionEvent(Event):
+    def run(self, persist_expression, code):
+        if not self.session or not self.session.is_connected():
+            self.ui.error("Evaluating an expression is only possible when Vdebug is running")
+            return
+
+        vdebug.log.Log("Evaluating code: %s" % code)
+
+        if len(code):
+            if persist_expression:
+                self.ui.windows.watch().set_eval_expression(code)
+            self.dispatch("eval", code)
+        else:
+            self.ui.windows.watch().clear_eval_expression()
+            self.dispatch("get_context", 0)
 
 class SetBreakpointEvent(Event):
     def run(self, args):
@@ -361,23 +379,28 @@ class RemoveBreakpointEvent(Event):
 
 class GetContextEvent(Event):
     def run(self, context_id):
-        name = self.session.context_names[context_id]
-        vdebug.log.Log("Getting %s variables" % name)
-        context_res = self.api.context_get(context_id)
-        rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
-                context_res,\
-                "%s at %s:%s" %(name, self.ui.sourcewin.file,self.session.cur_lineno),\
-                self.session.context_names,\
-                context_id)
-        self.ui.windows.watch().accept_renderer(rend)
+        if self.ui.windows.watch().has_persistent_eval():
+            self.dispatch("eval", self.ui.windows.watch().get_eval_expression())
+        else:
+            name = self.session.context_names[context_id]
+            vdebug.log.Log("Getting %s variables" % name)
+            context_res = self.api.context_get(context_id)
+            rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                    context_res,\
+                    "%s at %s:%s" %(name, self.ui.sourcewin.file,self.session.cur_lineno),\
+                    self.session.context_names,\
+                    context_id)
+            self.ui.windows.watch().accept_renderer(rend)
 
         self.dispatch("trace_refresh")
 
 class TraceRefreshEvent(Event):
     def run(self):
         if self.ui.windows.trace().is_tracing():
+            trace_expr = self.ui.windows.trace().get_trace_expression()
+            vdebug.log.Log("Tracing expression: %s" % trace_expr)
             try:
-                context_res = self.api.eval(self.ui.windows.trace().get_trace_expression())
+                context_res = self.api.eval(trace_expr)
                 rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                         context_res,"Trace of: '%s'" \
                         %context_res.get_code())
@@ -396,17 +419,19 @@ class TraceEvent(Event):
     def run(self, code):
         """Evaluate a snippet of code and show the response on the watch window.
         """
-        if not self.session.is_connected():
+        if not self.session or not self.session.is_connected():
             self.ui.error("Tracing an expression is only possible when Vdebug is running")
             return
         if not code:
             self.ui.error("You must supply an expression to trace, with `:VdebugTrace expr`")
             return
 
+        vdebug.log.Log("Setting trace expression: %s" % code)
+
         if self.ui.windows.trace().is_open:
             self.ui.windows.trace().clean()
         else:
-            self.ui.windows.toggle("DebuggerTrace")
+            self.ui.windows.open("DebuggerTrace")
 
         self.ui.windows.trace().set_trace_expression(code)
         self.dispatch("trace_refresh")
@@ -421,6 +446,7 @@ class Dispatcher:
         "step_out": StepOutEvent,
         "run_to_cursor": RunToCursorEvent,
         "eval": EvalEvent,
+        "set_eval_expression": SetEvalExpressionEvent,
         "set_breakpoint": SetBreakpointEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,

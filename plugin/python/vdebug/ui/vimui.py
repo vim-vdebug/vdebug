@@ -28,10 +28,15 @@ class WindowManager:
         }
         self._commands = self._default_commands.copy()
 
-    def open(self):
+    def open_all(self):
         self._refresh_commands()
         arrangement = vdebug.opts.Options.get('window_arrangement', list)
         for name in arrangement:
+            self.window(name).create(self._command(name))
+
+    def open(self, name):
+        if not self.window(name).is_open:
+            vdebug.log.Log("Creating window %s" %name)
             self.window(name).create(self._command(name))
 
     def toggle(self, name):
@@ -88,6 +93,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.windows = WindowManager()
         self.current_tab = "1"
         self.tabnr = None
+        self._last_error = None
 
     def mark_window_as_closed(self, name):
         self.windows.window(name).mark_as_closed()
@@ -128,7 +134,7 @@ class Ui(vdebug.ui.interface.Ui):
 
             srcwin_name = self.__get_srcwin_name()
 
-            self.windows.open()
+            self.windows.open_all()
             statuswin = self.windows.status()
             statuswin.set_status("loading")
 
@@ -216,10 +222,14 @@ class Ui(vdebug.ui.interface.Ui):
         vdebug.log.Log(string,vdebug.log.Logger.INFO)
 
     def error(self,string):
-        vim.command('echohl Error | echo "'+\
+        self._last_error = string
+        vim.command('echohl Error | echomsg "'+\
                 str(string).replace('"','\\"')+\
                 '" | echohl None')
         vdebug.log.Log(string,vdebug.log.Logger.ERROR)
+
+    def get_last_error(self):
+        return self._last_error
 
     def close(self):
         if not self.is_open:
@@ -583,6 +593,10 @@ class StackWindow(Window):
 class WatchWindow(Window):
     name = "DebuggerWatch"
 
+    def __init__(self):
+        Window.__init__(self)
+        self._eval_expression = None
+
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
                 ':python debugger.handle_return_keypress()<cr>')
@@ -591,6 +605,19 @@ class WatchWindow(Window):
         self.command('nnoremap <buffer> <2-LeftMouse> '+\
                 ':python debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_watch')
+
+    def set_eval_expression(self, eval_expression):
+        self._eval_expression = eval_expression
+
+    def has_persistent_eval(self):
+        if self.is_open:
+            return self._eval_expression is not None
+
+    def get_eval_expression(self):
+        return self._eval_expression
+
+    def clear_eval_expression(self):
+        self._eval_expression = None
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -702,7 +729,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
         properties = self.response.get_context()
         num_props = len(properties)
-        vdebug.log.Log("Writing %i properties to the context window" % num_props,\
+        vdebug.log.Log("Writing %i properties to the window" % num_props,\
                 vdebug.log.Logger.INFO )
         for idx, prop in enumerate(properties):
             final = False
@@ -713,7 +740,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 next_prop = None
             res += self.__render_property(prop,next_prop,final,indent)
 
-        vdebug.log.Log("Writing to context window:\n"+res,vdebug.log.Logger.DEBUG)
+        vdebug.log.Log("Writing to window:\n"+res,vdebug.log.Logger.DEBUG)
 
         return res
 

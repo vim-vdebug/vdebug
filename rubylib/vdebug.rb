@@ -15,13 +15,23 @@ class Vdebug
   def start_listening
     write_lock_file!
     clear_buffer_cache!
-    vim.command "VdebugOpt background_listener 0"
+    set_opt "debug_file_level", 2
+    set_opt "debug_file", "/tmp/vdebug.log"
+    set_opt "background_listener", 0
     vim.server.remote_send ":python debugger.run()<CR>"
     sleep 2
   end
 
+  def set_opt(name, value)
+    vim.command "VdebugOpt #{name} #{value}"
+  end
+
   def messages
     vim.command("messages")
+  end
+
+  def last_error
+    vim.command("python debugger.get_last_error()")
   end
 
   def step_to_line(number)
@@ -37,9 +47,17 @@ class Vdebug
     vim.command 'python debugger.step_into()'
   end
 
-  def evaluate(expression)
+  def trace(expression)
+    evaluate(expression, "VdebugTrace")
+  end
+
+  def evaluate(expression = "", command = "VdebugEval")
     safe_expression = expression.gsub(/['"\\\x0]/,'\\\\\0')
-    vim.command %Q{python debugger.handle_eval("#{safe_expression}")}
+    vim.command "#{command} #{safe_expression}"
+  end
+
+  def evaluate!(expression)
+    evaluate(expression, "VdebugEval!")
   end
 
   # Retrieve a hash with the buffer names (values) and numbers (keys)
@@ -84,6 +102,11 @@ class Vdebug
 
   def stack_window_content
     fetch_buffer_content 'DebuggerStack'
+  end
+
+  def trace_window_content
+    clear_buffer_cache!
+    fetch_buffer_content 'DebuggerTrace'
   end
 
   def stack

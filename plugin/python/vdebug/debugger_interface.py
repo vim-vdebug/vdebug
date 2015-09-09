@@ -90,10 +90,10 @@ class DebuggerInterface:
         """
         return self.event_dispatcher.visual_eval(self.session_handler)
 
-    def handle_eval(self,args):
+    def handle_eval(self, bang, args):
         """Evaluate a code snippet specified by args.
         """
-        return self.session_handler.dispatch_event("eval", args)
+        return self.session_handler.dispatch_event("set_eval_expression", len(bang) > 0, args)
 
     def handle_trace(self,args = None):
         """Trace a code snippet specified by args.
@@ -113,6 +113,9 @@ class DebuggerInterface:
 
     def toggle_breakpoint_window(self):
         self.session_handler.ui().toggle_window("DebuggerBreakpoints")
+
+    def get_last_error(self):
+        return self.session_handler.ui().get_last_error()
 
     def set_breakpoint(self,args = None):
         """Set a breakpoint, specified by args.

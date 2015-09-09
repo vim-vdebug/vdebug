@@ -1,4 +1,11 @@
-When "I evaluate $expression" do |expr|
+When(/^I evaluate "(.*)"$/) do |expr|
   vdebug.evaluate expr
-  vdebug.running?.should be(true), "Vdebug is not running: #{vdebug.messages}"
+end
+
+When(/^I evaluate "(.*)" with VdebugEval!$/) do |expr|
+  vdebug.evaluate! expr
+end
+
+When "I run VdebugEval without any arguments" do
+  vdebug.evaluate
 end
