@@ -515,6 +515,7 @@ class Window(vdebug.ui.interface.Window):
         vim.command(str(cmd))
 
     def accept_renderer(self, renderer):
+        self.clean()
         self.write(renderer.render())
 
 class BreakpointWindow(Window):
@@ -626,6 +627,10 @@ class StatusWindow(Window):
 
 class TraceWindow(WatchWindow):
     name = "DebuggerTrace"
+
+    def __init__(self):
+        Window.__init__(self)
+        self._trace_expression = None
 
     def on_create(self):
         if self.creation_count == 1:

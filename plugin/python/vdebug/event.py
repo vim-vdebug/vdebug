@@ -265,7 +265,6 @@ class RefreshEvent(Event):
     def __update_stack(self):
         """Update the stack window with the current stack info.
         """
-        self.ui.windows.stack().clean()
         res = self.api.stack_get()
         renderer = vdebug.ui.vimui.StackGetResponseRenderer(res)
         self.ui.windows.stack().accept_renderer(renderer)
@@ -327,7 +326,6 @@ class EvalEvent(Event):
             rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
                     context_res,\
                     "Eval of: '%s'" % context_res.get_code())
-            self.ui.windows.watch().clean()
             self.ui.windows.watch().accept_renderer(rend)
         except vdebug.dbgp.EvalError:
             self.ui.error("Failed to evaluate invalid code, '%s'" % code)
@@ -363,7 +361,6 @@ class RemoveBreakpointEvent(Event):
 
 class GetContextEvent(Event):
     def run(self, context_id):
-        self.ui.windows.watch().clean()
         name = self.session.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
         context_res = self.api.context_get(context_id)
@@ -374,11 +371,45 @@ class GetContextEvent(Event):
                 context_id)
         self.ui.windows.watch().accept_renderer(rend)
 
+        self.dispatch("trace_refresh")
+
+class TraceRefreshEvent(Event):
+    def run(self):
+        if self.ui.windows.trace().is_tracing():
+            try:
+                context_res = self.api.eval(self.ui.windows.trace().get_trace_expression())
+                rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
+                        context_res,"Trace of: '%s'" \
+                        %context_res.get_code())
+                self.ui.windows.trace().render(rend)
+            except vdebug.dbgp.EvalError:
+                self.ui.windows.trace().render_in_error_case()
+
+
 class ReloadKeymappingsEvent(Event):
     def run(self):
         if self.session:
             print "Reloaded keymappings"
             self.session.keymapper().reload()
+
+class TraceEvent(Event):
+    def run(self, code):
+        """Evaluate a snippet of code and show the response on the watch window.
+        """
+        if not self.session.is_connected():
+            self.ui.error("Tracing an expression is only possible when Vdebug is running")
+            return
+        if not code:
+            self.ui.error("You must supply an expression to trace, with `:VdebugTrace expr`")
+            return
+
+        if self.ui.windows.trace().is_open:
+            self.ui.windows.trace().clean()
+        else:
+            self.ui.windows.toggle("DebuggerTrace")
+
+        self.ui.windows.trace().set_trace_expression(code)
+        self.dispatch("trace_refresh")
 
 class Dispatcher:
     events = {
@@ -393,7 +424,9 @@ class Dispatcher:
         "set_breakpoint": SetBreakpointEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
-        "remove_breakpoint": RemoveBreakpointEvent
+        "remove_breakpoint": RemoveBreakpointEvent,
+        "trace": TraceEvent,
+        "trace_refresh": TraceRefreshEvent
     }
 
     def __init__(self, session_handler):
