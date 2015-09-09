@@ -3,7 +3,7 @@ require 'socket'
 
 describe "startup" do
   context "starting the debugger" do
-    before { vim.server.remote_send ':python debugger.run()<CR>' }
+    before { vim.server.remote_send ':VdebugStart<CR>' }
 
     # Try and connect via tcp socket
     it "should create a tcp server socket" do
