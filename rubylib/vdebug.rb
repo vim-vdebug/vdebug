@@ -3,12 +3,13 @@ require 'securerandom'
 class Vdebug
   class BufferNotFound < StandardError; end;
 
-  attr_reader :vim
+  attr_reader :vim, :watch_win_marker
 
   def initialize(vim)
     @lock_file = "../vdebug.lock"
     @instance_id = SecureRandom::hex(3)
     @vim = vim
+    @watch_win_marker = option_value("marker_default")
   end
 
   def start_listening
@@ -76,8 +77,8 @@ class Vdebug
 
   def watch_vars
     watch_lines = watch_window_content.split("\n")[4..-1]
-    Hash[watch_lines.join("").split('|').map { |v|
-      v[3..-1].split("=", 2).map(&:strip)
+    p Hash[watch_lines.join("").split('|').map { |v|
+      v.gsub(/^.*#{watch_win_marker}/, "").split("=", 2).map(&:strip)
     }]
   end
 
@@ -110,19 +111,30 @@ class Vdebug
   end
 
   def remove_lock_file!
-    if File.exists?(@lock_file) && File.read(@lock_file) == @instance_id
-      puts "Deleting lock file for #{@instance_id}"
-      File.delete(@lock_file)
+    if File.exists?(@lock_file)
+      lock_file_id = File.read(@lock_file)
+      if lock_file_id == @instance_id
+        puts "Releasing lock (#{@instance_id})"
+        File.delete(@lock_file)
+      else
+        puts "Lock file #{@lock_file} is for instance #{lock_file_id}, whereas current instance is #{@instance_id}"
+      end
     end
   end
 
 protected
   def write_lock_file!
-    while File.exists?(@lock_file)
-      puts "Waiting for lock to be removed"
-      sleep 0.1
+    if File.exists?(@lock_file)
+
+      puts "Waiting for vdebug lock to be released"
+      i = 0
+      while File.exists?(@lock_file)
+        sleep 0.5
+        i += 1
+        raise "Failed to acquire vdebug lock" if i >= 20
+      end
     end
-    puts "Creating lock file for #{@instance_id}"
+    puts "Acquiring vdebug lock (#{@instance_id})"
     File.write(@lock_file, @instance_id)
   end
 
@@ -140,5 +152,9 @@ protected
       [matches[1].to_i, matches[2]] if matches
     end
     Hash[names.compact]
+  end
+
+  def option_value(name)
+    vim.echo("g:vdebug_options['#{name}']")
   end
 end

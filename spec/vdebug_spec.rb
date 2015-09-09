@@ -8,6 +8,10 @@ describe Vdebug do
     @vdebug = Vdebug.new vim
   end
 
+  after do
+    @vdebug.remove_lock_file!
+  end
+
   let(:vimrunner) { @vim }
   let(:vdebug) { @vdebug }
 
