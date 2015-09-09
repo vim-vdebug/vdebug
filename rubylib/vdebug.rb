@@ -15,8 +15,10 @@ class Vdebug
   def start_listening
     write_lock_file!
     clear_buffer_cache!
-    set_opt "debug_file_level", 2
-    set_opt "debug_file", "/tmp/vdebug.log"
+    if ENV["DEBUG"]
+      set_opt "debug_file_level", 2
+      set_opt "debug_file", "/tmp/vdebug.log"
+    end
     set_opt "background_listener", 0
     vim.server.remote_send ":python debugger.run()<CR>"
     sleep 2
@@ -95,7 +97,7 @@ class Vdebug
 
   def watch_vars
     watch_lines = watch_window_content.split("\n")[4..-1]
-    p Hash[watch_lines.join("").split('|').map { |v|
+    Hash[watch_lines.join("").split('|').map { |v|
       v.gsub(/^.*#{watch_win_marker}/, "").split("=", 2).map(&:strip)
     }]
   end
