@@ -1,2 +1,6 @@
 *.pyc
 doc/tags
+.coverage
+htmlcov/
+.*.tags
+.vagrant/

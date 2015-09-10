@@ -6,6 +6,7 @@ sys.path.append('plugin/python')
 vdebugLoader = unittest.TestLoader()
 suites = vdebugLoader.discover('tests','test_*.py')
 result = unittest.TextTestRunner().run(suites)
+
 if result.failures:
     exit(1)
 elif result.errors:

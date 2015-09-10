@@ -17,6 +17,11 @@ class OptionsTest(unittest.TestCase):
         Options.set({'foo':"hello",'bar':"world"})
         self.assertEqual("hello",Options.get('foo'))
 
+    def test_get_option_for_print(self):
+        Options.set({'foo':"",'bar':"world"})
+        self.assertEqual("<empty>",Options.get_for_print('foo'))
+        self.assertEqual("world",Options.get_for_print('bar'))
+
     def test_get_option_as_type(self):
         Options.set({'foo':"1",'bar':"2"})
         opt = Options.get('foo',int)

@@ -20,7 +20,12 @@ namespace :test do
 
   desc "Run unit tests"
   task :unit do
-    cmd = "python vdebugtests.py"
+    if ENV["COVERAGE"]
+      puts "Running unit tests with coverage (view output at ./htmlcov/index.html)"
+      cmd = "coverage run vdebugtests.py && coverage html --include=\"*/vdebug/*\""
+    else
+      cmd = "python vdebugtests.py"
+    end
     puts cmd
     system cmd
   end
