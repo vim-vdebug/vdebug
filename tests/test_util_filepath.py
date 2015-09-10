@@ -2,7 +2,6 @@ if __name__ == "__main__":
     import sys
     sys.path.append('../plugin/python/')
 import unittest2 as unittest
-""" Mock vim import """
 import vdebug.opts
 from vdebug.util import FilePath,FilePathError
 
