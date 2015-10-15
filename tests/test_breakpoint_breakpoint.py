@@ -31,7 +31,7 @@ class LineBreakpointTest(unittest.TestCase):
         file = vdebug.util.FilePath("/path/to/file")
         line = 20
         bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
-        self.assertEqual(bp.get_cmd(),"-t line -f file://%s -n %i -s enabled" %(file, line))
+        self.assertEqual(bp.get_cmd(),"-t line -f \"file://%s\" -n %i -s enabled" %(file, line))
 
     def test_on_add_sets_ui_breakpoint(self):
         """ Test that the breakpoint is placed on the source window."""
@@ -63,7 +63,7 @@ class ConditionalBreakpointTest(unittest.TestCase):
         condition = "$x > 20"
         bp = vdebug.breakpoint.ConditionalBreakpoint(ui,file,line,condition)
         b64cond = base64.encodestring(condition)
-        exp_cmd = "-t conditional -f file://%s -n %i -s enabled -- %s" %(file, line, b64cond)
+        exp_cmd = "-t conditional -f \"file://%s\" -n %i -s enabled -- %s" %(file, line, b64cond)
         self.assertEqual(bp.get_cmd(), exp_cmd)
 
 class ExceptionBreakpointTest(unittest.TestCase):
