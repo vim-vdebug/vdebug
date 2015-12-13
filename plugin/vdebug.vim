@@ -162,7 +162,21 @@ endfunction
 " been loaded.
 function! Vdebug_load_options(options)
     " Merge options with defaults
+
+    let param_namespace = "g:vdebug_options_"
+    let parameters = map(keys(g:vdebug_options_defaults), '"g:vdebug_options_".v:val')
+    let existing_params = filter(parameters, 'exists(v:val)')
+
+    let final_params = {}
+    for name in existing_params
+      let val = eval(name)
+      let name = strpart(name, 17)
+      let final_params[name] = val
+    endfor
+
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+
+    let g:vdebug_options = extend(g:vdebug_options, final_params)
 endfunction
 
 " Assign keymappings, and merge with defaults.
