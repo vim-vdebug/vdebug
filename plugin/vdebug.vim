@@ -164,13 +164,14 @@ function! Vdebug_load_options(options)
     " Merge options with defaults
 
     let param_namespace = "g:vdebug_options_"
-    let parameters = map(keys(g:vdebug_options_defaults), '"g:vdebug_options_".v:val')
+    let param_namespace_len = strlen(param_namespace)
+    let parameters = map(keys(g:vdebug_options_defaults), 'param_namespace.v:val')
     let existing_params = filter(parameters, 'exists(v:val)')
 
     let final_params = {}
     for name in existing_params
       let val = eval(name)
-      let name = strpart(name, 17)
+      let name = strpart(name, param_namespace_len)
       let final_params[name] = val
     endfor
 
