@@ -392,18 +392,25 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
+    def __init__(self, host = '', port = 9000, proxy_host = '', proxy_port = 9001, idekey = None, timeout = 30, input_stream = None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
 
         host -- host name where debugger is running (default '')
         port -- port number which debugger is listening on (default 9000)
+        proxy_host -- If using a DBGp Proxy, host name where the proxy is running (default None to disable)
+        proxy_port -- If using a DBGp Proxy, port where the proxy is listening for debugger connections (default 9001)
+        idekey -- The idekey that our Api() wrapper is expecting. Only required if using a proxy
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
         input_stream -- object for checking input stream and user interrupts (default None)
         """
         self.port = port
         self.host = host
+        self.proxy_host = proxy_host
+        self.proxy_port = proxy_port
+        self.proxy_success = False
+        self.idekey = idekey
         self.timeout = timeout
         self.input_stream = input_stream
 
@@ -417,7 +424,7 @@ class Connection:
 
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
-        connection is handled by self.listen()."""
+        connection is handled by self.accept()."""
         print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ',self.timeout,' seconds...)'
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
@@ -425,19 +432,24 @@ class Connection:
             serv.setblocking(0)
             serv.bind((self.host, self.port))
             serv.listen(5)
-            (self.sock, self.address) = self.listen(serv, self.timeout)
+            if self.proxy_host and self.proxy_port:
+                # Register ourselves with the proxy server
+                self.proxyinit()
+            (self.sock, self.address) = self.accept(serv, self.timeout)
             self.sock.settimeout(None)
         except socket.timeout:
+            self.proxystop()
             serv.close()
             raise TimeoutError("Timeout waiting for connection")
         except:
+            self.proxystop()
             serv.close()
             raise
 
         self.isconned = 1
         serv.close()
 
-    def listen(self, serv, timeout):
+    def accept(self, serv, timeout):
         """Non-blocking listener. Provides support for keyboard interrupts from
         the user. Although it's non-blocking, the user interface will still
         block until the timeout is reached.
@@ -459,12 +471,48 @@ class Connection:
 
     def close(self):
         """Close the connection."""
+        self.proxystop()
         if self.sock != None:
             vdebug.log.Log("Closing the socket",\
                             vdebug.log.Logger.DEBUG)
             self.sock.close()
             self.sock = None
         self.isconned = 0
+
+    def proxyinit(self):
+        """Register ourselves with the proxy."""
+        if not self.proxy_host or not self.proxy_port:
+            return
+
+        vdebug.log.Log("Connecting to DBGp proxy [%s:%d]" % (self.proxy_host, self.proxy_port),\
+                        vdebug.log.Logger.DEBUG)
+        proxy_conn = socket.create_connection((self.proxy_host, self.proxy_port), 30)
+
+        vdebug.log.Log("Sending proxyinit command",\
+                        vdebug.log.Logger.DEBUG)
+        msg = 'proxyinit -p %d -k %s -m 0' % (self.port, self.idekey)
+        proxy_conn.send(msg)
+        proxy_conn.shutdown(socket.SHUT_WR)
+
+        # Parse proxy response
+        response = proxy_conn.recv(8192)
+        proxy_conn.close()
+        response = ET.fromstring(response)
+        self.proxy_success = bool(response.get("success"))
+
+    def proxystop(self):
+        """De-register ourselves from the proxy."""
+        if not self.proxy_success:
+            return
+
+        proxy_conn = socket.create_connection((self.proxy_host, self.proxy_port), 30)
+
+        vdebug.log.Log("Sending proxystop command",\
+                        vdebug.log.Logger.DEBUG)
+        msg = 'proxystop -k %s' % str(self.idekey)
+        proxy_conn.send(msg)
+        proxy_conn.close()
+        self.proxy_success = False
 
     def __recv_length(self):
         """Get the length of the proceeding message."""

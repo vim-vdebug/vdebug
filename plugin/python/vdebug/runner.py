@@ -323,8 +323,14 @@ class Runner:
                 if len(ide_key) == 0:
                     check_ide_key = False
 
-                connection = vdebug.dbgp.Connection(server,port,\
-                        timeout,vdebug.util.InputStream())
+                connection = vdebug.dbgp.Connection(
+                        server,
+                        port,
+                        vdebug.opts.Options.get('proxy_host'),
+                        vdebug.opts.Options.get('proxy_port',int),
+                        ide_key,
+                        timeout,
+                        vdebug.util.InputStream())
 
                 self.api = vdebug.dbgp.Api(connection)
                 if check_ide_key and ide_key != self.api.idekey:
