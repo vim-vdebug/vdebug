@@ -106,7 +106,7 @@ Clone this repository in your `~/.vim/bundle` directory
 Add this to your `~/.vimrc` file:
 
 ```vim
-Plugin 'joonty/vdebug.git'
+Plugin 'joonty/vdebug'
 ```
 
 Then, from the command line, run:
