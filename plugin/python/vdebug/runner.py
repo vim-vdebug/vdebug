@@ -225,7 +225,7 @@ class Runner:
         args = args.strip()
         if len(args) == 0:
             self.ui.error("ID or '*' required to remove a breakpoint: run "+\
-                    "':breakpointWindow' to see breakpoints and their IDs")
+                    "':BreakpointWindow' to see breakpoints and their IDs")
             return
 
         if args == '*':
