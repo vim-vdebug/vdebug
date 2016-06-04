@@ -244,7 +244,8 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def set_line(self,lineno):
         self.focus()
-        vim.command("normal %sgg" % str(lineno))
+        """ Centering display vertically on lineno """
+        vim.command("normal %szz" % str(lineno))
 
     def get_file(self):
         self.focus()
