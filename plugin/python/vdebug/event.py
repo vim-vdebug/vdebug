@@ -131,11 +131,11 @@ class StackWindowLineSelectEvent(Event):
     """Move the the currently selected file and line in the stack window
     """
     def execute(self,runner):
-        lineno = vim.current.window.cursor[0]
+        stacklineno = vim.current.window.cursor[0]
 
-        vdebug.log.Log("User action in stack window, line %s" % lineno,\
+        vdebug.log.Log("User action in stack window, line %s" % stacklineno,\
                 vdebug.log.Logger.DEBUG)
-        line = runner.ui.stackwin.buffer[lineno-1]
+        line = runner.ui.stackwin.buffer[stacklineno-1]
         if line.find(" @ ") == -1:
             return False
         filename_pos = line.find(" @ ") + 3
@@ -145,6 +145,8 @@ class StackWindowLineSelectEvent(Event):
         lineno = file_and_line[line_pos+1:]
         runner.ui.sourcewin.set_file(file)
         runner.ui.sourcewin.set_line(lineno)
+        runner.ui.sourcewin.place_stack_sign(lineno)
+        runner.ui.stackwin.place_stack_sign(stacklineno)
 
 class WatchWindowPropertyGetEvent(Event):
     """Open a tree node in the watch window.

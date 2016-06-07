@@ -131,10 +131,17 @@ end
 if hlexists("DbgBreakptSign") == 0
     hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 end
+if hlexists("DbgStackLine") == 0
+    hi default DbgStackLine term=reverse ctermfg=White ctermbg=Blue guifg=#ffffff guibg=#0000ff
+end
+if hlexists("DbgStackSign") == 0
+    hi default DbgStackSign term=reverse ctermfg=White ctermbg=Blue guifg=#ffffff guibg=#0000ff
+end
 
 " Signs and highlighted lines for breakpoints, etc.
 sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
 sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
+sign define stack text=#> texthl=DbgStackSign linehl=DbgStackLine
 
 function! s:BreakpointTypes(A,L,P)
     let arg_to_cursor = strpart(a:L,11,a:P)

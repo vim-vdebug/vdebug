@@ -95,7 +95,7 @@ class Runner:
         return code
 
     def refresh(self,status):
-        """The main action performed after a deubugger step.
+        """The main action performed after a debugger step.
 
         Updates the status window, current stack, source
         file and line and watch window."""
@@ -127,6 +127,10 @@ class Runner:
                 self.ui.set_source_position(\
                         self.cur_file,\
                         self.cur_lineno)
+
+                """ Removing stack signs """
+                self.ui.stackwin.remove_stack_sign()
+                self.ui.sourcewin.remove_stack_sign()
 
                 if self.saved_code != '':
                     self.eval(self.saved_code)
