@@ -669,8 +669,12 @@ class EvalProperty(ContextProperty):
             if self.language == 'php' or \
                     self.language == 'perl':
                 if self.parent.type == 'array':
-                    self.display_name = self.parent.display_name + \
-                        "['%s']" % node.get('name')
+                    if node.get('name').isdigit():
+                        self.display_name = self.parent.display_name + \
+                            "[%s]" % node.get('name')
+                    else:
+                        self.display_name = self.parent.display_name + \
+                            "['%s']" % node.get('name')
                 else:
                     self.display_name = self.parent.display_name + \
                         "->"+node.get('name')
