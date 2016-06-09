@@ -443,7 +443,8 @@ the current debugger status, connection details and a help message.
 
 This shows the current position of the debugger. The file will automatically
 change as the debugger pauses in different parts of the code, and the current
-line is shown with a "->" sign in the margin.
+line is shown centered vertically in the source window, with a "->" sign
+in the margin.
 
 Don't edit the contents of the file when in debug mode, and especially don't
 edit without saving - this causes problems when swapping between files.
@@ -472,8 +473,8 @@ strings to indicate relationships. The compact version has a variable on each
 line, and works better for smaller screens. To set this option, see
 |VdebugOptions-watch_window_style|.
 
-The watch window automatically updates every time the debugger pauses, so
-nothing needs to be done on your part.
+The watch window automatically updates every time the debugger pauses,
+or a stack jump is made on the stack window (see next topic).
 
 You can also see variables from different contexts. For example, PHP has normal
 context variables and global variables, and the debugging engine differentiates
@@ -498,7 +499,12 @@ below show the path the script has taken.
 Like the watch window, the stack will update automatically every time the
 debugger pauses. You can jump to a place in the stack by putting your cursor
 over a line and pressing <enter> (<cr>) or by double clicking with your mouse
-(if you have mouse support enabled).
+(if you have mouse support enabled). The watch window will be updated
+with the file name and line number of the file in the current stack
+depth (i.e. the index in the stack activated by <enter> ou double
+click - the "stack jump"), and the stack window and the source window
+will have a "#>" sign in their left margin marking the current stack
+depth and the corresponding source line number, respectively.
 
 ------------------------------------------------------------------------------
 4.2.4 The status window                                   *VdebugStatusWindow*

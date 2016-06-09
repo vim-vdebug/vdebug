@@ -335,11 +335,11 @@ class Api:
         """
         return self.send_cmd('stack_get','',StackGetResponse)
 
-    def context_get(self,context = 0):
+    def context_get(self,context = 0, depth = 0):
         """Get the context variables.
         """
         return self.send_cmd('context_get',\
-                '-c %i' % int(context),\
+                '-c %i -d %i' % (int(context), int(depth)),\
                 ContextGetResponse)
 
     def context_names(self):
@@ -347,10 +347,10 @@ class Api:
         """
         return self.send_cmd('context_names','',ContextNamesResponse)
 
-    def property_get(self,name):
+    def property_get(self,name, depth = 0):
         """Get a property.
         """
-        return self.send_cmd('property_get','-n %s -d 0' % name,ContextGetResponse)
+        return self.send_cmd('property_get','-n %s -d %i' % (name, int(depth)),ContextGetResponse)
 
     def detach(self):
         """Tell the debugger to detach itself from this

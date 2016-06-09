@@ -475,6 +475,13 @@ class StackWindow(Window):
     def remove_stack_sign(self):
         vim.command('sign unplace %s' % self.stack_sign_id)
 
+    def get_file_and_line(self, stacklineno):
+        line = self.buffer[stacklineno - 1]
+        if line.find(" @ ") == -1:
+            return False
+        filename_pos = line.find(" @ ") + 3
+        return line[filename_pos:]
+
 class WatchWindow(Window):
     name = "DebuggerWatch"
 
@@ -568,7 +575,7 @@ class StackGetResponseRenderer(ResponseRenderer):
                     %{'num':s.get('level'),'where':where,\
                     'file':str(file.as_local()),'line':s.get('lineno')}
             string += line + "\n"
-        return string
+        return string[:-1]
 
 
 class ContextGetResponseRenderer(ResponseRenderer):
