@@ -135,6 +135,7 @@ class Runner:
                 """ Removing stack signs """
                 self.ui.stackwin.remove_stack_sign()
                 self.ui.sourcewin.remove_stack_sign()
+                self.set_context_stack_info(0)
 
                 if self.saved_code != '':
                     self.eval(self.saved_code)
