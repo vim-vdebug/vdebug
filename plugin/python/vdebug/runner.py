@@ -166,6 +166,8 @@ class Runner:
             except vdebug.dbgp.EvalError:
                 self.ui.tracewin.render_in_error_case()
 
+    def property_get(self, name):
+        return self.api.property_get(name, self.context_stack_depth)
 
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.

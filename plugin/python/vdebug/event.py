@@ -165,7 +165,8 @@ class WatchWindowPropertyGetEvent(Event):
             raise EventError("Cannot read the selected property")
 
         name = line[pointer_index+step:eq_index-1]
-        context_res = runner.api.property_get(name, runner.context_stack_depth)
+        """ Refactoring property_get with multiple pages """ 
+        context_res = runner.property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':
