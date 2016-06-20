@@ -128,10 +128,13 @@ class ContextGetResponse(Response):
             page = int(result.group(1))
         return page
 
+    def show_children(self):
+        return self.cmd == 'property_get'
+    
     def get_context(self):
-        for c in list(self.as_xml()):
-            self.create_properties(ContextProperty(c))
         page = self.get_page(self.cmd_args)
+        for c in list(self.as_xml()):
+            self.create_properties(ContextProperty(c, init_children=self.show_children()))
         if page == 0:
             """ Loop through pages 2 to num_pages """
             for p in xrange(1, self.properties[0].num_pages):
@@ -545,7 +548,7 @@ class ContextProperty:
 
     ns = '{urn:debugger_protocol_v1}'
 
-    def __init__(self,node,parent = None,depth = 0):
+    def __init__(self,node,parent = None,depth = 0, init_children = True):
         self.parent = parent
         """ Every child property will have a zero-based page property set """
         if self.parent:
@@ -561,7 +564,8 @@ class ContextProperty:
 
         self._determine_children(node)
         self.__determine_value(node)
-        self.__init_children(node)
+        if init_children:
+            self.__init_children(node)
         if self.type == 'scalar':
             self.size = len(self.value) - 2
 

@@ -4,6 +4,7 @@ import vdebug.util
 import vim
 import vdebug.log
 import vdebug.opts
+import vdebug.event
 
 class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -499,6 +500,17 @@ class WatchWindow(Window):
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
+
+    def open_child_properties(self, runner):
+        self.focus()
+        last_line_idx = int(vim.eval("line('$')")) - 1
+        first_line_idx = -1
+        for idx in xrange(last_line_idx, first_line_idx, -1):
+            self.command('normal ' + str(idx+1) + 'G')
+            line = vim.current.buffer[idx]
+            if line.startswith(' ' + vdebug.opts.Options.get('marker_closed_tree')):
+                vdebug.event.WatchWindowPropertyGetEvent().execute(runner)
+        self.command('normal gg')
 
 class StatusWindow(Window):
     name = "DebuggerStatus"

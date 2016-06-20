@@ -143,7 +143,14 @@ encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property></property></response>
     def test_properties_are_objects(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        assert len(context) == 13 
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert len(context) == 5 
         self.assertIsInstance(context[0],vdebug.dbgp.ContextProperty)
 
     def test_int_property_attributes(self):
@@ -166,30 +173,33 @@ encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property></property></response>
         assert prop.type == "array"
         assert prop.value == ""
         assert prop.has_children == True
-        assert prop.child_count() == 4
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
         assert prop.page == 0
-
-    def test_string_property_attributes(self):
-        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
-        context = res.get_context()
-        prop = context[2]
-
-        assert prop.display_name == "$argv[0]"
-        assert prop.type == "string"
-        assert prop.value == "`/usr/local/bin/cake`"
-        assert prop.has_children == False
-        assert prop.size == "19"
 
     def test_even_num_pages(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        prop = context[7]
+        prop = context[3]
 
         assert prop.display_name == "$even_num_pages_attr"
         assert prop.type == "array"
         assert prop.value == ""
         assert prop.has_children == True
-        assert prop.child_count() == 2
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
         assert prop.page == 0
         assert prop.pagesize == 2
         assert prop.num_pages == 2
@@ -197,13 +207,20 @@ encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property></property></response>
     def test_odd_num_pages(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        prop = context[10]
+        prop = context[4]
 
         assert prop.display_name == "$odd_num_pages_attr"
         assert prop.type == "array"
         assert prop.value == ""
         assert prop.has_children == True
-        assert prop.child_count() == 2
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
         assert prop.page == 0
         assert prop.pagesize == 2
         assert prop.num_pages == 3

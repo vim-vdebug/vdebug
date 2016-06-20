@@ -155,6 +155,7 @@ class Runner:
                 self.context_names, context_id)
 
         self.ui.watchwin.accept_renderer(rend)
+        self.ui.watchwin.open_child_properties(self)
 
         if self.ui.tracewin.is_tracing():
             try:

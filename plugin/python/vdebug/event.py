@@ -162,7 +162,7 @@ class WatchWindowPropertyGetEvent(Event):
 
         eq_index = line.find('=')
         if eq_index == -1:
-            raise EventError("Cannot read the selected property")
+            return
 
         name = line[pointer_index+step:eq_index-1]
         """ Refactoring property_get with multiple pages """ 
