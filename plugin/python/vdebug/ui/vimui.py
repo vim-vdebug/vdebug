@@ -4,6 +4,7 @@ import vdebug.util
 import vim
 import vdebug.log
 import vdebug.opts
+import vdebug.msys2
 
 class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -104,7 +105,10 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin.insert(details,1,True)
 
     def get_current_file(self):
-        return vdebug.util.LocalFilePath(vim.current.buffer.name)
+        if vdebug.msys2.shell():
+            return vdebug.util.LocalFilePath(vdebug.msys2.toNativePath(vim.current.buffer.name))
+        else:
+            return vdebug.util.LocalFilePath(vim.current.buffer.name)
 
     def get_current_row(self):
         return vim.current.window.cursor[0]
@@ -240,7 +244,11 @@ class SourceWindow(vdebug.ui.interface.Window):
         self.file = file
         vdebug.log.Log("Setting source file: "+file,vdebug.log.Logger.INFO)
         self.focus()
-        vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
+
+        if vdebug.msys2.shell():
+            vim.command('call Vdebug_edit("%s")' % vdebug.msys2.toMSYSPath(str(file)))
+        else:
+            vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self,lineno):
         self.focus()
@@ -248,7 +256,10 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def get_file(self):
         self.focus()
-        self.file = vdebug.util.LocalFilePath(vim.eval("expand('%:p')"))
+        if vdebug.msys2.shell():
+            self.file = vdebug.util.LocalFilePath(vdebug.msys2.toNativePath(vim.eval("expand('%:p')")))
+        else:
+            self.file = vdebug.util.LocalFilePath(vim.eval("expand('%:p')"))
         return self.file
 
     def clear_signs(self):
