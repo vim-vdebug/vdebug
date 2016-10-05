@@ -70,9 +70,10 @@ class Runner:
             else:
                 status = self.api.run()
 
-            """ Updating stack on open, for wathwin correct title """
-            self.update_stack()
-            self.set_context_stack_info(0)
+            """ Updating stack on open, for watchwin correct title """
+            if status in ["running", "break"]:  
+                self.update_stack()
+                self.set_context_stack_info(0)
             self.refresh(status)
         except Exception:
             self.close()
