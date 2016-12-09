@@ -195,7 +195,19 @@ class LocalFilePath(FilePath):
 
         Uses the "local_path" and "remote_path" options.
         """
-        return f
+        ret = f
+        if ret[2] == "/":
+            ret = ret.replace("/","\\")
+
+        if vdebug.opts.Options.isset('path_maps'):
+            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+                if remote in ret:
+                    vdebug.log.Log("Replacing remote path (%s) " % remote +\
+                            "with local path (%s)" % local ,\
+                            vdebug.log.Logger.DEBUG)
+                    ret = ret.replace(remote,local)
+                    break
+        return ret
 
 class RemoteFilePath(FilePath):
     def _create_remote(self,f):
@@ -203,7 +215,24 @@ class RemoteFilePath(FilePath):
 
         Uses the "local_path" and "remote_path" options.
         """
-        return f
+        ret = f
+
+        if vdebug.opts.Options.isset('path_maps'):
+            for remote, local in vdebug.opts.Options.get('path_maps', dict).items():
+                if local in ret:
+                    vdebug.log.Log("Replacing local path (%s) " % local +\
+                            "with remote path (%s)" % remote ,\
+                            vdebug.log.Logger.DEBUG)
+                    ret = ret.replace(local,remote)
+                    break
+
+        if ret[2] == "\\":
+            ret = ret.replace("\\","/")
+
+        if self.is_win:
+            return "file:///"+ret
+        else:
+            return "file://"+ret
 
 class FilePathError(Exception):
     pass
