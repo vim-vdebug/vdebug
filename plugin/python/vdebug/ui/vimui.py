@@ -346,7 +346,7 @@ class Window(vdebug.ui.interface.Window):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
         vim.command("setlocal buftype=nofile modifiable "+ \
-                "winfixheight winfixwidth")
+                "winfixheight winfixwidth nonumber")
         self.buffer = vim.current.buffer
         self.is_open = True
         self.creation_count += 1
