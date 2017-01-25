@@ -146,6 +146,13 @@ class WatchWindowHideEvent(Event):
         end_lineno = buf_len - 1
         for i in range(lineno,end_lineno):
             buf_line = vim.current.buffer[i]
+
+            # If the value of the variable contains a new line and the new line
+            # is shorter than the variables tree level, skip it, to avoid an
+            # IndexError
+            if pointer_index >= len(buf_line):
+                continue
+
             char = buf_line[pointer_index]
             if char != " ":
                 end_lineno = i - 1
