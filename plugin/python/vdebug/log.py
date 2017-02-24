@@ -72,7 +72,7 @@ class FileLogger(Logger):
     def __open(self):
         try:
             self.f = open(self.filename,'w')
-        except IOError, e:
+        except IOError as e:
             raise LogError("Invalid file name '%s' for log file: %s" \
                     %(self.filename,str(e)))
         except:
@@ -102,7 +102,7 @@ class Log:
 
     @classmethod
     def log(cls, string, level = Logger.INFO):
-        for k, l in cls.loggers.iteritems():
+        for k, l in cls.loggers.items():
             l.log(string,level)
 
     @classmethod
@@ -118,12 +118,12 @@ class Log:
             cls.loggers[type].shutdown()
             return True
         else:
-            print "Failed to find logger %s in list of loggers" % type
+            print("Failed to find logger %s in list of loggers" % type)
             return False
 
     @classmethod
     def shutdown(cls):
-        for k, l in cls.loggers.iteritems():
+        for k, l in cls.loggers.items():
             l.shutdown()
         cls.loggers = {}
 

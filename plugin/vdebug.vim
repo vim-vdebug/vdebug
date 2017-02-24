@@ -18,9 +18,9 @@
 "=============================================================================
 " }}}
 
-" Do not source this script when python is not compiled in.
+" Do not source this script when python3 is not compiled in.
 if !has("python")
-    finish
+    "finish
 endif
 
 silent doautocmd User VdebugPre
@@ -29,15 +29,15 @@ silent doautocmd User VdebugPre
 " /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
 " home vim directory (usually ~/.vim/plugin/).
 if filereadable($VIMRUNTIME."/plugin/python/start_vdebug.py")
-  pyfile $VIMRUNTIME/plugin/start_vdebug.py
+  py3file $VIMRUNTIME/plugin/start_vdebug.py
 elseif filereadable($HOME."/.vim/plugin/python/start_vdebug.py")
-  pyfile $HOME/.vim/plugin/python/start_vdebug.py
+  py3file $HOME/.vim/plugin/python/start_vdebug.py
 else
   " when we use pathogen for instance
   let $CUR_DIRECTORY=expand("<sfile>:p:h")
 
   if filereadable($CUR_DIRECTORY."/python/start_vdebug.py")
-    pyfile $CUR_DIRECTORY/python/start_vdebug.py
+    py3file $CUR_DIRECTORY/python/start_vdebug.py
   else
     call confirm('vdebug.vim: Unable to find start_vdebug.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
   endif
@@ -108,16 +108,16 @@ if g:vdebug_force_ascii == 1
 endif
 
 " Create the top dog
-python debugger = DebuggerInterface()
+python3 debugger = DebuggerInterface()
 
 " Commands
-command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
-command! VdebugStart python debugger.run()
-command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
-command! BreakpointWindow python debugger.toggle_breakpoint_window()
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.set_breakpoint(<q-args>)
+command! VdebugStart python3 debugger.run()
+command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
+command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
 command! -nargs=? -bang VdebugEval call s:HandleEval('<bang>', <q-args>)
-command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
-command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
+command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python3 debugger.handle_opt(<f-args>)
+command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
 
 if hlexists("DbgCurrentLine") == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
@@ -149,10 +149,10 @@ endfunction
 function! s:HandleEval(bang,code)
     let code = escape(a:code,'"')
     if strlen(a:bang)
-        execute 'python debugger.save_eval("'.code.'")'
+        execute 'python3 debugger.save_eval("'.code.'")'
     endif
     if strlen(a:code)
-        execute 'python debugger.handle_eval("'.code.'")'
+        execute 'python3 debugger.handle_eval("'.code.'")'
     endif
 endfunction
 
@@ -185,11 +185,11 @@ function! Vdebug_load_keymaps(keymaps)
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
-    exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
-    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
+    exe "noremap ".g:vdebug_keymap["run"]." :python3 debugger.run()<cr>"
+    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python3 debugger.set_breakpoint()<cr>"
 
     " Exceptional case for visual evaluation
-    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
+    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
 endfunction
 
 function! s:OptionNames(A,L,P)

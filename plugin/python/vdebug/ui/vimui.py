@@ -74,7 +74,7 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self,winnr)
             self.sourcewin.focus()
-        except Exception, e:
+        except Exception as e:
             self.is_open = False
             raise e
 
@@ -153,7 +153,7 @@ class Ui(vdebug.ui.interface.Ui):
 
     def say(self,string):
         """ Vim picks up Python prints, so just print """
-        print str(string)
+        print(str(string))
         vdebug.log.Log(string,vdebug.log.Logger.INFO)
 
     def error(self,string):
@@ -577,7 +577,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __create_tabs(self):
         res = []
         if self.contexts:
-            for id,name in self.contexts.iteritems():
+            for id,name in self.contexts.items():
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)

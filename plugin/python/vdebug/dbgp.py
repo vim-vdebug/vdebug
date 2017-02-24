@@ -67,7 +67,7 @@ class Response:
 
         Returns an xml.etree.ElementTree.Element object.
         """
-        if self.xml == None:
+        if self.xml is None:
             self.xml = ET.fromstring(self.response)
             self.__determine_ns()
         return self.xml
@@ -135,7 +135,7 @@ class EvalResponse(ContextGetResponse):
     def __init__(self,response,cmd,cmd_args,api):
         try:
             ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
-        except DBGPError, e:
+        except DBGPError as e:
             if int(e.args[1]) == 206:
                 raise EvalError()
             else:
@@ -418,7 +418,8 @@ class Connection:
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
-        print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ',self.timeout,' seconds...)'
+        print('Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', self.timeout,
+              ' seconds...)')
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -459,7 +460,7 @@ class Connection:
 
     def close(self):
         """Close the connection."""
-        if self.sock != None:
+        if self.sock is not None:
             vdebug.log.Log("Closing the socket",\
                             vdebug.log.Logger.DEBUG)
             self.sock.close()
@@ -575,7 +576,7 @@ class ContextProperty:
 
     def _determine_displayname(self,node):
         display_name = node.get('fullname')
-        if display_name == None:
+        if display_name is None:
             display_name = self._get_enc_node_text(node,'fullname',"")
         if display_name == '::':
             display_name = self.type
