@@ -555,13 +555,18 @@ class ContextProperty:
                 if node.text is None:
                     self.value = ""
                 else:
-                    self.value = base64.decodestring(node.text)
+                    self.value = base64.decodestring(node.text.encode())
             elif not self.is_uninitialized() \
                     and not self.has_children:
                 self.value = node.text
 
         if self.value is None:
             self.value = ""
+
+        try:
+            self.value = self.value.decode()
+        except AttributeError:
+            pass
 
         self.num_crs = self.value.count('\n')
         if self.type.lower() in ("string","str","scalar"):
