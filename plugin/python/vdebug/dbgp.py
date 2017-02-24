@@ -471,7 +471,7 @@ class Connection:
         """Get the length of the proceeding message."""
         length = ''
         while 1:
-            c = self.sock.recv(1)
+            c = self.sock.recv(1).decode('UTF-8')
             if c == '':
                 self.close()
                 raise EOFError('Socket Closed')
@@ -483,7 +483,7 @@ class Connection:
     def __recv_null(self):
         """Receive a null byte."""
         while 1:
-            c = self.sock.recv(1)
+            c = self.sock.recv(1).decode('UTF-8')
             if c == '':
                 self.close()
                 raise EOFError('Socket Closed')
@@ -497,7 +497,7 @@ class Connection:
         """
         body = ''
         while to_recv > 0:
-            buf = self.sock.recv(to_recv)
+            buf = self.sock.recv(to_recv).decode('UTF-8')
             if buf == '':
                 self.close()
                 raise EOFError('Socket Closed')
@@ -520,7 +520,8 @@ class Connection:
 
         cmd -- command to send
         """
-        self.sock.send(cmd + '\0')
+        cmd += '\0'
+        self.sock.send(cmd.encode())
 
 class ContextProperty:
 
