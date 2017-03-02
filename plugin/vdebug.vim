@@ -185,11 +185,11 @@ function! Vdebug_load_keymaps(keymaps)
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
-    exe "noremap ".g:vdebug_keymap["run"]." :python3 debugger.run()<cr>"
-    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python3 debugger.set_breakpoint()<cr>"
+    exe "noremap ".g:vdebug_keymap["run"]." :call vdebug#run()<cr>"
+    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :call vdebug#set_breakpoint()<cr>"
 
     " Exceptional case for visual evaluation
-    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
+    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :call vdebug#handle_visual_eval()<cr>"
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -205,6 +205,18 @@ function! s:OptionNames(A,L,P)
             return []
         endif
     endif
+endfunction
+
+function! vdebug#run()
+    python3 debugger.run()
+endfunction
+
+function! vdebug#set_breakpoint()
+    python3 debugger.set_breakpoint()
+endfunction
+
+function! vdebug#handle_visual_eval()
+    python3 debugger.handle_visual_eval()
 endfunction
 
 function! Vdebug_get_visual_selection()
