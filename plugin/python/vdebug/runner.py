@@ -390,3 +390,7 @@ class Runner:
         self.close_connection()
         self.ui.close()
         self.keymapper.unmap()
+
+    def handle_window_close(self):
+        if not self.ui.is_source_window_open():
+            self.close()

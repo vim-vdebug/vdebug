@@ -236,6 +236,10 @@ function! Vdebug_edit(filename)
     endtry
 endfunction
 
+function! vdebug#handle_window_close()
+    python3 debugger.handle_window_close()
+endfunction
+
 silent doautocmd User VdebugPost
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)

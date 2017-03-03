@@ -17,6 +17,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
         self.current_tab = "1"
         self.tabnr = None
+        self.source_window_name = None
 
     def is_modified(self):
        modified = int(vim.eval('&mod'))
@@ -47,7 +48,7 @@ class Ui(vdebug.ui.interface.Ui):
             self.tabnr = vim.eval("tabpagenr()")
 
             srcwin_name = self.__get_srcwin_name()
-
+            self.source_window_name = srcwin_name
 
             self.watchwin = WatchWindow(self,'vertical belowright new')
             self.watchwin.create()
@@ -190,6 +191,8 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin = None
         self.tracewin  = None
 
+        vim.command('au! vdebug WinEnter *')
+
 
     def __get_srcwin_name(self):
         return vim.current.buffer.name
@@ -213,6 +216,17 @@ class Ui(vdebug.ui.interface.Ui):
     def __get_buf_list(self):
         return vim.eval("range(1, bufnr('$'))")
 
+    def is_source_window_open(self):
+        for tab in vim.tabpages:
+            if tab.number != int(self.tabnr):
+                continue
+
+            for window in tab.windows:
+                if window.buffer.name == self.source_window_name:
+                    return True
+
+        return False
+
 class SourceWindow(vdebug.ui.interface.Window):
 
     file = None
@@ -221,6 +235,15 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
+        self.create()
+
+    def create(self):
+        self.on_create()
+
+    def on_create(self):
+        vim.command('augroup vdebug')
+        vim.command('au vdebug WinEnter * call vdebug#handle_window_close()')
+        vim.command('augroup END')
 
     def focus(self):
         vim.command(self.winno+"wincmd w")

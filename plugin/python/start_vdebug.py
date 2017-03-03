@@ -120,6 +120,12 @@ class DebuggerInterface:
         except Exception as e:
             self.handle_exception(e)
 
+    def handle_window_close(self):
+        try:
+            return self.runner.handle_window_close()
+        except Exception as e:
+            self.handle_exception(e)
+
     def eval_under_cursor(self):
         """Evaluate the property under the cursor.
         """
