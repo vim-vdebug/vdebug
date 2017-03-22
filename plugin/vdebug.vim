@@ -190,6 +190,9 @@ function! Vdebug_load_keymaps(keymaps)
 
     " Exceptional case for visual evaluation
     exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :call vdebug#handle_visual_eval()<cr>"
+
+    " Eval when not in Visual Mode
+    exe "nnoremap " . g:vdebug_keymap["eval_visual"] . " :call vdebug#handle_input_eval()<cr>"
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -217,6 +220,10 @@ endfunction
 
 function! vdebug#handle_visual_eval()
     python3 debugger.handle_visual_eval()
+endfunction
+
+function! vdebug#handle_input_eval()
+    python3 debugger.handle_input_eval()
 endfunction
 
 function! Vdebug_get_visual_selection()

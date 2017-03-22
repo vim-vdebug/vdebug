@@ -13,6 +13,11 @@ class Dispatcher:
             event = VisualEvalEvent()
             return event.execute(self.runner)
 
+    def input_eval(self):
+        if self.runner.is_alive():
+            event = InputEvalEvent()
+            return event.execute(self.runner)
+
     def eval_under_cursor(self):
         if self.runner.is_alive():
             event = CursorEvalEvent()
@@ -62,6 +67,17 @@ class VisualEvalEvent(Event):
     def execute(self,runner):
         selection = vim.eval("Vdebug_get_visual_selection()")
         runner.eval(selection)
+        return True
+
+class InputEvalEvent(Event):
+    """Evaluate code inputted by user
+    """
+    def execute(self, runner):
+        vim.command('call inputsave()')
+        vim.command('let input_eval = input("Code to Evaluate: ")')
+        vim.command('call inputrestore()')
+        eval_input = vim.eval('input_eval')
+        runner.eval(eval_input)
         return True
 
 class CursorEvalEvent(Event):
