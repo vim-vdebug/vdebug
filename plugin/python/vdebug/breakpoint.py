@@ -12,13 +12,13 @@ class Store:
         num_bps = len(self.breakpoints)
         if num_bps > 0:
             vdebug.log.Log("Registering %i breakpoints with the debugger" % num_bps)
-        for id, bp in self.breakpoints.iteritems():
+        for id, bp in self.breakpoints.items():
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
 
     # Update line-based breakpoints with a dict of IDs and lines
     def update_lines(self,lines):
-        for id, line in lines.iteritems():
+        for id, line in lines.items():
             try:
                 self.breakpoints[id].set_line(line)
                 vdebug.log.Log("Updated line number of breakpoint %s to %s"\
@@ -61,7 +61,7 @@ class Store:
 
     def find_breakpoint(self,file,line):
         found = None
-        for id, bp in self.breakpoints.iteritems():
+        for id, bp in self.breakpoints.items():
             if bp.type == "line":
                 if bp.get_file() == file and\
                         bp.get_line() == line:
