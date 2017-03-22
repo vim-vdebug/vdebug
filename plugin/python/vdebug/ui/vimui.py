@@ -50,10 +50,10 @@ class Ui(vdebug.ui.interface.Ui):
             srcwin_name = self.__get_srcwin_name()
             self.source_window_name = srcwin_name
 
-            self.watchwin = WatchWindow(self,'vertical belowright new')
+            self.watchwin = WatchWindow(self,'below new')
             self.watchwin.create()
 
-            self.stackwin = StackWindow(self,'belowright new')
+            self.stackwin = StackWindow(self,'vertical leftabove new')
             self.stackwin.create()
 
             self.statuswin = StatusWindow(self,'belowright new')
@@ -62,8 +62,9 @@ class Ui(vdebug.ui.interface.Ui):
 
             self.tracewin = TraceWindow(self,'rightbelow 7new')
 
-            self.watchwin.set_height(20)
-            self.statuswin.set_height(5)
+            # self.statuswin.set_height(5)
+            # self.watchwin.set_height(20)
+            # self.statuswin.set_height(5)
 
             logwin = LogWindow(self,'rightbelow 6new')
 
@@ -309,7 +310,7 @@ class Window(vdebug.ui.interface.Window):
             height = minheight
         if height <= 0:
             height = 1
-        self.command('set winheight=%i' % height)
+        self.command('resize=%i' % height)
 
     def write(self, msg, return_focus = True, after = "normal G"):
         if not self.is_open:
