@@ -4,8 +4,11 @@ notifications:
     secure: BksygPSsoRfvre27w6XQN9ooKB9C1n83Bw96YurvyDHJ6BYM2Gv9fW1Sj6NHpB8MQkMaJ+9gRiBSflkP+l80t3EXAdStuI/8EM/wZu1ov6bmYT/hYQ8HnULmmPNj8uVzsX13VGEUC/YY4osWuJFM1wh61dStoF+SKrpslqWCV4w=
 language: python
 python:
-- '2.6'
-- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
 rvm: 1.9.3
 before_install:
 - sudo apt-get update && sudo apt-get install vim-gtk php5-cli php5-xdebug
