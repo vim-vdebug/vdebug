@@ -159,8 +159,7 @@ class EvalResponse(ContextGetResponse):
     def get_code(self):
         cmd = self.get_cmd_args()
         parts = cmd.split('-- ')
-        return base64.decodestring(parts[1])
-
+        return parts[1]
 
 class BreakpointSetResponse(Response):
     """Response object returned by the breakpoint_set command."""
@@ -300,8 +299,7 @@ class Api:
     def eval(self, code):
         """Tell the debugger to start or resume
         execution."""
-        code_enc = base64.encodestring(code.encode())
-        args = '-- %s' % code_enc
+        args = '-- %s' % code
 
         """ The python engine incorrectly requires length.
         if self.language == 'python':
@@ -567,18 +565,13 @@ class ContextProperty:
                 if node.text is None:
                     self.value = ""
                 else:
-                    self.value = base64.decodestring(node.text.encode())
+                    self.value = node.text
             elif not self.is_uninitialized() \
                     and not self.has_children:
                 self.value = node.text
 
         if self.value is None:
             self.value = ""
-
-        try:
-            self.value = self.value.decode()
-        except AttributeError:
-            pass
 
         self.num_crs = self.value.count('\n')
         if self.type.lower() in ("string", "str", "scalar"):
@@ -603,13 +596,15 @@ class ContextProperty:
     def _get_enc_node_text(self, node, name, default=
     None):
         n = node.find('%s%s' % (self.ns, name))
+
         if n is not None and n.text is not None:
             if n.get('encoding') == 'base64':
-                val = base64.decodestring(n.text)
+                val = n.text
             else:
                 val = n.text
         else:
             val = None
+
         if val is None:
             return default
         else:
@@ -708,7 +703,6 @@ class EvalProperty(ContextProperty):
                 else:
                     self.display_name = self.parent.display_name + \
                                         "." + name
-
 
 """ Errors/Exceptions """
 
