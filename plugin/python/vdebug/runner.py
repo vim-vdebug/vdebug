@@ -273,6 +273,7 @@ class Runner:
         self.ui.tracewin.set_trace_expression(code)
 
     def eval(self,code):
+        code = code.strip()
         """Evaluate a snippet of code and show the response on the watch window.
         """
         if not self.is_alive():

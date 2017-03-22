@@ -53,18 +53,14 @@ class Ui(vdebug.ui.interface.Ui):
             self.watchwin = WatchWindow(self,'below new')
             self.watchwin.create()
 
-            self.stackwin = StackWindow(self,'vertical leftabove new')
-            self.stackwin.create()
-
-            self.statuswin = StatusWindow(self,'belowright new')
+            self.statuswin = StatusWindow(self,'vertical leftabove new')
             self.statuswin.create()
             self.statuswin.set_status("loading")
 
-            self.tracewin = TraceWindow(self,'rightbelow 7new')
+            self.stackwin = StackWindow(self,'belowright new')
+            self.stackwin.create()
 
-            # self.statuswin.set_height(5)
-            # self.watchwin.set_height(20)
-            # self.statuswin.set_height(5)
+            self.tracewin = TraceWindow(self,'rightbelow 7new')
 
             logwin = LogWindow(self,'rightbelow 6new')
 
@@ -76,6 +72,10 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self,winnr)
             self.sourcewin.focus()
+
+            self.watchwin.command('resize 15')
+            self.statuswin.command('resize 1')
+            self.statuswin.command('vertical resize 60')
         except Exception as e:
             self.is_open = False
             raise e
@@ -97,7 +97,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin.insert("Connected to %s:%s" %(addr,port),2,True)
 
     def remove_conn_details(self):
-        self.statuswin.insert("Not connected",2,True)
+        self.statuswin.set_status('stopped')
 
     def set_listener_details(self,addr,port,idekey):
         details = "Listening on %s:%s" %(addr,port)
@@ -310,7 +310,7 @@ class Window(vdebug.ui.interface.Window):
             height = minheight
         if height <= 0:
             height = 1
-        self.command('resize=%i' % height)
+        self.command('silent res=%i' % height)
 
     def write(self, msg, return_focus = True, after = "normal G"):
         if not self.is_open:
@@ -369,8 +369,7 @@ class Window(vdebug.ui.interface.Window):
     def create(self):
         """ create window """
         vim.command('silent ' + self.open_cmd + ' ' + self.name)
-        vim.command("setlocal buftype=nofile modifiable "+ \
-                "winfixheight winfixwidth")
+        vim.command("setlocal buftype=nofile modifiable ")
         self.buffer = vim.current.buffer
         self.is_open = True
         self.creation_count += 1
@@ -494,12 +493,10 @@ class StatusWindow(Window):
 
     def on_create(self):
         keys = vdebug.util.Keymapper()
-        output = "Status: starting\nListening on port\nNot connected\n\n"
-        output += "Press %s to start debugging, " %(keys.run_key())
-        output += "%s to stop/close. " %(keys.close_key())
-        output += "Type :help Vdebug for more information."
+        output = "starting\nListening on port\nNot connected"
 
         self.write(output)
+        self.set_status('loading')
 
         self.command('setlocal syntax=debugger_status')
         if self.creation_count == 1:
@@ -507,7 +504,21 @@ class StatusWindow(Window):
             vim.command('%s | python3 debugger.runner.ui.statuswin.is_open = False' % cmd)
 
     def set_status(self,status):
-        self.insert("Status: "+str(status),0,True)
+        if str(status) == "stopped":
+            status = "■"
+        if str(status) == "running":
+            status = "▶"
+        if str(status) == "break":
+            status = "▌▌"
+
+        keys = vdebug.util.Keymapper()
+
+        output = "  " + str(status) + "  "
+        output += "[%s Start] " %(keys.run_key())
+        output += "[%s Stop] " %(keys.close_key())
+        output += "[:help Vdebug]"
+
+        self.insert(output,0,True)
 
 class TraceWindow(WatchWindow):
     name = "DebuggerTrace"
