@@ -101,18 +101,28 @@ called "python".
 
 Clone this repository in your `~/.vim/bundle` directory
 
-### Using vundle
+### Using Vundle
 
 Add this to your `~/.vimrc` file:
 
 ```vim
-Bundle 'joonty/vdebug.git'
+Plugin 'joonty/vdebug'
 ```
 
 Then, from the command line, run:
 
 ```bash
-vim +BundleInstall +qall
+vim +PluginInstall +qall
+```
+
+Or, in vim, run:
+```vim
+:PluginInstall
+```
+
+For new changes to take effect, you may have to reload your .vimrc first:
+```vim
+:source $MYVIMRC
 ```
 
 ## Quick guide
