@@ -488,7 +488,7 @@ class Window(vdebug.ui.interface.Window):
         """ create window """
         vim.command('silent %s %s' %(open_cmd, self.name))
         vim.command("setlocal buftype=nofile modifiable "+ \
-                "winfixheight winfixwidth nonumber")
+                "winfixheight winfixwidth nonumber norelativenumber")
         existing_content = self._buffer.contents()
         vdebug.log.Log("Setting buffer for %s: %s" %(self.name, existing_content),
                 vdebug.log.Logger.DEBUG)
