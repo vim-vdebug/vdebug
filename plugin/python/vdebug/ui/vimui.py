@@ -302,7 +302,7 @@ class SourceWindow(vdebug.ui.interface.Window):
     def set_line(self,lineno):
         vdebug.log.Log("Setting source line number: %s" % lineno,vdebug.log.Logger.DEBUG)
         self.focus()
-        vim.command("normal %sgg" % str(lineno))
+        vim.command(":%s" % str(lineno))
 
     def get_file(self):
         self.focus()
