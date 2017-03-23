@@ -506,12 +506,13 @@ class Window(vdebug.ui.interface.Window):
 
     def destroy(self, wipeout = True):
         """ destroy window """
-        if not self.is_open:
+        if self._buffer == None:
             return
         self.is_open = False
         self._buffer = HiddenBuffer(self._buffer.contents())
         if wipeout and int(vim.eval('buffer_exists("%s")' % self.name)) == 1:
             vim.command('bwipeout %s' % self.name)
+        self.on_destroy()
 
     def clean(self):
         """ clean all data in buffer """
