@@ -190,7 +190,7 @@ class LineBreakpoint(Breakpoint):
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        cmd += " -f " + self.file.as_remote()
+        cmd += " -f " + '"' + self.file.as_remote() + '"'
         cmd += " -n " + str(self.line)
         cmd += " -s enabled"
         
