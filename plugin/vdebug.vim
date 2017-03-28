@@ -163,6 +163,36 @@ endfunction
 function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+
+    " Override with single defined params ie. g:vdebug_options_port
+    let single_defined_params = s:Vdebug_get_options()
+    let g:vdebug_options = extend(g:vdebug_options, single_defined_params)
+endfunction
+
+" Get options defined outside of the vdebug_options dictionary
+"
+" This helps for when users might want to define a single option by itself
+" without needing the dictionary ie. vdebug_options_port = 9000
+function! s:Vdebug_get_options()
+    let param_namespace = "g:vdebug_options_"
+    let param_namespace_len = strlen(param_namespace)
+
+    " Get the paramter names and concat the g:vdebug_options namespace
+    let parameters = map(keys(g:vdebug_options_defaults), 'param_namespace.v:val')
+
+    " Only use the defined parameters
+    let existing_params = filter(parameters, 'exists(v:val)')
+
+    " put into a dictionary for use with extend()
+    let params = {}
+    for name in existing_params
+      let val = eval(name)
+
+      " Remove g:vdebug_options namespace from param
+      let name = strpart(name, param_namespace_len)
+      let params[name] = val
+    endfor
+    return params
 endfunction
 
 " Assign keymappings, and merge with defaults.
