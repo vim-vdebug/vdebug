@@ -172,7 +172,7 @@ endfunction
 " Get options defined outside of the vdebug_options dictionary
 "
 " This helps for when users might want to define a single option by itself
-" without needing the ditionary ie. vdebug_options_port = 9000
+" without needing the dictionary ie. vdebug_options_port = 9000
 function! s:Vdebug_get_options()
     let param_namespace = "g:vdebug_options_"
     let param_namespace_len = strlen(param_namespace)
