@@ -4,6 +4,7 @@ import vim
 import re
 import os
 import urllib
+import urllib.parse
 import time
 
 class Keymapper:
@@ -31,7 +32,7 @@ class Keymapper:
         for func in self.keymaps:
             if func not in self.exclude:
                 key = self.keymaps[func]
-                map_cmd = "noremap %s%s :python debugger.%s()<cr>" %\
+                map_cmd = "noremap %s%s :python3 debugger.%s()<cr>" %\
                     (self.leader,key,func)
                 vim.command(map_cmd)
         self.is_mapped = True
@@ -47,7 +48,7 @@ class Keymapper:
         regex = re.compile(r'^([nvxsoilc]|)(nore)?map!?')
         split_regex = re.compile(r'\s+')
         keys = set(v for (k,v) in self.keymaps.items() if k not in self.exclude)
-        special = set(["<buffer>", "<silent>", "<special>", "<script>", "<expr>", "<unique>"])
+        special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>", "<unique>"}
         for line in open(tempfile, 'r'):
             if not regex.match(line):
                 continue
@@ -85,7 +86,7 @@ class FilePath:
         if filename is None or \
             len(filename) == 0:
             raise FilePathError("Missing or invalid file name")
-        filename = urllib.unquote(filename)
+        filename = urllib.parse.unquote(filename)
         if filename.startswith('file:'):
             filename = filename[5:]
             if filename.startswith('///'):
@@ -109,7 +110,7 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if remote in ret:
                     vdebug.log.Log("Replacing remote path (%s) " % remote +\
@@ -134,7 +135,7 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if local in ret:
                     vdebug.log.Log("Replacing local path (%s) " % local +\

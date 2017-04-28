@@ -17,6 +17,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.breakpointwin = BreakpointWindow(self,'rightbelow 7new')
         self.current_tab = "1"
         self.tabnr = None
+        self.source_window_name = None
 
     def is_modified(self):
        modified = int(vim.eval('&mod'))
@@ -47,7 +48,7 @@ class Ui(vdebug.ui.interface.Ui):
             self.tabnr = vim.eval("tabpagenr()")
 
             srcwin_name = self.__get_srcwin_name()
-
+            self.source_window_name = srcwin_name
 
             self.watchwin = WatchWindow(self,'vertical belowright new')
             self.watchwin.create()
@@ -74,7 +75,7 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self,winnr)
             self.sourcewin.focus()
-        except Exception, e:
+        except Exception as e:
             self.is_open = False
             raise e
 
@@ -152,8 +153,8 @@ class Ui(vdebug.ui.interface.Ui):
         return vim.eval('_tmp')
 
     def say(self,string):
-        """ Vim picks up Python prints, so just print """
-        print str(string)
+        """ Vim picks up python3 prints, so just print """
+        print(str(string))
         vdebug.log.Log(string,vdebug.log.Logger.INFO)
 
     def error(self,string):
@@ -190,6 +191,8 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin = None
         self.tracewin  = None
 
+        vim.command('au! vdebug WinEnter *')
+
 
     def __get_srcwin_name(self):
         return vim.current.buffer.name
@@ -213,6 +216,17 @@ class Ui(vdebug.ui.interface.Ui):
     def __get_buf_list(self):
         return vim.eval("range(1, bufnr('$'))")
 
+    def is_source_window_open(self):
+        for tab in vim.tabpages:
+            if tab.number != int(self.tabnr):
+                continue
+
+            for window in tab.windows:
+                if window.buffer.name == self.source_window_name:
+                    return True
+
+        return False
+
 class SourceWindow(vdebug.ui.interface.Window):
 
     file = None
@@ -221,6 +235,15 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
+        self.create()
+
+    def create(self):
+        self.on_create()
+
+    def on_create(self):
+        vim.command('augroup vdebug')
+        vim.command('au vdebug WinEnter * call vdebug#handle_window_close()')
+        vim.command('augroup END')
 
     def focus(self):
         vim.command(self.winno+"wincmd w")
@@ -391,7 +414,7 @@ class BreakpointWindow(Window):
             self.add_breakpoint(bp)
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.breakpointwin.is_open = False' % cmd)
+            vim.command('%s | python3 debugger.runner.ui.breakpointwin.is_open = False' % cmd)
 
     def add_breakpoint(self,breakpoint):
         bp_str = " %-7i | %-11s | " %(breakpoint.id,breakpoint.type)
@@ -424,7 +447,7 @@ class LogWindow(Window):
         self.command('setlocal syntax=debugger_log')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python vdebug.log.Log.remove_logger("WindowLogger")' % cmd)
+            vim.command('%s | python3 vdebug.log.Log.remove_logger("WindowLogger")' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg,return_focus=True)
@@ -434,15 +457,15 @@ class StackWindow(Window):
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_double_click()<cr>')
+                ':python3 debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_stack')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.stackwin.is_open = False' % cmd)
+            vim.command('%s | python3 debugger.runner.ui.stackwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -452,15 +475,15 @@ class WatchWindow(Window):
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '+\
-                ':python debugger.handle_return_keypress()<cr>')
+                ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_double_click()<cr>')
+                ':python3 debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_watch')
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.watchwin.is_open = False' % cmd)
+            vim.command('%s | python3 debugger.runner.ui.watchwin.is_open = False' % cmd)
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
@@ -480,7 +503,7 @@ class StatusWindow(Window):
         self.command('setlocal syntax=debugger_status')
         if self.creation_count == 1:
             cmd = 'au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.statuswin.is_open = False' % cmd)
+            vim.command('%s | python3 debugger.runner.ui.statuswin.is_open = False' % cmd)
 
     def set_status(self,status):
         self.insert("Status: "+str(status),0,True)
@@ -491,7 +514,7 @@ class TraceWindow(WatchWindow):
     def on_create(self):
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.tracewin.is_open = False' % cmd)
+            vim.command('%s | python3 debugger.runner.ui.tracewin.is_open = False' % cmd)
         self.command('setlocal syntax=debugger_watch')
 
     def set_trace_expression(self, trace_expression):
@@ -577,7 +600,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __create_tabs(self):
         res = []
         if self.contexts:
-            for id,name in self.contexts.iteritems():
+            for id,name in self.contexts.items():
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)

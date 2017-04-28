@@ -81,10 +81,10 @@ class Runner:
         value. This doesn't break the loop, so multiple features can be set
         even in the case of an error."""
         features = vim.eval('g:vdebug_features')
-        for name, value in features.iteritems():
+        for name, value in features.items():
             try:
                 self.api.feature_set(name, value)
-            except vdebug.dbgp.DBGPError, e:
+            except vdebug.dbgp.DBGPError as e:
                 error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
                 self.ui.error(error_str)
 
@@ -328,8 +328,8 @@ class Runner:
 
                 self.api = vdebug.dbgp.Api(connection)
                 if check_ide_key and ide_key != self.api.idekey:
-                    print "Ignoring debugger connection with IDE key '%s'" \
-                            % self.api.idekey
+                    print("Ignoring debugger connection with IDE key '%s'"
+                          % self.api.idekey)
                     self.api.detach()
                 else:
                     break
@@ -390,3 +390,7 @@ class Runner:
         self.close_connection()
         self.ui.close()
         self.keymapper.unmap()
+
+    def handle_window_close(self):
+        if not self.ui.is_source_window_open():
+            self.close()

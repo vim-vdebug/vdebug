@@ -20,7 +20,7 @@ describe Vdebug do
 
       it "should send the command to start vdebug" do
         vim.server.should_receive(:remote_send).
-          with(":python debugger.run()<CR>")
+          with(":python3 debugger.run()<CR>")
         vdebug.start_listening
       end
     end
@@ -31,7 +31,7 @@ describe Vdebug do
     context "step over" do
       it "should send the command to vdebug" do
         vim.should_receive(:command).
-          with('python debugger.step_over()')
+          with('python3 debugger.step_over()')
         vdebug.step_over
       end
     end
@@ -41,7 +41,7 @@ describe Vdebug do
     context "asking whether it's connected" do
       it "should query the vdebug api" do
         vim.should_receive(:command).
-          with("python print debugger.runner.is_alive()").
+          with("python3 print debugger.runner.is_alive()").
           and_return("True")
         vdebug.connected?
       end
