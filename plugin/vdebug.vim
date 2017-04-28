@@ -244,7 +244,7 @@ function! Vdebug_edit(filename)
 endfunction
 
 function! vdebug#handle_window_close()
-    python3 debugger.handle_window_close()
+   " python3 debugger.handle_window_close()
 endfunction
 
 silent doautocmd User VdebugPost
