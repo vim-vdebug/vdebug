@@ -4,6 +4,7 @@ import vdebug.log
 import vdebug.dbgp
 import vdebug.listener
 import vim
+import socket
 
 class ModifiedBufferError(Exception):
     pass
