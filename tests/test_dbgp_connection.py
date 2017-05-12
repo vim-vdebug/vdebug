@@ -1,7 +1,7 @@
 if __name__ == "__main__":
     import sys
     sys.path.append('../plugin/python/')
-import unittest2 as unittest
+import unittest
 import vdebug.dbgp
 
 class SocketMockError():
@@ -41,7 +41,7 @@ class SocketMock():
         pass
 
 
-class ConnectionTest(unittest.TestCase):      
+class ConnectionTest(unittest.TestCase):
 
     def setUp(self):
         self.conn = vdebug.dbgp.Connection('', 0)
@@ -81,8 +81,8 @@ class ConnectionTest(unittest.TestCase):
         self.conn.sock.add_response('')
         self.assertRaises(EOFError,self.conn.recv_msg)
 
-    """ 
-    Test that the send_msg command calls send on the socket, 
+    """
+    Test that the send_msg command calls send on the socket,
     and adds a null byte to the string.
     """
     def test_send(self):

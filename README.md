@@ -5,16 +5,16 @@
 ## Introduction
 
 Vdebug is a new, fast, powerful debugger client for Vim. It's multi-language,
-and has been tested with PHP, Python, Ruby, Perl, Tcl and NodeJS. It interfaces with 
-**any** debugger that faithfully uses the DBGP protocol, such as Xdebug for PHP.  
-There are step-by-step instructions for setting up debugging with all of the aforementioned 
-languages in the Vim help file that comes with Vdebug. 
+and has been tested with PHP, Python, Ruby, Perl, Tcl and NodeJS. It interfaces with
+**any** debugger that faithfully uses the DBGP protocol, such as Xdebug for PHP.
+There are step-by-step instructions for setting up debugging with all of the aforementioned
+languages in the Vim help file that comes with Vdebug.
 
-It builds on the experience gained through the legacy of the Xdebug Vim script 
+It builds on the experience gained through the legacy of the Xdebug Vim script
 originally created by Seung Woo Shin and extended by so many others, but it's a
 total rebuild to allow for a nicer interface and support of new features.
 
-It's written in Python, and has an object-oriented interface that is easy to extend 
+It's written in Python, and has an object-oriented interface that is easy to extend
 and can even be used from the command-line. It even has unit tests covering
 some of the more critical parts of the code.
 
@@ -172,10 +172,9 @@ I gladly accept contributions to the code. Just fork the repository, make your c
 
 ## Tests
 
- * The tests use `unittest2` and `mock`, so make sure they're installed
+ * The tests use `unittest` (should be part of the stdlib) and `mock`, so make sure they're installed
 
 ```
-pip install unittest2
 pip install mock
 ```
 

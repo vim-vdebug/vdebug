@@ -1,4 +1,4 @@
-import unittest2 as unittest
+import unittest
 import sys
 
 sys.path.append('tests')

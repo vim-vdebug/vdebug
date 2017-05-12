@@ -139,7 +139,7 @@ set relativenumber
 EOF
 
 chown vagrant:vagrant /home/vagrant/.vimrc
-pip install unittest2 mock
+pip install mock
 
 # Do things as the vagrant user
 sudo -u vagrant bash << EOF
