@@ -148,7 +148,7 @@ class Ui(vdebug.ui.interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self, winnr)
             self.sourcewin.focus()
-        except Exception, e:
+        except Exception as e:
             self.is_open = False
             raise
 

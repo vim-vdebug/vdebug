@@ -470,7 +470,7 @@ class Dispatcher:
     def dispatch_event(self, name, *args):
         try:
             Dispatcher.events[name](self.__session_handler).run(*args)
-        except Exception, e:
+        except Exception as e:
             self.__ex_handler.handle(e)
 
     def visual_eval(self, session):

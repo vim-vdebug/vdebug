@@ -106,7 +106,7 @@ class SessionHandler:
                 return True
             else:
                 return False
-        except Exception, e:
+        except Exception as e:
             print("Error starting Vdebug: %s" %
                   self.__ex_handler.exception_to_string(e))
 
