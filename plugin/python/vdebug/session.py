@@ -4,6 +4,7 @@ import vdebug.opts
 import vdebug.log
 import vdebug.dbgp
 import vdebug.listener
+import vdebug.event
 import vim
 import socket
 

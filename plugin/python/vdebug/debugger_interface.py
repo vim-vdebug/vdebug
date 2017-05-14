@@ -1,5 +1,4 @@
 import vdebug.event
-import vdebug.listener
 import vdebug.session
 import vdebug.util
 import vdebug.breakpoint

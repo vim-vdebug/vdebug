@@ -6,6 +6,7 @@ import socket
 import sys
 import time
 import traceback
+import urllib
 try:
     import urllib.parse as urllib
 except ImportError:
@@ -13,10 +14,12 @@ except ImportError:
 
 import vim
 
-import vdebug.opts
-import vdebug.log
-import vdebug.session
 import vdebug.breakpoint
+import vdebug.dbgp
+import vdebug.event
+import vdebug.log
+import vdebug.opts
+import vdebug.session
 
 class ExceptionHandler:
     def __init__(self, session_handler):

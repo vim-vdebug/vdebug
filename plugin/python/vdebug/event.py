@@ -2,6 +2,10 @@
 from __future__ import print_function
 import vdebug.log
 import vdebug.opts
+import vdebug.util
+import vdebug.ui.vimui
+import vdebug.breakpoint
+import vdebug.dbgp
 import vim
 import re
 
