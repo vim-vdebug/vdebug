@@ -852,9 +852,13 @@ The default options look like this: >
     \    "marker_open_tree" : '▾'
     \}
 <
-You can either use the multi-line notation like above, or set individual keys:
+You can either use the multi-line notation like above, or set individual keys
+(make sure that the directory is defined before setting fields in it):
 >
-    g:vdebug_options_port = 9001
+    if !exists('g:vdebug_options')
+      let g:vdebug_options = {}
+    endif
+    let g:vdebug_options.port = 9001
 <
 You only need to set the options you want to change: the defaults will be used
 if you don't set them.
