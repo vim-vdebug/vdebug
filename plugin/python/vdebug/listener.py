@@ -1,7 +1,8 @@
+import vim
+
 import vdebug.connection
 import vdebug.opts
 import vdebug.util
-import vim
 
 class Listener:
     @classmethod

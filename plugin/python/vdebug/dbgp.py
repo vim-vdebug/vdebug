@@ -1,13 +1,15 @@
 from __future__ import print_function
+
+import base64
+import socket
 import sys
+import time
 if sys.hexversion >= 0x02050000:
     import xml.etree.ElementTree as ET
 else:
     import elementtree.ElementTree as ET
-import socket
+
 import vdebug.log
-import base64
-import time
 
 """ Response objects for the DBGP module."""
 

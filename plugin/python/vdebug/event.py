@@ -1,13 +1,16 @@
 # coding=utf-8
 from __future__ import print_function
-import vdebug.log
-import vdebug.opts
-import vdebug.util
-import vdebug.ui.vimui
+
+import re
+
+import vim
+
 import vdebug.breakpoint
 import vdebug.dbgp
-import vim
-import re
+import vdebug.log
+import vdebug.opts
+import vdebug.ui.vimui
+import vdebug.util
 
 class Event:
     def __init__(self, session_handler):

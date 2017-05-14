@@ -1,7 +1,8 @@
 from __future__ import print_function
-import time
-import sys
+
 import os
+import sys
+import time
 
 class Logger:
     """ Abstract class for all logger implementations.

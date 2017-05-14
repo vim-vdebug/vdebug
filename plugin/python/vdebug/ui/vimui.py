@@ -1,10 +1,12 @@
 # coding=utf-8
 from __future__ import print_function
-import vdebug.ui.interface
-import vdebug.util
+
 import vim
+
 import vdebug.log
 import vdebug.opts
+import vdebug.ui.interface
+import vdebug.util
 
 class WindowError(Exception):
     pass

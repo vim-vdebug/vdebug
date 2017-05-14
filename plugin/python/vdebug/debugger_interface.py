@@ -1,10 +1,11 @@
-import vdebug.event
-import vdebug.session
-import vdebug.util
-import vdebug.breakpoint
-import vdebug.ui.vimui
-import vdebug.opts
 import vim
+
+import vdebug.breakpoint
+import vdebug.event
+import vdebug.opts
+import vdebug.session
+import vdebug.ui.vimui
+import vdebug.util
 
 class DebuggerInterface:
     """Provides all methods used to control the debugger."""

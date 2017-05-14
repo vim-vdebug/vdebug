@@ -1,12 +1,15 @@
 from __future__ import print_function
-import vdebug.util
-import vdebug.opts
-import vdebug.log
-import vdebug.dbgp
-import vdebug.listener
-import vdebug.event
-import vim
+
 import socket
+
+import vim
+
+import vdebug.dbgp
+import vdebug.event
+import vdebug.listener
+import vdebug.log
+import vdebug.opts
+import vdebug.util
 
 class ModifiedBufferError(Exception):
     pass
