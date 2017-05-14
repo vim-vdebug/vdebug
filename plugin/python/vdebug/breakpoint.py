@@ -1,7 +1,7 @@
 import base64
 
-import vdebug.log
-import vdebug.util
+from . import log
+from . import util
 
 class Store:
 
@@ -13,7 +13,7 @@ class Store:
         self.api = api
         num_bps = len(self.breakpoints)
         if num_bps > 0:
-            vdebug.log.Log("Registering %i breakpoints with the debugger" % num_bps)
+            log.Log("Registering %i breakpoints with the debugger" % num_bps)
         for id, bp in self.breakpoints.items():
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
@@ -23,7 +23,7 @@ class Store:
         for id, line in lines.items():
             try:
                 self.breakpoints[id].set_line(line)
-                vdebug.log.Log("Updated line number of breakpoint %s to %s"\
+                log.Log("Updated line number of breakpoint %s to %s"\
                                     %(str(id),str(line)) )
             except ValueError:
                 pass
@@ -33,7 +33,7 @@ class Store:
         self.api = None
 
     def add_breakpoint(self,breakpoint):
-        vdebug.log.Log("Adding " + str(breakpoint))
+        log.Log("Adding " + str(breakpoint))
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
         if self.api is not None:
@@ -48,7 +48,7 @@ class Store:
         id = str(id)
         if id not in self.breakpoints:
             raise BreakpointError("No breakpoint matching ID %s" % id)
-        vdebug.log.Log("Removing breakpoint id %s" % id)
+        log.Log("Removing breakpoint id %s" % id)
         if self.api is not None:
             dbg_id = self.breakpoints[id].get_debugger_id()
             if dbg_id is not None:
@@ -123,7 +123,7 @@ class Breakpoint:
                 if len(line.strip()) == 0:
                     raise BreakpointError('Cannot set a breakpoint ' +\
                                             'on an empty line')
-            except vdebug.util.FilePathError:
+            except util.FilePathError:
                 raise BreakpointError('No file, cannot set breakpoint')
             return LineBreakpoint(ui,file,row)
         else:
@@ -143,7 +143,7 @@ class Breakpoint:
                     raise BreakpointError("Watch breakpoints " +\
                             "require a condition to be specified")
                 expr = " ".join(arg_parts)
-                vdebug.log.Log("Expression: %s"%expr)
+                log.Log("Expression: %s"%expr)
                 return WatchBreakpoint(ui,expr)
             elif type == 'exception':
                 if len(arg_parts) == 0:

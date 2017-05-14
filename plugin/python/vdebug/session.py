@@ -4,12 +4,12 @@ import socket
 
 import vim
 
-import vdebug.dbgp
-import vdebug.event
-import vdebug.listener
-import vdebug.log
-import vdebug.opts
-import vdebug.util
+from . import dbgp
+from . import event
+from . import listener
+from . import log
+from . import opts
+from . import util
 
 class ModifiedBufferError(Exception):
     pass
@@ -21,12 +21,12 @@ class SessionHandler:
     def __init__(self, ui, breakpoints):
         self.__ui = ui
         self.__breakpoints = breakpoints
-        self.__ex_handler = vdebug.util.ExceptionHandler(self)
+        self.__ex_handler = util.ExceptionHandler(self)
         self.__session = None
         self.listener = None
 
     def dispatch_event(self, name, *args):
-        vdebug.event.Dispatcher(self).dispatch_event(name, *args)
+        event.Dispatcher(self).dispatch_event(name, *args)
 
     def ui(self):
         return self.__ui
@@ -47,9 +47,9 @@ class SessionHandler:
             self.start_listener()
 
     def start_listener(self):
-        self.listener = vdebug.listener.Listener.create()
+        self.listener = listener.Listener.create()
         print("Vdebug will wait for a connection in the background")
-        vdebug.util.Environment.reload()
+        util.Environment.reload()
         if self.is_open():
             self.ui().set_status("listening")
         self.listener.start()
@@ -117,7 +117,7 @@ class SessionHandler:
     def __new_session(self):
         self.__session = Session(self.__ui,
                 self.__breakpoints,
-                vdebug.util.Keymapper())
+                util.Keymapper())
 
         status = self.__session.start(self.listener.create_connection())
         self.dispatch_event("refresh", status)
@@ -162,14 +162,14 @@ class Session:
         self.__ui.mark_as_stopped()
         try:
             if self.is_connected():
-                vdebug.log.Log("Closing the connection")
+                log.Log("Closing the connection")
                 if stop:
-                    if vdebug.opts.Options.get('on_close') == 'detach':
+                    if opts.Options.get('on_close') == 'detach':
                         try:
                             self.__api.detach()
-                        except vdebug.dbgp.CmdNotImplementedError:
+                        except dbgp.CmdNotImplementedError:
                             self.__ui.error('Detach is not supported by the debugger, stopping instead')
-                            vdebug.opts.Options.overwrite('on_close', 'stop')
+                            opts.Options.overwrite('on_close', 'stop')
                             self.__api.stop()
                     else:
                         self.__api.stop()
@@ -185,30 +185,30 @@ class Session:
             self.__ui.say("Connection has been closed")
 
     def start(self, connection):
-        vdebug.util.Environment.reload()
+        util.Environment.reload()
         if self.__ui.is_modified():
             raise ModifiedBufferError("Modified buffers must be saved before debugging")
 
         try:
-            self.__api = vdebug.dbgp.Api(connection)
+            self.__api = dbgp.Api(connection)
             if not self.is_open():
                 self.__ui.open()
                 self.__keymapper.map()
 
             self.__ui.set_listener_details(\
-                    vdebug.opts.Options.get('server'),\
-                    vdebug.opts.Options.get('port'),\
-                    vdebug.opts.Options.get('ide_key'))
+                    opts.Options.get('server'),\
+                    opts.Options.get('port'),\
+                    opts.Options.get('ide_key'))
 
             addr = self.__api.conn.address
-            vdebug.log.Log("Found connection from %s" % str(addr), vdebug.log.Logger.INFO)
+            log.Log("Found connection from %s" % str(addr), log.Logger.INFO)
             self.__ui.set_conn_details(addr[0], addr[1])
 
             self.__collect_context_names()
             self.__set_features()
             self.__initialize_breakpoints()
 
-            if vdebug.opts.Options.get('break_on_open', int) == 1:
+            if opts.Options.get('break_on_open', int) == 1:
                 status = self.__api.step_into()
             else:
                 status = self.__api.run()
@@ -234,7 +234,7 @@ class Session:
         for name, value in features.items():
             try:
                 self.__api.feature_set(name, value)
-            except vdebug.dbgp.DBGPError as e:
+            except dbgp.DBGPError as e:
                 error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
                 self.__ui.error(error_str)
 
@@ -245,5 +245,5 @@ class Session:
     def __collect_context_names(self):
         cn_res = self.__api.context_names()
         self.context_names = cn_res.names()
-        vdebug.log.Log("Available context names: %s" %\
-                str(self.context_names), vdebug.log.Logger.DEBUG)
+        log.Log("Available context names: %s" %\
+                str(self.context_names), log.Logger.DEBUG)
