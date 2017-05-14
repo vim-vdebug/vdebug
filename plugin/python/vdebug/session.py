@@ -1,3 +1,4 @@
+from __future__ import print_function
 import vdebug.util
 import vdebug.opts
 import vdebug.log
@@ -34,16 +35,16 @@ class SessionHandler:
 
     def listen(self):
         if self.listener and self.listener.is_listening():
-            print "Waiting for a connection: none found so far"
+            print("Waiting for a connection: none found so far")
         elif self.listener and self.listener.is_ready():
-            print "Found connection, starting debugger"
+            print("Found connection, starting debugger")
             self.__new_session()
         else:
             self.start_listener()
 
     def start_listener(self):
         self.listener = vdebug.listener.Listener.create()
-        print "Vdebug will wait for a connection in the background"
+        print("Vdebug will wait for a connection in the background")
         vdebug.util.Environment.reload()
         if self.is_open():
             self.ui().set_status("listening")
@@ -100,13 +101,14 @@ class SessionHandler:
     def start_if_ready(self):
         try:
             if self.listener.is_ready():
-                print "Found connection, starting debugger"
+                print("Found connection, starting debugger")
                 self.__new_session()
                 return True
             else:
                 return False
         except Exception, e:
-            print "Error starting Vdebug: %s" % self.__ex_handler.exception_to_string(e)
+            print("Error starting Vdebug: %s" %
+                  self.__ex_handler.exception_to_string(e))
 
     def __new_session(self):
         self.__session = Session(self.__ui,

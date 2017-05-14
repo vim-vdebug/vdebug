@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 import sys
 import os
@@ -118,7 +119,7 @@ class Log:
             cls.loggers[type].shutdown()
             return True
         else:
-            print "Failed to find logger %s in list of loggers" % type
+            print("Failed to find logger %s in list of loggers" % type)
             return False
 
     @classmethod

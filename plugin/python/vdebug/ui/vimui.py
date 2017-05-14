@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import print_function
 import vdebug.ui.interface
 import vdebug.util
 import vim
@@ -218,7 +219,7 @@ class Ui(vdebug.ui.interface.Ui):
 
     def say(self, string):
         """ Vim picks up Python prints, so just print """
-        print str(string)
+        print(string)
         vdebug.log.Log(string,vdebug.log.Logger.INFO)
 
     def error(self,string):

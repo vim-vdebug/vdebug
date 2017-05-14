@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 if sys.hexversion >= 0x02050000:
     import xml.etree.ElementTree as ET
@@ -233,7 +234,7 @@ class Api:
         response message and command.
 
         cmd -- the command name, e.g. 'status'
-        args -- arguments for the command, which is optional 
+        args -- arguments for the command, which is optional
                 for certain commands (default '')
         """
         args = args.strip()
@@ -421,7 +422,7 @@ class Connection:
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
-        print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ',self.timeout,' seconds...)'
+        print('Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', self.timeout, ' seconds...)')
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
