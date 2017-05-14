@@ -5,17 +5,12 @@ import socket
 import vim
 
 from . import dbgp
+from . import error
 from . import event
 from . import listener
 from . import log
 from . import opts
 from . import util
-
-class ModifiedBufferError(Exception):
-    pass
-
-class NoConnectionError(Exception):
-    pass
 
 class SessionHandler:
     def __init__(self, ui, breakpoints):
@@ -187,7 +182,7 @@ class Session:
     def start(self, connection):
         util.Environment.reload()
         if self.__ui.is_modified():
-            raise ModifiedBufferError("Modified buffers must be saved before debugging")
+            raise error.ModifiedBufferError("Modified buffers must be saved before debugging")
 
         try:
             self.__api = dbgp.Api(connection)

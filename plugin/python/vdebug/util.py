@@ -13,21 +13,19 @@ except ImportError:
 
 import vim
 
-from . import breakpoint
 from . import dbgp
-from . import event
+from . import error
 from . import log
 from . import opts
-from . import session
 
 class ExceptionHandler:
     def __init__(self, session_handler):
         self._session_handler = session_handler
-        self.readable_errors = (event.EventError,
-                breakpoint.BreakpointError,
-                log.LogError,
-                session.NoConnectionError,
-                session.ModifiedBufferError)
+        self.readable_errors = (error.EventError,
+                error.BreakpointError,
+                error.LogError,
+                error.NoConnectionError,
+                error.ModifiedBufferError)
 
 
     """ Exception handlers """
@@ -86,7 +84,7 @@ class ExceptionHandler:
         """
         if isinstance(e, dbgp.TimeoutError):
             self.handle_timeout()
-        elif isinstance(e, UserInterrupt):
+        elif isinstance(e, error.UserInterrupt):
             try:
                 self.handle_interrupt()
             except:
@@ -193,7 +191,7 @@ class FilePath:
     def __init__(self,filename):
         if filename is None or \
             len(filename) == 0:
-            raise FilePathError("Missing or invalid file name")
+            raise error.FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
         if filename.startswith('file:'):
             filename = filename[5:]
@@ -324,9 +322,6 @@ class Environment:
                     options.get('debug_file_level'),\
                     options.get('debug_file')))
 
-class FilePathError(Exception):
-    pass
-
 class InputStream:
     """Get a character from Vim's input stream.
 
@@ -337,7 +332,5 @@ class InputStream:
             vim.eval("getchar(0)")
             time.sleep(0.1)
         except: # vim.error
-            raise UserInterrupt()
+            raise error.UserInterrupt()
 
-class UserInterrupt(Exception):
-    """Raised when a user interrupts connection wait."""

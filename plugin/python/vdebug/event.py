@@ -7,6 +7,7 @@ import vim
 
 from . import breakpoint
 from . import dbgp
+from . import error
 from . import log
 from . import opts
 from . import util
@@ -133,7 +134,7 @@ class WatchWindowPropertyGetEvent(Event):
 
         eq_index = line.find('=')
         if eq_index == -1:
-            raise EventError("Cannot read the selected property")
+            raise error.EventError("Cannot read the selected property")
 
         name = line[pointer_index+step:eq_index-1]
         context_res = self.api.property_get(name)
@@ -194,7 +195,7 @@ class WatchWindowContextChangeEvent(Event):
 
         if tab_end_pos == -1 or \
                 tab_start_pos == -1:
-            raise EventError("Failed to find context name under cursor")
+            raise error.EventError("Failed to find context name under cursor")
 
         context_name = line[tab_start_pos:tab_end_pos]
         log.Log("Context name: %s" % context_name,\
@@ -207,7 +208,7 @@ class WatchWindowContextChangeEvent(Event):
                 self.session.context_names, context_name)
 
         if context_id == -1:
-            raise EventError("Could not resolve context name")
+            raise error.EventError("Could not resolve context name")
             return False
         else:
             self.dispatch("get_context", context_id)
@@ -243,9 +244,6 @@ class WatchWindowContextChangeEvent(Event):
                 found_id = id
                 break
         return found_id
-
-class EventError(Exception):
-    pass
 
 class RefreshEvent(Event):
     def run(self, status):
