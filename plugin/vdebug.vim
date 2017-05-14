@@ -202,6 +202,9 @@ function! s:Vdebug_get_options()
       let name = strpart(name, param_namespace_len)
       let params[name] = val
     endfor
+    if !empty(params)
+      echoerr "Deprication Warning: The options g:vdebug_options_* are depricated.  Please use the g:vdebug_options dictionary."
+    endif
     return params
 endfunction
 
