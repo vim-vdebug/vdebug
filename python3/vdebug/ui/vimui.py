@@ -1,4 +1,7 @@
 # coding=utf-8
+
+import sys
+
 import vim
 
 from . import interface
@@ -109,8 +112,7 @@ class Ui(interface.Ui):
 
     @staticmethod
     def is_modified():
-        modified = int(vim.eval('&mod'))
-        return bool(modified)
+        return vim.current.buffer.options['modified']
 
     def window(self, name):
         self.windows.window(name)
@@ -122,19 +124,19 @@ class Ui(interface.Ui):
 
         try:
             existing_buffer = True
-            cur_buf_name = vim.eval("bufname('%')")
+            cur_buf_name = vim.current.buffer.name
             if cur_buf_name is None:
                 existing_buffer = False
                 cur_buf_name = ''
 
-            self.current_tab = vim.eval("tabpagenr()")
+            self.current_tab = vim.current.tabpage.number
 
             vim.command('silent tabnew')
-            self.empty_buf_num = vim.eval('bufnr("%")')
+            self.empty_buf_num = vim.current.buffer.number
             if existing_buffer:
                 vim.command('call Vdebug_edit("%s")' % cur_buf_name)
 
-            self.tabnr = vim.eval("tabpagenr()")
+            self.tabnr = vim.current.tabpage.number
 
             self.windows.open_all()
             statuswin = self.windows.status()
@@ -182,7 +184,7 @@ class Ui(interface.Ui):
 
     @staticmethod
     def get_line(row):
-        return vim.eval("getline(" + str(row) + ")")
+        return vim.current.buffer[row - 1]
 
     def register_breakpoint(self, breakpoint):
         if breakpoint.type == 'line':
@@ -225,9 +227,7 @@ class Ui(interface.Ui):
 
     def error(self, string):
         self._last_error = string
-        vim.command('echohl Error | echomsg "'
-                    + str(string).replace('"', '\\"')
-                    + '" | echohl None')
+        print(string, file=sys.stderr)
         log.Log(string, log.Logger.ERROR)
 
     def get_last_error(self):
@@ -287,7 +287,7 @@ class SourceWindow(interface.Window):
 
     def get_file(self):
         self.focus()
-        self.file = util.LocalFilePath(vim.eval("expand('%:p')"))
+        self.file = util.LocalFilePath(vim.current.buffer.name)
         return self.file
 
     def clear_signs(self):
@@ -316,7 +316,7 @@ class VimBuffer:
 
     def write(self, msg, return_focus, after_callback):
         if return_focus:
-            prev_win = vim.eval('winnr()')
+            prev_win = vim.current.window.number
         if self.is_empty():
             self._buffer[:] = str(msg).split('\n')
         else:
@@ -445,7 +445,8 @@ class Window(interface.Window):
 
     def set_height(self, height):
         height = int(height)
-        minheight = int(vim.eval("&winminheight"))
+        # FIXME is this really what we want? See :h 'wmh'
+        minheight = vim.options['winminheight']
         if height < minheight:
             height = minheight
         if height <= 0:
@@ -468,8 +469,13 @@ class Window(interface.Window):
     def create(self, open_cmd):
         """ create window """
         vim.command('silent %s %s' % (open_cmd, self.name))
-        vim.command("setlocal buftype=nofile modifiable winfixheight "
-                    "winfixwidth noswapfile nonumber norelativenumber")
+        vim.current.buffer.options['buftype'] = 'nofile'
+        vim.current.buffer.options['modifiable'] = True
+        vim.current.buffer.window['winfixheight'] = True
+        vim.current.buffer.window['winfixwidth'] = True
+        vim.current.buffer.window['swapfile'] = False
+        vim.current.buffer.window['number'] = False
+        vim.current.buffer.window['relativenumber'] = False
         existing_content = self._buffer.contents()
         log.Log("Setting buffer for %s: %s" % (self.name, existing_content),
                 log.Logger.DEBUG)
@@ -502,7 +508,7 @@ class Window(interface.Window):
     def command(self, cmd):
         """ go to my window & execute command """
         winnr = self.getwinnr()
-        if winnr != int(vim.eval("winnr()")):
+        if winnr != vim.current.window.number:
             vim.command(str(winnr) + 'wincmd w')
         vim.command(str(cmd))
 
