@@ -1,6 +1,6 @@
 if __name__ == "__main__":
     import sys
-    sys.path.append('../plugin/python/')
+    sys.path.append('pythonx')
 import unittest
 """ Mock vim import """
 import vdebug.log
