@@ -73,10 +73,6 @@ class Store:
                     break
         return found
 
-    def get_sorted_list(self):
-        keys = self.breakpoints.keys()
-        keys.sort()
-        return map(self.breakpoints.get, keys)
 
 class Breakpoint:
     """ Abstract factory for creating a breakpoint object.

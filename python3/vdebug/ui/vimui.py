@@ -290,9 +290,6 @@ class SourceWindow(interface.Window):
         self.file = util.LocalFilePath(vim.current.buffer.name)
         return self.file
 
-    def clear_signs(self):
-        vim.command('sign unplace *')
-
     def place_pointer(self, line):
         log.Log("Placing pointer sign on line "+str(line), log.Logger.INFO)
         self.remove_pointer()
@@ -442,16 +439,6 @@ class Window(interface.Window):
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('%s')" % self.name))
-
-    def set_height(self, height):
-        height = int(height)
-        # FIXME is this really what we want? See :h 'wmh'
-        minheight = vim.options['winminheight']
-        if height < minheight:
-            height = minheight
-        if height <= 0:
-            height = 1
-        self.command('resize %i' % height)
 
     def write(self, msg, return_focus=True, after="normal G"):
         self._buffer.write(msg, return_focus, lambda: self.command(after))

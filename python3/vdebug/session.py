@@ -137,9 +137,6 @@ class Session:
     def keymapper(self):
         return self.__keymapper
 
-    def set_api(self, api):
-        self.__api = api
-
     def is_connected(self):
         return self.__api is not None
 
