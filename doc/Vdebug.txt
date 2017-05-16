@@ -852,9 +852,13 @@ The default options look like this: >
     \    "marker_open_tree" : '▾'
     \}
 <
-You can either use the multi-line notation like above, or set individual keys:
+You can either use the multi-line notation like above, or set individual keys
+(make sure that the directory is defined before setting fields in it):
 >
-    g:vdebug_options_port = 9001
+    if !exists('g:vdebug_options')
+      let g:vdebug_options = {}
+    endif
+    let g:vdebug_options.port = 9001
 <
 You only need to set the options you want to change: the defaults will be used
 if you don't set them.
@@ -862,13 +866,13 @@ if you don't set them.
 Here is a list of all the available options.
 
                                                           *VdebugOptions-port*
-g:vdebug_options_port (default = 9000)
+g:vdebug_options.port (default = 9000)
     This sets the port that Vdebug will use to listen for connections. Xdebug
     defaults to 9000, and it's the normal port for DBGP, so only change it if
     you also change the port that the engine uses.
 
                                                         *VdebugOptions-server*
-g:vdebug_options_server (default = "")
+g:vdebug_options.server (default = "")
     Sets the IP address or host name that Vdebug will use to listen for
     connections. It defaults to a blank string, which corresponds to all
     available interfaces. You can set this explicitly if you want to restrict
@@ -877,26 +881,26 @@ g:vdebug_options_server (default = "")
     debugging remote scripts (see |VdebugRemote|).
 
                                                        *VdebugOptions-timeout*
-g:vdebug_options_timeout (default = 20)
+g:vdebug_options.timeout (default = 20)
     Number of seconds to wait for when listening for a connection. VIM will
     lock up due to the server socket listening for a client connection, so this
     timeout is there to protect your VIM from locking up forever!
 
                                                       *VdebugOptions-on_close*
-g:vdebug_options_on_close (default = "detach")
+g:vdebug_options.on_close (default = "detach")
     The default action when stopping the debugger. By default, it will detach
     the debugger engine meaning that the script will execute until it finishes.
     The other option is "stop", which means that the script will be killed
     immediately.
 
                                                  *VdebugOptions-break_on_open*
-g:vdebug_options_break_on_open (default = 1)
+g:vdebug_options.break_on_open (default = 1)
     This determines whether the debugger should stop on the first line of the
     script, or just immediately start running until it hits a pre-defined
     breakpoint.
 
                                                        *VdebugOptions-ide_key*
-g:vdebug_options_ide_key (default = empty)
+g:vdebug_options.ide_key (default = empty)
     The IDE key that Vdebug will watch for with incoming connections. This
     allows you to differentiate between connections, and only start a session
     when this key matches the incoming key. This is empty by default, which
@@ -905,14 +909,14 @@ g:vdebug_options_ide_key (default = empty)
     |VdebugIDEKey| for more information.
 
                                                        *VdebugOptions-path_maps*
-g:vdebug_options_path_maps (default = {})
+g:vdebug_options.path_maps (default = {})
     This is only used for debugging a script on a remote machine. This is used
     to map remote file paths to local file paths, as they are very likely to be
     different. This is a VimL dictionary of mappings between remote files (keys)
     and local files (values).
 
                                             *VdebugOptions-debug_window_level*
-g:vdebug_options_debug_window_level (default = 0)
+g:vdebug_options.debug_window_level (default = 0)
     Sets the amount of information sent to the log window, |VdebugLogWindow|.
     The default value, 0, only shows errors. The other options are 1
     (information) and 2 (debug). The latter option is not ideal to use, as it
@@ -921,42 +925,42 @@ g:vdebug_options_debug_window_level (default = 0)
     debugging.
 
                                               *VdebugOptions-debug_file_level*
-g:vdebug_options_debug_file_level (default = 0)
+g:vdebug_options.debug_file_level (default = 0)
     Sets the amount of information written to the log file, which is set with
     the |VdebugOptions-debug_file| option. The default value, 0, only shows
     errors. The other options are 1 (information) and 2 (debug).
 
                                                     *VdebugOptions-debug_file*
-g:vdebug_options_debug_file (default = empty)
+g:vdebug_options.debug_file (default = empty)
     Sets the path to the log file, which writes information set by
     |VdebugOptions-debug_file_level|. This is empty by default, meaning that
     file logging is turned off. Enter a file path to enable file logging.
 
                                             *VdebugOptions-watch_window_style*
-g:vdebug_options_watch_window_style (default = 'expanded')
+g:vdebug_options.watch_window_style (default = 'expanded')
     Sets the style of the watch window, 'expanded' or 'compact'. The compact
     version works better for smaller screens, but the expanded version looks
     a bit nicer in my opinion.
 
                                                 *VdebugOptions-marker_default*
-g:vdebug_options_marker_default (default = '⬦')
+g:vdebug_options.marker_default (default = '⬦')
     Sets the marker used for a variable in the watch window that has no
     children. A "*" symbol is used if multi byte support is not enabled.
 
                                             *VdebugOptions-marker_closed_tree*
-g:vdebug_options_marker_closed_tree (default = '▸')
+g:vdebug_options.marker_closed_tree (default = '▸')
     Sets the marker used for a variable in the watch window that does have
     children, but the tree is currently closed. A "+" symbol is used if multi
     byte support is not enabled.
 
                                               *VdebugOptions-marker_open_tree*
-g:vdebug_options_marker_open_tree (default = '▾')
+g:vdebug_options.marker_open_tree (default = '▾')
     Sets the marker used for a variable in the watch window that does have
     children, and the tree is currently open. A "-" symbol is used if multi
     byte support is not enabled.
 
                                               *VdebugOptions-continuous_mode*
-g:vdebug_options_continuous_mode (default = 0)
+g:vdebug_options.continuous_mode (default = 0)
     If enabled, Vdebug will start listening immediately after a debugging
     session has finished, allowing for constant debugging across separate
     requests. Press <F6> during a debugging session to stop this, or <Ctrl-C>
@@ -1025,7 +1029,7 @@ Vdebug) will be used, otherwise it's ignored. For instance, using Xdebug and
 PHP with Netbeans requires you to use the IDE key "netbeans-xdebug".
 
 You can tell Vdebug to use an IDE key with the option
-"g:vdebug_options_ide_key" (see |VdebugOptions-ide_key|). This is empty by
+"g:vdebug_options.ide_key" (see |VdebugOptions-ide_key|). This is empty by
 default, so all connections will be picked up, even if an IDE key has been set
 on the debugger engine side of things. It's useful to leave the IDE key option
 empty if you're having trouble getting a connection, as it's one less thing to
@@ -1069,7 +1073,7 @@ Let's say we're debugging a file on a remote machine, and the path is
 /home/jon/php/myscript.php. I would have to set the remote and local path
 options as so: >
 
-    let g:vdebug_options_path_maps = {"/home/user/scripts": "/home/jon/php"}
+    let g:vdebug_options.path_maps = {"/home/user/scripts": "/home/jon/php"}
 <
 When the debugger engine sends any file paths, a straight swap of the paths is
 done, so all instances of "/home/user/scripts" are replaced with
@@ -1097,7 +1101,7 @@ the script that I wanted to debug on my desktop. I configured Xdebug on the
 server to use my desktop's IP address as the remote host. The default "server"
 option in Vdebug is blank, which allows it to bind to all interfaces: >
 
-    let g:vdebug_options_server = ""
+    let g:vdebug_options.server = ""
 <
 You can either leave this blank, or set the IP address explicitly.
 
