@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 import sys
 import os
@@ -72,7 +73,7 @@ class FileLogger(Logger):
     def __open(self):
         try:
             self.f = open(self.filename,'w')
-        except IOError, e:
+        except IOError as e:
             raise LogError("Invalid file name '%s' for log file: %s" \
                     %(self.filename,str(e)))
         except:
@@ -118,7 +119,7 @@ class Log:
             cls.loggers[type].shutdown()
             return True
         else:
-            print "Failed to find logger %s in list of loggers" % type
+            print("Failed to find logger %s in list of loggers" % type)
             return False
 
     @classmethod

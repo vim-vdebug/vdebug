@@ -1,3 +1,4 @@
+from __future__ import print_function
 import vdebug.opts
 import vdebug.log
 import vdebug.session
@@ -89,7 +90,7 @@ class ExceptionHandler:
         elif isinstance(e, (EOFError,socket.error)):
             self.handle_socket_end()
         elif isinstance(e, KeyboardInterrupt):
-            print "Keyboard interrupt - debugging session cancelled"
+            print("Keyboard interrupt - debugging session cancelled")
             try:
                 self._session_handler.stop()
             except:

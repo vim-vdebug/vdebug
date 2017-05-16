@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import print_function
 import vdebug.log
 import vdebug.opts
 import vim
@@ -419,7 +420,7 @@ class TraceRefreshEvent(Event):
 class ReloadKeymappingsEvent(Event):
     def run(self):
         if self.session:
-            print "Reloaded keymappings"
+            print("Reloaded keymappings")
             self.session.keymapper().reload()
 
 class TraceEvent(Event):
@@ -469,7 +470,7 @@ class Dispatcher:
     def dispatch_event(self, name, *args):
         try:
             Dispatcher.events[name](self.__session_handler).run(*args)
-        except Exception, e:
+        except Exception as e:
             self.__ex_handler.handle(e)
 
     def visual_eval(self, session):

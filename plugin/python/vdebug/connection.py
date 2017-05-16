@@ -1,3 +1,4 @@
+from __future__ import print_function
 import socket
 import time
 import sys
@@ -104,7 +105,7 @@ class SocketCreator:
         port -- port number which debugger is listening on (default 9000)
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
 ."""
-        print 'Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', timeout, ' seconds...)'
+        print('Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', timeout, ' seconds...)')
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
