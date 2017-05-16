@@ -1,12 +1,12 @@
 import sys
 if __name__ == "__main__":
     sys.path.append('../plugin/python/')
-import unittest2 as unittest
+import unittest
 import vdebug.dbgp
 import xml
 from mock import Mock
 
-class ResponseTest(unittest.TestCase): 
+class ResponseTest(unittest.TestCase):
     """Test the response class in the vdebug.dbgp module."""
 
     def test_get_cmd(self):
@@ -35,15 +35,15 @@ class ResponseTest(unittest.TestCase):
         element"""
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
             <response xmlns="urn:debugger_protocol_v1"
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="status" transaction_id="1" status="starting" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="status" transaction_id="1" status="starting"
             reason="ok"></response>"""
         res = vdebug.dbgp.Response(response,"","",Mock())
         self.assertIsInstance(res.as_xml(),xml.etree.ElementTree.Element)
 
     def test_error_tag_raises_exception(self):
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
+            <response xmlns="urn:debugger_protocol_v1"
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
             command="stack_get" transaction_id="4"><error
             code="5"><message><![CDATA[command is not available]]>
@@ -51,42 +51,42 @@ class ResponseTest(unittest.TestCase):
         re = "command is not available"
         self.assertRaisesRegexp(vdebug.dbgp.DBGPError,re,vdebug.dbgp.Response,response,"","",Mock())
 
-class StatusResponseTest(unittest.TestCase): 
+class StatusResponseTest(unittest.TestCase):
     """Test the behaviour of the StatusResponse class."""
     def test_string_is_status_text(self):
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
             <response xmlns="urn:debugger_protocol_v1"
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="status" transaction_id="1" status="starting" 
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="status" transaction_id="1" status="starting"
             reason="ok"></response>"""
         res = vdebug.dbgp.StatusResponse(response,"","",Mock())
         assert str(res) == "starting"
 
-class FeatureResponseTest(unittest.TestCase): 
+class FeatureResponseTest(unittest.TestCase):
     """Test the behaviour of the FeatureResponse class."""
     def test_feature_is_supported(self):
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="feature_get" transaction_id="2" 
+            <response xmlns="urn:debugger_protocol_v1"
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="feature_get" transaction_id="2"
             feature_name="max_depth" supported="1"><![CDATA[1]]></response>"""
         res = vdebug.dbgp.FeatureGetResponse(response,"","",Mock())
         assert res.is_supported() == 1
 
     def test_feature_is_not_supported(self):
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
-            xmlns:xdebug="http://xdebug.org/dbgp/xdebug" 
-            command="feature_get" transaction_id="2" 
+            <response xmlns="urn:debugger_protocol_v1"
+            xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+            command="feature_get" transaction_id="2"
             feature_name="max_depth" supported="0"><![CDATA[0]]></response>"""
         res = vdebug.dbgp.FeatureGetResponse(response,"","",Mock())
         assert res.is_supported() == 0
 
-class StackGetTest(unittest.TestCase): 
+class StackGetTest(unittest.TestCase):
     """Test the behaviour of the StackGetResponse class."""
     def test_string_is_status_text(self):
         response = """<?xml version="1.0" encoding="iso-8859-1"?>
-            <response xmlns="urn:debugger_protocol_v1" 
+            <response xmlns="urn:debugger_protocol_v1"
             xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
             command="stack_get" transaction_id="8">
                 <stack where="{main}" level="0" type="file"
