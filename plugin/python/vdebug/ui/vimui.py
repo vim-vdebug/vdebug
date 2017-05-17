@@ -44,7 +44,7 @@ class WindowManager:
         self.window(name).toggle(self._command(name))
 
     def close(self):
-        for name, win in self._windows.iteritems():
+        for name, win in self._windows.items():
             win.destroy()
 
     def watch(self):
@@ -749,7 +749,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __create_tabs(self):
         res = []
         if self.contexts:
-            for id,name in self.contexts.iteritems():
+            for id,name in self.contexts.items():
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)
