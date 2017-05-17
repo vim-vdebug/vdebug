@@ -1,10 +1,15 @@
 from __future__ import print_function
-import socket
-import time
-import sys
+
 import os
-import Queue
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+import socket
+import sys
 import threading
+import time
+
 import vdebug.log
 
 class ConnectionHandler:
@@ -188,7 +193,7 @@ class BackgroundSocketCreator(threading.Thread):
         try:
             #self.log("Checking for exit")
             self.__check_exit(self.__message_q.get_nowait())
-        except Queue.Empty:
+        except queue.Empty:
             pass
 
     def __check_exit(self, message):
@@ -197,8 +202,8 @@ class BackgroundSocketCreator(threading.Thread):
 
 class SocketServer:
     def __init__(self):
-        self.__message_q = Queue.Queue(0)
-        self.__socket_q = Queue.Queue(1)
+        self.__message_q = queue.Queue(0)
+        self.__socket_q = queue.Queue(1)
         self.__thread = None
 
     def __del__(self):

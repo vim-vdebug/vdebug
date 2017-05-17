@@ -1,16 +1,22 @@
 from __future__ import print_function
+
+import os
+import re
+import socket
+import sys
+import time
+import traceback
+try:
+    import urllib.parse as urllib
+except ImportError:
+    import urllib
+
+import vim
+
 import vdebug.opts
 import vdebug.log
 import vdebug.session
 import vdebug.breakpoint
-import vim
-import re
-import os
-import sys
-import traceback
-import socket
-import urllib
-import time
 
 class ExceptionHandler:
     def __init__(self, session_handler):
