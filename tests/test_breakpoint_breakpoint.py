@@ -62,7 +62,7 @@ class ConditionalBreakpointTest(unittest.TestCase):
         line = 20
         condition = "$x > 20"
         bp = vdebug.breakpoint.ConditionalBreakpoint(ui,file,line,condition)
-        b64cond = base64.encodestring(condition)
+        b64cond = base64.encodestring(condition.encode("UTF-8")).decode("UTF-8")
         exp_cmd = "-t conditional -f \"file://%s\" -n %i -s enabled -- %s" %(file, line, b64cond)
         self.assertEqual(bp.get_cmd(), exp_cmd)
 
