@@ -544,7 +544,7 @@ This isn't recommended for normal use, as it noticeably slows the interface
 down. In the case of 2), the window will automatically open when an error happens.
 
 If you want to log things, it's better to use file logging (see
-|VdebugLogFile|).
+|VdebugOptions-debug_file|).
 
 ------------------------------------------------------------------------------
 4.2.7 The trace window                                     *VdebugTraceWindow*
