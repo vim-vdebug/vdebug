@@ -8,8 +8,13 @@ python:
 - '2.7'
 - '3.6'
 rvm: 1.9.3
+addons:
+  apt:
+    packages:
+    - vim-gtk
+    - php5-cli
+    - php5-xdebug
 install:
-- sudo apt-get update && sudo apt-get install vim-gtk php5-cli php5-xdebug
 - pip install -r requirements.txt
 - bundle install
 before_script:
