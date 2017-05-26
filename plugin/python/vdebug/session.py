@@ -227,7 +227,7 @@ class Session:
         value. This doesn't break the loop, so multiple features can be set
         even in the case of an error."""
         features = vim.eval('g:vdebug_features')
-        for name, value in features.iteritems():
+        for name, value in features.items():
             try:
                 self.__api.feature_set(name, value)
             except vdebug.dbgp.DBGPError as e:

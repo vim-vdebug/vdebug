@@ -103,7 +103,7 @@ class Log:
 
     @classmethod
     def log(cls, string, level = Logger.INFO):
-        for k, l in cls.loggers.iteritems():
+        for k, l in cls.loggers.items():
             l.log(string,level)
 
     @classmethod
@@ -124,7 +124,7 @@ class Log:
 
     @classmethod
     def shutdown(cls):
-        for k, l in cls.loggers.iteritems():
+        for k, l in cls.loggers.items():
             l.shutdown()
         cls.loggers = {}
 

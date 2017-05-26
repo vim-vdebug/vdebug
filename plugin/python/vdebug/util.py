@@ -1,16 +1,22 @@
 from __future__ import print_function
+
+import os
+import re
+import socket
+import sys
+import time
+import traceback
+try:
+    import urllib.parse as urllib
+except ImportError:
+    import urllib
+
+import vim
+
 import vdebug.opts
 import vdebug.log
 import vdebug.session
 import vdebug.breakpoint
-import vim
-import re
-import os
-import sys
-import traceback
-import socket
-import urllib
-import time
 
 class ExceptionHandler:
     def __init__(self, session_handler):
@@ -210,7 +216,7 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if remote in ret:
                     vdebug.log.Log("Replacing remote path (%s) " % remote +\
@@ -235,7 +241,7 @@ class FilePath:
         ret = f
 
         if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).iteritems(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if local in ret:
                     vdebug.log.Log("Replacing local path (%s) " % local +\

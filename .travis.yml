@@ -6,6 +6,7 @@ language: python
 python:
 - '2.6'
 - '2.7'
+- '3.6'
 rvm: 1.9.3
 before_install:
 - sudo apt-get update && sudo apt-get install vim-gtk php5-cli php5-xdebug
