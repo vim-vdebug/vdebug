@@ -20,4 +20,6 @@ install:
 before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
-script: bundle exec rake test:all
+script:
+- python ./vdebugtests.py
+- bundle exec rake spec features
