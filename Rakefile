@@ -2,11 +2,6 @@ require 'rspec/core/rake_task'
 require 'cucumber'
 require 'cucumber/rake/task'
 
-task :travis do
-  system("export DISPLAY=:99.0 && bundle exec rake test:all")
-  raise "Tests failed!" unless $?.exitstatus == 0
-end
-
 namespace :test do
   desc "Run all tests (unit and integration/specs)"
   task :all do
