@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import os
 try:
     import queue
 except ImportError:
@@ -10,7 +9,7 @@ import sys
 import threading
 import time
 
-import vdebug.log
+from . import log
 
 class ConnectionHandler:
     """Handles read and write operations to a given socket."""
@@ -32,8 +31,8 @@ class ConnectionHandler:
 
     def close(self):
         """Close the connection."""
-        vdebug.log.Log("Closing the socket",\
-                        vdebug.log.Logger.DEBUG)
+        log.Log("Closing the socket",\
+                        log.Logger.DEBUG)
         self.sock.close()
 
     def __recv_length(self):
@@ -161,7 +160,7 @@ class BackgroundSocketCreator(threading.Thread):
         threading.Thread.__init__(self)
 
     def log(self, message):
-        vdebug.log.Log(message, vdebug.log.Logger.DEBUG)
+        log.Log(message, log.Logger.DEBUG)
 
     def run(self):
         self.log("Started")

@@ -1,28 +1,28 @@
-import vdebug.event
-import vdebug.listener
-import vdebug.session
-import vdebug.util
-import vdebug.breakpoint
-import vdebug.ui.vimui
-import vdebug.opts
 import vim
+
+from . import breakpoint
+from . import event
+from . import opts
+from . import session
+from . import util
+from .ui import vimui
 
 class DebuggerInterface:
     """Provides all methods used to control the debugger."""
     def __init__(self):
-        self.breakpoints = vdebug.breakpoint.Store()
-        self.ui = vdebug.ui.vimui.Ui()
+        self.breakpoints = breakpoint.Store()
+        self.ui = vimui.Ui()
 
-        self.session_handler = vdebug.session.SessionHandler(self.ui,
+        self.session_handler = session.SessionHandler(self.ui,
                                     self.breakpoints)
-        self.event_dispatcher = vdebug.event.Dispatcher(self.session_handler)
+        self.event_dispatcher = event.Dispatcher(self.session_handler)
 
     def __del__(self):
         self.session_handler.stop()
         self.session_handler = None
 
     def reload_options(self):
-        vdebug.util.Environment.reload()
+        util.Environment.reload()
 
     def reload_keymappings(self):
         self.session_handler.dispatch_event("reload_keymappings")
@@ -68,12 +68,12 @@ class DebuggerInterface:
         """Set an option, overwriting the existing value.
         """
         if value is None:
-            return self.ui.say(vdebug.opts.Options.get(option))
+            return self.ui.say(opts.Options.get(option))
         else:
             self.ui.say("Setting vdebug option '%s' to: %s"\
                                 %(option,value))
             vim.command('let g:vdebug_options["%s"] = "%s"' %(option,value))
-            return vdebug.opts.Options.overwrite(option,value)
+            return opts.Options.overwrite(option,value)
 
     def handle_return_keypress(self):
         """React to a <enter> keypress event.

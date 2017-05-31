@@ -1,10 +1,12 @@
 # coding=utf-8
 from __future__ import print_function
-import vdebug.ui.interface
-import vdebug.util
+
 import vim
-import vdebug.log
-import vdebug.opts
+
+from . import interface
+from .. import log
+from .. import opts
+from .. import util
 
 class WindowError(Exception):
     pass
@@ -31,13 +33,13 @@ class WindowManager:
 
     def open_all(self):
         self._refresh_commands()
-        arrangement = vdebug.opts.Options.get('window_arrangement', list)
+        arrangement = opts.Options.get('window_arrangement', list)
         for name in arrangement:
             self.window(name).create(self._command(name))
 
     def open(self, name):
         if not self.window(name).is_open:
-            vdebug.log.Log("Creating window %s" %name)
+            log.Log("Creating window %s" %name)
             self.window(name).create(self._command(name))
 
     def toggle(self, name):
@@ -81,14 +83,14 @@ class WindowManager:
 
     def _refresh_commands(self):
         self._commands = self._default_commands.copy()
-        self._commands.update(vdebug.opts.Options.get('window_commands', dict))
+        self._commands.update(opts.Options.get('window_commands', dict))
 
-class Ui(vdebug.ui.interface.Ui):
+class Ui(interface.Ui):
     """Ui layer which manages the Vim windows.
     """
 
     def __init__(self):
-        vdebug.ui.interface.Ui.__init__(self)
+        interface.Ui.__init__(self)
         self.is_open = False
         self.emptybuffer = None
         self.windows = WindowManager()
@@ -139,9 +141,9 @@ class Ui(vdebug.ui.interface.Ui):
             statuswin = self.windows.status()
             statuswin.set_status("loading")
 
-            vdebug.log.Log.set_logger(
-                    vdebug.log.WindowLogger(
-                        vdebug.opts.Options.get('debug_window_level'),
+            log.Log.set_logger(
+                    log.WindowLogger(
+                        opts.Options.get('debug_window_level'),
                         self.windows.log()
                     ))
 
@@ -173,7 +175,7 @@ class Ui(vdebug.ui.interface.Ui):
         self.windows.status().set_status(status)
 
     def get_current_file(self):
-        return vdebug.util.LocalFilePath(vim.current.buffer.name)
+        return util.LocalFilePath(vim.current.buffer.name)
 
     def get_current_row(self):
         return vim.current.window.cursor[0]
@@ -220,14 +222,14 @@ class Ui(vdebug.ui.interface.Ui):
     def say(self, string):
         """ Vim picks up Python prints, so just print """
         print(string)
-        vdebug.log.Log(string,vdebug.log.Logger.INFO)
+        log.Log(string,log.Logger.INFO)
 
     def error(self,string):
         self._last_error = string
         vim.command('echohl Error | echomsg "'+\
                 str(string).replace('"','\\"')+\
                 '" | echohl None')
-        vdebug.log.Log(string,vdebug.log.Logger.ERROR)
+        log.Log(string,log.Logger.ERROR)
 
     def get_last_error(self):
         return self._last_error
@@ -237,7 +239,7 @@ class Ui(vdebug.ui.interface.Ui):
             return
         self.is_open = False
 
-        vdebug.log.Log.remove_logger('WindowLogger')
+        log.Log.remove_logger('WindowLogger')
         if self.tabnr:
             vim.command('silent! %stabc!' % self.tabnr)
         if self.current_tab:
@@ -253,24 +255,24 @@ class Ui(vdebug.ui.interface.Ui):
 
     def __get_srcwinno_by_name(self, name):
         i = 1
-        vdebug.log.Log("Searching for win by name %s" % name,\
-                vdebug.log.Logger.INFO)
+        log.Log("Searching for win by name %s" % name,\
+                log.Logger.INFO)
         for w in vim.windows:
-            vdebug.log.Log("Win %d, name %s" %(i, w.buffer.name),\
-                vdebug.log.Logger.INFO)
+            log.Log("Win %d, name %s" %(i, w.buffer.name),\
+                log.Logger.INFO)
             if w.buffer.name == name:
                 break
             else:
                 i += 1
 
-        vdebug.log.Log("Returning window number %d" % i,\
-                vdebug.log.Logger.INFO)
+        log.Log("Returning window number %d" % i,\
+                log.Logger.INFO)
         return i
 
     def __get_buf_list(self):
         return vim.eval("range(1, bufnr('$'))")
 
-class SourceWindow(vdebug.ui.interface.Window):
+class SourceWindow(interface.Window):
 
     file = None
     pointer_sign_id = '6145'
@@ -296,26 +298,26 @@ class SourceWindow(vdebug.ui.interface.Window):
         if file == self.file:
             return
         self.file = file
-        vdebug.log.Log("Setting source file: %s" % file,vdebug.log.Logger.INFO)
+        log.Log("Setting source file: %s" % file,log.Logger.INFO)
         self.focus()
         vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self,lineno):
-        vdebug.log.Log("Setting source line number: %s" % lineno,vdebug.log.Logger.DEBUG)
+        log.Log("Setting source line number: %s" % lineno,log.Logger.DEBUG)
         self.focus()
         vim.command(":%s" % str(lineno))
 
     def get_file(self):
         self.focus()
-        self.file = vdebug.util.LocalFilePath(vim.eval("expand('%:p')"))
+        self.file = util.LocalFilePath(vim.eval("expand('%:p')"))
         return self.file
 
     def clear_signs(self):
         vim.command('sign unplace *')
 
     def place_pointer(self,line):
-        vdebug.log.Log("Placing pointer sign on line "+str(line),\
-                vdebug.log.Logger.INFO)
+        log.Log("Placing pointer sign on line "+str(line),\
+                log.Logger.INFO)
         self.remove_pointer()
         vim.command('sign place '+self.pointer_sign_id+\
                 ' name=current line='+str(line)+\
@@ -394,8 +396,8 @@ class VimBuffer:
 class HiddenBuffer:
     def __init__(self, buffer = []):
         self._buffer = buffer
-        vdebug.log.Log("Creating hidden buffer: %s" % buffer,
-                vdebug.log.Logger.DEBUG)
+        log.Log("Creating hidden buffer: %s" % buffer,
+                log.Logger.DEBUG)
 
     def line(self, number):
         return self._buffer[number]
@@ -422,8 +424,8 @@ class HiddenBuffer:
                 from_line = lineno
                 to_line = lineno
             self._buffer[from_line:to_line] = str(msg).split('\n')
-        vdebug.log.Log("Hidden buffer after insert: %s" %(self._buffer),
-                vdebug.log.Logger.DEBUG)
+        log.Log("Hidden buffer after insert: %s" %(self._buffer),
+                log.Logger.DEBUG)
 
     def delete(self, start_line, end_line = None):
         try:
@@ -442,7 +444,7 @@ class HiddenBuffer:
     def is_empty(self):
         return not self._buffer
 
-class Window(vdebug.ui.interface.Window):
+class Window(interface.Window):
     name = "WINDOW"
     creation_count = 0
 
@@ -491,8 +493,8 @@ class Window(vdebug.ui.interface.Window):
         vim.command("setlocal buftype=nofile modifiable "+ \
                 "winfixheight winfixwidth nonumber norelativenumber")
         existing_content = self._buffer.contents()
-        vdebug.log.Log("Setting buffer for %s: %s" %(self.name, existing_content),
-                vdebug.log.Logger.DEBUG)
+        log.Log("Setting buffer for %s: %s" %(self.name, existing_content),
+                log.Logger.DEBUG)
         self._buffer = VimBuffer(vim.current.buffer)
         self._buffer.overwrite(existing_content)
         self.is_open = True
@@ -630,7 +632,7 @@ class StatusWindow(Window):
     def on_create(self):
         self.command('setlocal syntax=debugger_status')
         if self._buffer.is_empty():
-            keys = vdebug.util.Keymapper()
+            keys = util.Keymapper()
             output = "Status: starting\nListening on port\nNot connected\n\n"
             output += "Press %s to start debugging, " %(keys.run_key())
             output += "%s to stop/close. " %(keys.close_key())
@@ -707,7 +709,7 @@ class StackGetResponseRenderer(ResponseRenderer):
                 where = s.get('where')
             else:
                 where = 'main'
-            file = vdebug.util.FilePath(s.get('filename'))
+            file = util.FilePath(s.get('filename'))
             line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
                     %{'num':s.get('level'),'where':where,\
                     'file':str(file.as_local()),'line':s.get('lineno')}
@@ -731,8 +733,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
         properties = self.response.get_context()
         num_props = len(properties)
-        vdebug.log.Log("Writing %i properties to the window" % num_props,\
-                vdebug.log.Logger.INFO )
+        log.Log("Writing %i properties to the window" % num_props,\
+                log.Logger.INFO )
         for idx, prop in enumerate(properties):
             final = False
             try:
@@ -742,7 +744,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 next_prop = None
             res += self.__render_property(prop,next_prop,final,indent)
 
-        vdebug.log.Log("Writing to window:\n"+res,vdebug.log.Logger.DEBUG)
+        log.Log("Writing to window:\n"+res,log.Logger.DEBUG)
 
         return res
 
@@ -768,7 +770,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
                         "\\n'\n%(indent)s'"%{'indent':indent_str})}
         line = line.rstrip() + "\n"
 
-        if vdebug.opts.Options.get('watch_window_style') == 'expanded':
+        if opts.Options.get('watch_window_style') == 'expanded':
             depth = p.depth
             if next_p and not last:
                 next_depth = next_p.depth
@@ -794,10 +796,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
         return line
 
     def __get_marker(self,property):
-        char = vdebug.opts.Options.get('marker_default')
+        char = opts.Options.get('marker_default')
         if property.has_children:
             if property.child_count() == 0:
-                char = vdebug.opts.Options.get('marker_closed_tree')
+                char = opts.Options.get('marker_closed_tree')
             else:
-                char = vdebug.opts.Options.get('marker_open_tree')
+                char = opts.Options.get('marker_open_tree')
         return char

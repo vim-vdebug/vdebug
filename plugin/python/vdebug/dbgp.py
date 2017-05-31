@@ -1,13 +1,15 @@
 from __future__ import print_function
+
+import base64
+import socket
 import sys
+import time
 if sys.hexversion >= 0x02050000:
     import xml.etree.ElementTree as ET
 else:
     import elementtree.ElementTree as ET
-import socket
-import vdebug.log
-import base64
-import time
+
+from . import log
 
 """ Response objects for the DBGP module."""
 
@@ -243,12 +245,12 @@ class Api:
         send += ' -i '+ str(self.transID)
         if len(args) > 0:
             send += ' ' + args
-        vdebug.log.Log("Command: "+send,\
-                vdebug.log.Logger.DEBUG)
+        log.Log("Command: "+send,\
+                log.Logger.DEBUG)
         self.conn.send_msg(send)
         msg = self.conn.recv_msg()
-        vdebug.log.Log("Response: "+msg,\
-                vdebug.log.Logger.DEBUG)
+        log.Log("Response: "+msg,\
+                log.Logger.DEBUG)
         return res_cls(msg,cmd,args,self)
 
     def status(self):
@@ -464,8 +466,8 @@ class Connection:
     def close(self):
         """Close the connection."""
         if self.sock != None:
-            vdebug.log.Log("Closing the socket",\
-                            vdebug.log.Logger.DEBUG)
+            log.Log("Closing the socket",\
+                            log.Logger.DEBUG)
             self.sock.close()
             self.sock = None
         self.isconned = 0

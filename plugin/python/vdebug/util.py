@@ -13,19 +13,19 @@ except ImportError:
 
 import vim
 
-import vdebug.opts
-import vdebug.log
-import vdebug.session
-import vdebug.breakpoint
+from . import dbgp
+from . import error
+from . import log
+from . import opts
 
 class ExceptionHandler:
     def __init__(self, session_handler):
         self._session_handler = session_handler
-        self.readable_errors = (vdebug.event.EventError,
-                vdebug.breakpoint.BreakpointError,
-                vdebug.log.LogError,
-                vdebug.session.NoConnectionError,
-                vdebug.session.ModifiedBufferError)
+        self.readable_errors = (error.EventError,
+                error.BreakpointError,
+                error.LogError,
+                error.NoConnectionError,
+                error.ModifiedBufferError)
 
 
     """ Exception handlers """
@@ -82,16 +82,16 @@ class ExceptionHandler:
     def handle(self, e):
         """Switch on the exception type to work out how to handle it.
         """
-        if isinstance(e, vdebug.dbgp.TimeoutError):
+        if isinstance(e, dbgp.TimeoutError):
             self.handle_timeout()
-        elif isinstance(e, vdebug.util.UserInterrupt):
+        elif isinstance(e, error.UserInterrupt):
             try:
                 self.handle_interrupt()
             except:
                 pass
         elif isinstance(e, self.readable_errors):
             self.handle_readable_error(e)
-        elif isinstance(e, vdebug.dbgp.DBGPError):
+        elif isinstance(e, dbgp.DBGPError):
             self.handle_dbgp_error(e)
         elif isinstance(e, (EOFError,socket.error)):
             self.handle_socket_end()
@@ -163,8 +163,8 @@ class Keymapper:
                 if p in special:
                     continue
                 elif p in keys:
-                    vdebug.log.Log("Storing existing key mapping, '%s' " % line,
-                                   vdebug.log.Logger.DEBUG)
+                    log.Log("Storing existing key mapping, '%s' " % line,
+                                   log.Logger.DEBUG)
                     self.existing.append(line)
                 else:
                     break
@@ -179,8 +179,8 @@ class Keymapper:
                 if func not in self.exclude:
                     vim.command("unmap %s%s" %(self.leader,key))
             for mapping in self.existing:
-                vdebug.log.Log("Remapping key with '%s' " % mapping,\
-                        vdebug.log.Logger.DEBUG)
+                log.Log("Remapping key with '%s' " % mapping,\
+                        log.Logger.DEBUG)
                 vim.command(mapping)
 
 class FilePath:
@@ -191,7 +191,7 @@ class FilePath:
     def __init__(self,filename):
         if filename is None or \
             len(filename) == 0:
-            raise FilePathError("Missing or invalid file name")
+            raise error.FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
         if filename.startswith('file:'):
             filename = filename[5:]
@@ -215,13 +215,13 @@ class FilePath:
         """
         ret = f
 
-        if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
+        if opts.Options.isset('path_maps'):
+            sorted_path_maps = sorted(opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if remote in ret:
-                    vdebug.log.Log("Replacing remote path (%s) " % remote +\
+                    log.Log("Replacing remote path (%s) " % remote +\
                             "with local path (%s)" % local ,\
-                            vdebug.log.Logger.DEBUG)
+                            log.Logger.DEBUG)
                     ret = ret.replace(remote,local,1)
 
                     # determine remote path separator and replace by local
@@ -240,13 +240,13 @@ class FilePath:
         """
         ret = f
 
-        if vdebug.opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(vdebug.opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
+        if opts.Options.isset('path_maps'):
+            sorted_path_maps = sorted(opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if local in ret:
-                    vdebug.log.Log("Replacing local path (%s) " % local +\
+                    log.Log("Replacing local path (%s) " % local +\
                             "with remote path (%s)" % remote ,\
-                            vdebug.log.Logger.DEBUG)
+                            log.Logger.DEBUG)
                     ret = ret.replace(local,remote,1)
                     # replace remaining local separators with URL '/' separators
                     ret = ret.replace('\\', '/')
@@ -314,16 +314,13 @@ class RemoteFilePath(FilePath):
 
 class Environment:
     @staticmethod
-    def reload(options = vdebug.opts.Options):
+    def reload(options = opts.Options):
         options.set(vim.eval('g:vdebug_options'))
 
         if options.isset('debug_file'):
-            vdebug.log.Log.set_logger(vdebug.log.FileLogger(\
+            log.Log.set_logger(log.FileLogger(\
                     options.get('debug_file_level'),\
                     options.get('debug_file')))
-
-class FilePathError(Exception):
-    pass
 
 class InputStream:
     """Get a character from Vim's input stream.
@@ -335,7 +332,5 @@ class InputStream:
             vim.eval("getchar(0)")
             time.sleep(0.1)
         except: # vim.error
-            raise UserInterrupt()
+            raise error.UserInterrupt()
 
-class UserInterrupt(Exception):
-    """Raised when a user interrupts connection wait."""

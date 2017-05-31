@@ -3,7 +3,8 @@ if __name__ == "__main__":
     sys.path.append('../plugin/python/')
 import unittest
 import vdebug.opts
-from vdebug.util import FilePath,FilePathError
+from vdebug.util import FilePath
+from vdebug.error import FilePathError
 
 class LocalFilePathTest(unittest.TestCase):
 

@@ -3,6 +3,7 @@ if __name__ == "__main__":
     sys.path.append('../plugin/python/')
 import unittest
 import vdebug.breakpoint
+import vdebug.error
 import vdebug.util
 import base64
 from mock import Mock
@@ -118,7 +119,7 @@ class BreakpointTest(unittest.TestCase):
         Mock.__len__ = Mock(return_value=0)
         ui = Mock()
         re = 'Cannot set a breakpoint on an empty line'
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegexp(vdebug.error.BreakpointError,\
                 re,vdebug.breakpoint.Breakpoint.parse,ui,"")
 
     def test_parse_with_conditional_breakpoint(self):
@@ -134,7 +135,7 @@ class BreakpointTest(unittest.TestCase):
         args = "conditional"
         re = "Conditional breakpoints require a condition "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegexp(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_exception_breakpoint(self):
@@ -150,7 +151,7 @@ class BreakpointTest(unittest.TestCase):
         args = "exception"
         re = "Exception breakpoints require an exception name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegexp(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
 
@@ -167,7 +168,7 @@ class BreakpointTest(unittest.TestCase):
         args = "call"
         re = "Call breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegexp(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_return_breakpoint(self):
@@ -183,6 +184,6 @@ class BreakpointTest(unittest.TestCase):
         args = "return"
         re = "Return breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegexp(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 

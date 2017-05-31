@@ -1,7 +1,8 @@
 from __future__ import print_function
-import time
-import sys
+
 import os
+import sys
+import time
 
 class Logger:
     """ Abstract class for all logger implementations.
@@ -74,10 +75,10 @@ class FileLogger(Logger):
         try:
             self.f = open(self.filename,'w')
         except IOError as e:
-            raise LogError("Invalid file name '%s' for log file: %s" \
+            raise error.LogError("Invalid file name '%s' for log file: %s" \
                     %(self.filename,str(e)))
         except:
-            raise LogError("Error using file '%s' as a log file: %s" \
+            raise error.LogError("Error using file '%s' as a log file: %s" \
                     %(self.filename,sys.exc_info()[0]))
 
 
@@ -127,7 +128,4 @@ class Log:
         for k, l in cls.loggers.items():
             l.shutdown()
         cls.loggers = {}
-
-class LogError(Exception):
-    pass
 
