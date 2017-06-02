@@ -1,6 +1,6 @@
 if __name__ == "__main__":
     import sys
-    sys.path.append('../plugin/python/')
+    sys.path.append('pythonx')
 import unittest
 from vdebug.opts import Options,OptionsError
 

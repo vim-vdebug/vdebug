@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append('tests')
-sys.path.append('plugin/python')
+sys.path.append('pythonx')
 vdebugLoader = unittest.TestLoader()
 suites = vdebugLoader.discover('tests','test_*.py')
 result = unittest.TextTestRunner().run(suites)

@@ -25,23 +25,7 @@ endif
 
 silent doautocmd User VdebugPre
 
-" Load start_vdebug.py either from the runtime directory (usually
-" /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
-" home vim directory (usually ~/.vim/plugin/).
-if filereadable($VIMRUNTIME."/plugin/python/start_vdebug.py")
-  pyfile $VIMRUNTIME/plugin/start_vdebug.py
-elseif filereadable($HOME."/.vim/plugin/python/start_vdebug.py")
-  pyfile $HOME/.vim/plugin/python/start_vdebug.py
-else
-  " when we use pathogen for instance
-  let $CUR_DIRECTORY=expand("<sfile>:p:h")
-
-  if filereadable($CUR_DIRECTORY."/python/start_vdebug.py")
-    pyfile $CUR_DIRECTORY/python/start_vdebug.py
-  else
-    call confirm('vdebug.vim: Unable to find start_vdebug.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
-  endif
-endif
+execute 'pyfile' fnamemodify(expand('<sfile>'), ':p:h:h') . '/pythonx/start_vdebug.py'
 
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
