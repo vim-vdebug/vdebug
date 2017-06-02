@@ -178,7 +178,7 @@ I gladly accept contributions to the code. Just fork the repository, make your c
 pip install mock
 ```
 
-* To run the tests, run `python vdebugtests.py` in the top directory of the plugin
+* To run the tests, run `python -m unittest discover` in the top directory of the plugin
 
 ## Licence
 

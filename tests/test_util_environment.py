@@ -1,6 +1,4 @@
-if __name__ == "__main__":
-    import sys
-    sys.path.append('pythonx')
+from . import setup
 import unittest
 from mock import MagicMock, patch
 import vdebug.util

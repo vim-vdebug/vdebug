@@ -20,5 +20,5 @@ before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 script:
-- python ./vdebugtests.py
+- python -m unittest discover
 - bundle exec rake spec features
