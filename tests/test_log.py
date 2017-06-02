@@ -5,11 +5,50 @@ import mock
 import vdebug.log
 
 
+class LoggerTest(unittest.TestCase):
+
+    level = 1
+    text = 'dummy text'
+    time_tuple = (2042, 4, 2, 1, 42, 42, 0, 0, 0)
+    time_string = 'Mon 02 2042 01:42:42'
+
+    def setUp(self):
+        self.logger = vdebug.log.Logger(self.level)
+        self.worker = mock.Mock()
+        self.logger._actual_log = self.worker
+
+    def test_log_with_same_level(self):
+        self.logger.log(self.text, self.level)
+        self.worker.assert_called_once_with(self.text, self.level)
+
+    def test_log_with_higher_level(self):
+        self.logger.log(self.text, self.level+1)
+        self.worker.assert_not_called()
+
+    def test_log_with_lower_level(self):
+        self.logger.log(self.text, self.level-1)
+        self.worker.assert_called_once_with(self.text, self.level-1)
+
+    def test_time(self):
+        with mock.patch('time.localtime',
+                        mock.Mock(return_value=self.time_tuple)):
+            string = self.logger.time()
+        self.assertEqual(string, self.time_string)
+
+    def test_format(self):
+        with mock.patch('time.localtime',
+                        mock.Mock(return_value=self.time_tuple)):
+            string = self.logger.format(self.text, self.level)
+        expected = '- [Info] {%s} %s' % (self.time_string, self.text)
+        self.assertEqual(string, expected)
+
+
 class WindowLoggerTest(unittest.TestCase):
+
+    level = 2
 
     def setUp(self):
         self.window = mock.Mock()
-        self.level = 2
         self.logger = vdebug.log.WindowLogger(self.level, self.window)
 
     def _log_tester(self, window_open, call_level, text='dummy text'):
