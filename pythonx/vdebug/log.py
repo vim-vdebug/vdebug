@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-class Logger:
+class Logger(object):
     """ Abstract class for all logger implementations.
 
     Concrete classes will log messages using various methods,
@@ -16,10 +16,16 @@ class Logger:
     debug_level = ERROR
 
     def __init__(self,debug_level):
-        pass
+        self.debug_level = int(debug_level)
 
     def log(self, string, level):
         """ Log a message """
+        if level > self.debug_level:
+            return
+        self._actual_log(string, level)
+
+    def _actual_log(self, string, level):
+        """ Actually perform the logging (to be implemented in subclasses) """
         pass
 
     def shutdown(self):
@@ -45,15 +51,13 @@ class WindowLogger(Logger):
     """
     def __init__(self, debug_level, window):
         self.window = window
-        self.debug_level = int(debug_level)
+        super(WindowLogger, self).__init__(debug_level)
 
     def shutdown(self):
         if self.window is not None:
             self.window.is_open = False
 
-    def log(self, string, level):
-        if level > self.debug_level:
-            return
+    def _actual_log(self, string, level):
         if not self.window.is_open:
             self.window.create("rightbelow 6new")
         self.window.write(\
@@ -69,7 +73,7 @@ class FileLogger(Logger):
     def __init__(self,debug_level,filename):
         self.filename = os.path.expanduser(filename)
         self.f = None
-        self.debug_level = int(debug_level)
+        super(FileLogger, self).__init__(debug_level)
 
     def __open(self):
         try:
@@ -86,9 +90,7 @@ class FileLogger(Logger):
         if self.f is not None:
             self.f.close()
 
-    def log(self, string, level):
-        if level > self.debug_level:
-            return
+    def _actual_log(self, string, level):
         if self.f is None:
             self.__open()
         self.f.write(\
