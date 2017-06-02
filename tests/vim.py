@@ -1,7 +1,1 @@
-
-def eval(self, *args):
-    return ""
-
-def command(self, *args):
-    pass
-
+"""A dummy file as the real vim module can only be loaded from within vim."""
