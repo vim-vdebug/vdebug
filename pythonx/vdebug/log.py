@@ -32,7 +32,8 @@ class Logger(object):
         """ Action to perform when closing the logger """
         pass
 
-    def time(self):
+    @staticmethod
+    def time():
         """ Get a nicely formatted time string """
         return time.strftime("%a %d %Y %H:%M:%S", \
                 time.localtime())
