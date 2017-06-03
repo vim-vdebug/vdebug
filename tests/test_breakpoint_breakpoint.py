@@ -4,7 +4,10 @@ import vdebug.breakpoint
 import vdebug.error
 import vdebug.util
 import base64
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 
 class LineBreakpointTest(unittest.TestCase):
 

@@ -172,10 +172,11 @@ I gladly accept contributions to the code. Just fork the repository, make your c
 
 ## Tests
 
- * The tests use `unittest` (should be part of the stdlib) and `mock`, so make sure they're installed
+ * The tests use `unittest` and `mock`. For python 3 the stdlib should e fine,
+   for python 2 you need to install `mock` manually:
 
 ```
-pip install mock
+pip2 install mock
 ```
 
 * To run the tests, run `python -m unittest discover` in the top directory of the plugin

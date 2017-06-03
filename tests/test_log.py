@@ -1,8 +1,11 @@
 from . import setup
 import sys
 import unittest
-import mock
 import vdebug.log
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class LoggerTest(unittest.TestCase):
