@@ -17,9 +17,9 @@ namespace :test do
   task :unit do
     if ENV["COVERAGE"]
       puts "Running unit tests with coverage (view output at ./htmlcov/index.html)"
-      cmd = "coverage run vdebugtests.py && coverage html --include=\"*/vdebug/*\""
+      cmd = "coverage run -m unittest discover && coverage html --include=\"*/vdebug/*\""
     else
-      cmd = "python vdebugtests.py"
+      cmd = "python -m unittest discover"
     end
     puts cmd
     system cmd

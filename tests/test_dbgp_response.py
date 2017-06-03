@@ -1,6 +1,5 @@
+from . import setup
 import sys
-if __name__ == "__main__":
-    sys.path.append('pythonx')
 import unittest
 import vdebug.dbgp
 import xml
