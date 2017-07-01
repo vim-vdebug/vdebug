@@ -153,8 +153,9 @@ class Keymapper:
         vim.command('mkexrc! %s' % (tempfile))
         regex = re.compile(r'^([nvxsoilc]|)(nore)?map!?')
         split_regex = re.compile(r'\s+')
-        keys = set(v for (k,v) in self.keymaps.items() if k not in self.exclude)
-        special = set(["<buffer>", "<silent>", "<special>", "<script>", "<expr>", "<unique>"])
+        keys = {v for k, v in self.keymaps.items() if k not in self.exclude}
+        special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>",
+                   "<unique>"}
         for line in open(tempfile, 'r'):
             if not regex.match(line):
                 continue
