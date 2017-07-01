@@ -106,8 +106,8 @@ class Breakpoint:
     def on_remove(self):
         self.ui.remove_breakpoint(self)
 
-    @classmethod
-    def parse(self, ui, args):
+    @staticmethod
+    def parse(ui, args):
         if args is None:
             args = ""
         args = args.strip()

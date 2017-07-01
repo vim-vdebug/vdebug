@@ -164,7 +164,8 @@ class BackgroundSocketCreator(threading.Thread):
         self.__port = port
         threading.Thread.__init__(self)
 
-    def log(self, message):
+    @staticmethod
+    def log(message):
         log.Log(message, log.Logger.DEBUG)
 
     def run(self):
@@ -200,7 +201,8 @@ class BackgroundSocketCreator(threading.Thread):
         except queue.Empty:
             pass
 
-    def __check_exit(self, message):
+    @staticmethod
+    def __check_exit(message):
         if message == "exit":
             raise Exception("Exiting")
 

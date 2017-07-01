@@ -222,7 +222,8 @@ class WatchWindowContextChangeEvent(Event):
         self.dispatch("get_context", context_id)
         return True
 
-    def __get_word_end(self, line, column):
+    @staticmethod
+    def __get_word_end(line, column):
         tab_end_pos = -1
         line_len = len(line)
         i = column
@@ -233,7 +234,8 @@ class WatchWindowContextChangeEvent(Event):
             i += 1
         return tab_end_pos
 
-    def __get_word_start(self, line, column):
+    @staticmethod
+    def __get_word_start(line, column):
         tab_start_pos = -1
         j = column
         while j >= 0:
@@ -243,7 +245,8 @@ class WatchWindowContextChangeEvent(Event):
             j -= 1
         return tab_start_pos
 
-    def __determine_context_id(self, context_names, context_name):
+    @staticmethod
+    def __determine_context_id(context_names, context_name):
         found_id = -1
         for id in context_names.keys():
             name = context_names[id]
@@ -521,7 +524,8 @@ class Dispatcher:
             event = VisualEvalEvent(session)
             return event.run()
 
-    def eval_under_cursor(self, session):
+    @staticmethod
+    def eval_under_cursor(session):
         if session.is_connected():
             event = CursorEvalEvent(session)
             return event.run()
@@ -535,7 +539,8 @@ class Dispatcher:
                     log.Logger.DEBUG)
             return False
 
-    def _get_event_by_position(self, session):
+    @staticmethod
+    def _get_event_by_position(session):
         buf_name = vim.current.buffer.name
         p = re.compile('.*[\\\/]([^\\\/]+)')
         m = p.match(buf_name)

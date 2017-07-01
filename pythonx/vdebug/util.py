@@ -235,7 +235,8 @@ class FilePath:
 
         return ret
 
-    def _create_remote(self, f):
+    @staticmethod
+    def _create_remote(f):
         """Create the file name valid for the remote server.
 
         Uses the "local_path" and "remote_path" options.
@@ -267,7 +268,8 @@ class FilePath:
     def as_remote(self):
         return self.remote
 
-    def _findSeparator(self, path):
+    @staticmethod
+    def _findSeparator(path):
         for sep in '\\/':
             if sep in path:
                 return sep
@@ -334,7 +336,8 @@ class InputStream:
 
     Used to check for keyboard interrupts."""
 
-    def probe(self):
+    @staticmethod
+    def probe():
         try:
             vim.eval("getchar(0)")
             time.sleep(0.1)

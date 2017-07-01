@@ -22,7 +22,8 @@ class DebuggerInterface:
         self.session_handler.stop()
         self.session_handler = None
 
-    def reload_options(self):
+    @staticmethod
+    def reload_options():
         util.Environment.reload()
 
     def reload_keymappings(self):

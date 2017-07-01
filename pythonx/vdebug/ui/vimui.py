@@ -108,7 +108,8 @@ class Ui(interface.Ui):
     def toggle_window(self, name):
         self.windows.toggle(name)
 
-    def is_modified(self):
+    @staticmethod
+    def is_modified():
         modified = int(vim.eval('&mod'))
         return bool(modified)
 
@@ -172,16 +173,19 @@ class Ui(interface.Ui):
     def set_status(self, status):
         self.windows.status().set_status(status)
 
-    def get_current_file(self):
+    @staticmethod
+    def get_current_file():
         return util.LocalFilePath(vim.current.buffer.name)
 
-    def get_current_row(self):
+    @staticmethod
+    def get_current_row():
         return vim.current.window.cursor[0]
 
     def get_current_line(self):
         return self.get_line(self.get_current_row())
 
-    def get_line(self, row):
+    @staticmethod
+    def get_line(row):
         return vim.eval("getline(" + str(row) + ")")
 
     def register_breakpoint(self, breakpoint):
@@ -190,7 +194,8 @@ class Ui(interface.Ui):
                                   breakpoint.line)
         self.windows.breakpoints().add_breakpoint(breakpoint)
 
-    def place_breakpoint(self, sign_id, file, line):
+    @staticmethod
+    def place_breakpoint(sign_id, file, line):
         vim.command('sign place %s name=breakpt line=%s file=%s'
                     % (sign_id, line, file.as_local()))
 
@@ -248,10 +253,12 @@ class Ui(interface.Ui):
 
         self.windows.close()
 
-    def __get_srcwin_name(self):
+    @staticmethod
+    def __get_srcwin_name():
         return vim.current.buffer.name
 
-    def __get_srcwinno_by_name(self, name):
+    @staticmethod
+    def __get_srcwinno_by_name(name):
         i = 1
         log.Log("Searching for win by name %s" % name, log.Logger.INFO)
         for w in vim.windows:
@@ -264,7 +271,8 @@ class Ui(interface.Ui):
         log.Log("Returning window number %d" % i, log.Logger.INFO)
         return i
 
-    def __get_buf_list(self):
+    @staticmethod
+    def __get_buf_list():
         return vim.eval("range(1, bufnr('$'))")
 
 class SourceWindow(interface.Window):
