@@ -677,7 +677,7 @@ class TraceWindow(WatchWindow):
     name = "DebuggerTrace"
 
     def __init__(self):
-        Window.__init__(self)
+        WatchWindow.__init__(self)
         self._trace_expression = None
         self._last_context_rendered = None
 
