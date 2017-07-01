@@ -397,8 +397,8 @@ class VimBuffer:
 
 class HiddenBuffer:
 
-    def __init__(self, buffer=[]):
-        self._buffer = buffer
+    def __init__(self, buffer=None):
+        self._buffer = buffer if buffer is not None else []
         log.Log("Creating hidden buffer: %s" % buffer,
                 log.Logger.DEBUG)
 
@@ -744,10 +744,10 @@ class StackGetResponseRenderer(ResponseRenderer):
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
-    def __init__(self, response, title=None, contexts={}, current_context=0):
+    def __init__(self, response, title=None, contexts=None, current_context=0):
         ResponseRenderer.__init__(self, response)
         self.title = title
-        self.contexts = contexts
+        self.contexts = contexts if contexts is not None else {}
         self.current_context = current_context
 
     def render(self, indent=0):
