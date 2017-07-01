@@ -541,7 +541,7 @@ class Dispatcher:
     @staticmethod
     def _get_event_by_position(session):
         buf_name = vim.current.buffer.name
-        p = re.compile('.*[\\\/]([^\\\/]+)')
+        p = re.compile(r'.*[\\/]([^\\/]+)')
         m = p.match(buf_name)
         if m is None:
             return None
