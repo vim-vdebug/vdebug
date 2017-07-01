@@ -359,7 +359,7 @@ class VimBuffer:
             self._buffer[:] = str(msg).split('\n')
         else:
             if lineno is None:
-                (lineno, rol) = vim.current.window.cursor
+                lineno, col = vim.current.window.cursor
             remaining_buffer = str(msg).split('\n')
             if overwrite:
                 lfrom = lineno + 1

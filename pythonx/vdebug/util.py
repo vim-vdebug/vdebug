@@ -100,10 +100,8 @@ class ExceptionHandler:
                 pass
         else:
             self.handle_general_exception()
-        """
-        elif isinstance(e,vim.error):
-            self.handle_vim_error(e)
-        """
+        #elif isinstance(e,vim.error):
+        #    self.handle_vim_error(e)
 
 
 class Keymapper:
