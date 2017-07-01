@@ -218,7 +218,6 @@ class WatchWindowContextChangeEvent(Event):
 
         if context_id == -1:
             raise error.EventError("Could not resolve context name")
-            return False
         self.dispatch("get_context", context_id)
         return True
 
