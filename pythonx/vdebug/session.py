@@ -126,6 +126,7 @@ class Session:
         self.__api = None
         self.cur_file = None
         self.cur_lineno = None
+        self.context_names = None
 
     def api(self):
         return self.__api

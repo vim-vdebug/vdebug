@@ -101,6 +101,7 @@ class Ui(interface.Ui):
         self.current_tab = "1"
         self.tabnr = None
         self._last_error = None
+        self.empty_buf_num = None
 
     def mark_window_as_closed(self, name):
         self.windows.window(name).mark_as_closed()
@@ -678,6 +679,7 @@ class TraceWindow(WatchWindow):
     def __init__(self):
         Window.__init__(self)
         self._trace_expression = None
+        self._last_context_rendered = None
 
     def on_create(self):
         if self.creation_count == 1:
