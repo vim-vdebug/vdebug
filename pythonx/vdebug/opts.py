@@ -2,11 +2,11 @@
 class Options:
     instance = None
 
-    def __init__(self,options):
+    def __init__(self, options):
         self.options = options
 
     @classmethod
-    def set(cls,options):
+    def set(cls, options):
         """Create an Options instance with the provided dictionary of
         options"""
         cls.instance = Options(options)
@@ -20,7 +20,7 @@ class Options:
         return cls.instance
 
     @classmethod
-    def get(cls,name,as_type = str):
+    def get(cls, name, as_type=str):
         """Get an option by name.
 
         Raises an OptionsError if the option doesn't exist.
@@ -43,14 +43,13 @@ class Options:
         else:
             return option
 
-
     @classmethod
-    def overwrite(cls,name,value):
+    def overwrite(cls, name, value):
         inst = cls.inst()
         inst.options[name] = value
 
     @classmethod
-    def isset(cls,name):
+    def isset(cls, name):
         """Checks whether the option exists and is set.
 
         By set, it means whether the option has length. All the option
@@ -65,4 +64,3 @@ class Options:
 
 class OptionsError(Exception):
     pass
-

@@ -18,24 +18,22 @@ from . import error
 from . import log
 from . import opts
 
-class ExceptionHandler:
-    def __init__(self, session_handler):
-        self._session_handler = session_handler
-        self.readable_errors = (error.EventError,
-                error.BreakpointError,
-                error.LogError,
-                error.NoConnectionError,
-                error.ModifiedBufferError)
 
+class ExceptionHandler:
 
     """ Exception handlers """
+
+    def __init__(self, session_handler):
+        self._session_handler = session_handler
+        self.readable_errors = (error.EventError, error.BreakpointError,
+                                error.LogError, error.NoConnectionError,
+                                error.ModifiedBufferError)
 
     def exception_to_string(self, e):
         if isinstance(e, self.readable_errors):
             return str(e)
         else:
             return str(sys.exc_info()[0])
-
 
     def handle_timeout(self):
         """Handle a timeout, which is pretty normal.
@@ -55,20 +53,20 @@ class ExceptionHandler:
         self._session_handler.ui().say("Connection to the debugger has been closed")
         self._session_handler.stop()
 
-    def handle_vim_error(self,e):
+    def handle_vim_error(self, e):
         """Handle a VIM error.
 
         This should NOT occur under normal circumstances.
         """
-        self._session_handler.ui().error("A Vim error occured: %s\n%s"\
-                        % (str(e), traceback.format_exc()))
+        self._session_handler.ui().error("A Vim error occured: %s\n%s" %
+                                         (e, traceback.format_exc()))
 
-    def handle_readable_error(self,e):
+    def handle_readable_error(self, e):
         """Simply print an error, since it is human readable enough.
         """
         self._session_handler.ui().error(str(e))
 
-    def handle_dbgp_error(self,e):
+    def handle_dbgp_error(self, e):
         """Simply print an error, since it is human readable enough.
         """
         self._session_handler.ui().error(str(e.args[0]))
@@ -76,8 +74,8 @@ class ExceptionHandler:
     def handle_general_exception(self):
         """Handle an unknown error of any kind.
         """
-        self._session_handler.ui().error("An error occured: %s\n%s"\
-                        % (str(sys.exc_info()[0]), traceback.format_exc(5)))
+        self._session_handler.ui().error("An error occured: %s\n%s" % (
+            sys.exc_info()[0], traceback.format_exc(5)))
 
     def handle(self, e):
         """Switch on the exception type to work out how to handle it.
@@ -93,7 +91,7 @@ class ExceptionHandler:
             self.handle_readable_error(e)
         elif isinstance(e, dbgp.DBGPError):
             self.handle_dbgp_error(e)
-        elif isinstance(e, (EOFError,socket.error)):
+        elif isinstance(e, (EOFError, socket.error)):
             self.handle_socket_end()
         elif isinstance(e, KeyboardInterrupt):
             print("Keyboard interrupt - debugging session cancelled")
@@ -108,7 +106,9 @@ class ExceptionHandler:
             self.handle_vim_error(e)
         """
 
+
 class Keymapper:
+
     """Map and unmap key commands for the Vim user interface.
     """
 
@@ -133,8 +133,8 @@ class Keymapper:
         for func in self.keymaps:
             if func not in self.exclude:
                 key = self.keymaps[func]
-                map_cmd = "noremap %s%s :python debugger.%s()<cr>" %\
-                    (self.leader,key,func)
+                map_cmd = "noremap %s%s :python debugger.%s()<cr>" % (
+                    self.leader, key, func)
                 vim.command(map_cmd)
         self.is_mapped = True
 
@@ -164,7 +164,7 @@ class Keymapper:
                     continue
                 elif p in keys:
                     log.Log("Storing existing key mapping, '%s' " % line,
-                                   log.Logger.DEBUG)
+                            log.Logger.DEBUG)
                     self.existing.append(line)
                 else:
                     break
@@ -177,20 +177,21 @@ class Keymapper:
             for func in self.keymaps:
                 key = self.keymaps[func]
                 if func not in self.exclude:
-                    vim.command("unmap %s%s" %(self.leader,key))
+                    vim.command("unmap %s%s" % (self.leader, key))
             for mapping in self.existing:
-                log.Log("Remapping key with '%s' " % mapping,\
-                        log.Logger.DEBUG)
+                log.Log("Remapping key with '%s' " % mapping, log.Logger.DEBUG)
                 vim.command(mapping)
 
+
 class FilePath:
-    is_win = False
 
     """Normalizes a file name and allows for remote and local path mapping.
     """
-    def __init__(self,filename):
-        if filename is None or \
-            len(filename) == 0:
+
+    is_win = False
+
+    def __init__(self, filename):
+        if filename is None or len(filename) == 0:
             raise error.FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
         if filename.startswith('file:'):
@@ -208,7 +209,7 @@ class FilePath:
         self.local = self._create_local(filename)
         self.remote = self._create_remote(filename)
 
-    def _create_local(self,f):
+    def _create_local(self, f):
         """Create the file name as a locally valid version.
 
         Uses the "local_path" and "remote_path" options.
@@ -216,13 +217,14 @@ class FilePath:
         ret = f
 
         if opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(
+                opts.Options.get('path_maps', dict).items(),
+                key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if remote in ret:
-                    log.Log("Replacing remote path (%s) " % remote +\
-                            "with local path (%s)" % local ,\
-                            log.Logger.DEBUG)
-                    ret = ret.replace(remote,local,1)
+                    log.Log("Replacing remote path (%s) with local path (%s)"
+                            % (remote, local), log.Logger.DEBUG)
+                    ret = ret.replace(remote, local, 1)
 
                     # determine remote path separator and replace by local
                     local_sep = self._findSeparator(local)
@@ -233,7 +235,7 @@ class FilePath:
 
         return ret
 
-    def _create_remote(self,f):
+    def _create_remote(self, f):
         """Create the file name valid for the remote server.
 
         Uses the "local_path" and "remote_path" options.
@@ -241,13 +243,14 @@ class FilePath:
         ret = f
 
         if opts.Options.isset('path_maps'):
-            sorted_path_maps = sorted(opts.Options.get('path_maps', dict).items(), key=lambda l: len(l[0]), reverse=True)
+            sorted_path_maps = sorted(
+                opts.Options.get('path_maps', dict).items(),
+                key=lambda l: len(l[0]), reverse=True)
             for remote, local in sorted_path_maps:
                 if local in ret:
-                    log.Log("Replacing local path (%s) " % local +\
-                            "with remote path (%s)" % remote ,\
-                            log.Logger.DEBUG)
-                    ret = ret.replace(local,remote,1)
+                    log.Log("Replacing local path (%s) with remote path (%s)"
+                            % (local, remote), log.Logger.DEBUG)
+                    ret = ret.replace(local, remote, 1)
                     # replace remaining local separators with URL '/' separators
                     ret = ret.replace('\\', '/')
                     break
@@ -257,7 +260,7 @@ class FilePath:
         else:
             return "file:///"+ret
 
-    def as_local(self,quote = False):
+    def as_local(self, quote=False):
         if quote:
             return urllib.quote(self.local)
         else:
@@ -272,22 +275,22 @@ class FilePath:
                 return sep
         return None
 
-    def __eq__(self,other):
-        if isinstance(other,FilePath):
+    def __eq__(self, other):
+        if isinstance(other, FilePath):
             if other.as_local() == self.as_local():
                 return True
         return False
 
-    def __ne__(self,other):
-        if isinstance(other,FilePath):
+    def __ne__(self, other):
+        if isinstance(other, FilePath):
             if other.as_local() == self.as_local():
                 return False
         return True
 
-    def __add__(self,other):
+    def __add__(self, other):
         return self.as_local() + other
 
-    def __radd__(self,other):
+    def __radd__(self, other):
         return other + self.as_local()
 
     def __str__(self):
@@ -296,31 +299,37 @@ class FilePath:
     def __repr__(self):
         return str(self)
 
+
 class LocalFilePath(FilePath):
-    def _create_local(self,f):
+
+    def _create_local(self, f):
         """Create the file name as a locally valid version.
 
         Uses the "local_path" and "remote_path" options.
         """
         return f
 
+
 class RemoteFilePath(FilePath):
-    def _create_remote(self,f):
+
+    def _create_remote(self, f):
         """Create the file name valid for the remote server.
 
         Uses the "local_path" and "remote_path" options.
         """
         return f
 
+
 class Environment:
+
     @staticmethod
-    def reload(options = opts.Options):
+    def reload(options=opts.Options):
         options.set(vim.eval('g:vdebug_options'))
 
         if options.isset('debug_file'):
-            log.Log.set_logger(log.FileLogger(\
-                    options.get('debug_file_level'),\
-                    options.get('debug_file')))
+            log.Log.set_logger(log.FileLogger(
+                options.get('debug_file_level'), options.get('debug_file')))
+
 
 class InputStream:
     """Get a character from Vim's input stream.
@@ -331,6 +340,5 @@ class InputStream:
         try:
             vim.eval("getchar(0)")
             time.sleep(0.1)
-        except: # vim.error
+        except:  # vim.error
             raise error.UserInterrupt()
-

@@ -4,7 +4,9 @@ from . import connection
 from . import opts
 from . import util
 
+
 class Listener:
+
     @classmethod
     def create(cls):
         if opts.Options.get('background_listener', int):
@@ -12,7 +14,9 @@ class Listener:
         else:
             return ForegroundListener()
 
+
 class ForegroundListener:
+
     def __init__(self):
         self.__server = connection.SocketCreator(util.InputStream())
 
@@ -37,6 +41,7 @@ class ForegroundListener:
         handler = connection.ConnectionHandler(*self.__server.socket())
         self.stop()
         return handler
+
 
 class BackgroundListener:
 

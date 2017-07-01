@@ -12,7 +12,9 @@ from . import log
 from . import opts
 from . import util
 
+
 class SessionHandler:
+
     def __init__(self, ui, breakpoints):
         self.__ui = ui
         self.__breakpoints = breakpoints
@@ -110,14 +112,15 @@ class SessionHandler:
                   self.__ex_handler.exception_to_string(e))
 
     def __new_session(self):
-        self.__session = Session(self.__ui,
-                self.__breakpoints,
-                util.Keymapper())
+        self.__session = Session(self.__ui, self.__breakpoints,
+                                 util.Keymapper())
 
         status = self.__session.start(self.listener.create_connection())
         self.dispatch_event("refresh", status)
 
+
 class Session:
+
     def __init__(self, ui, breakpoints, keymapper):
         self.__ui = ui
         self.__breakpoints = breakpoints
@@ -151,7 +154,7 @@ class Session:
         self.__ui.close()
         self.__keymapper.unmap()
 
-    def close_connection(self, stop = True):
+    def close_connection(self, stop=True):
         """ Close the connection to the debugger.
         """
         self.__ui.mark_as_stopped()
@@ -163,7 +166,8 @@ class Session:
                         try:
                             self.__api.detach()
                         except dbgp.CmdNotImplementedError:
-                            self.__ui.error('Detach is not supported by the debugger, stopping instead')
+                            self.__ui.error('Detach is not supported by the '
+                                            'debugger, stopping instead')
                             opts.Options.overwrite('on_close', 'stop')
                             self.__api.stop()
                     else:
@@ -182,7 +186,8 @@ class Session:
     def start(self, connection):
         util.Environment.reload()
         if self.__ui.is_modified():
-            raise error.ModifiedBufferError("Modified buffers must be saved before debugging")
+            raise error.ModifiedBufferError("Modified buffers must be saved "
+                                            "before debugging")
 
         try:
             self.__api = dbgp.Api(connection)
@@ -190,10 +195,9 @@ class Session:
                 self.__ui.open()
                 self.__keymapper.map()
 
-            self.__ui.set_listener_details(\
-                    opts.Options.get('server'),\
-                    opts.Options.get('port'),\
-                    opts.Options.get('ide_key'))
+            self.__ui.set_listener_details(opts.Options.get('server'),
+                                           opts.Options.get('port'),
+                                           opts.Options.get('ide_key'))
 
             addr = self.__api.conn.address
             log.Log("Found connection from %s" % str(addr), log.Logger.INFO)
@@ -230,15 +234,16 @@ class Session:
             try:
                 self.__api.feature_set(name, value)
             except dbgp.DBGPError as e:
-                error_str = "Failed to set feature %s: %s" %(name,str(e.args[0]))
+                error_str = "Failed to set feature %s: %s" % (name, e.args[0])
                 self.__ui.error(error_str)
 
     def __initialize_breakpoints(self):
-        self.__breakpoints.update_lines(self.__ui.get_breakpoint_sign_positions())
+        self.__breakpoints.update_lines(
+            self.__ui.get_breakpoint_sign_positions())
         self.__breakpoints.link_api(self.__api)
 
     def __collect_context_names(self):
         cn_res = self.__api.context_names()
         self.context_names = cn_res.names()
-        log.Log("Available context names: %s" %\
-                str(self.context_names), log.Logger.DEBUG)
+        log.Log("Available context names: %s" % self.context_names,
+                log.Logger.DEBUG)

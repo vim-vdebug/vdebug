@@ -7,6 +7,7 @@ from . import session
 from . import util
 from .ui import vimui
 
+
 class DebuggerInterface:
     """Provides all methods used to control the debugger."""
     def __init__(self):
@@ -14,7 +15,7 @@ class DebuggerInterface:
         self.ui = vimui.Ui()
 
         self.session_handler = session.SessionHandler(self.ui,
-                                    self.breakpoints)
+                                                      self.breakpoints)
         self.event_dispatcher = event.Dispatcher(self.session_handler)
 
     def __del__(self):
@@ -64,16 +65,15 @@ class DebuggerInterface:
         """
         self.session_handler.dispatch_event("step_out")
 
-    def handle_opt(self, option, value = None):
+    def handle_opt(self, option, value=None):
         """Set an option, overwriting the existing value.
         """
         if value is None:
             return self.ui.say(opts.Options.get(option))
         else:
-            self.ui.say("Setting vdebug option '%s' to: %s"\
-                                %(option,value))
-            vim.command('let g:vdebug_options["%s"] = "%s"' %(option,value))
-            return opts.Options.overwrite(option,value)
+            self.ui.say("Setting vdebug option '%s' to: %s" % (option, value))
+            vim.command('let g:vdebug_options["%s"] = "%s"' % (option, value))
+            return opts.Options.overwrite(option, value)
 
     def handle_return_keypress(self):
         """React to a <enter> keypress event.
@@ -93,9 +93,10 @@ class DebuggerInterface:
     def handle_eval(self, bang, args):
         """Evaluate a code snippet specified by args.
         """
-        return self.session_handler.dispatch_event("set_eval_expression", len(bang) > 0, args)
+        return self.session_handler.dispatch_event("set_eval_expression",
+                                                   len(bang) > 0, args)
 
-    def handle_trace(self,args = None):
+    def handle_trace(self, args=None):
         """Trace a code snippet specified by args.
         """
         return self.session_handler.dispatch_event("trace", args)
@@ -117,12 +118,12 @@ class DebuggerInterface:
     def get_last_error(self):
         return self.session_handler.ui().get_last_error()
 
-    def set_breakpoint(self,args = None):
+    def set_breakpoint(self, args=None):
         """Set a breakpoint, specified by args.
         """
         self.session_handler.dispatch_event("set_breakpoint", args)
 
-    def remove_breakpoint(self,args = None):
+    def remove_breakpoint(self, args=None):
         """Remove one or more breakpoints, specified by args.
         """
         self.session_handler.dispatch_event("remove_breakpoint", args)

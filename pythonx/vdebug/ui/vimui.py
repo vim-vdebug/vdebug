@@ -8,26 +8,29 @@ from .. import log
 from .. import opts
 from .. import util
 
+
 class WindowError(Exception):
     pass
 
+
 class WindowManager:
+
     def __init__(self):
         self._windows = {
-            "DebuggerWatch" :  WatchWindow(),
-            "DebuggerStatus" : StatusWindow(),
-            "DebuggerStack" : StackWindow(),
-            "DebuggerBreakpoints" : BreakpointWindow(),
-            "DebuggerLog" : LogWindow(),
-            "DebuggerTrace" : TraceWindow()
+            "DebuggerWatch":  WatchWindow(),
+            "DebuggerStatus": StatusWindow(),
+            "DebuggerStack": StackWindow(),
+            "DebuggerBreakpoints": BreakpointWindow(),
+            "DebuggerLog": LogWindow(),
+            "DebuggerTrace": TraceWindow()
         }
         self._default_commands = {
-            "DebuggerWatch" : "vertical belowright new",
-            "DebuggerStatus" : "belowright new",
-            "DebuggerStack" : "belowright new",
-            "DebuggerBreakpoints" : "rightbelow 7new",
-            "DebuggerLog" : "rightbelow 6new",
-            "DebuggerTrace" : 'rightbelow 7new'
+            "DebuggerWatch": "vertical belowright new",
+            "DebuggerStatus": "belowright new",
+            "DebuggerStack": "belowright new",
+            "DebuggerBreakpoints": "rightbelow 7new",
+            "DebuggerLog": "rightbelow 6new",
+            "DebuggerTrace": 'rightbelow 7new'
         }
         self._commands = self._default_commands.copy()
 
@@ -39,7 +42,7 @@ class WindowManager:
 
     def open(self, name):
         if not self.window(name).is_open:
-            log.Log("Creating window %s" %name)
+            log.Log("Creating window %s" % name)
             self.window(name).create(self._command(name))
 
     def toggle(self, name):
@@ -71,19 +74,20 @@ class WindowManager:
         try:
             return self._windows[name]
         except KeyError:
-            raise WindowError("No debugger window named '%s'" % name \
-                    + " - check your window options")
+            raise WindowError("No debugger window named '%s' - check your "
+                              "window options" % name)
 
     def _command(self, name):
         try:
             return self._commands[name]
         except KeyError:
-            raise WindowError("No debugger window named '%s'" % name \
-                    + " - check your window options")
+            raise WindowError("No debugger window named '%s' - check your "
+                              "window options" % name)
 
     def _refresh_commands(self):
         self._commands = self._default_commands.copy()
         self._commands.update(opts.Options.get('window_commands', dict))
+
 
 class Ui(interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -141,11 +145,8 @@ class Ui(interface.Ui):
             statuswin = self.windows.status()
             statuswin.set_status("loading")
 
-            log.Log.set_logger(
-                    log.WindowLogger(
-                        opts.Options.get('debug_window_level'),
-                        self.windows.log()
-                    ))
+            log.Log.set_logger(log.WindowLogger(
+                opts.Options.get('debug_window_level'), self.windows.log()))
 
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self, winnr)
@@ -188,13 +189,13 @@ class Ui(interface.Ui):
 
     def register_breakpoint(self, breakpoint):
         if breakpoint.type == 'line':
-            self.place_breakpoint(breakpoint.id,\
-                    breakpoint.file,breakpoint.line)
+            self.place_breakpoint(breakpoint.id, breakpoint.file,
+                                  breakpoint.line)
         self.windows.breakpoints().add_breakpoint(breakpoint)
 
-    def place_breakpoint(self ,sign_id, file, line):
-        vim.command('sign place %s name=breakpt line=%s file=%s'\
-                        %(str(sign_id), str(line), file.as_local()))
+    def place_breakpoint(self, sign_id, file, line):
+        vim.command('sign place %s name=breakpt line=%s file=%s'
+                    % (sign_id, line, file.as_local()))
 
     def remove_breakpoint(self, breakpoint):
         id = breakpoint.id
@@ -222,14 +223,14 @@ class Ui(interface.Ui):
     def say(self, string):
         """ Vim picks up Python prints, so just print """
         print(string)
-        log.Log(string,log.Logger.INFO)
+        log.Log(string, log.Logger.INFO)
 
-    def error(self,string):
+    def error(self, string):
         self._last_error = string
-        vim.command('echohl Error | echomsg "'+\
-                str(string).replace('"','\\"')+\
-                '" | echohl None')
-        log.Log(string,log.Logger.ERROR)
+        vim.command('echohl Error | echomsg "'
+                    + str(string).replace('"', '\\"')
+                    + '" | echohl None')
+        log.Log(string, log.Logger.ERROR)
 
     def get_last_error(self):
         return self._last_error
@@ -255,18 +256,15 @@ class Ui(interface.Ui):
 
     def __get_srcwinno_by_name(self, name):
         i = 1
-        log.Log("Searching for win by name %s" % name,\
-                log.Logger.INFO)
+        log.Log("Searching for win by name %s" % name, log.Logger.INFO)
         for w in vim.windows:
-            log.Log("Win %d, name %s" %(i, w.buffer.name),\
-                log.Logger.INFO)
+            log.Log("Win %d, name %s" % (i, w.buffer.name), log.Logger.INFO)
             if w.buffer.name == name:
                 break
             else:
                 i += 1
 
-        log.Log("Returning window number %d" % i,\
-                log.Logger.INFO)
+        log.Log("Returning window number %d" % i, log.Logger.INFO)
         return i
 
     def __get_buf_list(self):
@@ -278,14 +276,14 @@ class SourceWindow(interface.Window):
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
 
-    def __init__(self,ui,winno):
+    def __init__(self, ui, winno):
         self.winno = str(winno)
 
     def focus(self):
         vim.command(self.winno+"wincmd w")
         vim.command("filetype detect")
 
-    def command(self,cmd,silent = True):
+    def command(self, cmd, silent=True):
         self.focus()
         if silent:
             prepend = "silent "
@@ -294,18 +292,18 @@ class SourceWindow(interface.Window):
         command_str = prepend + self.winno + "wincmd " + cmd
         vim.command(command_str)
 
-    def set_file(self,file):
+    def set_file(self, file):
         if file == self.file:
             return
         self.file = file
-        log.Log("Setting source file: %s" % file,log.Logger.INFO)
+        log.Log("Setting source file: %s" % file, log.Logger.INFO)
         self.focus()
         vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
 
-    def set_line(self,lineno):
-        log.Log("Setting source line number: %s" % lineno,log.Logger.DEBUG)
+    def set_line(self, lineno):
+        log.Log("Setting source line number: %s" % lineno, log.Logger.DEBUG)
         self.focus()
-        vim.command(":%s" % str(lineno))
+        vim.command(":%s" % lineno)
 
     def get_file(self):
         self.focus()
@@ -315,18 +313,18 @@ class SourceWindow(interface.Window):
     def clear_signs(self):
         vim.command('sign unplace *')
 
-    def place_pointer(self,line):
-        log.Log("Placing pointer sign on line "+str(line),\
-                log.Logger.INFO)
+    def place_pointer(self, line):
+        log.Log("Placing pointer sign on line "+str(line), log.Logger.INFO)
         self.remove_pointer()
-        vim.command('sign place '+self.pointer_sign_id+\
-                ' name=current line='+str(line)+\
-                ' file='+self.file)
+        vim.command('sign place %s name=current line=%s file=%s'
+                    % (self.pointer_sign_id, line, self.file))
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
 
+
 class VimBuffer:
+
     def __init__(self, buffer):
         self._buffer = buffer
 
@@ -370,7 +368,7 @@ class VimBuffer:
                     self._buffer.append(line)
             after_callback()
 
-    def delete(self, start_line, end_line = None):
+    def delete(self, start_line, end_line=None):
         try:
             if not end_line:
                 end_line = start_line + 1
@@ -393,8 +391,10 @@ class VimBuffer:
         else:
             return False
 
+
 class HiddenBuffer:
-    def __init__(self, buffer = []):
+
+    def __init__(self, buffer=[]):
         self._buffer = buffer
         log.Log("Creating hidden buffer: %s" % buffer,
                 log.Logger.DEBUG)
@@ -424,10 +424,10 @@ class HiddenBuffer:
                 from_line = lineno
                 to_line = lineno
             self._buffer[from_line:to_line] = str(msg).split('\n')
-        log.Log("Hidden buffer after insert: %s" %(self._buffer),
+        log.Log("Hidden buffer after insert: %s" % (self._buffer),
                 log.Logger.DEBUG)
 
-    def delete(self, start_line, end_line = None):
+    def delete(self, start_line, end_line=None):
         try:
             if not end_line:
                 end_line = start_line + 1
@@ -444,7 +444,9 @@ class HiddenBuffer:
     def is_empty(self):
         return not self._buffer
 
+
 class Window(interface.Window):
+
     name = "WINDOW"
     creation_count = 0
 
@@ -473,15 +475,14 @@ class Window(interface.Window):
             height = 1
         self.command('set winheight=%i' % height)
 
-    def write(self, msg, return_focus = True, after = "normal G"):
-        self._buffer.write(msg, return_focus,\
-                lambda: self.command(after))
+    def write(self, msg, return_focus=True, after="normal G"):
+        self._buffer.write(msg, return_focus, lambda: self.command(after))
 
-    def insert(self, msg, lineno = None, overwrite = False, allowEmpty = False):
-        self._buffer.insert(msg, lineno, overwrite, allowEmpty,\
-                lambda: self.command(lineno))
+    def insert(self, msg, lineno=None, overwrite=False, allowEmpty=False):
+        self._buffer.insert(msg, lineno, overwrite, allowEmpty,
+                            lambda: self.command(lineno))
 
-    def delete(self, start_line, end_line = None):
+    def delete(self, start_line, end_line=None):
         self._buffer.delete(start_line, end_line)
 
     def line_at(self, line):
@@ -489,11 +490,11 @@ class Window(interface.Window):
 
     def create(self, open_cmd):
         """ create window """
-        vim.command('silent %s %s' %(open_cmd, self.name))
-        vim.command("setlocal buftype=nofile modifiable "+ \
-                "winfixheight winfixwidth nonumber norelativenumber")
+        vim.command('silent %s %s' % (open_cmd, self.name))
+        vim.command("setlocal buftype=nofile modifiable winfixheight "
+                    "winfixwidth nonumber norelativenumber")
         existing_content = self._buffer.contents()
-        log.Log("Setting buffer for %s: %s" %(self.name, existing_content),
+        log.Log("Setting buffer for %s: %s" % (self.name, existing_content),
                 log.Logger.DEBUG)
         self._buffer = VimBuffer(vim.current.buffer)
         self._buffer.overwrite(existing_content)
@@ -507,7 +508,7 @@ class Window(interface.Window):
 
         self.on_create()
 
-    def destroy(self, wipeout = True):
+    def destroy(self, wipeout=True):
         """ destroy window """
         if self._buffer == None:
             return
@@ -532,7 +533,9 @@ class Window(interface.Window):
         self.clean()
         self.write(renderer.render())
 
+
 class BreakpointWindow(Window):
+
     name = "DebuggerBreakpoints"
     header = """===========================================================
  ID      | TYPE        | DATA
@@ -543,17 +546,16 @@ class BreakpointWindow(Window):
             self.insert(self.header, 0)
         self.command('setlocal syntax=debugger_breakpoint')
 
-    def add_breakpoint(self,breakpoint):
-        bp_str = " %-7i | %-11s | " %(breakpoint.id, breakpoint.type)
+    def add_breakpoint(self, breakpoint):
+        bp_str = " %-7i | %-11s | " % (breakpoint.id, breakpoint.type)
         if breakpoint.type == 'line':
-            bp_str += "%s:%s" %(breakpoint.file, str(breakpoint.line))
+            bp_str += "%s:%s" % (breakpoint.file, str(breakpoint.line))
         elif breakpoint.type == 'conditional':
-            bp_str += "%s:%s when (%s)" \
-                %(breakpoint.file, str(breakpoint.line), breakpoint.condition)
+            bp_str += "%s:%s when (%s)" % (
+                breakpoint.file, str(breakpoint.line), breakpoint.condition)
         elif breakpoint.type == 'exception':
             bp_str += "Exception: %s" % breakpoint.exception
-        elif breakpoint.type == 'call' or \
-                breakpoint.type == 'return':
+        elif breakpoint.type == 'call' or breakpoint.type == 'return':
             bp_str += "Function: %s" % breakpoint.function
 
         self.write(bp_str)
@@ -567,34 +569,43 @@ class BreakpointWindow(Window):
                 self._buffer.delete(i)
             i += 1
 
+
 class LogWindow(Window):
+
     name = "DebuggerLog"
 
     def on_create(self):
         self.command('setlocal syntax=debugger_log')
         if self.creation_count == 1:
-            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python vdebug.log.Log.remove_logger("WindowLogger")' % cmd)
+            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
+                                                                     self.name)
+            vim.command(
+                '%s | python vdebug.log.Log.remove_logger("WindowLogger")'
+                % cmd)
 
-    def write(self, msg, return_focus = True):
-        Window.write(self, msg,return_focus=True)
+    def write(self, msg, return_focus=True):
+        Window.write(self, msg, return_focus=True)
+
 
 class StackWindow(Window):
+
     name = "DebuggerStack"
 
     def on_create(self):
-        self.command('inoremap <buffer> <cr> <esc>'+\
-                ':python debugger.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <cr> '+\
-                ':python debugger.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_double_click()<cr>')
+        self.command('inoremap <buffer> <cr> <esc>'
+                     ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> '
+                     ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <2-LeftMouse> '
+                     ':python debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_stack')
 
-    def write(self, msg, return_focus = True):
+    def write(self, msg, return_focus=True):
         Window.write(self, msg, after="normal gg")
 
+
 class WatchWindow(Window):
+
     name = "DebuggerWatch"
 
     def __init__(self):
@@ -602,12 +613,12 @@ class WatchWindow(Window):
         self._eval_expression = None
 
     def on_create(self):
-        self.command('inoremap <buffer> <cr> <esc>'+\
-                ':python debugger.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <cr> '+\
-                ':python debugger.handle_return_keypress()<cr>')
-        self.command('nnoremap <buffer> <2-LeftMouse> '+\
-                ':python debugger.handle_double_click()<cr>')
+        self.command('inoremap <buffer> <cr> <esc>'
+                     ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> '
+                     ':python debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <2-LeftMouse> '
+                     ':python debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_watch')
 
     def set_eval_expression(self, eval_expression):
@@ -623,10 +634,12 @@ class WatchWindow(Window):
     def clear_eval_expression(self):
         self._eval_expression = None
 
-    def write(self, msg, return_focus = True):
+    def write(self, msg, return_focus=True):
         Window.write(self, msg, after="normal gg")
 
+
 class StatusWindow(Window):
+
     name = "DebuggerStatus"
 
     def on_create(self):
@@ -634,8 +647,8 @@ class StatusWindow(Window):
         if self._buffer.is_empty():
             keys = util.Keymapper()
             output = "Status: starting\nListening on port\nNot connected\n\n"
-            output += "Press %s to start debugging, " %(keys.run_key())
-            output += "%s to stop/close. " %(keys.close_key())
+            output += "Press %s to start debugging, " % (keys.run_key())
+            output += "%s to stop/close. " % (keys.close_key())
             output += "Type :help Vdebug for more information."
             self.write(output)
 
@@ -647,16 +660,17 @@ class StatusWindow(Window):
         self.insert("Not connected", 2, True)
 
     def set_conn_details(self, addr, port):
-        self.insert("Connected to %s:%s" %(addr, port), 2, True)
+        self.insert("Connected to %s:%s" % (addr, port), 2, True)
 
     def set_listener_details(self, addr, port, idekey):
-        details = "Listening on %s:%s" %(addr, port)
-        if len(idekey):
+        details = "Listening on %s:%s" % (addr, port)
+        if idekey:
             details += " (IDE key: %s)" % idekey
         self.insert(details, 1, True)
 
 
 class TraceWindow(WatchWindow):
+
     name = "DebuggerTrace"
 
     def __init__(self):
@@ -665,8 +679,11 @@ class TraceWindow(WatchWindow):
 
     def on_create(self):
         if self.creation_count == 1:
-            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' %(self.name,self.name)
-            vim.command('%s | python debugger.runner.ui.tracewin.is_open = False' % cmd)
+            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
+                                                                     self.name)
+            vim.command(
+                '%s | python debugger.runner.ui.tracewin.is_open = False'
+                % cmd)
         self.command('setlocal syntax=debugger_watch')
 
     def set_trace_expression(self, trace_expression):
@@ -693,14 +710,18 @@ class TraceWindow(WatchWindow):
         self._trace_expression = None
         self._last_context_rendered = None
 
+
 class ResponseRenderer:
-    def __init__(self,response):
+
+    def __init__(self, response):
         self.response = response
 
     def render(self):
         pass
 
+
 class StackGetResponseRenderer(ResponseRenderer):
+
     def render(self):
         stack = self.response.get_stack()
         string = ""
@@ -710,22 +731,22 @@ class StackGetResponseRenderer(ResponseRenderer):
             else:
                 where = 'main'
             file = util.FilePath(s.get('filename'))
-            line = "[%(num)s] %(where)s @ %(file)s:%(line)s" \
-                    %{'num':s.get('level'),'where':where,\
-                    'file':str(file.as_local()),'line':s.get('lineno')}
+            line = "[%(num)s] %(where)s @ %(file)s:%(line)s" % {
+                'num': s.get('level'), 'where': where,
+                'file': str(file.as_local()), 'line': s.get('lineno')}
             string += line + "\n"
         return string
 
 
 class ContextGetResponseRenderer(ResponseRenderer):
 
-    def __init__(self,response,title = None,contexts = {},current_context = 0):
-        ResponseRenderer.__init__(self,response)
+    def __init__(self, response, title=None, contexts={}, current_context=0):
+        ResponseRenderer.__init__(self, response)
         self.title = title
         self.contexts = contexts
         self.current_context = current_context
 
-    def render(self,indent = 0):
+    def render(self, indent=0):
         res = self.__create_tabs()
 
         if self.title:
@@ -733,8 +754,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
 
         properties = self.response.get_context()
         num_props = len(properties)
-        log.Log("Writing %i properties to the window" % num_props,\
-                log.Logger.INFO )
+        log.Log("Writing %i properties to the window" % num_props,
+                log.Logger.INFO)
         for idx, prop in enumerate(properties):
             final = False
             try:
@@ -742,16 +763,16 @@ class ContextGetResponseRenderer(ResponseRenderer):
             except IndexError:
                 final = True
                 next_prop = None
-            res += self.__render_property(prop,next_prop,final,indent)
+            res += self.__render_property(prop, next_prop, final, indent)
 
-        log.Log("Writing to window:\n"+res,log.Logger.DEBUG)
+        log.Log("Writing to window:\n"+res, log.Logger.DEBUG)
 
         return res
 
     def __create_tabs(self):
         res = []
         if self.contexts:
-            for id,name in self.contexts.items():
+            for id, name in self.contexts.items():
                 if self.current_context == id:
                     name = "*"+name
                 res.append("[ %s ]" % name)
@@ -760,14 +781,13 @@ class ContextGetResponseRenderer(ResponseRenderer):
         else:
             return ""
 
-    def __render_property(self,p,next_p,last = False,indent = 0):
+    def __render_property(self, p, next_p, last=False, indent=0):
         indent_str = "".rjust((p.depth * 2)+indent)
-        line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" \
-                %{'indent':indent_str,\
-                'marker':self.__get_marker(p),'name':p.display_name.encode('latin1'),\
-                'type':p.type_and_size(),'value': " " + p.value.replace(
-                        "\n",
-                        "\\n'\n%(indent)s'"%{'indent':indent_str})}
+        line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" % {
+            'indent': indent_str, 'marker': self.__get_marker(p),
+            'name': p.display_name.encode('latin1'), 'type': p.type_and_size(),
+            'value': " " + p.value.replace("\n", "\\n'\n%(indent)s'" % {
+                'indent': indent_str})}
         line = line.rstrip() + "\n"
 
         if opts.Options.get('watch_window_style') == 'expanded':
@@ -779,8 +799,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
                     num_spaces = depth * 2
                 elif depth > next_depth:
                     if not p.is_last_child:
-                       line += "".rjust(depth * 2 +indent) + " |\n"
-                       line += "".rjust(depth * 2 +indent) + " ...\n"
+                        line += "".rjust(depth * 2 + indent) + " |\n"
+                        line += "".rjust(depth * 2 + indent) + " ...\n"
                     next_sep = "/"
                     num_spaces = (depth * 2) - 1
                 else:
@@ -790,12 +810,12 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 line += "".rjust(num_spaces+indent) + " " + next_sep + "\n"
             elif depth > 0:
                 if not p.is_last_child:
-                   line += "".rjust(depth * 2 +indent) + " |\n"
-                   line += "".rjust(depth * 2 +indent) + " ...\n"
+                    line += "".rjust(depth * 2 + indent) + " |\n"
+                    line += "".rjust(depth * 2 + indent) + " ...\n"
                 line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
         return line
 
-    def __get_marker(self,property):
+    def __get_marker(self, property):
         char = opts.Options.get('marker_default')
         if property.has_children:
             if property.child_count() == 0:

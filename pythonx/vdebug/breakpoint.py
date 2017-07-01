@@ -3,13 +3,14 @@ import base64
 from . import error
 from . import log
 
+
 class Store:
 
     def __init__(self):
         self.breakpoints = {}
         self.api = None
 
-    def link_api(self,api):
+    def link_api(self, api):
         self.api = api
         num_bps = len(self.breakpoints)
         if num_bps > 0:
@@ -19,12 +20,12 @@ class Store:
             bp.set_debugger_id(res.get_id())
 
     # Update line-based breakpoints with a dict of IDs and lines
-    def update_lines(self,lines):
+    def update_lines(self, lines):
         for id, line in lines.items():
             try:
                 self.breakpoints[id].set_line(line)
-                log.Log("Updated line number of breakpoint %s to %s"\
-                                    %(str(id),str(line)) )
+                log.Log("Updated line number of breakpoint %s to %s" % (id,
+                                                                        line))
             except ValueError:
                 pass
                 # No method set_line, not a line breakpoint
@@ -32,7 +33,7 @@ class Store:
     def unlink_api(self):
         self.api = None
 
-    def add_breakpoint(self,breakpoint):
+    def add_breakpoint(self, breakpoint):
         log.Log("Adding " + str(breakpoint))
         self.breakpoints[str(breakpoint.get_id())] = breakpoint
         breakpoint.on_add()
@@ -40,11 +41,10 @@ class Store:
             res = self.api.breakpoint_set(breakpoint.get_cmd())
             breakpoint.set_debugger_id(res.get_id())
 
-    def remove_breakpoint(self,breakpoint):
-        self.remove_breakpoint_by_id(\
-                breakpoint.get_id())
+    def remove_breakpoint(self, breakpoint):
+        self.remove_breakpoint_by_id(breakpoint.get_id())
 
-    def remove_breakpoint_by_id(self,id):
+    def remove_breakpoint_by_id(self, id):
         id = str(id)
         if id not in self.breakpoints:
             raise error.BreakpointError("No breakpoint matching ID %s" % id)
@@ -61,7 +61,7 @@ class Store:
             self.remove_breakpoint_by_id(id)
         self.breakpoints = {}
 
-    def find_breakpoint(self,file,line):
+    def find_breakpoint(self, file, line):
         found = None
         for id, bp in self.breakpoints.items():
             if bp.type == "line":
@@ -74,7 +74,7 @@ class Store:
     def get_sorted_list(self):
         keys = self.breakpoints.keys()
         keys.sort()
-        return map(self.breakpoints.get,keys)
+        return map(self.breakpoints.get, keys)
 
 class Breakpoint:
     """ Abstract factory for creating a breakpoint object.
@@ -86,7 +86,7 @@ class Breakpoint:
     id = 11000
     dbg_id = None
 
-    def __init__(self,ui):
+    def __init__(self, ui):
         self.id = Breakpoint.id
         Breakpoint.id += 1
         self.ui = ui
@@ -94,7 +94,7 @@ class Breakpoint:
     def get_id(self):
         return self.id
 
-    def set_debugger_id(self,dbg_id):
+    def set_debugger_id(self, dbg_id):
         self.dbg_id = dbg_id
 
     def get_debugger_id(self):
@@ -107,7 +107,7 @@ class Breakpoint:
         self.ui.remove_breakpoint(self)
 
     @classmethod
-    def parse(self,ui,args):
+    def parse(self, ui, args):
         if args is None:
             args = ""
         args = args.strip()
@@ -118,11 +118,11 @@ class Breakpoint:
                 file = ui.get_current_file()
                 line = ui.get_current_line()
                 if len(line.strip()) == 0:
-                    raise error.BreakpointError('Cannot set a breakpoint ' +\
-                                            'on an empty line')
+                    raise error.BreakpointError('Cannot set a breakpoint on '
+                                                'an empty line')
             except error.FilePathError:
                 raise error.BreakpointError('No file, cannot set breakpoint')
-            return LineBreakpoint(ui,file,row)
+            return LineBreakpoint(ui, file, row)
         else:
             arg_parts = args.split(' ')
             type = arg_parts.pop(0)
@@ -131,57 +131,62 @@ class Breakpoint:
                 row = ui.get_current_row()
                 file = ui.get_current_file()
                 if len(arg_parts) == 0:
-                    raise error.BreakpointError("Conditional breakpoints " +\
-                            "require a condition to be specified")
+                    raise error.BreakpointError(
+                        "Conditional breakpoints require a condition to be "
+                        "specified")
                 cond = " ".join(arg_parts)
-                return ConditionalBreakpoint(ui,file,row,cond)
+                return ConditionalBreakpoint(ui, file, row, cond)
             elif type == 'watch':
                 if len(arg_parts) == 0:
-                    raise error.BreakpointError("Watch breakpoints " +\
-                            "require a condition to be specified")
+                    raise error.BreakpointError(
+                        "Watch breakpoints require a condition to be "
+                        "specified")
                 expr = " ".join(arg_parts)
-                log.Log("Expression: %s"%expr)
-                return WatchBreakpoint(ui,expr)
+                log.Log("Expression: %s" % expr)
+                return WatchBreakpoint(ui, expr)
             elif type == 'exception':
                 if len(arg_parts) == 0:
-                    raise error.BreakpointError("Exception breakpoints " +\
-                            "require an exception name to be specified")
-                return ExceptionBreakpoint(ui,arg_parts[0])
+                    raise error.BreakpointError(
+                        "Exception breakpoints require an exception name to "
+                        "be specified")
+                return ExceptionBreakpoint(ui, arg_parts[0])
             elif type == 'return':
                 l = len(arg_parts)
                 if l == 0:
-                    raise error.BreakpointError("Return breakpoints " +\
-                            "require a function name to be specified")
-                return ReturnBreakpoint(ui,arg_parts[0])
+                    raise error.BreakpointError(
+                        "Return breakpoints require a function name to be "
+                        "specified")
+                return ReturnBreakpoint(ui, arg_parts[0])
             elif type == 'call':
                 l = len(arg_parts)
                 if l == 0:
-                    raise error.BreakpointError("Call breakpoints " +\
-                            "require a function name to be specified")
-                return CallBreakpoint(ui,arg_parts[0])
+                    raise error.BreakpointError(
+                        "Call breakpoints require a function name to be "
+                        "specified")
+                return CallBreakpoint(ui, arg_parts[0])
             else:
-                raise error.BreakpointError("Unknown breakpoint type, " +\
-                        "please choose one of: conditional, exception,"+\
-                        "call or return")
+                raise error.BreakpointError(
+                    "Unknown breakpoint type, please choose one of: "
+                    "conditional, exception, call or return")
 
     def get_cmd(self):
         pass
 
     def __str__(self):
-        return "%s breakpoint, id %i" %(self.type,self.id)
+        return "%s breakpoint, id %i" % (self.type, self.id)
 
 class LineBreakpoint(Breakpoint):
     type = "line"
 
-    def __init__(self,ui,file,line):
-        Breakpoint.__init__(self,ui)
+    def __init__(self, ui, file, line):
+        Breakpoint.__init__(self, ui)
         self.file = file
         self.line = line
 
     def get_line(self):
         return self.line
 
-    def set_line(self,line):
+    def set_line(self, line):
         self.line = int(line)
 
     def get_file(self):
@@ -209,20 +214,21 @@ class TemporaryLineBreakpoint(LineBreakpoint):
 class ConditionalBreakpoint(LineBreakpoint):
     type = "conditional"
 
-    def __init__(self,ui,file,line,condition):
-        LineBreakpoint.__init__(self,ui,file,line)
+    def __init__(self, ui, file, line, condition):
+        LineBreakpoint.__init__(self, ui, file, line)
         self.condition = condition
 
     def get_cmd(self):
         cmd = LineBreakpoint.get_cmd(self)
-        cmd += " -- " + base64.encodestring(self.condition.encode("UTF-8")).decode("UTF-8")
+        cmd += " -- " + base64.encodestring(
+            self.condition.encode("UTF-8")).decode("UTF-8")
         return cmd
 
 class WatchBreakpoint(Breakpoint):
     type = "watch"
 
-    def __init__(self,ui,expr):
-        Breakpoint.__init__(self,ui)
+    def __init__(self, ui, expr):
+        Breakpoint.__init__(self, ui)
         self.expr = expr
 
     def get_cmd(self):
@@ -234,8 +240,8 @@ class WatchBreakpoint(Breakpoint):
 class ExceptionBreakpoint(Breakpoint):
     type = "exception"
 
-    def __init__(self,ui,exception):
-        Breakpoint.__init__(self,ui)
+    def __init__(self, ui, exception):
+        Breakpoint.__init__(self, ui)
         self.exception = exception
 
     def get_cmd(self):
@@ -247,8 +253,8 @@ class ExceptionBreakpoint(Breakpoint):
 class CallBreakpoint(Breakpoint):
     type = "call"
 
-    def __init__(self,ui,function):
-        Breakpoint.__init__(self,ui)
+    def __init__(self, ui, function):
+        Breakpoint.__init__(self, ui)
         self.function = function
 
     def get_cmd(self):
