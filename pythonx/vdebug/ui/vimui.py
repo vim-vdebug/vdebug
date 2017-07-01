@@ -49,7 +49,7 @@ class WindowManager:
         self.window(name).toggle(self._command(name))
 
     def close(self):
-        for name, win in self._windows.items():
+        for win in self._windows.values():
             win.destroy()
 
     def watch(self):

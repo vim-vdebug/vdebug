@@ -15,7 +15,7 @@ class Store:
         num_bps = len(self.breakpoints)
         if num_bps > 0:
             log.Log("Registering %i breakpoints with the debugger" % num_bps)
-        for id, bp in self.breakpoints.items():
+        for bp in self.breakpoints.values():
             res = self.api.breakpoint_set(bp.get_cmd())
             bp.set_debugger_id(res.get_id())
 
@@ -57,13 +57,13 @@ class Store:
         del self.breakpoints[id]
 
     def clear_breakpoints(self):
-        for id in self.breakpoints.keys():
+        for id in self.breakpoints:
             self.remove_breakpoint_by_id(id)
         self.breakpoints = {}
 
     def find_breakpoint(self, file, line):
         found = None
-        for id, bp in self.breakpoints.items():
+        for bp in self.breakpoints.values():
             if bp.type == "line":
                 if bp.get_file() == file and\
                         bp.get_line() == line:
