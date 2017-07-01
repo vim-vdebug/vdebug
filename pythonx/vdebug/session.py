@@ -93,8 +93,7 @@ class SessionHandler:
     def status(self):
         if self.is_connected():
             return "running"
-        else:
-            return self.listener.status()
+        return self.listener.status()
 
     def status_for_statusline(self):
         return "vdebug(%s)" % self.status()
@@ -105,8 +104,7 @@ class SessionHandler:
                 print("Found connection, starting debugger")
                 self.__new_session()
                 return True
-            else:
-                return False
+            return False
         except Exception as e:
             print("Error starting Vdebug: %s" %
                   self.__ex_handler.exception_to_string(e))

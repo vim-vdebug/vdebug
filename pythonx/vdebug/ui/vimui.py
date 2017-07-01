@@ -383,10 +383,7 @@ class VimBuffer:
         self._buffer[:] = []
 
     def is_empty(self):
-        if len(self._buffer) == 1 and not self._buffer[0]:
-            return True
-        else:
-            return False
+        return bool(len(self._buffer) == 1 and not self._buffer[0])
 
 
 class HiddenBuffer:
@@ -775,8 +772,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 res.append("[ %s ]" % name)
         if res:
             return " ".join(res) + "\n\n"
-        else:
-            return ""
+        return ""
 
     def __render_property(self, p, next_p, last=False, indent=0):
         indent_str = "".rjust((p.depth * 2)+indent)

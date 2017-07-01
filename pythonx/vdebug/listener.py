@@ -11,8 +11,7 @@ class Listener:
     def create(cls):
         if opts.Options.get('background_listener', int):
             return BackgroundListener()
-        else:
-            return ForegroundListener()
+        return ForegroundListener()
 
 
 class ForegroundListener:
@@ -74,10 +73,9 @@ class BackgroundListener:
             return "inactive"
         if self.is_ready():
             return "ready"
-        elif self.__server.is_alive():
+        if self.__server.is_alive():
             return "listening"
-        else:
-            return "inactive"
+        return "inactive"
 
     def is_ready(self):
         return self.__server.has_socket()

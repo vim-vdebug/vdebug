@@ -187,8 +187,7 @@ class FeatureGetResponse(Response):
         if self.is_supported():
             xml = self.as_xml()
             return xml.text
-        else:
-            return "* Feature not supported *"
+        return "* Feature not supported *"
 
 
 class Api:
@@ -602,8 +601,7 @@ class ContextProperty:
             val = None
         if val is None:
             return default
-        else:
-            return val
+        return val
 
     def _determine_children(self, node):
         children = node.get('numchildren')
@@ -652,8 +650,7 @@ class ContextProperty:
 
         if size is None:
             return self.type
-        else:
-            return "%s [%s]" % (self.type, size)
+        return "%s [%s]" % (self.type, size)
 
 
 class EvalProperty(ContextProperty):

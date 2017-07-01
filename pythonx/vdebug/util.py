@@ -32,8 +32,7 @@ class ExceptionHandler:
     def exception_to_string(self, e):
         if isinstance(e, self.readable_errors):
             return str(e)
-        else:
-            return str(sys.exc_info()[0])
+        return str(sys.exc_info()[0])
 
     def handle_timeout(self):
         """Handle a timeout, which is pretty normal.
@@ -258,14 +257,12 @@ class FilePath:
 
         if ret.startswith('/'):
             return "file://"+ret
-        else:
-            return "file:///"+ret
+        return "file:///"+ret
 
     def as_local(self, quote=False):
         if quote:
             return urllib.quote(self.local)
-        else:
-            return self.local
+        return self.local
 
     def as_remote(self):
         return self.remote

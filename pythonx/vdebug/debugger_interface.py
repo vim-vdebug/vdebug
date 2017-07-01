@@ -70,10 +70,9 @@ class DebuggerInterface:
         """
         if value is None:
             return self.ui.say(opts.Options.get(option))
-        else:
-            self.ui.say("Setting vdebug option '%s' to: %s" % (option, value))
-            vim.command('let g:vdebug_options["%s"] = "%s"' % (option, value))
-            return opts.Options.overwrite(option, value)
+        self.ui.say("Setting vdebug option '%s' to: %s" % (option, value))
+        vim.command('let g:vdebug_options["%s"] = "%s"' % (option, value))
+        return opts.Options.overwrite(option, value)
 
     def handle_return_keypress(self):
         """React to a <enter> keypress event.

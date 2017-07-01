@@ -101,9 +101,8 @@ class CursorEvalEvent(Event):
         if var:
             self.dispatch("eval", var)
             return True
-        else:
-            self.ui.error("Cannot find a valid variable under the cursor")
-            return False
+        self.ui.error("Cannot find a valid variable under the cursor")
+        return False
 
 
 class StackWindowLineSelectEvent(Event):
@@ -220,9 +219,8 @@ class WatchWindowContextChangeEvent(Event):
         if context_id == -1:
             raise error.EventError("Could not resolve context name")
             return False
-        else:
-            self.dispatch("get_context", context_id)
-            return True
+        self.dispatch("get_context", context_id)
+        return True
 
     def __get_word_end(self, line, column):
         tab_end_pos = -1
@@ -533,10 +531,9 @@ class Dispatcher:
             event = self._get_event_by_position(session)
             if event is not None:
                 return event.run()
-            else:
-                log.Log("No executable event found at current cursor position",
-                        log.Logger.DEBUG)
-                return False
+            log.Log("No executable event found at current cursor position",
+                    log.Logger.DEBUG)
+            return False
 
     def _get_event_by_position(self, session):
         buf_name = vim.current.buffer.name

@@ -124,9 +124,8 @@ class Log:
         if type in cls.loggers:
             cls.loggers[type].shutdown()
             return True
-        else:
-            print("Failed to find logger %s in list of loggers" % type)
-            return False
+        print("Failed to find logger %s in list of loggers" % type)
+        return False
 
     @classmethod
     def shutdown(cls):

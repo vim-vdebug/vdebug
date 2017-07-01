@@ -40,8 +40,7 @@ class Options:
         option = cls.get(name)
         if not option:
             return "<empty>"
-        else:
-            return option
+        return option
 
     @classmethod
     def overwrite(cls, name, value):
