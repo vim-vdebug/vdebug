@@ -111,13 +111,13 @@ class Breakpoint:
         if args is None:
             args = ""
         args = args.strip()
-        if len(args) == 0:
+        if not args:
             """ Line breakpoint """
             row = ui.get_current_row()
             try:
                 file = ui.get_current_file()
                 line = ui.get_current_line()
-                if len(line.strip()) == 0:
+                if not line.strip():
                     raise error.BreakpointError('Cannot set a breakpoint on '
                                                 'an empty line')
             except error.FilePathError:
@@ -130,14 +130,14 @@ class Breakpoint:
             if type == 'conditional':
                 row = ui.get_current_row()
                 file = ui.get_current_file()
-                if len(arg_parts) == 0:
+                if not arg_parts:
                     raise error.BreakpointError(
                         "Conditional breakpoints require a condition to be "
                         "specified")
                 cond = " ".join(arg_parts)
                 return ConditionalBreakpoint(ui, file, row, cond)
             elif type == 'watch':
-                if len(arg_parts) == 0:
+                if not arg_parts:
                     raise error.BreakpointError(
                         "Watch breakpoints require a condition to be "
                         "specified")
@@ -145,7 +145,7 @@ class Breakpoint:
                 log.Log("Expression: %s" % expr)
                 return WatchBreakpoint(ui, expr)
             elif type == 'exception':
-                if len(arg_parts) == 0:
+                if not arg_parts:
                     raise error.BreakpointError(
                         "Exception breakpoints require an exception name to "
                         "be specified")

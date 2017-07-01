@@ -386,7 +386,7 @@ class VimBuffer:
         self._buffer[:] = []
 
     def is_empty(self):
-        if len(self._buffer) == 1 and len(self._buffer[0]) == 0:
+        if len(self._buffer) == 1 and not self._buffer[0]:
             return True
         else:
             return False

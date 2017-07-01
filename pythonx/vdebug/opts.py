@@ -38,7 +38,7 @@ class Options:
         Raises an OptionsError if the option doesn't exist.
         """
         option = cls.get(name)
-        if len(option) == 0:
+        if not option:
             return "<empty>"
         else:
             return option

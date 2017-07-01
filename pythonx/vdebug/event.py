@@ -380,7 +380,7 @@ class SetEvalExpressionEvent(Event):
 
         log.Log("Evaluating code: %s" % code)
 
-        if len(code):
+        if code:
             if persist_expression:
                 self.ui.windows.watch().set_eval_expression(code)
             self.dispatch("eval", code)
@@ -408,7 +408,7 @@ class RemoveBreakpointEvent(Event):
         if args is None:
             args = ""
         args = args.strip()
-        if len(args) == 0:
+        if not args:
             self.ui.error("ID or '*' required to remove a breakpoint: run "
                           "':BreakpointWindow' to see breakpoints and their "
                           "IDs")

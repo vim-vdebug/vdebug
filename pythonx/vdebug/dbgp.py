@@ -252,7 +252,7 @@ class Api:
         send = cmd.strip()
         self.transID += 1
         send += ' -i ' + str(self.transID)
-        if len(args) > 0:
+        if args:
             send += ' ' + args
         log.Log("Command: "+send, log.Logger.DEBUG)
         self.conn.send_msg(send)
