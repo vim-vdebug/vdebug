@@ -193,12 +193,8 @@ class LineBreakpoint(Breakpoint):
         return self.file
 
     def get_cmd(self):
-        cmd = "-t " + self.type
-        cmd += " -f " + '"' + self.file.as_remote() + '"'
-        cmd += " -n " + str(self.line)
-        cmd += " -s enabled"
-
-        return cmd
+        return '-t {} -f "{}" -n {} -s enabled'.format(
+            self.type, self.file.as_remote(), self.line)
 
 class TemporaryLineBreakpoint(LineBreakpoint):
     def on_add(self):
@@ -245,10 +241,7 @@ class ExceptionBreakpoint(Breakpoint):
         self.exception = exception
 
     def get_cmd(self):
-        cmd = "-t " + self.type
-        cmd += " -x " + self.exception
-        cmd += " -s enabled"
-        return cmd
+        return "-t {} -x {} -s enabled".format(self.type, self.exception)
 
 class CallBreakpoint(Breakpoint):
     type = "call"
@@ -258,10 +251,7 @@ class CallBreakpoint(Breakpoint):
         self.function = function
 
     def get_cmd(self):
-        cmd = "-t " + self.type
-        cmd += " -m %s" % self.function
-        cmd += " -s enabled"
-        return cmd
+        return "-t {} -m {} -s enabled".format(self.type, self.function)
 
 class ReturnBreakpoint(CallBreakpoint):
     type = "return"
