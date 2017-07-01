@@ -11,10 +11,13 @@ else:
 
 from . import log
 
-""" Response objects for the DBGP module."""
 
 class Response:
-    """Contains response data from a command made to the debugger."""
+    """ Response objects for the DBGP module.
+
+    Contains response data from a command made to the debugger.
+    """
+
     ns = '{urn:debugger_protocol_v1}'
 
     def __init__(self, response, cmd, cmd_args, api):
