@@ -191,7 +191,7 @@ class FilePath:
     is_win = False
 
     def __init__(self, filename):
-        if filename is None or len(filename) == 0:
+        if not filename:
             raise error.FilePathError("Missing or invalid file name")
         filename = urllib.unquote(filename)
         if filename.startswith('file:'):

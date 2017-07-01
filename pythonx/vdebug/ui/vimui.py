@@ -347,12 +347,12 @@ class VimBuffer:
 
     def insert(self, msg, lineno, overwrite, allowEmpty, after_callback):
         """ insert into current position in buffer"""
-        if not msg and allowEmpty == False:
+        if not msg and not allowEmpty:
             return
         if self.is_empty():
             self._buffer[:] = str(msg).split('\n')
         else:
-            if lineno == None:
+            if lineno is None:
                 (lineno, rol) = vim.current.window.cursor
             remaining_buffer = str(msg).split('\n')
             if overwrite:
@@ -412,7 +412,7 @@ class HiddenBuffer:
 
     def insert(self, msg, lineno, overwrite, allowEmpty, after_callback):
         """ insert into current position in buffer"""
-        if not msg and allowEmpty == False:
+        if not msg and not allowEmpty:
             return
         if self.is_empty():
             self._buffer[:] = str(msg).split('\n')
@@ -510,7 +510,7 @@ class Window(interface.Window):
 
     def destroy(self, wipeout=True):
         """ destroy window """
-        if self._buffer == None:
+        if self._buffer is None:
             return
         self.is_open = False
         self._buffer = HiddenBuffer(self._buffer.contents())

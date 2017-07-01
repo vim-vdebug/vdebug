@@ -71,7 +71,7 @@ class Response:
 
         Returns an xml.etree.ElementTree.Element object.
         """
-        if self.xml == None:
+        if self.xml is None:
             self.xml = ET.fromstring(self.response)
             self.__determine_ns()
         return self.xml
