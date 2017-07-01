@@ -109,11 +109,8 @@ class Ui(interface.Ui):
         self.windows.toggle(name)
 
     def is_modified(self):
-       modified = int(vim.eval('&mod'))
-       if modified:
-           return True
-       else:
-           return False
+        modified = int(vim.eval('&mod'))
+        return bool(modified)
 
     def window(self, name):
         self.windows.window(name)

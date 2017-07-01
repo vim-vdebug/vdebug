@@ -638,10 +638,7 @@ class ContextProperty:
         self.is_last_child = True
 
     def is_uninitialized(self):
-        if self.type == 'uninitialized':
-            return True
-        else:
-            return False
+        return self.type == 'uninitialized'
 
     def child_count(self):
         return len(self.children)
@@ -663,10 +660,7 @@ class EvalProperty(ContextProperty):
     def __init__(self, node, code, language, parent=None, depth=0):
         self.code = code
         self.language = language.lower()
-        if parent is None:
-            self.is_parent = True
-        else:
-            self.is_parent = False
+        self.is_parent = parent is None
         ContextProperty.__init__(self, node, parent, depth)
 
     def _create_child(self, node, parent, depth):

@@ -56,11 +56,8 @@ class Options:
         values are strings.
         """
         inst = cls.inst()
-        if name in inst.options and \
-            len(inst.options[name]) > 0:
-            return True
-        else:
-            return False
+        return name in inst.options and len(inst.options[name]) > 0
+
 
 class OptionsError(Exception):
     pass
