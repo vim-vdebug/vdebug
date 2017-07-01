@@ -150,7 +150,7 @@ class Ui(interface.Ui):
             winnr = self.__get_srcwinno_by_name(srcwin_name)
             self.sourcewin = SourceWindow(self, winnr)
             self.sourcewin.focus()
-        except Exception as e:
+        except Exception:
             self.is_open = False
             raise
 
