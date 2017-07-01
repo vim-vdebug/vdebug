@@ -4,6 +4,8 @@ import os
 import sys
 import time
 
+from . import error
+
 
 class Logger(object):
     """ Abstract class for all logger implementations.
