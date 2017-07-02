@@ -3,7 +3,7 @@
 " Maintainer: Jon Cairns
 " Latest Revision: 2 August 2012
 
-if exists("b:current_syntax")
+if exists('b:current_syntax')
   finish
 endif
 
