@@ -11,6 +11,7 @@ import time
 
 from . import log
 
+
 class ConnectionHandler:
     """Handles read and write operations to a given socket."""
 
@@ -31,8 +32,7 @@ class ConnectionHandler:
 
     def close(self):
         """Close the connection."""
-        log.Log("Closing the socket",\
-                        log.Logger.DEBUG)
+        log.Log("Closing the socket", log.Logger.DEBUG)
         self.sock.close()
 
     def __recv_length(self):
@@ -79,7 +79,7 @@ class ConnectionHandler:
         Returns a string, which is expected to be XML.
         """
         length = self.__recv_length()
-        body     = self.__recv_body(length)
+        body = self.__recv_body(length)
         self.__recv_null()
         return body
 
@@ -90,8 +90,10 @@ class ConnectionHandler:
         """
         self.sock.send(cmd + '\0')
 
+
 class SocketCreator:
-    def __init__(self, input_stream = None):
+
+    def __init__(self, input_stream=None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
@@ -101,15 +103,16 @@ class SocketCreator:
         self.__sock = None
         self.input_stream = input_stream
 
-    def start(self, host = '', port = 9000, timeout = 30):
+    def start(self, host='', port=9000, timeout=30):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()
 
         host -- host name where debugger is running (default '')
         port -- port number which debugger is listening on (default 9000)
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
-."""
-        print('Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', timeout, ' seconds...)')
+        """
+        print('Waiting for a connection (Ctrl-C to cancel, this message will '
+              'self-destruct in ', timeout, ' seconds...)')
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -151,7 +154,9 @@ class SocketCreator:
     def has_socket(self):
         return self.__sock is not None
 
+
 class BackgroundSocketCreator(threading.Thread):
+
     def __init__(self, host, port, message_q, output_q):
         self.__message_q = message_q
         self.__output_q = output_q
@@ -159,7 +164,8 @@ class BackgroundSocketCreator(threading.Thread):
         self.__port = port
         threading.Thread.__init__(self)
 
-    def log(self, message):
+    @staticmethod
+    def log(message):
         log.Log(message, log.Logger.DEBUG)
 
     def run(self):
@@ -195,11 +201,14 @@ class BackgroundSocketCreator(threading.Thread):
         except queue.Empty:
             pass
 
-    def __check_exit(self, message):
-         if message == "exit":
+    @staticmethod
+    def __check_exit(message):
+        if message == "exit":
             raise Exception("Exiting")
 
+
 class SocketServer:
+
     def __init__(self):
         self.__message_q = queue.Queue(0)
         self.__socket_q = queue.Queue(1)
@@ -210,10 +219,8 @@ class SocketServer:
 
     def start(self, host, port):
         if not self.is_alive():
-            self.__thread = BackgroundSocketCreator(host,
-                                                    port,
-                                                    self.__message_q,
-                                                    self.__socket_q)
+            self.__thread = BackgroundSocketCreator(
+                host, port, self.__message_q, self.__socket_q)
             self.__thread.start()
 
     def is_alive(self):
@@ -231,4 +238,3 @@ class SocketServer:
             self.__thread.join(3000)
         if self.has_socket():
             self.socket()[0].close()
-

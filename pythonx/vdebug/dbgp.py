@@ -11,13 +11,16 @@ else:
 
 from . import log
 
-""" Response objects for the DBGP module."""
 
 class Response:
-    """Contains response data from a command made to the debugger."""
+    """ Response objects for the DBGP module.
+
+    Contains response data from a command made to the debugger.
+    """
+
     ns = '{urn:debugger_protocol_v1}'
 
-    def __init__(self,response,cmd,cmd_args,api):
+    def __init__(self, response, cmd, cmd_args, api):
         self.response = response
         self.cmd = cmd
         self.cmd_args = cmd_args
@@ -32,21 +35,19 @@ class Response:
         xml = self.as_xml()
         err_el = xml.find('%serror' % self.ns)
         if err_el is None:
-            raise DBGPError("Could not parse error from return XML",1)
+            raise DBGPError("Could not parse error from return XML", 1)
         else:
             code = err_el.get("code")
             if code is None:
-                raise ResponseError(
-                        "Missing error code in response",
-                        self.response)
+                raise ResponseError("Missing error code in response",
+                                    self.response)
             elif int(code) == 4:
                 raise CmdNotImplementedError('Command not implemented')
             msg_el = err_el.find('%smessage' % self.ns)
             if msg_el is None:
-                raise ResponseError(
-                        "Missing error message in response",
-                        self.response)
-            raise DBGPError(msg_el.text,code)
+                raise ResponseError("Missing error message in response",
+                                    self.response)
+            raise DBGPError(msg_el.text, code)
 
     def get_cmd(self):
         """Get the command that created this response."""
@@ -70,7 +71,7 @@ class Response:
 
         Returns an xml.etree.ElementTree.Element object.
         """
-        if self.xml == None:
+        if self.xml is None:
             self.xml = ET.fromstring(self.response)
             self.__determine_ns()
         return self.xml
@@ -78,7 +79,7 @@ class Response:
     def __determine_ns(self):
         tag_repr = str(self.xml.tag)
         if tag_repr[0] != '{':
-            raise DBGPError('Invalid or missing XML namespace',1)
+            raise DBGPError('Invalid or missing XML namespace', 1)
         else:
             ns_parts = tag_repr.split('}')
             self.ns = ns_parts[0] + '}'
@@ -86,12 +87,15 @@ class Response:
     def __str__(self):
         return self.as_string()
 
+
 class ContextNamesResponse(Response):
+
     def names(self):
         names = {}
         for c in list(self.as_xml()):
             names[int(c.get('id'))] = c.get('name')
         return names
+
 
 class TraceResponse(Response):
     """Response object returned by the trace command."""
@@ -106,11 +110,13 @@ class StatusResponse(Response):
     def __str__(self):
         return self.as_xml().get('status')
 
+
 class StackGetResponse(Response):
     """Response object used by the stack_get command."""
 
     def get_stack(self):
         return list(self.as_xml())
+
 
 class ContextGetResponse(Response):
     """Response object used by the context_get command.
@@ -118,8 +124,8 @@ class ContextGetResponse(Response):
     The property nodes are converted into ContextProperty
     objects, which are much easier to use."""
 
-    def __init__(self,response,cmd,cmd_args,api):
-        Response.__init__(self,response,cmd,cmd_args,api)
+    def __init__(self, response, cmd, cmd_args, api):
+        Response.__init__(self, response, cmd, cmd_args, api)
         self.properties = []
 
     def get_context(self):
@@ -128,16 +134,18 @@ class ContextGetResponse(Response):
 
         return self.properties
 
-    def create_properties(self,property):
+    def create_properties(self, property):
         self.properties.append(property)
         for p in property.children:
             self.create_properties(p)
 
+
 class EvalResponse(ContextGetResponse):
     """Response object returned by the eval command."""
-    def __init__(self,response,cmd,cmd_args,api):
+
+    def __init__(self, response, cmd, cmd_args, api):
         try:
-            ContextGetResponse.__init__(self,response,cmd,cmd_args,api)
+            ContextGetResponse.__init__(self, response, cmd, cmd_args, api)
         except DBGPError as e:
             if int(e.args[1]) == 206:
                 raise EvalError()
@@ -147,7 +155,7 @@ class EvalResponse(ContextGetResponse):
     def get_context(self):
         code = self.get_code()
         for c in list(self.as_xml()):
-            self.create_properties(EvalProperty(c,code,self.api.language))
+            self.create_properties(EvalProperty(c, code, self.api.language))
 
         return self.properties
 
@@ -166,6 +174,7 @@ class BreakpointSetResponse(Response):
     def __str__(self):
         return self.as_xml().get('id')
 
+
 class FeatureGetResponse(Response):
     """Response object specifically for the feature_get command."""
 
@@ -178,8 +187,8 @@ class FeatureGetResponse(Response):
         if self.is_supported():
             xml = self.as_xml()
             return xml.text
-        else:
-            return "* Feature not supported *"
+        return "* Feature not supported *"
+
 
 class Api:
     """Api for eBGP commands.
@@ -212,7 +221,7 @@ class Api:
     def __del__(self):
         self.conn.close()
 
-    def __parse_init_msg(self,msg):
+    def __parse_init_msg(self, msg):
         """Parse the init message from the debugger"""
         xml = ET.fromstring(msg)
         self.language = xml.get("language")
@@ -225,8 +234,7 @@ class Api:
         self.version = xml.get("api_version")
         self.startfile = xml.get("fileuri")
 
-    def send_cmd(self,cmd,args = '',
-            res_cls = Response):
+    def send_cmd(self, cmd, args='', res_cls=Response):
         """Send a command to the debugger.
 
         This method automatically adds a unique transaction
@@ -242,25 +250,23 @@ class Api:
         args = args.strip()
         send = cmd.strip()
         self.transID += 1
-        send += ' -i '+ str(self.transID)
-        if len(args) > 0:
+        send += ' -i ' + str(self.transID)
+        if args:
             send += ' ' + args
-        log.Log("Command: "+send,\
-                log.Logger.DEBUG)
+        log.Log("Command: "+send, log.Logger.DEBUG)
         self.conn.send_msg(send)
         msg = self.conn.recv_msg()
-        log.Log("Response: "+msg,\
-                log.Logger.DEBUG)
-        return res_cls(msg,cmd,args,self)
+        log.Log("Response: "+msg, log.Logger.DEBUG)
+        return res_cls(msg, cmd, args, self)
 
     def status(self):
         """Get the debugger status.
 
         Returns a Response object.
         """
-        return self.send_cmd('status','',StatusResponse)
+        return self.send_cmd('status', '', StatusResponse)
 
-    def feature_get(self,name):
+    def feature_get(self, name):
         """Get the value of a feature from the debugger.
 
         See the DBGP documentation for a list of features.
@@ -269,12 +275,10 @@ class Api:
 
         name -- name of the feature, e.g. encoding
         """
-        return self.send_cmd(
-                'feature_get',
-                '-n '+str(name),
-                FeatureGetResponse)
+        return self.send_cmd('feature_get', '-n '+str(name),
+                             FeatureGetResponse)
 
-    def feature_set(self,name,value):
+    def feature_set(self, name, value):
         """Set the value of a debugger feature.
 
         See the DBGP documentation for a list of features.
@@ -284,16 +288,14 @@ class Api:
         name -- name of the feature, e.g. encoding
         value -- new value for the feature
         """
-        return self.send_cmd(
-                'feature_set',
-                '-n ' + str(name) + ' -v ' + str(value))
+        return self.send_cmd('feature_set', '-n {} -v {}'.format(name, value))
 
     def run(self):
         """Tell the debugger to start or resume
         execution."""
-        return self.send_cmd('run','',StatusResponse)
+        return self.send_cmd('run', '', StatusResponse)
 
-    def eval(self,code):
+    def eval(self, code):
         """Tell the debugger to start or resume
         execution."""
         code_enc = base64.encodestring(code)
@@ -303,7 +305,7 @@ class Api:
         if self.language == 'python':
             args = ("-l %i " % len(code_enc) ) + args"""
 
-        return self.send_cmd('eval',args,EvalResponse)
+        return self.send_cmd('eval', args, EvalResponse)
 
     def step_into(self):
         """Tell the debugger to step to the next
@@ -312,7 +314,7 @@ class Api:
         If there's a function call, the debugger engine
         will break on the first statement in the function.
         """
-        return self.send_cmd('step_into','',StatusResponse)
+        return self.send_cmd('step_into', '', StatusResponse)
 
     def step_over(self):
         """Tell the debugger to step to the next
@@ -321,42 +323,42 @@ class Api:
         If there's a function call, the debugger engine
         will stop at the next statement after the function call.
         """
-        return self.send_cmd('step_over','',StatusResponse)
+        return self.send_cmd('step_over', '', StatusResponse)
 
     def step_out(self):
         """Tell the debugger to step out of the statement.
 
         The debugger will step out of the current scope.
         """
-        return self.send_cmd('step_out','',StatusResponse)
+        return self.send_cmd('step_out', '', StatusResponse)
 
     def stop(self):
         """Tell the debugger to stop execution.
 
         The script is terminated immediately."""
-        return self.send_cmd('stop','',StatusResponse)
+        return self.send_cmd('stop', '', StatusResponse)
 
     def stack_get(self):
         """Get the stack information.
         """
-        return self.send_cmd('stack_get','',StackGetResponse)
+        return self.send_cmd('stack_get', '', StackGetResponse)
 
-    def context_get(self,context = 0):
+    def context_get(self, context=0):
         """Get the context variables.
         """
-        return self.send_cmd('context_get',\
-                '-c %i' % int(context),\
-                ContextGetResponse)
+        return self.send_cmd('context_get', '-c %i' % int(context),
+                             ContextGetResponse)
 
     def context_names(self):
         """Get the context types.
         """
-        return self.send_cmd('context_names','',ContextNamesResponse)
+        return self.send_cmd('context_names', '', ContextNamesResponse)
 
-    def property_get(self,name):
+    def property_get(self, name):
         """Get a property.
         """
-        return self.send_cmd('property_get','-n %s -d 0' % name,ContextGetResponse)
+        return self.send_cmd('property_get', '-n %s -d 0' % name,
+                             ContextGetResponse)
 
     def detach(self):
         """Tell the debugger to detach itself from this
@@ -364,26 +366,25 @@ class Api:
 
         The script is not terminated, but runs as normal
         from this point."""
-        ret = self.send_cmd('detach','',StatusResponse)
+        ret = self.send_cmd('detach', '', StatusResponse)
         self.conn.close()
         return ret
 
-    def breakpoint_set(self,cmd_args):
+    def breakpoint_set(self, cmd_args):
         """Set a breakpoint.
 
         The breakpoint type is defined by the arguments, see the
         Breakpoint class for more detail."""
-        return self.send_cmd('breakpoint_set',cmd_args,\
-                BreakpointSetResponse)
+        return self.send_cmd('breakpoint_set', cmd_args, BreakpointSetResponse)
 
     def breakpoint_list(self):
         return self.send_cmd('breakpoint_list')
 
-    def breakpoint_remove(self,id):
+    def breakpoint_remove(self, id):
         """Remove a breakpoint by ID.
 
         The ID is that returned in the response from breakpoint_set."""
-        return self.send_cmd('breakpoint_remove','-d %i' % id,Response)
+        return self.send_cmd('breakpoint_remove', '-d %i' % id, Response)
 
 """Connection module for managing a socket connection
 between this client and the debugger."""
@@ -398,7 +399,7 @@ class Connection:
     address = None
     isconned = 0
 
-    def __init__(self, host = '', port = 9000, timeout = 30, input_stream = None):
+    def __init__(self, host='', port=9000, timeout=30, input_stream=None):
         """Create a new Connection.
 
         The connection is not established until open() is called.
@@ -424,7 +425,8 @@ class Connection:
     def open(self):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()."""
-        print('Waiting for a connection (Ctrl-C to cancel, this message will self-destruct in ', self.timeout, ' seconds...)')
+        print('Waiting for a connection (Ctrl-C to cancel, this message will '
+              'self-destruct in ', self.timeout, ' seconds...)')
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -465,9 +467,8 @@ class Connection:
 
     def close(self):
         """Close the connection."""
-        if self.sock != None:
-            log.Log("Closing the socket",\
-                            log.Logger.DEBUG)
+        if self.sock is not None:
+            log.Log("Closing the socket", log.Logger.DEBUG)
             self.sock.close()
             self.sock = None
         self.isconned = 0
@@ -516,7 +517,7 @@ class Connection:
         Returns a string, which is expected to be XML.
         """
         length = self.__recv_length()
-        body     = self.__recv_body(length)
+        body = self.__recv_body(length)
         self.__recv_null()
         return body
 
@@ -527,11 +528,12 @@ class Connection:
         """
         self.sock.send(cmd + '\0')
 
+
 class ContextProperty:
 
     ns = '{urn:debugger_protocol_v1}'
 
-    def __init__(self,node,parent = None,depth = 0):
+    def __init__(self, node, parent=None, depth=0):
         self.parent = parent
         self.__determine_type(node)
         self._determine_displayname(node)
@@ -548,30 +550,30 @@ class ContextProperty:
         if self.type == 'scalar':
             self.size = len(self.value) - 2
 
-    def __determine_value(self,node):
+    def __determine_value(self, node):
         if self.has_children:
             self.value = ""
             return
 
-        self.value = self._get_enc_node_text(node,'value')
+        self.value = self._get_enc_node_text(node, 'value')
         if self.value is None:
             if self.encoding == 'base64':
                 if node.text is None:
                     self.value = ""
                 else:
-                    self.value = base64.decodestring(node.text.encode("UTF-8")).decode("UTF-8")
-            elif not self.is_uninitialized() \
-                    and not self.has_children:
+                    self.value = base64.decodestring(
+                        node.text.encode("UTF-8")).decode("UTF-8")
+            elif not self.is_uninitialized() and not self.has_children:
                 self.value = node.text
 
         if self.value is None:
             self.value = ""
 
         self.num_crs = self.value.count('\n')
-        if self.type.lower() in ("string","str","scalar"):
-            self.value = '`%s`' % self.value.replace('`','\\`')
+        if self.type.lower() in ("string", "str", "scalar"):
+            self.value = '`%s`' % self.value.replace('`', '\\`')
 
-    def __determine_type(self,node):
+    def __determine_type(self, node):
         type = node.get('classname')
         if type is None:
             type = node.get('type')
@@ -579,30 +581,29 @@ class ContextProperty:
             type = 'unknown'
         self.type = type
 
-    def _determine_displayname(self,node):
+    def _determine_displayname(self, node):
         display_name = node.get('fullname')
-        if display_name == None:
-            display_name = self._get_enc_node_text(node,'fullname',"")
+        if display_name is None:
+            display_name = self._get_enc_node_text(node, 'fullname', "")
         if display_name == '::':
             display_name = self.type
         self.display_name = display_name
 
-    def _get_enc_node_text(self,node,name,default =
-            None):
-        n = node.find('%s%s' %(self.ns, name))
+    def _get_enc_node_text(self, node, name, default=None):
+        n = node.find('%s%s' % (self.ns, name))
         if n is not None and n.text is not None:
             if n.get('encoding') == 'base64':
-                val = base64.decodestring(n.text.encode("UTF-8")).decode("UTF-8")
+                val = base64.decodestring(n.text.encode("UTF-8")).decode(
+                    "UTF-8")
             else:
                 val = n.text
         else:
             val = None
         if val is None:
             return default
-        else:
-            return val
+        return val
 
-    def _determine_children(self,node):
+    def _determine_children(self, node):
         children = node.get('numchildren')
         if children is None:
             children = node.get('children')
@@ -614,7 +615,7 @@ class ContextProperty:
         self.has_children = children > 0
         self.children = []
 
-    def __init_children(self,node):
+    def __init_children(self, node):
         if self.has_children:
             idx = 0
             tagname = '%sproperty' % self.ns
@@ -623,22 +624,19 @@ class ContextProperty:
                 for c in children:
                     if c.tag == tagname:
                         idx += 1
-                        p = self._create_child(c,self,self.depth+1)
+                        p = self._create_child(c, self, self.depth+1)
                         self.children.append(p)
                         if idx == self.num_declared_children:
                             p.mark_as_last_child()
 
-    def _create_child(self,node,parent,depth):
-        return ContextProperty(node,parent,depth)
+    def _create_child(self, node, parent, depth):
+        return ContextProperty(node, parent, depth)
 
     def mark_as_last_child(self):
         self.is_last_child = True
 
     def is_uninitialized(self):
-        if self.type == 'uninitialized':
-            return True
-        else:
-            return False
+        return self.type == 'uninitialized'
 
     def child_count(self):
         return len(self.children)
@@ -652,23 +650,20 @@ class ContextProperty:
 
         if size is None:
             return self.type
-        else:
-            return "%s [%s]" %(self.type,size)
+        return "%s [%s]" % (self.type, size)
+
 
 class EvalProperty(ContextProperty):
-    def __init__(self,node,code,language,parent=None,depth=0):
+    def __init__(self, node, code, language, parent=None, depth=0):
         self.code = code
         self.language = language.lower()
-        if parent is None:
-            self.is_parent = True
-        else:
-            self.is_parent = False
-        ContextProperty.__init__(self,node,parent,depth)
+        self.is_parent = parent is None
+        ContextProperty.__init__(self, node, parent, depth)
 
-    def _create_child(self,node,parent,depth):
-        return EvalProperty(node,self.code,self.language,parent,depth)
+    def _create_child(self, node, parent, depth):
+        return EvalProperty(node, self.code, self.language, parent, depth)
 
-    def _determine_displayname(self,node):
+    def _determine_displayname(self, node):
         if self.is_parent:
             self.display_name = self.code
         else:
@@ -688,7 +683,7 @@ class EvalProperty(ContextProperty):
                 name = node.get('name')
                 if name is None:
                     name = "?"
-                    name = self._get_enc_node_text(node,'name','?')
+                    name = self._get_enc_node_text(node, 'name', '?')
                 if self.parent.type == 'list':
                     self.display_name = self.parent.display_name + name
                 else:

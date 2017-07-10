@@ -4,6 +4,8 @@ import os
 import sys
 import time
 
+from . import error
+
 
 class Logger(object):
     """ Abstract class for all logger implementations.
@@ -45,11 +47,13 @@ class Logger(object):
 
 
 class WindowLogger(Logger):
+
     """ Log messages to a window.
 
     The window object is passed in on construction, but
     only created if a message is written.
     """
+
     def __init__(self, debug_level, window):
         self.window = window
         super(WindowLogger, self).__init__(debug_level)
@@ -65,11 +69,13 @@ class WindowLogger(Logger):
 
 
 class FileLogger(Logger):
+
     """ Log messages to a window.
 
     The window object is passed in on construction, but
     only created if a message is written.
     """
+
     def __init__(self, debug_level, filename):
         self.filename = os.path.expanduser(filename)
         self.f = None
@@ -95,6 +101,7 @@ class FileLogger(Logger):
         self.f.write(self.format(string, level)+"\n")
         self.f.flush()
 
+
 class Log:
 
     loggers = {}
@@ -119,9 +126,8 @@ class Log:
         if type in cls.loggers:
             cls.loggers[type].shutdown()
             return True
-        else:
-            print("Failed to find logger %s in list of loggers" % type)
-            return False
+        print("Failed to find logger %s in list of loggers" % type)
+        return False
 
     @classmethod
     def shutdown(cls):
