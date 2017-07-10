@@ -1,7 +1,10 @@
 from . import setup
 import unittest
 import vdebug.dbgp
-from mock import MagicMock, patch
+try:
+    from unittest.mock import MagicMock, patch
+except ImportError:
+    from mock import MagicMock, patch
 
 class ApiTest(unittest.TestCase):
     """Test the Api class in the vdebug.dbgp module."""

@@ -14,7 +14,7 @@ addons:
     - php5-cli
     - php5-xdebug
 install:
-- pip install -r requirements.txt
+- if [ $TRAVIS_PYTHON_VERSION = 2.7 ]; then pip install --upgrade mock; fi
 - bundle install
 before_script:
 - export DISPLAY=:99.0

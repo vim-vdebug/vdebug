@@ -3,7 +3,10 @@ import sys
 import unittest
 import vdebug.dbgp
 import xml
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 
 class ResponseTest(unittest.TestCase):
     """Test the response class in the vdebug.dbgp module."""

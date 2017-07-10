@@ -1,7 +1,10 @@
 from . import setup
 import unittest
-from mock import MagicMock, patch
 import vdebug.util
+try:
+    from unittest.mock import MagicMock, patch
+except ImportError:
+    from mock import MagicMock, patch
 
 class EnvironmentTest(unittest.TestCase):
     def test_reload_evals_options(self):
