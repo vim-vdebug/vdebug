@@ -20,6 +20,7 @@
 
 " Do not source this script when python is not compiled in.
 if !has("python")
+    echomsg ":python is not available, vdebug will not be loaded."
     finish
 endif
 
