@@ -186,4 +186,26 @@ class RemoteUnixLocalWinPathTest(unittest.TestCase):
 
         filename = "file:///G:/local2/path/to/file"
         file = FilePath(filename)
+        self.assertEqual("file:///remote2/path//to/file",file.as_remote())
+
+class MismatchingSeparatorsTest(unittest.TestCase):
+    def setUp(self):
+        vdebug.opts.Options.set({'path_maps':{'remote1/':'local1', 'remote2':'local2/'}})
+
+    def test_as_local(self):
+        filename = "/remote1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local1/path/to/file",file.as_local())
+
+        filename = "/remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local2//path/to/file",file.as_local())
+
+    def test_as_remote(self):
+        filename = "/local1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///remote1//path/to/file",file.as_remote())
+
+        filename = "/local2/path/to/file"
+        file = FilePath(filename)
         self.assertEqual("file:///remote2/path/to/file",file.as_remote())
