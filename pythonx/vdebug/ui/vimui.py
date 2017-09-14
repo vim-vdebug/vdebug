@@ -787,10 +787,12 @@ class ContextGetResponseRenderer(ResponseRenderer):
     def __render_property(self, p, next_p, last=False, indent=0):
         indent_str = "".rjust((p.depth * 2)+indent)
         line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" % {
-            'indent': indent_str, 'marker': self.__get_marker(p),
-            'name': p.display_name.encode('latin1'), 'type': p.type_and_size(),
-            'value': " " + p.value.replace("\n", "\\n'\n%(indent)s'" % {
-                'indent': indent_str})}
+            'indent': indent_str,
+            'marker': self.__get_marker(p),
+            'name': p.display_name.encode('ascii'),
+            'type': p.type_and_size(),
+            'value': " " + p.value.encode('ascii')
+        }
         line = line.rstrip() + "\n"
 
         if opts.Options.get('watch_window_style') == 'expanded':
