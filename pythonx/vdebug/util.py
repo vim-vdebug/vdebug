@@ -222,6 +222,8 @@ class FilePath:
                 if remote in ret:
                     log.Log("Replacing remote path (%s) with local path (%s)"
                             % (remote, local), log.Logger.DEBUG)
+                    if not local.endswith('/'):
+                        local = local+'/'
                     ret = ret.replace(remote, local, 1)
 
                     # determine remote path separator and replace by local
@@ -249,6 +251,8 @@ class FilePath:
                 if local in ret:
                     log.Log("Replacing local path (%s) with remote path (%s)"
                             % (local, remote), log.Logger.DEBUG)
+                    if not remote.endswith('/'):
+                        remote = remote+'/'
                     ret = ret.replace(local, remote, 1)
                     # replace remaining local separators with URL '/' separators
                     ret = ret.replace('\\', '/')
