@@ -489,6 +489,12 @@ class TraceEvent(Event):
         self.dispatch("trace_refresh")
 
 
+class DetachEvent(Event):
+
+    def run(self):
+        self.session_handler.detach()
+
+
 class Dispatcher:
     events = {
         "run": RunEvent,
@@ -505,7 +511,8 @@ class Dispatcher:
         "reload_keymappings": ReloadKeymappingsEvent,
         "remove_breakpoint": RemoveBreakpointEvent,
         "trace": TraceEvent,
-        "trace_refresh": TraceRefreshEvent
+        "trace_refresh": TraceRefreshEvent,
+        "detach": DetachEvent
     }
 
     def __init__(self, session_handler):
