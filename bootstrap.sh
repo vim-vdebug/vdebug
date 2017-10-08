@@ -151,3 +151,39 @@ git clone https://github.com/joonty/vdebug.git ~/.vim/bundle/vdebug
 cd /vagrant
 bundle install
 EOF
+
+### Neovim installation
+cat <<EOF > /home/vagrant/neovim.sh
+### This script compiles and builds neovim 
+# Install required build tools
+sudo apt-get install pkg-config build-essential libtool automake software-properties-common python-dev -y
+
+# install latest cmake
+# Taken from https://askubuntu.com/questions/355565/how-to-install-latest-cmake-version-in-linux-ubuntu-from-command-line
+#  Uninstall the default version provided by Ubuntu's package manager:
+sudo apt-get purge cmake -y
+# Go to the official CMake webpage, then download and extract the latest version.
+cd /tmp
+wget https://cmake.org/files/v3.9/cmake-3.9.4.tar.gz
+tar -xzvf cmake-3.9.4.tar.gz
+cd cmake-3.9.4/
+# Install the extracted source by running:
+./bootstrap
+make -j4
+sudo make install
+
+# Install the neovim itself
+cd ~ && git clone https://github.com/neovim/neovim.git && cd neovim
+make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$(echo ~vagrant)/neovim"
+make install
+
+# install neovim-python client
+sudo pip install neovim
+
+# Set ide key
+echo PATH="$(echo ~vagrant)/neovim/build/bin:$PATH" | sudo tee -a /etc/profile
+alias nvim="nvim -u ~/.vimrc"
+EOF
+
+chown vagrant:vagrant /home/vagrant/neovim.sh
+chmod +x /home/vagrant/neovim.sh

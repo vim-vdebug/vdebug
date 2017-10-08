@@ -138,8 +138,6 @@ class Ui(interface.Ui):
 
             self.tabnr = vim.eval("tabpagenr()")
 
-            srcwin_name = self.__get_srcwin_name()
-
             self.windows.open_all()
             statuswin = self.windows.status()
             statuswin.set_status("loading")
@@ -147,8 +145,7 @@ class Ui(interface.Ui):
             log.Log.set_logger(log.WindowLogger(
                 opts.Options.get('debug_window_level'), self.windows.log()))
 
-            winnr = self.__get_srcwinno_by_name(srcwin_name)
-            self.sourcewin = SourceWindow(self, winnr)
+            self.sourcewin = SourceWindow()
             self.sourcewin.focus()
         except Exception:
             self.is_open = False
@@ -255,24 +252,6 @@ class Ui(interface.Ui):
         self.windows.close()
 
     @staticmethod
-    def __get_srcwin_name():
-        return vim.current.buffer.name
-
-    @staticmethod
-    def __get_srcwinno_by_name(name):
-        i = 1
-        log.Log("Searching for win by name %s" % name, log.Logger.INFO)
-        for w in vim.windows:
-            log.Log("Win %d, name %s" % (i, w.buffer.name), log.Logger.INFO)
-            if w.buffer.name == name:
-                break
-            else:
-                i += 1
-
-        log.Log("Returning window number %d" % i, log.Logger.INFO)
-        return i
-
-    @staticmethod
     def __get_buf_list():
         return vim.eval("range(1, bufnr('$'))")
 
@@ -282,11 +261,8 @@ class SourceWindow(interface.Window):
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
 
-    def __init__(self, ui, winno):
-        self.winno = str(winno)
-
     def focus(self):
-        vim.command(self.winno+"wincmd w")
+        vim.command("1wincmd w")
         vim.command("filetype detect")
 
     def command(self, cmd, silent=True):
@@ -295,7 +271,7 @@ class SourceWindow(interface.Window):
             prepend = "silent "
         else:
             prepend = ""
-        command_str = prepend + self.winno + "wincmd " + cmd
+        command_str = prepend + "1wincmd " + cmd
         vim.command(command_str)
 
     def set_file(self, file):
