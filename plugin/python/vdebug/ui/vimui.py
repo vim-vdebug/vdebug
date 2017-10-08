@@ -46,9 +46,6 @@ class Ui(vdebug.ui.interface.Ui):
 
             self.tabnr = vim.eval("tabpagenr()")
 
-            srcwin_name = self.__get_srcwin_name()
-
-
             self.watchwin = WatchWindow(self,'vertical belowright new')
             self.watchwin.create()
 
@@ -71,8 +68,7 @@ class Ui(vdebug.ui.interface.Ui):
                     vdebug.opts.Options.get('debug_window_level'),\
                     logwin))
 
-            winnr = self.__get_srcwinno_by_name(srcwin_name)
-            self.sourcewin = SourceWindow(self,winnr)
+            self.sourcewin = SourceWindow()
             self.sourcewin.focus()
         except Exception, e:
             self.is_open = False
@@ -190,26 +186,6 @@ class Ui(vdebug.ui.interface.Ui):
         self.statuswin = None
         self.tracewin  = None
 
-
-    def __get_srcwin_name(self):
-        return vim.current.buffer.name
-
-    def __get_srcwinno_by_name(self,name):
-        i = 1
-        vdebug.log.Log("Searching for win by name %s" % name,\
-                vdebug.log.Logger.INFO)
-        for w in vim.windows:
-            vdebug.log.Log("Win %d, name %s" %(i,w.buffer.name),\
-                vdebug.log.Logger.INFO)
-            if w.buffer.name == name:
-                break
-            else:
-                i += 1
-
-        vdebug.log.Log("Returning window number %d" % i,\
-                vdebug.log.Logger.INFO)
-        return i
-
     def __get_buf_list(self):
         return vim.eval("range(1, bufnr('$'))")
 
@@ -219,11 +195,8 @@ class SourceWindow(vdebug.ui.interface.Window):
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
 
-    def __init__(self,ui,winno):
-        self.winno = str(winno)
-
     def focus(self):
-        vim.command(self.winno+"wincmd w")
+        vim.command("1wincmd w")
 
     def command(self,cmd,silent = True):
         self.focus()
@@ -231,7 +204,7 @@ class SourceWindow(vdebug.ui.interface.Window):
             prepend = "silent "
         else:
             prepend = ""
-        command_str = prepend + self.winno + "wincmd " + cmd
+        command_str = prepend + "1wincmd " + cmd
         vim.command(command_str)
 
     def set_file(self,file):
