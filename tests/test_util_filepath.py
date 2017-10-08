@@ -199,12 +199,12 @@ class MismatchingSeparatorsTest(unittest.TestCase):
 
         filename = "/remote2/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("/local2//path/to/file",file.as_local())
+        self.assertEqual("/local2/path/to/file",file.as_local())
 
     def test_as_remote(self):
         filename = "/local1/path/to/file"
         file = FilePath(filename)
-        self.assertEqual("file:///remote1//path/to/file",file.as_remote())
+        self.assertEqual("file:///remote1/path/to/file",file.as_remote())
 
         filename = "/local2/path/to/file"
         file = FilePath(filename)
