@@ -262,7 +262,9 @@ class FilePath:
                     ret = ret.replace('\\', '/')
                     break
 
-        if ret.startswith('/'):
+        if ret.startswith('phar://'):
+            return ret
+        elif ret.startswith('/'):
             return "file://"+ret
         return "file:///"+ret
 
