@@ -177,5 +177,5 @@ class apiInvalidInitTest(unittest.TestCase):
             c.recv_msg.return_value = self.invalid_init_msg
             c.isconnected.return_value = 1
             re = "Invalid XML response from debugger"
-            self.assertRaisesRegexp(vdebug.dbgp.ResponseError,re,vdebug.dbgp.Api,c)
+            self.assertRaisesRegex(vdebug.dbgp.ResponseError,re,vdebug.dbgp.Api,c)
 
