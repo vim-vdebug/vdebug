@@ -216,7 +216,7 @@ class ConditionalBreakpoint(LineBreakpoint):
 
     def get_cmd(self):
         cmd = LineBreakpoint.get_cmd(self)
-        cmd += " -- " + base64.encodestring(
+        cmd += " -- " + base64.encodebytes(
             self.condition.encode("UTF-8")).decode("UTF-8")
         return cmd
 

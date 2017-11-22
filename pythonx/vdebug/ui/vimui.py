@@ -506,7 +506,7 @@ class Window(interface.Window):
 
         if self.creation_count == 1:
             cmd = 'silent! au BufWinLeave %s' % self.name
-            cmd += ' :python debugger.mark_window_as_closed("%s")' % self.name
+            cmd += ' :python3 debugger.mark_window_as_closed("%s")' % self.name
             vim.command(cmd)
 
         self.on_create()
@@ -583,7 +583,7 @@ class LogWindow(Window):
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
                                                                      self.name)
             vim.command(
-                '%s | python vdebug.log.Log.remove_logger("WindowLogger")'
+                '%s | python3 vdebug.log.Log.remove_logger("WindowLogger")'
                 % cmd)
 
     def write(self, msg, return_focus=True):
@@ -596,11 +596,11 @@ class StackWindow(Window):
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'
-                     ':python debugger.handle_return_keypress()<cr>')
+                     ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '
-                     ':python debugger.handle_return_keypress()<cr>')
+                     ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '
-                     ':python debugger.handle_double_click()<cr>')
+                     ':python3 debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_stack')
 
     def write(self, msg, return_focus=True):
@@ -617,11 +617,11 @@ class WatchWindow(Window):
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'
-                     ':python debugger.handle_return_keypress()<cr>')
+                     ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <cr> '
-                     ':python debugger.handle_return_keypress()<cr>')
+                     ':python3 debugger.handle_return_keypress()<cr>')
         self.command('nnoremap <buffer> <2-LeftMouse> '
-                     ':python debugger.handle_double_click()<cr>')
+                     ':python3 debugger.handle_double_click()<cr>')
         self.command('setlocal syntax=debugger_watch')
 
     def set_eval_expression(self, eval_expression):
@@ -686,7 +686,7 @@ class TraceWindow(WatchWindow):
             cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
                                                                      self.name)
             vim.command(
-                '%s | python debugger.runner.ui.tracewin.is_open = False'
+                '%s | python3 debugger.runner.ui.tracewin.is_open = False'
                 % cmd)
         self.command('setlocal syntax=debugger_watch')
 
@@ -791,7 +791,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
             'marker': self.__get_marker(p),
             'name': p.display_name.encode('ascii'),
             'type': p.type_and_size(),
-            'value': " " + p.value.encode('ascii')
+            #'value': " " + p.value.encode('ascii')
+            'value': " " + p.value
         }
         line = line.rstrip() + "\n"
 

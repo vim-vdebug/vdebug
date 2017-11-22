@@ -162,7 +162,7 @@ class EvalResponse(ContextGetResponse):
     def get_code(self):
         cmd = self.get_cmd_args()
         parts = cmd.split('-- ')
-        return base64.decodestring(parts[1])
+        return base64.decodebytes(parts[1])
 
 
 class BreakpointSetResponse(Response):
@@ -298,7 +298,7 @@ class Api:
     def eval(self, code):
         """Tell the debugger to start or resume
         execution."""
-        code_enc = base64.encodestring(code)
+        code_enc = base64.encodestring(code.encode("UTF-8"))
         args = '-- %s' % code_enc
 
         """ The python engine incorrectly requires length.
@@ -475,25 +475,27 @@ class Connection:
 
     def __recv_length(self):
         """Get the length of the proceeding message."""
-        length = ''
+        length = []
+        #import pdb
+        #pdb.set_trace()
         while 1:
             c = self.sock.recv(1)
-            if c == '':
+            if c == b'':
                 self.close()
                 raise EOFError('Socket Closed')
-            if c == '\0':
-                return int(length)
+            if c == b'\x00':
+                return int(b''.join(length))
             if c.isdigit():
-                length = length + c
+                length.append(c)
 
     def __recv_null(self):
         """Receive a null byte."""
         while 1:
             c = self.sock.recv(1)
-            if c == '':
+            if c == b'':
                 self.close()
                 raise EOFError('Socket Closed')
-            if c == '\0':
+            if c == b'\x00':
                 return
 
     def __recv_body(self, to_recv):
@@ -501,15 +503,16 @@ class Connection:
 
         to_recv -- length of the message to receive
         """
-        body = ''
+        body = []
         while to_recv > 0:
             buf = self.sock.recv(to_recv)
-            if buf == '':
+            if buf == b'':
                 self.close()
                 raise EOFError('Socket Closed')
             to_recv -= len(buf)
-            body = body + buf
-        return body
+            #body.append(buf)
+            body += buf.decode("iso-8859-1")
+        return ''.join(body)
 
     def recv_msg(self):
         """Receive a message from the debugger.
@@ -526,7 +529,14 @@ class Connection:
 
         cmd -- command to send
         """
-        self.sock.send(cmd + '\0')
+        MSGLEN = len(cmd)
+        totalsent = 0
+        while totalsent < MSGLEN:
+            sent = int(self.sock.send(bytes(cmd[totalsent:].encode())))
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            totalsent = totalsent + sent
+        sent = self.sock.send(b'\x00')
 
 
 class ContextProperty:
@@ -561,8 +571,8 @@ class ContextProperty:
                 if node.text is None:
                     self.value = ""
                 else:
-                    self.value = base64.decodestring(
-                        node.text.encode("UTF-8")).decode("UTF-8")
+                    self.value = base64.decodebytes(
+                        node.text.encode("UTF-8")).decode("iso-8859-1")
             elif not self.is_uninitialized() and not self.has_children:
                 self.value = node.text
 
@@ -593,7 +603,7 @@ class ContextProperty:
         n = node.find('%s%s' % (self.ns, name))
         if n is not None and n.text is not None:
             if n.get('encoding') == 'base64':
-                val = base64.decodestring(n.text.encode("UTF-8")).decode(
+                val = base64.decodebytes(n.text.encode("UTF-8")).decode(
                     "UTF-8")
             else:
                 val = n.text

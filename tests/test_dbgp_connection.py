@@ -8,7 +8,7 @@ class SocketMockError():
 class SocketMock():
     def __init__(self):
         self.response = []
-        self.last_msg = None
+        self.last_msg = []
 
     def recv(self,length):
         ret = self.response[0]
@@ -19,21 +19,39 @@ class SocketMock():
                 self.response[0] = newval
             else:
                 self.response.pop(0)
-            return "".join(chars)
+            if (length == 1):
+                return b"".join(chars)
+            else :
+                return chars
+            #if type(chars[0]) is int:
+            #    print("len same as length")
+            #    print(ret[0:length])
+            #    return b''.join([bytes(i) for i in chars])
+            #    return b"".join(chars)
+            #else:
+            #    return b"".join(chars)
         else:
             self.response.pop(0)
-            return ''
+            return b''
 
     def add_response(self,res):
-        res = str(res)
-        self.response.append(list(res))
-        self.response.append(['\0'])
+        digitlist = []
+        for i in str(res):
+            digitlist.append(bytes(i, "utf8"))
+        self.response.append(digitlist)
+
+        #res = bytes(res, 'utf8')
+        #self.response.append(list(res))
+        self.response.append([b'\x00'])
 
     def send(self,msg):
-        self.last_msg = msg
+        self.last_msg.append( msg )
+        return len(msg)
 
     def get_last_sent(self):
-        return self.last_msg
+        last = self.last_msg
+        self.last_msg = [];
+        return b''.join(last).decode('UTF-8')
 
     def close(self):
         pass
