@@ -162,7 +162,11 @@ class EvalResponse(ContextGetResponse):
     def get_code(self):
         cmd = self.get_cmd_args()
         parts = cmd.split('-- ')
-        return base64.decodebytes(parts[1])
+        missing_padding = len(parts[1]) % 4
+        if missing_padding != 0:
+            parts[1] += '='* (4 - missing_padding)
+        #return base64.decodebytes(parts[1])
+        return base64.b64decode(parts[1].encode('ascii'))
 
 
 class BreakpointSetResponse(Response):
@@ -299,7 +303,10 @@ class Api:
         """Tell the debugger to start or resume
         execution."""
         code_enc = base64.encodestring(code.encode("UTF-8"))
-        args = '-- %s' % code_enc
+        #PY3
+        #code_enc = base64.encodestring(code)
+        args = '-- %s' % code_enc.decode('ascii')
+        #print(code_enc.decode('ascii'))
 
         """ The python engine incorrectly requires length.
         if self.language == 'python':

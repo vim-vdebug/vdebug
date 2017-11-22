@@ -789,7 +789,8 @@ class ContextGetResponseRenderer(ResponseRenderer):
         line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" % {
             'indent': indent_str,
             'marker': self.__get_marker(p),
-            'name': p.display_name.encode('ascii'),
+            #'name': p.display_name.decode('ascii'),
+            'name': p.display_name,
             'type': p.type_and_size(),
             #'value': " " + p.value.encode('ascii')
             'value': " " + p.value
