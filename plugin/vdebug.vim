@@ -18,6 +18,15 @@
 "=============================================================================
 " }}}
 
+" avoid double loading of vdebug
+if exists('g:is_vdebug_loaded')
+    finish
+endif
+
+" Set a special flag used only by this plugin for preventing doubly
+" loading the script.
+let g:is_vdebug_loaded = 1
+
 " Do not source this script when python is not compiled in.
 if !has("python3")
     echomsg ":python3 is not available, vdebug will not be loaded."
