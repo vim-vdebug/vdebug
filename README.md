@@ -79,7 +79,7 @@ To manually generate the tags, run this in vim:
 :helptags /path/to/vdebug/doc
 ```
 
-where the path supplied is vdebug's doc directory. This should enable vdebug's help to be accessed.
+where the path supplied is vdebug's doc directory. Then copy the doc directory to your .vim directory. This should enable vdebug's help to be accessed.
 
 ## Installation
 
