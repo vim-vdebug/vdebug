@@ -532,7 +532,7 @@ class StackGetResponseRenderer(ResponseRenderer):
         string = ""
         for s in stack:
             if s.get('where'):
-                where = s.get('where')
+                where = s.get('where').encode('latin1')
             else:
                 where = 'main'
             file = vdebug.util.FilePath(s.get('filename'))
