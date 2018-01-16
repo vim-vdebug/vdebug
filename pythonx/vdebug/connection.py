@@ -37,41 +37,53 @@ class ConnectionHandler:
 
     def __recv_length(self):
         """Get the length of the proceeding message."""
-        length = ''
+        length = []
         while 1:
             c = self.sock.recv(1)
-            if c == '':
+            if c == b'':
                 self.close()
                 raise EOFError('Socket Closed')
-            if c == '\0':
-                return int(length)
+            if c == b'\x00':
+                return int(b''.join(length))
             if c.isdigit():
-                length = length + c
+                length.append(c)
 
     def __recv_null(self):
         """Receive a null byte."""
         while 1:
             c = self.sock.recv(1)
-            if c == '':
+            if c == b'':
                 self.close()
                 raise EOFError('Socket Closed')
-            if c == '\0':
+            if c == b'\x00':
                 return
 
-    def __recv_body(self, to_recv):
+    def __recv_body2(self, to_recv):
         """Receive a message of a given length.
 
         to_recv -- length of the message to receive
         """
-        body = ''
+        body = []
         while to_recv > 0:
             buf = self.sock.recv(to_recv)
-            if buf == '':
+            if buf == b'':
                 self.close()
                 raise EOFError('Socket Closed')
             to_recv -= len(buf)
-            body = body + buf
-        return body
+            body.append(buf)
+        return b''.join(body)
+
+    def __recv_body(self, to_recv):
+        body = []
+        while to_recv > 0:
+            buf = self.sock.recv(to_recv)
+            if buf == b'':
+                self.close()
+                raise EOFError('Socket Closed')
+            to_recv -= len(buf)
+            #body.append(buf)
+            body += buf.decode("iso-8859-1")
+        return ''.join(body)
 
     def recv_msg(self):
         """Receive a message from the debugger.
@@ -88,7 +100,16 @@ class ConnectionHandler:
 
         cmd -- command to send
         """
-        self.sock.send(cmd + '\0')
+        #self.sock.send(cmd + '\0')
+        MSGLEN = len(cmd)
+        totalsent = 0
+        while totalsent < MSGLEN:
+            sent = self.sock.send(bytes(cmd[totalsent:].encode()))
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            totalsent = totalsent + sent
+        sent = self.sock.send(b'\x00')
+
 
 
 class SocketCreator:

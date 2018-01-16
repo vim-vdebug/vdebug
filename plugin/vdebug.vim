@@ -3,7 +3,7 @@
 " Script Info  {{{
 "=============================================================================
 "    Copyright: Copyright (C) 2012 Jon Cairns
-"      Licence:	The MIT Licence (see LICENCE file)
+"      Licence: The MIT Licence (see LICENCE file)
 " Name Of File: vdebug.vim
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
 "               Perl, NodeJS)
@@ -19,14 +19,14 @@
 " }}}
 
 " Do not source this script when python is not compiled in.
-if !has("python")
-    echomsg ":python is not available, vdebug will not be loaded."
+if !has("python3")
+    echomsg ":python3 is not available, vdebug will not be loaded."
     finish
 endif
 
 silent doautocmd User VdebugPre
 
-execute 'pyfile' fnamemodify(expand('<sfile>'), ':p:h:h') . '/pythonx/start_vdebug.py'
+execute 'py3file' fnamemodify(expand('<sfile>'), ':p:h:h') . '/pythonx/start_vdebug.py'
 
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
@@ -101,16 +101,16 @@ if g:vdebug_force_ascii == 1
 endif
 
 " Create the top dog
-python debugger = vdebug.debugger_interface.DebuggerInterface()
+python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands
-command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
-command! VdebugStart python debugger.run()
-command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
-command! BreakpointWindow python debugger.toggle_breakpoint_window()
-command! -nargs=? -bang VdebugEval python debugger.handle_eval('<bang>', <q-args>)
-command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
-command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.set_breakpoint(<q-args>)
+command! VdebugStart python3 debugger.run()
+command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
+command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
+command! -nargs=? -bang VdebugEval python3 debugger.handle_eval('<bang>', <q-args>)
+command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python3 debugger.handle_opt(<f-args>)
+command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
 
 if hlexists("DbgCurrentLine") == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
@@ -142,10 +142,10 @@ endfunction
 function! s:HandleEval(bang,code)
     let code = escape(a:code,'"')
     if strlen(a:bang)
-        execute 'python debugger.save_eval("'.code.'")'
+        execute 'python3 debugger.save_eval("'.code.'")'
     endif
     if strlen(a:code)
-        execute 'python debugger.handle_eval("'.code.'")'
+        execute 'python3 debugger.handle_eval("'.code.'")'
     endif
 endfunction
 
@@ -161,7 +161,7 @@ function! Vdebug_load_options(options)
     let single_defined_params = s:Vdebug_get_options()
     let g:vdebug_options = extend(g:vdebug_options, single_defined_params)
 
-    exe ":python debugger.reload_options()"
+    exe ":python3 debugger.reload_options()"
 endfunction
 
 " Get options defined outside of the vdebug_options dictionary
@@ -213,13 +213,13 @@ function! Vdebug_load_keymaps(keymaps)
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
-    exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
-    exe "noremap ".g:vdebug_keymap["close"]." :python debugger.close()<cr>"
-    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
+    exe "noremap ".g:vdebug_keymap["run"]." :python3 debugger.run()<cr>"
+    exe "noremap ".g:vdebug_keymap["close"]." :python3 debugger.close()<cr>"
+    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python3 debugger.set_breakpoint()<cr>"
 
     " Exceptional case for visual evaluation
-    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
-    exe ":python debugger.reload_keymappings()"
+    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
+    exe ":python3 debugger.reload_keymappings()"
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -259,7 +259,7 @@ function! Vdebug_statusline()
 endfunction
 
 silent doautocmd User VdebugPost
-autocmd VimLeavePre * python debugger.close()
+autocmd VimLeavePre * python3 debugger.close()
 
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)

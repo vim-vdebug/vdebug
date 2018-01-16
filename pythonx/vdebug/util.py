@@ -130,7 +130,7 @@ class Keymapper:
         for func in self.keymaps:
             if func not in self.exclude:
                 key = self.keymaps[func]
-                map_cmd = "noremap %s%s :python debugger.%s()<cr>" % (
+                map_cmd = "noremap %s%s :python3 debugger.%s()<cr>" % (
                     self.leader, key, func)
                 vim.command(map_cmd)
         self.is_mapped = True

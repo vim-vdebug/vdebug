@@ -51,7 +51,7 @@ class ResponseTest(unittest.TestCase):
             code="5"><message><![CDATA[command is not available]]>
             </message></error></response>"""
         re = "command is not available"
-        self.assertRaisesRegexp(vdebug.dbgp.DBGPError,re,vdebug.dbgp.Response,response,"","",Mock())
+        self.assertRaisesRegex(vdebug.dbgp.DBGPError,re,vdebug.dbgp.Response,response,"","",Mock())
 
 class StatusResponseTest(unittest.TestCase):
     """Test the behaviour of the StatusResponse class."""
