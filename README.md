@@ -43,16 +43,6 @@ and release news.
 * **12/04/2014:** My son was born! Hence no contact or work on Vdebug for the
   following month.
 
-## Recent version (version 1.5.1)
-
-### Bug fixes:
-* Fix buffers not being wiped out after ending a session (thanks
-  @BlackIkeEagle, #226)
-
-### Features:
-* Add :VdebugEval! command, which remembers the eval expression when stepping
-  through, as an alternative to :VdebugTrace (thanks @benjifisher, #193)
-
 See the CHANGELOG for the full history of changes.
 
 ## How to use
