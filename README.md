@@ -18,30 +18,6 @@ It's written in Python, and has an object-oriented interface that is easy to
 extend and can even be used from the command-line. It even has unit tests
 covering some of the more critical parts of the code.
 
-## Getting help
-
-If you're having trouble with Vdebug in any way, here are the steps you can
-take to get help (in the right order):
-
-1. [Check the issues][3] to see whether it's already come up.
-2. Visit the **#vdebug** irc channel on freenode, someone is normally there.
-3. [Open a new issue.][4]
-
-## How to use
-
-First of all, scoot down to the quick guide below.
-
-There is *extensive* help provided in the form of a Vim help file. This goes
-through absolutely everything, from installation to configuration, setting up
-debuggers for various languages, explanation of the interface, options, remote
-server debugging and more.
-
-To get this help, type:
-
-```
-:help Vdebug
-```
-
 ## Installation
 
 **Requirements**:
@@ -62,7 +38,20 @@ The actual installation is no different than for any other Vim plugin, you can
   file and update your plugins afterwards.  For Vundle this would be `Plugin
   'joonty/vdebug'` and `:PluginInstall`.
 
-## Quick guide
+## Usage
+
+There is *extensive* help provided in the form of a Vim help file. This goes
+through absolutely everything, from installation to configuration, setting up
+debuggers for various languages, explanation of the interface, options, remote
+server debugging and more.
+
+To get this help, type:
+
+```
+:help Vdebug
+```
+
+### Quick guide
 
 Set up any DBGP protocol debugger, e.g. Xdebug. (See :help VdebugSetUp). Start
 Vdebug with `<F5>`, which will make it wait for an incoming connection. Run the
@@ -92,6 +81,15 @@ interface.
 
 If you can't get a connection, then chances are you need to spend a bit of time
 setting up your environment. Type `:help Vdebug` for more information.
+
+## Getting help
+
+If you're having trouble with Vdebug in any way, here are the steps you can
+take to get help (in the right order):
+
+1. [Check the issues][3] to see whether it's already come up.
+2. Visit the **#vdebug** irc channel on freenode, someone is normally there.
+3. [Open a new issue.][4]
 
 ## Debugging
 
