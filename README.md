@@ -60,32 +60,6 @@ To get this help, type:
 :help Vdebug
 ```
 
-after installing the plugin. If this doesn't work, you will need to generate
-the help tags.
-
-### Generating help tags
-
-Some package managers, such as Vundle, will automatically generate help tags.
-Others, such as Pathogen, won't by default, so you have to do it yourself.
-Also, if you have installed Vdebug manually then you will also have to do this
-step.
-
-For pathogen users, you can add this to your vimrc file to automatically
-generate helptags for your plugins:
-
-```vim
-call pathogen#helptags()
-```
-
-To manually generate the tags, run this in vim:
-
-```vim
-:helptags /path/to/vdebug/doc
-```
-
-where the path supplied is vdebug's doc directory. This should enable vdebug's
-help to be accessed.
-
 ## Installation
 
 **Requirements**:
@@ -95,41 +69,16 @@ help to be accessed.
 * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
   Perl, NodeJS, Tcl...
 
-### Classic
+The actual installation is no different than for any other Vim plugin, you can
 
-Clone or download a tarball of the plugin and move its content in your
-`~/.vim/` directory.
-
-Your `~/.vim/plugin/` directory should now contain vdebug.vim and a directory
-called "pythonx".
-
-### Using git and Pathogen
-
-Clone this repository in your `~/.vim/bundle` directory
-
-### Using Vundle
-
-Add this to your `~/.vimrc` file:
-
-```vim
-Plugin 'joonty/vdebug'
-```
-
-Then, from the command line, run:
-
-```bash
-vim +PluginInstall +qall
-```
-
-Or, in vim, run:
-```vim
-:PluginInstall
-```
-
-For new changes to take effect, you may have to reload your .vimrc first:
-```vim
-:source $MYVIMRC
-```
+* install manually: Clone or download a tarball of the plugin and move its
+  content in your `~/.vim/` directory.  You should call `:helptags ~/.vim/doc`
+  to generate the necessary help tags afterwards.
+* use Pathogen: Clone this repository to your `~/.vim/bundle` directory and
+  `:call pathogen#helptags()` afterwards.
+* use your favorite plugin manager: Put the respective instruction in your init
+  file and update your plugins afterwards.  For Vundle this would be `Plugin
+  'joonty/vdebug'` and `:PluginInstall`.
 
 ## Quick guide
 
