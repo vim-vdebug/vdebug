@@ -145,7 +145,7 @@ see section 3, |VdebugSetUp|.
 2. Installing the plugin                                  *VdebugInstallation*
 
 Please note that you must have VIM 7+ for this plugin to work, and it must be
-compiled with tabs, signs and Python support. If you're using Windows, some
+compiled with tabs, signs and Python 3 support. If you're using Windows, some
 reports have said that Python must be installed separately to allow VIM to use
 it.
 
