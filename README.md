@@ -27,24 +27,6 @@ take to get help (in the right order):
 2. Visit the **#vdebug** irc channel on freenode, someone is normally there.
 3. [Open a new issue.][4]
 
-## News
-
-Follow me on Twitter, [@joonty](http://twitter.com/joonty), for Vdebug updates
-and release news.
-
-* **07/09/2015:** Version 1.5.1 released. This adds a `:VdebugEval!` command
-  and fixes issues with buffers not being wiped out. See below for more
-  information.
-* **26/08/2015:** Version 1.5.0 released. This has a whole series of fixes and
-  even a couple of new features.
-* **15/05/2014:** Version 1.4.2 released. This fixes major problems with the
-  latest version of Vim, which has stricter rules around function naming. See
-  [this pull request for more details][5]
-* **12/04/2014:** My son was born! Hence no contact or work on Vdebug for the
-  following month.
-
-See the CHANGELOG for the full history of changes.
-
 ## How to use
 
 First of all, scoot down to the quick guide below.
