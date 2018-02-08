@@ -85,7 +85,7 @@ where the path supplied is vdebug's doc directory. This should enable vdebug's h
 
 **Requirements**:
 
-  * Vim compiled with Python 2.4+ support, tabs and signs (for Debian/Ubuntu this is provided in the vim-nox package)
+  * Vim compiled with Python 3 support, tabs and signs (for Debian/Ubuntu this is provided in the vim-nox package)
   * A programming language that has a DBGP debugger, e.g. PHP, Python, Ruby,
     Perl, NodeJS, Tcl...
 
@@ -95,7 +95,7 @@ Clone or download a tarball of the plugin and move its content in your
 `~/.vim/` directory.
 
 Your `~/.vim/plugin/` directory should now contain vdebug.vim and a directory
-called "python".
+called "pythonx".
 
 ### Using git and Pathogen
 
@@ -172,14 +172,9 @@ I gladly accept contributions to the code. Just fork the repository, make your c
 
 ## Tests
 
- * The tests use `unittest` and `mock`. For python 3 the stdlib should e fine,
-   for python 2 you need to install `mock` manually:
-
-```
-pip2 install mock
-```
-
-* To run the tests, run `python -m unittest discover` in the top directory of the plugin
+The tests use `unittest` and `mock`, which are both part of the stdlib in
+Python 3. To run the tests, run `python3 -m unittest discover` in the top
+directory of the plugin
 
 ## Licence
 
