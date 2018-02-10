@@ -40,7 +40,7 @@ silent doautocmd User VdebugPre
 " /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
 " home vim directory (usually ~/.vim/plugin/).
 if filereadable($VIMRUNTIME."/plugin/python/start_vdebug.py")
-  pyfile $VIMRUNTIME/plugin/start_vdebug.py
+  pyfile $VIMRUNTIME/plugin/python/start_vdebug.py
 elseif filereadable($HOME."/.vim/plugin/python/start_vdebug.py")
   pyfile $HOME/.vim/plugin/python/start_vdebug.py
 else
