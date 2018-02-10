@@ -666,8 +666,7 @@ class EvalProperty(ContextProperty):
         if self.is_parent:
             self.display_name = self.code
         else:
-            if self.language == 'php' or \
-                    self.language == 'perl':
+            if self.language == 'php':
                 if self.parent.type == 'array':
                     if node.get('name').isdigit():
                         self.display_name = self.parent.display_name + \
@@ -678,6 +677,8 @@ class EvalProperty(ContextProperty):
                 else:
                     self.display_name = self.parent.display_name + \
                         "->"+node.get('name')
+            elif self.language == 'perl':
+                self.display_name = node.get('fullname')
             else:
                 name = node.get('name')
                 if name is None:
