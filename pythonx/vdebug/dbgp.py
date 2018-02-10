@@ -165,8 +165,7 @@ class EvalResponse(ContextGetResponse):
         missing_padding = len(parts[1]) % 4
         if missing_padding != 0:
             parts[1] += '='* (4 - missing_padding)
-        #return base64.decodebytes(parts[1])
-        return base64.b64decode(parts[1].encode('ascii'))
+        return base64.b64decode(parts[1].encode('utf-8')).decode('utf-8')
 
 
 class BreakpointSetResponse(Response):
@@ -302,11 +301,8 @@ class Api:
     def eval(self, code):
         """Tell the debugger to start or resume
         execution."""
-        code_enc = base64.encodestring(code.encode("UTF-8"))
-        #PY3
-        #code_enc = base64.encodestring(code)
-        args = '-- %s' % code_enc.decode('ascii')
-        #print(code_enc.decode('ascii'))
+        code_enc = base64.encodestring(code.encode('utf-8'))
+        args = '-- %s' % code_enc.decode('utf-8')
 
         """ The python engine incorrectly requires length.
         if self.language == 'python':
