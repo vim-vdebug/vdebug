@@ -244,7 +244,7 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def set_line(self,lineno):
         self.focus()
-        vim.command("normal %sgg" % str(lineno))
+        vim.command(":%s" % str(lineno))
 
     def get_file(self):
         self.focus()
