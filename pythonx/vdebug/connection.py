@@ -82,7 +82,7 @@ class ConnectionHandler:
                 raise EOFError('Socket Closed')
             to_recv -= len(buf)
             #body.append(buf)
-            body += buf.decode("iso-8859-1")
+            body += buf.decode("utf-8")
         return ''.join(body)
 
     def recv_msg(self):

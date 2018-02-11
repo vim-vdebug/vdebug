@@ -514,7 +514,7 @@ class Connection:
                 raise EOFError('Socket Closed')
             to_recv -= len(buf)
             #body.append(buf)
-            body += buf.decode("iso-8859-1")
+            body += buf.decode("utf-8")
         return ''.join(body)
 
     def recv_msg(self):
@@ -575,7 +575,7 @@ class ContextProperty:
                     self.value = ""
                 else:
                     self.value = base64.decodebytes(
-                        node.text.encode("UTF-8")).decode("iso-8859-1")
+                        node.text.encode("UTF-8")).decode("utf-8")
             elif not self.is_uninitialized() and not self.has_children:
                 self.value = node.text
 
