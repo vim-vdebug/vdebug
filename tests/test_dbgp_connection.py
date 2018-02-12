@@ -22,7 +22,7 @@ class SocketMock():
             if (length == 1):
                 return b"".join(chars)
             else :
-                return chars
+                return b''.join(chars)
             #if type(chars[0]) is int:
             #    print("len same as length")
             #    print(ret[0:length])
