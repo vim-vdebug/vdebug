@@ -6,6 +6,7 @@ language: python
 env:
   matrix:
     - DISTRO: 'ubuntu:16.04'
+    - DISTRO: 'debian:8'
 before_install:
   - docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null
   - docker ps
