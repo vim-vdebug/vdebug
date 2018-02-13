@@ -58,15 +58,17 @@ class WindowLoggerTest(unittest.TestCase):
         self.window.is_open = True
         ret = self.logger.log('dummy text', self.level)
         self.assertIsNone(ret)
-        self.window.create.assert_not_called()
-        self.window.write.assert_called_once()
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 6:
+            self.window.create.assert_not_called()
+            self.window.write.assert_called_once()
 
     def test_log_with_no_window(self):
         self.window.is_open = False
         ret = self.logger.log('dummy text', self.level)
         self.assertIsNone(ret)
-        self.window.create.assert_called_once()
-        self.window.write.assert_called_once()
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 6:
+            self.window.create.assert_called_once()
+            self.window.write.assert_called_once()
 
     def test_shutdown(self):
         self.logger.shutdown()
@@ -90,8 +92,9 @@ class FileLoggerTest(unittest.TestCase):
             self.logger.log('text', self.level)
         mocked_open.assert_called_once_with(self.filename, 'w')
         handle = mocked_open()
-        handle.write.assert_called_once()
-        handle.flush.assert_called_once()
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 6:
+            handle.write.assert_called_once()
+            handle.flush.assert_called_once()
 
     def test_log_with_open_file(self):
         handle = mock.Mock()
@@ -99,8 +102,9 @@ class FileLoggerTest(unittest.TestCase):
         with mock.patch(self.open_name, mock.mock_open()) as mocked_open:
             self.logger.log('text', self.level)
         mocked_open.assert_not_called()
-        handle.write.assert_called_once()
-        handle.flush.assert_called_once()
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 6:
+            handle.write.assert_called_once()
+            handle.flush.assert_called_once()
 
     def test_shutdown_without_file(self):
         with mock.patch(self.open_name, mock.mock_open()) as mocked_open:
