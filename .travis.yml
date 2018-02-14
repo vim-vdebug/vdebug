@@ -11,7 +11,8 @@ before_install:
   - docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null
   - docker ps
 install:
-  - docker exec -t vdebug-distro-test bash -c 'apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 ruby-dev gcc make automake libtool && gem install bundler && useradd -u 1000 -M -s /bin/bash -d /travis travis && echo "%travis ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/travis'
+  - |-
+    docker exec -t vdebug-distro-test bash -c "apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 ruby-dev gcc make automake libtool && gem install bundler && useradd -u $(id -u) -M -s /bin/bash -d /travis travis && echo '%travis ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/travis"
   - docker exec -t vdebug-distro-test su - travis -c "bundle install"
 script:
   - docker exec -t vdebug-distro-test su - travis -c "python3 -m unittest discover"
