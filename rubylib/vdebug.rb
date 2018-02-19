@@ -20,7 +20,7 @@ class Vdebug
       set_opt "debug_file", "/tmp/vdebug.log"
     end
     set_opt "background_listener", 0
-    vim.server.remote_send ":python debugger.run()<CR>"
+    vim.server.remote_send ":python3 debugger.run()<CR>"
     sleep 2
   end
 
@@ -33,20 +33,20 @@ class Vdebug
   end
 
   def last_error
-    vim.command("python debugger.get_last_error()")
+    vim.command("python3 debugger.get_last_error()")
   end
 
   def step_to_line(number)
     vim.command "#{number}"
-    vim.command "python debugger.run_to_cursor()"
+    vim.command "python3 debugger.run_to_cursor()"
   end
 
   def step_over
-    vim.command 'python debugger.step_over()'
+    vim.command 'python3 debugger.step_over()'
   end
 
   def step_in
-    vim.command 'python debugger.step_into()'
+    vim.command 'python3 debugger.step_into()'
   end
 
   def trace(expression)
@@ -86,7 +86,7 @@ class Vdebug
 
   def connected?
      status = vim.command(
-       "python print debugger.status()"
+       "python3 print debugger.status()"
      )
      %w(break running).include? status
   end
