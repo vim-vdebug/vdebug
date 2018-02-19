@@ -7,7 +7,7 @@ describe "startup" do
 
     # Try and connect via tcp socket
     it "should create a tcp server socket" do
-      expect { TCPSocket.new('localhost', 9000).close }.not_to raise_error
+        expect { TCPSocket.new('127.0.0.1', 9000).close }.not_to raise_error
     end
 
     after  { vim.command 'python debugger.close()' }
