@@ -492,7 +492,7 @@ class TraceEvent(Event):
 class DetachEvent(Event):
 
     def run(self):
-        self.session_handler.detach()
+        self.session.detach()
 
 
 class Dispatcher:
