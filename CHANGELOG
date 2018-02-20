@@ -1,3 +1,13 @@
+=== Vdebug 1.5.2 / 2018-02-20
+Bug fixes:
+ * Fix numeric array quoting
+ * Fixes in documentation
+ * Fix for Perl debugging
+ * Multibyte returns crash fix
+
+Features:
+ * allow debugging in phar:// paths (php)
+
 === Vdebug 1.5.1 / 2015-09-07
 Bug fixes:
  * Fix buffers not being wiped out after ending a session (thanks @BlackIkeEagle, #226)
@@ -120,7 +130,7 @@ Bug fixes:
  * Stopped creating empty buffers every time Vdebug started (issue #25)
  * Fixed bug with file URI quoting
  * Fixed escaping of characters when calling eval (issue #15)
- 
+
 
 === Vdebug 1.2 / 2012-10-05
 
