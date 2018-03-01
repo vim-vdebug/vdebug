@@ -58,21 +58,6 @@ class ConnectionHandler:
             if c == b'\x00':
                 return
 
-    def __recv_body2(self, to_recv):
-        """Receive a message of a given length.
-
-        to_recv -- length of the message to receive
-        """
-        body = []
-        while to_recv > 0:
-            buf = self.sock.recv(to_recv)
-            if buf == b'':
-                self.close()
-                raise EOFError('Socket Closed')
-            to_recv -= len(buf)
-            body.append(buf)
-        return b''.join(body)
-
     def __recv_body(self, to_recv):
         body = []
         while to_recv > 0:
@@ -81,8 +66,7 @@ class ConnectionHandler:
                 self.close()
                 raise EOFError('Socket Closed')
             to_recv -= len(buf)
-            #body.append(buf)
-            body += buf.decode("utf-8")
+            body.append(buf.decode("utf-8"))
         return ''.join(body)
 
     def recv_msg(self):
