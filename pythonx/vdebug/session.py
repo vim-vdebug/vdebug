@@ -173,8 +173,10 @@ class Session:
                         self.__api.stop()
                 self.__api.conn.close()
                 self.__api = None
+                self.__breakpoints.unlink_api()
             else:
                 self.__api = None
+                self.__breakpoints.unlink_api()
         except EOFError:
             self.__api = None
             self.__ui.say("Connection has been closed")
