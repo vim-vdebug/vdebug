@@ -1,6 +1,6 @@
 from . import setup
 import unittest
-import vdebug.dbgp
+import vdebug.connection
 
 class SocketMockError():
     pass
@@ -60,7 +60,7 @@ class SocketMock():
 class ConnectionTest(unittest.TestCase):
 
     def setUp(self):
-        self.conn = vdebug.dbgp.Connection('', 0)
+        self.conn = vdebug.connection.ConnectionHandler('', 0)
         self.conn.sock = SocketMock()
 
     """
