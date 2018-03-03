@@ -99,7 +99,7 @@ let g:vdebug_options_defaults = {
 \        "DebuggerStack" : "belowright new",
 \        "DebuggerStatus" : "belowright new"
 \    },
-\    "window_arrangement" : ["DebuggerWatch", "DebuggerStatus", "DebuggerStack"]
+\    "window_arrangement" : ["DebuggerWatch", "DebuggerStack", "DebuggerStatus"]
 \}
 
 " Different symbols for non unicode Vims

@@ -18,8 +18,8 @@ class WindowManager:
     def __init__(self):
         self._windows = {
             "DebuggerWatch":  WatchWindow(),
-            "DebuggerStatus": StatusWindow(),
             "DebuggerStack": StackWindow(),
+            "DebuggerStatus": StatusWindow(),
             "DebuggerBreakpoints": BreakpointWindow(),
             "DebuggerLog": LogWindow(),
             "DebuggerTrace": TraceWindow()
