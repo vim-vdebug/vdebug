@@ -1,5 +1,6 @@
 from . import setup
 import unittest
+import vdebug.connection
 import vdebug.dbgp
 try:
     from unittest.mock import MagicMock, patch
@@ -22,7 +23,7 @@ class ApiTest(unittest.TestCase):
         Rethans]]></copyright></init>"""
 
     def setUp(self):
-        with patch('vdebug.dbgp.Connection') as c:
+        with patch('vdebug.connection.ConnectionHandler') as c:
             self.c = c.return_value
             self.c.recv_msg.return_value = self.init_msg
             self.c.isconnected.return_value = 1
@@ -172,7 +173,7 @@ class apiInvalidInitTest(unittest.TestCase):
         xmlns="urn:debugger_api_v1">\n</invalid>"""
 
     def test_invalid_response_raises_error(self):
-        with patch('vdebug.dbgp.Connection') as c:
+        with patch('vdebug.connection.ConnectionHandler') as c:
             c = c.return_value
             c.recv_msg.return_value = self.invalid_init_msg
             c.isconnected.return_value = 1
