@@ -1,10 +1,8 @@
-if __name__ == "__main__":
-    import sys
-    sys.path.append('../plugin/python/')
-import unittest2 as unittest
-""" Mock vim import """
+from . import setup
+import unittest
 import vdebug.opts
-from vdebug.util import FilePath,FilePathError
+from vdebug.util import FilePath
+from vdebug.error import FilePathError
 
 class LocalFilePathTest(unittest.TestCase):
 
@@ -187,5 +185,27 @@ class RemoteUnixLocalWinPathTest(unittest.TestCase):
         self.assertEqual("file:///remote/path/to/file",file.as_remote())
 
         filename = "file:///G:/local2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///remote2/path/to/file",file.as_remote())
+
+class MismatchingSeparatorsTest(unittest.TestCase):
+    def setUp(self):
+        vdebug.opts.Options.set({'path_maps':{'remote1/':'local1', 'remote2':'local2/'}})
+
+    def test_as_local(self):
+        filename = "/remote1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local1/path/to/file",file.as_local())
+
+        filename = "/remote2/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("/local2/path/to/file",file.as_local())
+
+    def test_as_remote(self):
+        filename = "/local1/path/to/file"
+        file = FilePath(filename)
+        self.assertEqual("file:///remote1/path/to/file",file.as_remote())
+
+        filename = "/local2/path/to/file"
         file = FilePath(filename)
         self.assertEqual("file:///remote2/path/to/file",file.as_remote())

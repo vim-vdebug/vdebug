@@ -1,7 +1,5 @@
-if __name__ == "__main__":
-    import sys
-    sys.path.append('../plugin/python/')
-import unittest2 as unittest
+from . import setup
+import unittest
 import vdebug.dbgp
 import xml.etree.ElementTree as ET
 
@@ -15,13 +13,13 @@ class EvalPropertyTest(unittest.TestCase):
         prop = self.__get_eval_property(\
             """<?xml version="1.0" encoding="iso-8859-1"?>
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="eval" transaction_id="13">
-    <property 
+    <property
       address="140722906708544" type="array"
       children="1" numchildren="2" page="0" pagesize="32">
         <property
           name="0" address="140022315302704"
           type="array" children="1" numchildren="1"></property>
-        <property 
+        <property
           name="key" address="140022315307008"
           type="array" children="1" numchildren="1"></property>
     </property>

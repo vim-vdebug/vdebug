@@ -1,2 +1,10 @@
 *.pyc
 doc/tags
+.coverage
+htmlcov/
+.*.tags
+.vagrant/
+.bundle/
+vendor/
+.bash_history
+Gemfile.lock

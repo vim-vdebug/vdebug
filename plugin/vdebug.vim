@@ -3,13 +3,13 @@
 " Script Info  {{{
 "=============================================================================
 "    Copyright: Copyright (C) 2012 Jon Cairns
-"      Licence:	The MIT Licence (see LICENCE file)
+"      Licence: The MIT Licence (see LICENCE file)
 " Name Of File: vdebug.vim
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
 "               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
 "      Version: 1.4.1
-"               Inspired by the Xdebug plugin, which was originally written by 
+"               Inspired by the Xdebug plugin, which was originally written by
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
 "        Usage: Use :help Vdebug for information on how to configure and use
@@ -18,8 +18,7 @@
 "=============================================================================
 " }}}
 
-" Sanity Checks
-
+" avoid double loading of vdebug
 if exists('g:is_vdebug_loaded')
     finish
 endif
@@ -28,31 +27,15 @@ endif
 " loading the script.
 let g:is_vdebug_loaded = 1
 
-
 " Do not source this script when python is not compiled in.
-if !has("python")
+if !has("python3")
+    echomsg ":python3 is not available, vdebug will not be loaded."
     finish
 endif
 
 silent doautocmd User VdebugPre
 
-" Load start_vdebug.py either from the runtime directory (usually
-" /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
-" home vim directory (usually ~/.vim/plugin/).
-if filereadable($VIMRUNTIME."/plugin/python/start_vdebug.py")
-  pyfile $VIMRUNTIME/plugin/start_vdebug.py
-elseif filereadable($HOME."/.vim/plugin/python/start_vdebug.py")
-  pyfile $HOME/.vim/plugin/python/start_vdebug.py
-else
-  " when we use pathogen for instance
-  let $CUR_DIRECTORY=expand("<sfile>:p:h")
-
-  if filereadable($CUR_DIRECTORY."/python/start_vdebug.py")
-    pyfile $CUR_DIRECTORY/python/start_vdebug.py
-  else
-    call confirm('vdebug.vim: Unable to find start_vdebug.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
-  endif
-endif
+execute 'py3file' fnamemodify(expand('<sfile>'), ':p:h:h') . '/pythonx/start_vdebug.py'
 
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
@@ -108,7 +91,15 @@ let g:vdebug_options_defaults = {
 \    "marker_default" : '⬦',
 \    "marker_closed_tree" : '▸',
 \    "marker_open_tree" : '▾',
-\    "continuous_mode"  : 0
+\    "continuous_mode"  : 1,
+\    "background_listener" : 1,
+\    "auto_start" : 1,
+\    "window_commands" : {
+\        "DebuggerWatch" : "vertical belowright new",
+\        "DebuggerStack" : "belowright new",
+\        "DebuggerStatus" : "belowright new"
+\    },
+\    "window_arrangement" : ["DebuggerWatch", "DebuggerStack", "DebuggerStatus"]
 \}
 
 " Different symbols for non unicode Vims
@@ -119,16 +110,16 @@ if g:vdebug_force_ascii == 1
 endif
 
 " Create the top dog
-python debugger = DebuggerInterface()
+python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands
-command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python debugger.set_breakpoint(<q-args>)
-command! VdebugStart python debugger.run()
-command! -nargs=? BreakpointRemove python debugger.remove_breakpoint(<q-args>)
-command! BreakpointWindow python debugger.toggle_breakpoint_window()
-command! -nargs=? -bang VdebugEval call s:HandleEval('<bang>', <q-args>)
-command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python debugger.handle_opt(<f-args>)
-command! -nargs=? VdebugTrace python debugger.handle_trace(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.set_breakpoint(<q-args>)
+command! VdebugStart python3 debugger.run()
+command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
+command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
+command! -nargs=? -bang VdebugEval python3 debugger.handle_eval('<bang>', <q-args>)
+command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python3 debugger.handle_opt(<f-args>)
+command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
 
 if hlexists("DbgCurrentLine") == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
@@ -160,10 +151,10 @@ endfunction
 function! s:HandleEval(bang,code)
     let code = escape(a:code,'"')
     if strlen(a:bang)
-        execute 'python debugger.save_eval("'.code.'")'
+        execute 'python3 debugger.save_eval("'.code.'")'
     endif
     if strlen(a:code)
-        execute 'python debugger.handle_eval("'.code.'")'
+        execute 'python3 debugger.handle_eval("'.code.'")'
     endif
 endfunction
 
@@ -174,6 +165,41 @@ endfunction
 function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+
+    " Override with single defined params ie. g:vdebug_options_port
+    let single_defined_params = s:Vdebug_get_options()
+    let g:vdebug_options = extend(g:vdebug_options, single_defined_params)
+
+    exe ":python3 debugger.reload_options()"
+endfunction
+
+" Get options defined outside of the vdebug_options dictionary
+"
+" This helps for when users might want to define a single option by itself
+" without needing the dictionary ie. vdebug_options_port = 9000
+function! s:Vdebug_get_options()
+    let param_namespace = "g:vdebug_options_"
+    let param_namespace_len = strlen(param_namespace)
+
+    " Get the paramter names and concat the g:vdebug_options namespace
+    let parameters = map(keys(g:vdebug_options_defaults), 'param_namespace.v:val')
+
+    " Only use the defined parameters
+    let existing_params = filter(parameters, 'exists(v:val)')
+
+    " put into a dictionary for use with extend()
+    let params = {}
+    for name in existing_params
+      let val = eval(name)
+
+      " Remove g:vdebug_options namespace from param
+      let name = strpart(name, param_namespace_len)
+      let params[name] = val
+    endfor
+    if !empty(params)
+      echoerr "Deprication Warning: The options g:vdebug_options_* are depricated.  Please use the g:vdebug_options dictionary."
+    endif
+    return params
 endfunction
 
 " Assign keymappings, and merge with defaults.
@@ -196,11 +222,13 @@ function! Vdebug_load_keymaps(keymaps)
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
-    exe "noremap ".g:vdebug_keymap["run"]." :python debugger.run()<cr>"
-    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python debugger.set_breakpoint()<cr>"
+    exe "noremap ".g:vdebug_keymap["run"]." :python3 debugger.run()<cr>"
+    exe "noremap ".g:vdebug_keymap["close"]." :python3 debugger.close()<cr>"
+    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python3 debugger.set_breakpoint()<cr>"
 
     " Exceptional case for visual evaluation
-    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python debugger.handle_visual_eval()<cr>"
+    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
+    exe ":python3 debugger.reload_keymappings()"
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -231,10 +259,16 @@ function! Vdebug_edit(filename)
     try
         execute 'buffer' fnameescape(a:filename)
     catch /^Vim\%((\a\+)\)\=:E94/
-        execute 'silent edit' fnameescape(a:filename)
+        execute 'silent view' fnameescape(a:filename)
     endtry
 endfunction
 
+function! Vdebug_statusline()
+    return pyeval("debugger.status_for_statusline()")
+endfunction
+
 silent doautocmd User VdebugPost
+autocmd VimLeavePre * python3 debugger.close()
+
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)

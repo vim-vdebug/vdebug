@@ -1,11 +1,13 @@
-if __name__ == "__main__":
-    import sys
-    sys.path.append('../plugin/python/')
-import unittest2 as unittest
+from . import setup
+import unittest
 import vdebug.breakpoint
+import vdebug.error
 import vdebug.util
 import base64
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 
 class LineBreakpointTest(unittest.TestCase):
 
@@ -31,7 +33,7 @@ class LineBreakpointTest(unittest.TestCase):
         file = vdebug.util.FilePath("/path/to/file")
         line = 20
         bp = vdebug.breakpoint.LineBreakpoint(ui,file,line)
-        self.assertEqual(bp.get_cmd(),"-t line -f file://%s -n %i -s enabled" %(file, line))
+        self.assertEqual(bp.get_cmd(),"-t line -f \"file://%s\" -n %i -s enabled" %(file, line))
 
     def test_on_add_sets_ui_breakpoint(self):
         """ Test that the breakpoint is placed on the source window."""
@@ -62,8 +64,8 @@ class ConditionalBreakpointTest(unittest.TestCase):
         line = 20
         condition = "$x > 20"
         bp = vdebug.breakpoint.ConditionalBreakpoint(ui,file,line,condition)
-        b64cond = base64.encodestring(condition)
-        exp_cmd = "-t conditional -f file://%s -n %i -s enabled -- %s" %(file, line, b64cond)
+        b64cond = base64.encodebytes(condition.encode("UTF-8")).decode("UTF-8")
+        exp_cmd = "-t conditional -f \"file://%s\" -n %i -s enabled -- %s" %(file, line, b64cond)
         self.assertEqual(bp.get_cmd(), exp_cmd)
 
 class ExceptionBreakpointTest(unittest.TestCase):
@@ -118,7 +120,7 @@ class BreakpointTest(unittest.TestCase):
         Mock.__len__ = Mock(return_value=0)
         ui = Mock()
         re = 'Cannot set a breakpoint on an empty line'
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegex(vdebug.error.BreakpointError,\
                 re,vdebug.breakpoint.Breakpoint.parse,ui,"")
 
     def test_parse_with_conditional_breakpoint(self):
@@ -134,7 +136,7 @@ class BreakpointTest(unittest.TestCase):
         args = "conditional"
         re = "Conditional breakpoints require a condition "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegex(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_exception_breakpoint(self):
@@ -150,7 +152,7 @@ class BreakpointTest(unittest.TestCase):
         args = "exception"
         re = "Exception breakpoints require an exception name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegex(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
 
@@ -167,7 +169,7 @@ class BreakpointTest(unittest.TestCase):
         args = "call"
         re = "Call breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegex(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 
     def test_parse_with_return_breakpoint(self):
@@ -183,6 +185,6 @@ class BreakpointTest(unittest.TestCase):
         args = "return"
         re = "Return breakpoints require a function name "+\
                 "to be specified"
-        self.assertRaisesRegexp(vdebug.breakpoint.BreakpointError,\
+        self.assertRaisesRegex(vdebug.error.BreakpointError,\
                 re, vdebug.breakpoint.Breakpoint.parse, ui, args)
 

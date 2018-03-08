@@ -1,7 +1,5 @@
-if __name__ == "__main__":
-    import sys
-    sys.path.append('../plugin/python/')
-import unittest2 as unittest
+from . import setup
+import unittest
 import vdebug.dbgp
 import xml.etree.ElementTree as ET
 

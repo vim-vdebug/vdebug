@@ -2,11 +2,6 @@ require 'rspec/core/rake_task'
 require 'cucumber'
 require 'cucumber/rake/task'
 
-task :travis do
-  system("export DISPLAY=:99.0 && bundle exec rake test:all")
-  raise "Tests failed!" unless $?.exitstatus == 0
-end
-
 namespace :test do
   desc "Run all tests (unit and integration/specs)"
   task :all do
@@ -20,7 +15,12 @@ namespace :test do
 
   desc "Run unit tests"
   task :unit do
-    cmd = "python vdebugtests.py"
+    if ENV["COVERAGE"]
+      puts "Running unit tests with coverage (view output at ./htmlcov/index.html)"
+      cmd = "coverage run -m unittest discover && coverage html --include=\"*/vdebug/*\""
+    else
+      cmd = "python -m unittest discover"
+    end
     puts cmd
     system cmd
   end

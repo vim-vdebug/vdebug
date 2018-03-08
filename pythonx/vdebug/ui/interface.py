@@ -1,12 +1,12 @@
 class Ui:
     """Abstract for the UI, used by the debugger
     """
-    watchwin  = None
-    stackwin  = None
+    watchwin = None
+    stackwin = None
     statuswin = None
-    logwin    = None
+    logwin = None
     sourcewin = None
-    tracewin  = None
+    tracewin = None
 
     def __init__(self):
         self.is_open = False
@@ -17,7 +17,7 @@ class Ui:
     def open(self):
         pass
 
-    def say(self,string):
+    def say(self, string):
         pass
 
     def close(self):
@@ -25,6 +25,7 @@ class Ui:
 
     def log(self):
         pass
+
 
 class Window:
     """Abstract for UI windows
@@ -51,7 +52,7 @@ class Window:
         """ Write string in the window """
         pass
 
-    def insert(self, msg, position = None):
+    def insert(self, msg, position=None):
         """ Insert a string somewhere in the window """
         pass
 

@@ -15,30 +15,51 @@ class Vdebug
   def start_listening
     write_lock_file!
     clear_buffer_cache!
-    vim.server.remote_send ":python debugger.run()<CR>"
+    if ENV["DEBUG"]
+      set_opt "debug_file_level", 2
+      set_opt "debug_file", "/tmp/vdebug.log"
+    end
+    set_opt "background_listener", 0
+    vim.server.remote_send ":python3 debugger.run()<CR>"
     sleep 2
+  end
+
+  def set_opt(name, value)
+    vim.command "VdebugOpt #{name} #{value}"
   end
 
   def messages
     vim.command("messages")
   end
 
+  def last_error
+    vim.command("python3 debugger.get_last_error()")
+  end
+
   def step_to_line(number)
     vim.command "#{number}"
-    vim.command "python debugger.run_to_cursor()"
+    vim.command "python3 debugger.run_to_cursor()"
   end
 
   def step_over
-    vim.command 'python debugger.step_over()'
+    vim.command 'python3 debugger.step_over()'
   end
 
   def step_in
-    vim.command 'python debugger.step_into()'
+    vim.command 'python3 debugger.step_into()'
   end
 
-  def evaluate(expression)
+  def trace(expression)
+    evaluate(expression, "VdebugTrace")
+  end
+
+  def evaluate(expression = "", command = "VdebugEval")
     safe_expression = expression.gsub(/['"\\\x0]/,'\\\\\0')
-    vim.command %Q{python debugger.handle_eval("#{safe_expression}")}
+    vim.command "#{command} #{safe_expression}"
+  end
+
+  def evaluate!(expression)
+    evaluate(expression, "VdebugEval!")
   end
 
   # Retrieve a hash with the buffer names (values) and numbers (keys)
@@ -64,10 +85,10 @@ class Vdebug
   end
 
   def connected?
-     is_connected = vim.command(
-       "python print debugger.runner.is_alive()"
+     status = vim.command(
+       "python3 print debugger.status()"
      )
-     is_connected == "True"
+     %w(break running).include? status
   end
 
   def watch_window_content
@@ -76,13 +97,18 @@ class Vdebug
 
   def watch_vars
     watch_lines = watch_window_content.split("\n")[4..-1]
-    p Hash[watch_lines.join("").split('|').map { |v|
+    Hash[watch_lines.join("").split('|').map { |v|
       v.gsub(/^.*#{watch_win_marker}/, "").split("=", 2).map(&:strip)
     }]
   end
 
   def stack_window_content
     fetch_buffer_content 'DebuggerStack'
+  end
+
+  def trace_window_content
+    clear_buffer_cache!
+    fetch_buffer_content 'DebuggerTrace'
   end
 
   def stack

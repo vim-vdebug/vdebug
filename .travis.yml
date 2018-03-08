@@ -3,15 +3,17 @@ notifications:
   slack:
     secure: BksygPSsoRfvre27w6XQN9ooKB9C1n83Bw96YurvyDHJ6BYM2Gv9fW1Sj6NHpB8MQkMaJ+9gRiBSflkP+l80t3EXAdStuI/8EM/wZu1ov6bmYT/hYQ8HnULmmPNj8uVzsX13VGEUC/YY4osWuJFM1wh61dStoF+SKrpslqWCV4w=
 language: python
-python:
-- '2.6'
-- '2.7'
-rvm: 1.9.3
+env:
+  matrix:
+    - DISTRO: 'ubuntu:16.04'
+    - DISTRO: 'debian:9'
 before_install:
-- sudo apt-get update && sudo apt-get install vim-gtk php5-cli php5-xdebug
-before_script:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- bundle install
-install: pip install -r requirements.txt
-script: bundle exec rake travis
+  - docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null
+  - docker ps
+install:
+  - |-
+    docker exec -t vdebug-distro-test bash -c "apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 ruby-dev gcc make automake libtool php-cli php-xdebug locales && gem install bundler && echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/default/locale && useradd -u $(id -u) -M -s /bin/bash -d /travis travis && echo '%travis ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/travis"
+  - docker exec -t vdebug-distro-test su - travis -c "bundle install"
+script:
+  - docker exec -t vdebug-distro-test su - travis -c "python3 -m unittest discover"
+  - docker exec -t vdebug-distro-test su - travis -c "xvfb-run bundle exec rake spec features"
