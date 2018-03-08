@@ -630,6 +630,7 @@ class StatusWindow(Window):
             output += "%s to stop/close. " % (keys.close_key())
             output += "Type :help Vdebug for more information."
             self.write(output)
+            self.set_height(6)
 
     def set_status(self, status):
         self.insert("Status: %s" % str(status), 0, True)
