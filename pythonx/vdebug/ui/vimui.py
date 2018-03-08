@@ -452,7 +452,7 @@ class Window(interface.Window):
             height = minheight
         if height <= 0:
             height = 1
-        self.command('set winheight=%i' % height)
+        self.command('resize %i' % height)
 
     def write(self, msg, return_focus=True, after="normal G"):
         self._buffer.write(msg, return_focus, lambda: self.command(after))
