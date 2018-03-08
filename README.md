@@ -38,6 +38,11 @@ The actual installation is no different than for any other Vim plugin, you can
   file and update your plugins afterwards.  For Vundle this would be `Plugin
   'joonty/vdebug'` and `:PluginInstall`.
 
+### Python 2
+
+When you are stuck on a machine with only `+python` (Python 2) support you can
+use the latest [1.5][5] release.
+
 ## Usage
 
 There is *extensive* help provided in the form of a Vim help file. This goes
@@ -131,4 +136,4 @@ This plugin is released under the [MIT License][1].
 [2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 [3]: https://github.com/joonty/vdebug/issues/
 [4]: https://github.com/joonty/vdebug/issues/new
-[5]: https://github.com/joonty/vdebug/issues/158
+[5]: https://github.com/joonty/vdebug/releases/tag/v1.5.2
