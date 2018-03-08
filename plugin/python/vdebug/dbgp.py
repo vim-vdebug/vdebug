@@ -7,6 +7,7 @@ import socket
 import vdebug.log
 import base64
 import time
+import re
 
 """ Response objects for the DBGP module."""
 
@@ -119,9 +120,31 @@ class ContextGetResponse(Response):
         Response.__init__(self,response,cmd,cmd_args,api)
         self.properties = []
 
+    def get_page(self, cmd_args):
+        opts = re.compile('-p (\d+)')
+        page = None
+        result = opts.search(cmd_args)
+        if result != None:
+            page = int(result.group(1))
+        return page
+
+    def show_children(self):
+        return self.cmd == 'property_get'
+    
     def get_context(self):
+        page = self.get_page(self.cmd_args)
         for c in list(self.as_xml()):
-            self.create_properties(ContextProperty(c))
+            self.create_properties(ContextProperty(c, init_children=self.show_children()))
+        if page == 0:
+            """ Loop through pages 2 to num_pages """
+            for p in xrange(1, self.properties[0].num_pages):
+                nth_cmd_args = self.cmd_args.replace('-p ' + str(page), '-p ' + str(p))
+                nth_prop = self.api.send_cmd(self.cmd, nth_cmd_args, ContextGetResponse)
+                """ First row is duplicated on pages > 0 so delete it """
+                nth_page = nth_prop.get_context()
+                del nth_page[0]
+
+                self.properties.extend(nth_page)
 
         return self.properties
 
@@ -335,11 +358,11 @@ class Api:
         """
         return self.send_cmd('stack_get','',StackGetResponse)
 
-    def context_get(self,context = 0):
+    def context_get(self,context = 0, depth = 0):
         """Get the context variables.
         """
         return self.send_cmd('context_get',\
-                '-c %i' % int(context),\
+                '-c %i -d %i' % (int(context), int(depth)),\
                 ContextGetResponse)
 
     def context_names(self):
@@ -347,10 +370,10 @@ class Api:
         """
         return self.send_cmd('context_names','',ContextNamesResponse)
 
-    def property_get(self,name):
+    def property_get(self,name, depth = 0, page = 0):
         """Get a property.
         """
-        return self.send_cmd('property_get','-n %s -d 0' % name,ContextGetResponse)
+        return self.send_cmd('property_get','-n %s -d %i -p %i' % (name, int(depth), int(page)),ContextGetResponse)
 
     def detach(self):
         """Tell the debugger to detach itself from this
@@ -525,8 +548,11 @@ class ContextProperty:
 
     ns = '{urn:debugger_protocol_v1}'
 
-    def __init__(self,node,parent = None,depth = 0):
+    def __init__(self,node,parent = None,depth = 0, init_children = True):
         self.parent = parent
+        """ Every child property will have a zero-based page property set """
+        if self.parent:
+            self.page = parent.page
         self.__determine_type(node)
         self._determine_displayname(node)
         self.encoding = node.get('encoding')
@@ -538,7 +564,8 @@ class ContextProperty:
 
         self._determine_children(node)
         self.__determine_value(node)
-        self.__init_children(node)
+        if init_children:
+            self.__init_children(node)
         if self.type == 'scalar':
             self.size = len(self.value) - 2
 
@@ -606,6 +633,23 @@ class ContextProperty:
             children = int(children)
         self.num_declared_children = children
         self.has_children = children > 0
+        """ If the current element has children, initialize page properties """
+        self.page = None
+        self.pagesize = None
+        self.num_pages = 0
+        if self.has_children:
+            self.page = node.get('page')
+            self.pagesize = node.get('pagesize')
+            if self.page == None or self.pagesize == None:
+                self.page = 0
+                self.pagesize = 0
+                self.num_pages = 0
+            else:
+                self.page = int(self.page)
+                self.pagesize = int(self.pagesize)
+                self.num_pages = self.num_declared_children / self.pagesize
+                if (self.num_declared_children % self.pagesize):
+                    self.num_pages += 1
         self.children = []
 
     def __init_children(self,node):

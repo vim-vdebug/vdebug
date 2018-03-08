@@ -4,6 +4,7 @@ import vdebug.util
 import vim
 import vdebug.log
 import vdebug.opts
+import vdebug.event
 
 class Ui(vdebug.ui.interface.Ui):
     """Ui layer which manages the Vim windows.
@@ -218,6 +219,7 @@ class SourceWindow(vdebug.ui.interface.Window):
     file = None
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
+    stack_sign_id = '6147'
 
     def __init__(self,ui,winno):
         self.winno = str(winno)
@@ -244,7 +246,8 @@ class SourceWindow(vdebug.ui.interface.Window):
 
     def set_line(self,lineno):
         self.focus()
-        vim.command("normal %sgg" % str(lineno))
+        """ Centering display vertically on lineno """
+        vim.command("normal %szz" % str(lineno))
 
     def get_file(self):
         self.focus()
@@ -265,6 +268,17 @@ class SourceWindow(vdebug.ui.interface.Window):
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
 
+    def place_stack_sign(self, line):
+        self.remove_stack_sign()
+        vdebug.log.Log("Placing stack sign on line "+str(line),\
+                vdebug.log.Logger.INFO)
+        vim.command('sign place '+self.stack_sign_id+\
+                ' name=stack line='+str(line)+\
+                ' file='+self.file)
+
+    def remove_stack_sign(self):
+        vim.command('sign unplace %s' % self.stack_sign_id)
+
 class Window(vdebug.ui.interface.Window):
     name = "WINDOW"
     open_cmd = "new"
@@ -278,6 +292,9 @@ class Window(vdebug.ui.interface.Window):
 
     def getwinnr(self):
         return int(vim.eval("bufwinnr('"+self.name+"')"))
+
+    def focus(self):
+        vim.command(str(self.getwinnr())+"wincmd w")
 
     def set_height(self,height):
         height = int(height)
@@ -431,6 +448,7 @@ class LogWindow(Window):
 
 class StackWindow(Window):
     name = "DebuggerStack"
+    stack_sign_id = '6148'
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'+\
@@ -446,6 +464,24 @@ class StackWindow(Window):
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
+
+    def place_stack_sign(self, line):
+        self.remove_stack_sign()
+        self.focus()
+        vim.command('sign place ' + self.stack_sign_id +\
+                ' name=stack' +\
+                ' line=' + str(line) +\
+                ' buffer=' + vim.eval("bufnr('%')"))
+
+    def remove_stack_sign(self):
+        vim.command('sign unplace %s' % self.stack_sign_id)
+
+    def get_file_and_line(self, stacklineno):
+        line = self.buffer[stacklineno - 1]
+        if line.find(" @ ") == -1:
+            return False
+        filename_pos = line.find(" @ ") + 3
+        return line[filename_pos:]
 
 class WatchWindow(Window):
     name = "DebuggerWatch"
@@ -464,6 +500,17 @@ class WatchWindow(Window):
 
     def write(self, msg, return_focus = True):
         Window.write(self, msg, after="normal gg")
+
+    def open_child_properties(self, runner):
+        self.focus()
+        last_line_idx = int(vim.eval("line('$')")) - 1
+        first_line_idx = -1
+        for idx in xrange(last_line_idx, first_line_idx, -1):
+            self.command('normal ' + str(idx+1) + 'G')
+            line = vim.current.buffer[idx]
+            if line.startswith(' ' + vdebug.opts.Options.get('marker_closed_tree')):
+                vdebug.event.WatchWindowPropertyGetEvent().execute(runner)
+        self.command('normal gg')
 
 class StatusWindow(Window):
     name = "DebuggerStatus"
@@ -540,7 +587,7 @@ class StackGetResponseRenderer(ResponseRenderer):
                     %{'num':s.get('level'),'where':where,\
                     'file':str(file.as_local()),'line':s.get('lineno')}
             string += line + "\n"
-        return string
+        return string[:-1]
 
 
 class ContextGetResponseRenderer(ResponseRenderer):

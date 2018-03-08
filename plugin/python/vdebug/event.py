@@ -131,20 +131,23 @@ class StackWindowLineSelectEvent(Event):
     """Move the the currently selected file and line in the stack window
     """
     def execute(self,runner):
-        lineno = vim.current.window.cursor[0]
+        stacklineno = vim.current.window.cursor[0]
 
-        vdebug.log.Log("User action in stack window, line %s" % lineno,\
+        vdebug.log.Log("User action in stack window, line %s" % stacklineno,\
                 vdebug.log.Logger.DEBUG)
-        line = runner.ui.stackwin.buffer[lineno-1]
-        if line.find(" @ ") == -1:
-            return False
-        filename_pos = line.find(" @ ") + 3
-        file_and_line = line[filename_pos:]
+        file_and_line = runner.ui.stackwin.get_file_and_line(stacklineno)
         line_pos = file_and_line.rfind(":")
         file = vdebug.util.LocalFilePath(file_and_line[:line_pos])
+
+        """ Setting stack depth and current file_and_line in runner """
+        runner.set_context_stack_info(stacklineno - 1, file_and_line)
+
         lineno = file_and_line[line_pos+1:]
         runner.ui.sourcewin.set_file(file)
         runner.ui.sourcewin.set_line(lineno)
+        runner.ui.sourcewin.place_stack_sign(lineno)
+        runner.ui.stackwin.place_stack_sign(stacklineno)
+        runner.get_context(0)
 
 class WatchWindowPropertyGetEvent(Event):
     """Open a tree node in the watch window.
@@ -159,10 +162,11 @@ class WatchWindowPropertyGetEvent(Event):
 
         eq_index = line.find('=')
         if eq_index == -1:
-            raise EventError("Cannot read the selected property")
+            return
 
         name = line[pointer_index+step:eq_index-1]
-        context_res = runner.api.property_get(name)
+        """ Refactoring property_get with multiple pages """ 
+        context_res = runner.property_get(name)
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
         if vdebug.opts.Options.get('watch_window_style') == 'expanded':

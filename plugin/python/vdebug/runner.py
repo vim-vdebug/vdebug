@@ -69,6 +69,11 @@ class Runner:
                 status = self.api.step_into()
             else:
                 status = self.api.run()
+
+            """ Updating stack on open, for watchwin correct title """
+            if status in ["running", "break"]:  
+                self.update_stack()
+                self.set_context_stack_info(0)
             self.refresh(status)
         except Exception:
             self.close()
@@ -95,7 +100,7 @@ class Runner:
         return code
 
     def refresh(self,status):
-        """The main action performed after a deubugger step.
+        """The main action performed after a debugger step.
 
         Updates the status window, current stack, source
         file and line and watch window."""
@@ -128,6 +133,11 @@ class Runner:
                         self.cur_file,\
                         self.cur_lineno)
 
+                """ Removing stack signs """
+                self.ui.stackwin.remove_stack_sign()
+                self.ui.sourcewin.remove_stack_sign()
+                self.set_context_stack_info(0)
+
                 if self.saved_code != '':
                     self.eval(self.saved_code)
                 else:
@@ -138,14 +148,15 @@ class Runner:
         self.ui.tracewin.clean()
         name = self.context_names[context_id]
         vdebug.log.Log("Getting %s variables" % name)
-        context_res = self.api.context_get(context_id)
+        context_res = self.api.context_get(context_id, self.context_stack_depth)
 
         rend = vdebug.ui.vimui.ContextGetResponseRenderer(\
-                context_res,"%s at %s:%s" \
-                %(name,self.ui.sourcewin.file,self.cur_lineno),\
+                context_res,"%s at %s" \
+                %(name, self.context_file_and_line),\
                 self.context_names, context_id)
 
         self.ui.watchwin.accept_renderer(rend)
+        self.ui.watchwin.open_child_properties(self)
 
         if self.ui.tracewin.is_tracing():
             try:
@@ -157,6 +168,8 @@ class Runner:
             except vdebug.dbgp.EvalError:
                 self.ui.tracewin.render_in_error_case()
 
+    def property_get(self, name):
+        return self.api.property_get(name, self.context_stack_depth)
 
     def toggle_breakpoint_window(self):
         """Open or close the breakpoint window.
@@ -345,6 +358,13 @@ class Runner:
             renderer = vdebug.ui.vimui.StackGetResponseRenderer(res)
             self.ui.stackwin.accept_renderer(renderer)
             return res
+    
+    def set_context_stack_info(self, stack_depth, file_and_line = ''):
+        """ stack_depth parameter is zero-based """
+        self.context_stack_depth = stack_depth
+        if (file_and_line == ''):
+            file_and_line = self.ui.stackwin.get_file_and_line(stack_depth + 1)
+        self.context_file_and_line = file_and_line
 
     def detach(self):
         """Detach the debugger engine, and allow it to continue execution.

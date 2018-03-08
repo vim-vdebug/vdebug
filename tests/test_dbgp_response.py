@@ -121,39 +121,36 @@ name="3" fullname="$argv[3]" address="39795168"
 type="string" size="3"
 encoding="base64"><![CDATA[QWxs]]></property></property><property
 name="$cdstring" fullname="$cdstring"
-type="uninitialized"></property><property name="$cdup"
-fullname="$cdup" type="uninitialized"></property><property
-name="$cwd" fullname="$cwd"
-type="uninitialized"></property><property name="$dir"
-fullname="$dir" type="uninitialized"></property><property
-name="$dirs" fullname="$dirs"
-type="uninitialized"></property><property name="$f"
-fullname="$f" type="uninitialized"></property><property
-name="$f_parts" fullname="$f_parts"
-type="uninitialized"></property><property name="$f_user"
-fullname="$f_user"
-type="uninitialized"></property><property name="$i"
-fullname="$i" type="uninitialized"></property><property
-name="$idx" fullname="$idx"
-type="uninitialized"></property><property name="$op"
-fullname="$op" type="uninitialized"></property><property
-name="$pass" fullname="$pass"
-type="uninitialized"></property><property
-name="$require_chown" fullname="$require_chown"
-type="uninitialized"></property><property name="$retval"
-fullname="$retval"
-type="uninitialized"></property><property name="$tmp_files"
-fullname="$tmp_files"
-type="uninitialized"></property><property name="$uid"
-fullname="$uid" type="uninitialized"></property><property
-name="$user" fullname="$user"
-type="uninitialized"></property></response>
+type="uninitialized"></property><property name="$even_num_pages_attr"
+fullname="$even_num_pages_attr" address="39794056" type="array"
+children="1" numchildren="4" page="0"
+pagesize="2"><property name="0" fullname="$even_num_pages_attr[0]"
+address="39794368" type="string" size="19"
+encoding="base64"><![CDATA[L3Vzci9sb2NhbC9iaW4vY2FrZQ==]]></property><property
+name="1" fullname="$even_num_pages_attr[1]" address="39794640"
+type="string" size="8"
+encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property></property><property name="$odd_num_pages_attr"
+fullname="$odd_num_pages_attr" address="39794056" type="array"
+children="1" numchildren="5" page="0"
+pagesize="2"><property name="0" fullname="$odd_num_pages_attr[0]"
+address="39794368" type="string" size="19"
+encoding="base64"><![CDATA[L3Vzci9sb2NhbC9iaW4vY2FrZQ==]]></property><property
+name="1" fullname="$odd_num_pages_attr[1]" address="39794640"
+type="string" size="8"
+encoding="base64"><![CDATA[VGRkLnRlc3Q=]]></property></property></response>
 """
 
     def test_properties_are_objects(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        assert len(context) == 23
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert len(context) == 5 
         self.assertIsInstance(context[0],vdebug.dbgp.ContextProperty)
 
     def test_int_property_attributes(self):
@@ -165,6 +162,7 @@ type="uninitialized"></property></response>
         assert prop.type == "int"
         assert prop.value == "4"
         assert prop.has_children == False
+        assert prop.page == None
 
     def test_array_property_attributes(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
@@ -175,18 +173,57 @@ type="uninitialized"></property></response>
         assert prop.type == "array"
         assert prop.value == ""
         assert prop.has_children == True
-        assert prop.child_count() == 4
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
+        assert prop.page == 0
 
-    def test_string_property_attributes(self):
+    def test_even_num_pages(self):
         res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
         context = res.get_context()
-        prop = context[2]
+        prop = context[3]
 
-        assert prop.display_name == "$argv[0]"
-        assert prop.type == "string"
-        assert prop.value == "`/usr/local/bin/cake`"
-        assert prop.has_children == False
-        assert prop.size == "19"
+        assert prop.display_name == "$even_num_pages_attr"
+        assert prop.type == "array"
+        assert prop.value == ""
+        assert prop.has_children == True
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
+        assert prop.page == 0
+        assert prop.pagesize == 2
+        assert prop.num_pages == 2
+
+    def test_odd_num_pages(self):
+        res = vdebug.dbgp.ContextGetResponse(self.response,"","",Mock())
+        context = res.get_context()
+        prop = context[4]
+
+        assert prop.display_name == "$odd_num_pages_attr"
+        assert prop.type == "array"
+        assert prop.value == ""
+        assert prop.has_children == True
+        """
+        Children are only fetched in UI.
+        Every context get command, or property get in Watch window,
+        Trigger a property_get command for the property currently focused on watchwin.
+        This fetches all pages, and therefore
+        Here every child property is bypassed
+        """
+        assert prop.child_count() == 0
+        assert prop.page == 0
+        assert prop.pagesize == 2
+        assert prop.num_pages == 3
 
 class ContextGetAlternateTest(unittest.TestCase):
     response = """<?xml version="1.0" encoding="utf-8"?>
