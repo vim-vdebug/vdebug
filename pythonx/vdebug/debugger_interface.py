@@ -66,15 +66,6 @@ class DebuggerInterface:
         """
         self.session_handler.dispatch_event("step_out")
 
-    def handle_opt(self, option, value=None):
-        """Set an option, overwriting the existing value.
-        """
-        if value is None:
-            return self.ui.say(opts.Options.get(option))
-        self.ui.say("Setting vdebug option '%s' to: %s" % (option, value))
-        vim.command('let g:vdebug_options["%s"] = "%s"' % (option, value))
-        return opts.Options.overwrite(option, value)
-
     def handle_return_keypress(self):
         """React to a <enter> keypress event.
         """

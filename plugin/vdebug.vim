@@ -118,7 +118,9 @@ command! VdebugStart python3 debugger.run()
 command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
 command! -nargs=? -bang VdebugEval python3 debugger.handle_eval('<bang>', <q-args>)
-command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt python3 debugger.handle_opt(<f-args>)
+command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt :call Vdebug_set_option(<f-args>)
+command! -nargs=+ VdebugPathMap :call Vdebug_path_map(<f-args>)
+command! -nargs=+ VdebugAddPathMap :call Vdebug_add_path_map(<f-args>)
 command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
 
 if hlexists("DbgCurrentLine") == 0
@@ -244,6 +246,38 @@ function! s:OptionNames(A,L,P)
             return []
         endif
     endif
+endfunction
+
+function! Vdebug_set_option(option, ...)
+    if ! a:0
+        let g:vdebug_options[a:option]
+        return
+    endif
+    if a:option == 'path_maps'
+        echomsg 'use :VdebugAddPathMap to add extra or :VdebugPathMap to set new'
+        return
+    elseif a:option == 'window_commands'
+        echomsg 'update window_commands in your vimrc please'
+        return
+    elseif a:option == 'window_arrangement'
+        echomsg 'update window_arrangement in your vimrc please'
+        return
+    endif
+    echomsg 'Setting vdebug option "' . a:option . '" to: ' . a:1
+    let g:vdebug_options[a:option] = a:1
+    exe ":python3 debugger.reload_options()"
+endfunction
+
+function! Vdebug_add_path_map(from, to)
+    echomsg 'Adding vdebug path map "{' . a:from . ':' . a:to . '}"'
+    let g:vdebug_options['path_maps'] = extend(g:vdebug_options['path_maps'], {a:from: a:to})
+    exe ":python3 debugger.reload_options()"
+endfunction
+
+function! Vdebug_path_map(from, to)
+    echomsg 'Setting vdebug path maps to "{' . a:from . ':' . a:to . '}"'
+    let g:vdebug_options['path_maps'] = {a:from: a:to}
+    exe ":python3 debugger.reload_options()"
 endfunction
 
 function! Vdebug_get_visual_selection()
