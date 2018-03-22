@@ -66,11 +66,10 @@ class SessionHandler:
     def stop(self):
         if self.is_connected():
             self.__session.close_connection()
-        elif self.is_open():
-            self.stop_listening()
-            self.__ui.close()
         elif self.is_listening():
-            self.listener.stop()
+            self.stop_listening()
+        elif self.is_open():
+            self.__ui.close()
         else:
             self.__ui.say("Vdebug is not running")
 
