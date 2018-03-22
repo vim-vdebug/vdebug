@@ -181,6 +181,7 @@ class BackgroundSocketCreator(threading.Thread):
             s.setblocking(1)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.__host, self.__port))
+            s.settimeout(5) # timeout after 5 seconds so we can check messages
             s.listen(5)
             while 1:
                 try:
@@ -201,7 +202,7 @@ class BackgroundSocketCreator(threading.Thread):
 
     def __peek_for_exit(self):
         try:
-            #self.log("Checking for exit")
+            # self.log("Checking for exit")
             self.__check_exit(self.__message_q.get_nowait())
         except queue.Empty:
             pass
