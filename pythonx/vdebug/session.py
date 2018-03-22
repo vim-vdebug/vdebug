@@ -57,6 +57,9 @@ class SessionHandler:
             self.listener.stop()
             self.ui().say("Vdebug stopped waiting for a connection")
 
+        if self.__session:
+            self.__session.close_connection()
+
     def run(self):
         if self.is_connected():
             self.dispatch_event("run")
