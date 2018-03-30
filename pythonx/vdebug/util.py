@@ -6,6 +6,7 @@ import socket
 import sys
 import time
 import traceback
+import codecs
 try:
     import urllib.parse as urllib
 except ImportError:
@@ -153,7 +154,8 @@ class Keymapper:
         keys = {v for k, v in self.keymaps.items() if k not in self.exclude}
         special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>",
                    "<unique>"}
-        for line in open(tempfile, 'r'):
+        for line in codecs.open(tempfile, 'r', 'cp1250'):
+            line = line.encode('utf-8').decode('utf-8')
             if not regex.match(line):
                 continue
             parts = split_regex.split(line)[1:]
