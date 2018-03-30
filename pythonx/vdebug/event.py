@@ -262,12 +262,12 @@ class RefreshEvent(Event):
         if str(status) == "interactive":
             self.ui.error("Debugger engine says it is in interactive mode,"
                           "which is not supported: closing connection")
-            #self.__breakpoints.unlink_api()
+            log.Log("closing connection because of interactive mode")
             self.session.close_connection()
         elif str(status) in ("stopping", "stopped"):
             self.ui.set_status("stopped")
             self.ui.say("Debugging session has ended")
-            #self.__breakpoints.unlink_api()
+            log.Log("closing connection because status is stopped")
             self.session.close_connection(False)
             if opts.Options.get('continuous_mode', int) != 0:
                 self.dispatch("listen")
