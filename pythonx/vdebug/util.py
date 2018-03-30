@@ -6,6 +6,7 @@ import socket
 import sys
 import time
 import traceback
+import codecs
 try:
     import urllib.parse as urllib
 except ImportError:
@@ -49,7 +50,9 @@ class ExceptionHandler:
     def handle_socket_end(self):
         """Handle a socket closing, which is pretty normal.
         """
-        self._session_handler.ui().say("Connection to the debugger has been closed")
+        self._session_handler.ui().say(
+            "Connection to the debugger has been closed"
+        )
         self._session_handler.stop()
 
     def handle_vim_error(self, e):
@@ -84,7 +87,7 @@ class ExceptionHandler:
         elif isinstance(e, error.UserInterrupt):
             try:
                 self.handle_interrupt()
-            except:
+            except Exception as e:
                 pass
         elif isinstance(e, self.readable_errors):
             self.handle_readable_error(e)
@@ -96,12 +99,10 @@ class ExceptionHandler:
             print("Keyboard interrupt - debugging session cancelled")
             try:
                 self._session_handler.stop()
-            except:
+            except Exception as e:
                 pass
         else:
             self.handle_general_exception()
-        #elif isinstance(e,vim.error):
-        #    self.handle_vim_error(e)
 
 
 class Keymapper:
@@ -137,7 +138,6 @@ class Keymapper:
 
     def reload(self):
         self.is_mapped = False
-        self._reload_keys()
         self.map()
 
     def _reload_keys(self):
@@ -153,7 +153,8 @@ class Keymapper:
         keys = {v for k, v in self.keymaps.items() if k not in self.exclude}
         special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>",
                    "<unique>"}
-        for line in open(tempfile, 'r'):
+        for line in codecs.open(tempfile, 'r', 'cp1250'):
+            line = line.encode('utf-8').decode('utf-8')
             if not regex.match(line):
                 continue
             parts = split_regex.split(line)[1:]
@@ -258,7 +259,9 @@ class FilePath:
                     elif remote.endswith('/') and not local.endswith('/'):
                         remote = remote[:-1]
                     ret = ret.replace(local, remote, 1)
-                    # replace remaining local separators with URL '/' separators
+                    """
+                    replace remaining local separators with URL '/' separators
+                    """
                     ret = ret.replace('\\', '/')
                     break
 
@@ -349,5 +352,5 @@ class InputStream:
         try:
             vim.eval("getchar(0)")
             time.sleep(0.1)
-        except:  # vim.error
+        except vim.error as e:
             raise error.UserInterrupt()
