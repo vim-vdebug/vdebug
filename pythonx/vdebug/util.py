@@ -138,7 +138,6 @@ class Keymapper:
 
     def reload(self):
         self.is_mapped = False
-        self._reload_keys()
         self.map()
 
     def _reload_keys(self):
