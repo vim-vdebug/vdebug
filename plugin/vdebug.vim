@@ -302,7 +302,6 @@ function! Vdebug_statusline()
 endfunction
 
 silent doautocmd User VdebugPost
-autocmd VimLeavePre * python3 debugger.close()
 
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)

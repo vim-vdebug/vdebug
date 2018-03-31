@@ -19,7 +19,7 @@ class DebuggerInterface:
         self.event_dispatcher = event.Dispatcher(self.session_handler)
 
     def __del__(self):
-        self.session_handler.stop()
+        self.session_handler.close()
         self.session_handler = None
 
     @staticmethod
