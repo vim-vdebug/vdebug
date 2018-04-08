@@ -124,6 +124,7 @@ class Keymapper:
         return self.keymaps['close']
 
     def map(self):
+        log.Log("keymapper: map", log.Logger.DEBUG)
         if self.is_mapped:
             return
         self._store_old_map()
@@ -137,14 +138,17 @@ class Keymapper:
         self.is_mapped = True
 
     def reload(self):
+        log.Log("keymapper: reload", log.Logger.DEBUG)
         self.is_mapped = False
         self.map()
 
     def _reload_keys(self):
+        log.Log("keymapper: reload_keys", log.Logger.DEBUG)
         self.keymaps = vim.eval("g:vdebug_keymap")
         self.leader = vim.eval("g:vdebug_leader_key")
 
     def _store_old_map(self):
+        log.Log("keymapper: store_old_map", log.Logger.DEBUG)
         vim.command('let tempfile=tempname()')
         tempfile = vim.eval("tempfile")
         vim.command('mkexrc! %s' % (tempfile))
@@ -154,6 +158,7 @@ class Keymapper:
         special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>",
                    "<unique>"}
         for line in codecs.open(tempfile, 'r', 'cp1250'):
+            log.Log("keymapper: line '%s'" % line, log.Logger.DEBUG)
             line = line.encode('utf-8').decode('utf-8')
             if not regex.match(line):
                 continue
@@ -170,6 +175,7 @@ class Keymapper:
         os.remove(tempfile)
 
     def unmap(self):
+        log.Log("keymapper: unmap", log.Logger.DEBUG)
         if self.is_mapped:
             self.is_mapped = False
 
