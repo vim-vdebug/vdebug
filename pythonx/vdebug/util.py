@@ -157,7 +157,7 @@ class Keymapper:
         keys = {v for k, v in self.keymaps.items() if k not in self.exclude}
         special = {"<buffer>", "<silent>", "<special>", "<script>", "<expr>",
                    "<unique>"}
-        for line in codecs.open(tempfile, 'r', 'cp1250'):
+        for line in codecs.open(tempfile, 'r', errors='ignore'):
             log.Log("keymapper: line '%s'" % line, log.Logger.DEBUG)
             line = line.encode('utf-8').decode('utf-8')
             if not regex.match(line):
