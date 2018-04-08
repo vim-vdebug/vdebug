@@ -112,10 +112,13 @@ class SessionHandler:
                   self.__ex_handler.exception_to_string(e))
 
     def __new_session(self):
+        log.Log("create session", log.Logger.DEBUG)
         self.__session = Session(self.__ui, self.__breakpoints,
                                  util.Keymapper())
 
+        log.Log("start session", log.Logger.DEBUG)
         status = self.__session.start(self.listener.create_connection())
+        log.Log("refresh event", log.Logger.DEBUG)
         self.dispatch_event("refresh", status)
 
 
