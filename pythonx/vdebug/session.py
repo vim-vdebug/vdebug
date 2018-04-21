@@ -214,8 +214,10 @@ class Session:
             self.__initialize_breakpoints()
 
             if opts.Options.get('break_on_open', int) == 1:
+                log.Log('starting with step_into (break_on_open = 1)', log.Logger.DEBUG)
                 status = self.__api.step_into()
             else:
+                log.Log('starting with run (break_on_open = 0)', log.Logger.DEBUG)
                 status = self.__api.run()
             return status
         except Exception:
