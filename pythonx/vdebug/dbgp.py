@@ -360,8 +360,11 @@ class Api:
     def property_get(self, name):
         """Get a property.
         """
-        return self.send_cmd('property_get', '-n %s -d 0' % name,
-                             ContextGetResponse)
+        return self.send_cmd(
+            'property_get',
+            '-n "%s" -d 0' % name.replace("\\", "\\\\").replace("\"", "\\\""),
+            ContextGetResponse
+        )
 
     def detach(self):
         """Tell the debugger to detach itself from this
