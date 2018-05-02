@@ -90,7 +90,7 @@ catch
 endtry
 
 Plugin 'gmarik/Vundle.vim'
-Plugin 'joonty/vdebug.git'
+Plugin 'vim-vdebug/vdebug.git'
 
 call vundle#end()
 
@@ -147,7 +147,7 @@ echo "export LANG=en_US.UTF-8" >> /home/vagrant/.bashrc
 echo "export DISPLAY=:0" >> /home/vagrant/.bashrc
 mkdir -p /home/vagrant/.vim-tmp /home/vagrant/.vim/bundle
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-git clone https://github.com/joonty/vdebug.git ~/.vim/bundle/vdebug
+git clone https://github.com/vim-vdebug/vdebug.git ~/.vim/bundle/vdebug
 cd /vagrant
 bundle install
 EOF

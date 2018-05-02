@@ -13,7 +13,8 @@
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
 "        Usage: Use :help Vdebug for information on how to configure and use
-"               this script, or visit the Github page http://github.com/joonty/vdebug.
+"               this script, or visit the Github page
+"               https://github.com/vim-vdebug/vdebug.
 "
 "=============================================================================
 " }}}
