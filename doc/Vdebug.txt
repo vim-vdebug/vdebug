@@ -149,8 +149,8 @@ compiled with tabs, signs and Python 3 support. If you're using Windows, some
 reports have said that Python must be installed separately to allow VIM to use
 it.
 
-The Github page for the plugin is https://github.com/joonty/vdebug, and the VIM
-scripts URL is http://www.vim.org/scripts/script.php?script_id=4170.
+The Github page for the plugin is https://github.com/vim-vdebug/vdebug, and the
+VIM scripts URL is https://www.vim.org/scripts/script.php?script_id=4170.
 
 By far the easiest way to install is by using a plugin manager, e.g. vundle
 (https://github.com/gmarik/vundle/) or pathogen
@@ -780,7 +780,7 @@ some debugger engines.
 4.6 Tracing expressions                                          *VdebugTrace*
 
 A large part of this work is thanks to escher9 on Github. See this pull
-request for the history: https://github.com/joonty/vdebug/pull/178.
+request for the history: https://github.com/vim-vdebug/vdebug/pull/178
 
 If you want to track an expression (any piece of code that can be evaluated)
 or clearly see how a single variable changes through your code's execution,
@@ -1117,9 +1117,9 @@ machine using your router, as it will be blocked by default.
 10. Troubleshooting/FAQ                                *VdebugTroubleshooting*
 
 If you have any questions or problems that aren't addressed or fixed here then
-feel free to raise an issue on the Github page https://github.com/joonty/vdebug
-or email me at <jon AT joncairns.com>. If the question is good I might even add
-it to this list.
+feel free to raise an issue on the Github page
+https://github.com/vim-vdebug/vdebug or email me at <jon AT joncairns.com>. If
+the question is good I might even add it to this list.
 
     Q. I can't get the debugger to run! Pressing <F5> does nothing.
     A. The most common reason for this is that your VIM installation is not

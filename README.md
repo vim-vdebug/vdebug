@@ -1,6 +1,6 @@
 # Vdebug
 
-[![Build Status](https://travis-ci.org/joonty/vdebug.png?branch=master)](https://travis-ci.org/joonty/vdebug)
+[![Build Status](https://travis-ci.org/vim-vdebug/vdebug.png?branch=master)](https://travis-ci.org/vim-vdebug/vdebug)
 
 ## Introduction
 
@@ -36,7 +36,7 @@ The actual installation is no different than for any other Vim plugin, you can
   `:call pathogen#helptags()` afterwards.
 * use your favorite plugin manager: Put the respective instruction in your init
   file and update your plugins afterwards.  For Vundle this would be `Plugin
-  'joonty/vdebug'` and `:PluginInstall`.
+  'vim-vdebug/vdebug'` and `:PluginInstall`.
 
 ### Python 2
 
@@ -132,8 +132,8 @@ directory of the plugin
 
 This plugin is released under the [MIT License][1].
 
-[1]: https://raw.github.com/joonty/vdebug/master/LICENCE
+[1]: https://raw.github.com/vim-vdebug/vdebug/master/LICENCE
 [2]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[3]: https://github.com/joonty/vdebug/issues/
-[4]: https://github.com/joonty/vdebug/issues/new
-[5]: https://github.com/joonty/vdebug/releases/tag/v1.5.2
+[3]: https://github.com/vim-vdebug/vdebug/issues/
+[4]: https://github.com/vim-vdebug/vdebug/issues/new
+[5]: https://github.com/vim-vdebug/vdebug/releases/tag/v1.5.2
