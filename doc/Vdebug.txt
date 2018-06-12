@@ -422,8 +422,8 @@ start a script in this way. It will be obvious when a connection is made,
 because a new VIM tab opens with four windows, signalling the start of a new
 debugging session.
 
-If you are starting a script but Vdebug does not react, see the
-|VdebugTroubleshooting| section for information.
+If you are starting a script but Vdebug does not react, or the source code is
+not loaded, see the |VdebugTroubleshooting| section for information.
 
 The debugger will pause at the first line of the beginning of the script. It
 then waits for your action before continuing.
@@ -1197,6 +1197,14 @@ the question is good I might even add it to this list.
 
     Q. Why doesn't Ross, the largest friend, simply eat the other ones?
     A. Think of the indigestion that would result.
+
+    Q. My command line php script seems to stop at the first line, but the
+       source code is not loaded in the debugger window, how can that be?
+    A. A possible solution is to launch vi in the directory, where your source
+       code resides.
+       Another possible issue was observed, when the source code was called
+       from within a bash script with 'php -r "<php code>". In this case, try
+       to put your source code in a separate .php file.
 
 
 ==============================================================================
