@@ -57,7 +57,9 @@ class Store:
         del self.breakpoints[id]
 
     def clear_breakpoints(self):
-        for id in self.breakpoints:
+        # We need to copy the keys to a new list, otherwise the for loop
+        # complains when items are removed.
+        for id in list(self.breakpoints.keys()):
             self.remove_breakpoint_by_id(id)
         self.breakpoints = {}
 
