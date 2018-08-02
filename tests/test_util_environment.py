@@ -1,4 +1,3 @@
-from . import setup
 import unittest
 import vdebug.util
 try:

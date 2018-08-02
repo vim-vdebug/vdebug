@@ -1,4 +1,3 @@
-from . import setup
 import unittest
 import vdebug.opts
 from vdebug.util import FilePath
