@@ -172,7 +172,7 @@ function! Vdebug_load_options(options)
     let single_defined_params = s:Vdebug_get_options()
     let g:vdebug_options = extend(g:vdebug_options, single_defined_params)
 
-    exe ":python3 debugger.reload_options()"
+    python3 debugger.reload_options()
 endfunction
 
 " Get options defined outside of the vdebug_options dictionary
@@ -230,7 +230,7 @@ function! Vdebug_load_keymaps(keymaps)
 
     " Exceptional case for visual evaluation
     exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
-    exe ":python3 debugger.reload_keymappings()"
+    python3 debugger.reload_keymappings()
 endfunction
 
 function! s:OptionNames(A,L,P)
@@ -265,19 +265,19 @@ function! Vdebug_set_option(option, ...)
     endif
     echomsg 'Setting vdebug option "' . a:option . '" to: ' . a:1
     let g:vdebug_options[a:option] = a:1
-    exe ":python3 debugger.reload_options()"
+    python3 debugger.reload_options()
 endfunction
 
 function! Vdebug_add_path_map(from, to)
     echomsg 'Adding vdebug path map "{' . a:from . ':' . a:to . '}"'
     let g:vdebug_options['path_maps'] = extend(g:vdebug_options['path_maps'], {a:from: a:to})
-    exe ":python3 debugger.reload_options()"
+    python3 debugger.reload_options()
 endfunction
 
 function! Vdebug_path_map(from, to)
     echomsg 'Setting vdebug path maps to "{' . a:from . ':' . a:to . '}"'
     let g:vdebug_options['path_maps'] = {a:from: a:to}
-    exe ":python3 debugger.reload_options()"
+    python3 debugger.reload_options()
 endfunction
 
 function! Vdebug_get_visual_selection()
