@@ -36,8 +36,6 @@ endif
 
 silent doautocmd User VdebugPre
 
-execute 'py3file' fnamemodify(expand('<sfile>'), ':p:h:h') . '/pythonx/start_vdebug.py'
-
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
     let g:vdebug_force_ascii = 1
@@ -111,6 +109,7 @@ if g:vdebug_force_ascii == 1
 endif
 
 " Create the top dog
+python3 import vdebug.debugger_interface
 python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands

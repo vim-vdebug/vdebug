@@ -1,4 +1,3 @@
-from . import setup
 import sys
 import unittest
 import vdebug.log

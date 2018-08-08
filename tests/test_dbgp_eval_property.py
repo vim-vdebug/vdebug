@@ -1,4 +1,3 @@
-from . import setup
 import unittest
 import vdebug.dbgp
 import xml.etree.ElementTree as ET

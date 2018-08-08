@@ -1,4 +1,3 @@
-from . import setup
 import unittest
 from vdebug.opts import Options,OptionsError
 
