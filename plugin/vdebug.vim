@@ -34,8 +34,6 @@ if !has("python3")
     finish
 endif
 
-silent doautocmd User VdebugPre
-
 " Nice characters get screwed up on windows
 if has('win32') || has('win64')
     let g:vdebug_force_ascii = 1
@@ -301,7 +299,9 @@ function! Vdebug_statusline()
     return pyeval("debugger.status_for_statusline()")
 endfunction
 
-silent doautocmd User VdebugPost
+augroup Vdebug
+autocmd VimLeavePre * python3 debugger.close()
+augroup END
 
 call Vdebug_load_options(g:vdebug_options)
 call Vdebug_load_keymaps(g:vdebug_keymap)

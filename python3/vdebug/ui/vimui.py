@@ -481,8 +481,8 @@ class Window(interface.Window):
         self.creation_count += 1
 
         if self.creation_count == 1:
-            cmd = 'silent! au BufWinLeave %s' % self.name
-            cmd += ' :python3 debugger.mark_window_as_closed("%s")' % self.name
+            cmd = 'autocmd Vdebug BufWinLeave %s' % self.name
+            cmd += ' python3 debugger.mark_window_as_closed("%s")' % self.name
             vim.command(cmd)
 
         self.on_create()
@@ -556,8 +556,8 @@ class LogWindow(Window):
     def on_create(self):
         self.command('setlocal syntax=debugger_log')
         if self.creation_count == 1:
-            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
-                                                                     self.name)
+            cmd = 'autocmd Vdebug BufWinLeave %s silent! bdelete %s' \
+                % (self.name, self.name)
             vim.command(
                 '%s | python3 vdebug.log.Log.remove_logger("WindowLogger")'
                 % cmd)
@@ -660,8 +660,8 @@ class TraceWindow(WatchWindow):
 
     def on_create(self):
         if self.creation_count == 1:
-            cmd = 'silent! au BufWinLeave %s :silent! bdelete %s' % (self.name,
-                                                                     self.name)
+            cmd = 'autocmd Vdebug BufWinLeave %s silent! bdelete %s' \
+                % (self.name, self.name)
             vim.command(
                 '%s | python3 debugger.runner.ui.tracewin.is_open = False'
                 % cmd)
