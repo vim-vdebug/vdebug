@@ -296,7 +296,7 @@ class Api:
     def eval(self, code):
         """Tell the debugger to start or resume
         execution."""
-        code_enc = base64.encodestring(code.encode('utf-8'))
+        code_enc = base64.encodebytes(code.encode('utf-8'))
         args = '-- %s' % code_enc.decode('utf-8')
 
         """ The python engine incorrectly requires length.

@@ -227,7 +227,7 @@ class WatchBreakpoint(Breakpoint):
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        cmd += " -- " + base64.encodestring(self.expr)
+        cmd += " -- " + base64.encodebytes(self.expr)
         return cmd
 
 
