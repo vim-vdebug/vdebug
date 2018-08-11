@@ -267,7 +267,7 @@ class FilePath:
 
         if ret.startswith('phar://'):
             return ret
-        elif ret.startswith('/'):
+        if ret.startswith('/'):
             return "file://"+ret
         return "file:///"+ret
 
