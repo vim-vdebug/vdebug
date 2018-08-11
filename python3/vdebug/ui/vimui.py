@@ -253,6 +253,7 @@ class Ui(interface.Ui):
     def __get_buf_list():
         return vim.eval("range(1, bufnr('$'))")
 
+
 class SourceWindow(interface.Window):
 
     file = None

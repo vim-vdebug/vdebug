@@ -169,6 +169,7 @@ class Breakpoint:
     def __str__(self):
         return "%s breakpoint, id %i" % (self.type, self.id)
 
+
 class LineBreakpoint(Breakpoint):
     type = "line"
 
@@ -190,6 +191,7 @@ class LineBreakpoint(Breakpoint):
         return '-t {} -f "{}" -n {} -s enabled'.format(
             self.type, self.file.as_remote(), self.line)
 
+
 class TemporaryLineBreakpoint(LineBreakpoint):
     def on_add(self):
         pass
@@ -200,6 +202,7 @@ class TemporaryLineBreakpoint(LineBreakpoint):
     def get_cmd(self):
         cmd = LineBreakpoint.get_cmd(self)
         return cmd + " -r 1"
+
 
 class ConditionalBreakpoint(LineBreakpoint):
     type = "conditional"
@@ -213,6 +216,7 @@ class ConditionalBreakpoint(LineBreakpoint):
         cmd += " -- " + base64.encodebytes(
             self.condition.encode("UTF-8")).decode("UTF-8")
         return cmd
+
 
 class WatchBreakpoint(Breakpoint):
     type = "watch"
@@ -237,6 +241,7 @@ class ExceptionBreakpoint(Breakpoint):
     def get_cmd(self):
         return "-t {} -x {} -s enabled".format(self.type, self.exception)
 
+
 class CallBreakpoint(Breakpoint):
     type = "call"
 
@@ -246,6 +251,7 @@ class CallBreakpoint(Breakpoint):
 
     def get_cmd(self):
         return "-t {} -m {} -s enabled".format(self.type, self.function)
+
 
 class ReturnBreakpoint(CallBreakpoint):
     type = "return"

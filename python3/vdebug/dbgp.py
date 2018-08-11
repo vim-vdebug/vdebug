@@ -551,26 +551,31 @@ class EvalProperty(ContextProperty):
                         "." + name
 
 
-""" Errors/Exceptions """
+# Errors/Exceptions
 class TimeoutError(Exception):
     pass
+
 
 class DBGPError(Exception):
     """Raised when the debugger returns an error message."""
     pass
 
+
 class CmdNotImplementedError(Exception):
     """Raised when the debugger returns an error message."""
     pass
+
 
 class EvalError(Exception):
     """Raised when some evaluated code is invalid."""
     pass
 
+
 class ResponseError(Exception):
     """An error caused by an unexpected response from the
     debugger (e.g. invalid format XML)."""
     pass
+
 
 class TraceError(Exception):
     """Raised when trace is out of domain."""
