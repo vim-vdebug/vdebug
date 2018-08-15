@@ -29,8 +29,8 @@ endif
 let g:is_vdebug_loaded = 1
 
 " Do not source this script when python is not compiled in.
-if !has("python3")
-    echomsg ":python3 is not available, vdebug will not be loaded."
+if !has('python3')
+    echomsg ':python3 is not available, vdebug will not be loaded.'
     finish
 endif
 
@@ -43,67 +43,67 @@ else
     let g:vdebug_force_ascii = 0
 end
 
-if !exists("g:vdebug_options")
+if !exists('g:vdebug_options')
     let g:vdebug_options = {}
 endif
 
-if !exists("g:vdebug_keymap")
+if !exists('g:vdebug_keymap')
     let g:vdebug_keymap = {}
 endif
 
-if !exists("g:vdebug_features")
+if !exists('g:vdebug_features')
     let g:vdebug_features = {}
 endif
 
-if !exists("g:vdebug_leader_key")
-    let g:vdebug_leader_key = ""
+if !exists('g:vdebug_leader_key')
+    let g:vdebug_leader_key = ''
 endif
 
 let g:vdebug_keymap_defaults = {
-\    "run" : "<F5>",
-\    "run_to_cursor" : "<F9>",
-\    "step_over" : "<F2>",
-\    "step_into" : "<F3>",
-\    "step_out" : "<F4>",
-\    "close" : "<F6>",
-\    "detach" : "<F7>",
-\    "set_breakpoint" : "<F10>",
-\    "get_context" : "<F11>",
-\    "eval_under_cursor" : "<F12>",
-\    "eval_visual" : "<Leader>e"
+\    'run' : '<F5>',
+\    'run_to_cursor' : '<F9>',
+\    'step_over' : '<F2>',
+\    'step_into' : '<F3>',
+\    'step_out' : '<F4>',
+\    'close' : '<F6>',
+\    'detach' : '<F7>',
+\    'set_breakpoint' : '<F10>',
+\    'get_context' : '<F11>',
+\    'eval_under_cursor' : '<F12>',
+\    'eval_visual' : '<Leader>e'
 \}
 
 let g:vdebug_options_defaults = {
-\    "port" : 9000,
-\    "timeout" : 20,
-\    "server" : '',
-\    "on_close" : 'stop',
-\    "break_on_open" : 1,
-\    "ide_key" : '',
-\    "debug_window_level" : 0,
-\    "debug_file_level" : 0,
-\    "debug_file" : "",
-\    "path_maps" : {},
-\    "watch_window_style" : 'expanded',
-\    "marker_default" : '⬦',
-\    "marker_closed_tree" : '▸',
-\    "marker_open_tree" : '▾',
-\    "continuous_mode"  : 1,
-\    "background_listener" : 1,
-\    "auto_start" : 1,
-\    "window_commands" : {
-\        "DebuggerWatch" : "vertical belowright new",
-\        "DebuggerStack" : "belowright new",
-\        "DebuggerStatus" : "belowright new"
+\    'port' : 9000,
+\    'timeout' : 20,
+\    'server' : '',
+\    'on_close' : 'stop',
+\    'break_on_open' : 1,
+\    'ide_key' : '',
+\    'debug_window_level' : 0,
+\    'debug_file_level' : 0,
+\    'debug_file' : '',
+\    'path_maps' : {},
+\    'watch_window_style' : 'expanded',
+\    'marker_default' : '⬦',
+\    'marker_closed_tree' : '▸',
+\    'marker_open_tree' : '▾',
+\    'continuous_mode'  : 1,
+\    'background_listener' : 1,
+\    'auto_start' : 1,
+\    'window_commands' : {
+\        'DebuggerWatch' : 'vertical belowright new',
+\        'DebuggerStack' : 'belowright new',
+\        'DebuggerStatus' : 'belowright new'
 \    },
-\    "window_arrangement" : ["DebuggerWatch", "DebuggerStack", "DebuggerStatus"]
+\    'window_arrangement' : ['DebuggerWatch', 'DebuggerStack', 'DebuggerStatus']
 \}
 
 " Different symbols for non unicode Vims
 if g:vdebug_force_ascii == 1
-    let g:vdebug_options_defaults["marker_default"] = '*'
-    let g:vdebug_options_defaults["marker_closed_tree"] = '+'
-    let g:vdebug_options_defaults["marker_open_tree"] = '-'
+    let g:vdebug_options_defaults['marker_default'] = '*'
+    let g:vdebug_options_defaults['marker_closed_tree'] = '+'
+    let g:vdebug_options_defaults['marker_open_tree'] = '-'
 endif
 
 " Create the top dog
@@ -121,16 +121,16 @@ command! -nargs=+ VdebugPathMap :call Vdebug_path_map(<f-args>)
 command! -nargs=+ VdebugAddPathMap :call Vdebug_add_path_map(<f-args>)
 command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
 
-if hlexists("DbgCurrentLine") == 0
+if hlexists('DbgCurrentLine') == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 end
-if hlexists("DbgCurrentSign") == 0
+if hlexists('DbgCurrentSign') == 0
     hi default DbgCurrentSign term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
 end
-if hlexists("DbgBreakptLine") == 0
+if hlexists('DbgBreakptLine') == 0
     hi default DbgBreakptLine term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 end
-if hlexists("DbgBreakptSign") == 0
+if hlexists('DbgBreakptSign') == 0
     hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 end
 
@@ -178,7 +178,7 @@ endfunction
 " This helps for when users might want to define a single option by itself
 " without needing the dictionary ie. vdebug_options_port = 9000
 function! s:Vdebug_get_options()
-    let param_namespace = "g:vdebug_options_"
+    let param_namespace = 'g:vdebug_options_'
     let param_namespace_len = strlen(param_namespace)
 
     " Get the paramter names and concat the g:vdebug_options namespace
@@ -197,7 +197,7 @@ function! s:Vdebug_get_options()
       let params[name] = val
     endfor
     if !empty(params)
-      echoerr "Deprication Warning: The options g:vdebug_options_* are depricated.  Please use the g:vdebug_options dictionary."
+      echoerr 'Deprication Warning: The options g:vdebug_options_* are depricated.  Please use the g:vdebug_options dictionary.'
     endif
     return params
 endfunction
@@ -208,26 +208,26 @@ endfunction
 " been loaded.
 function! Vdebug_load_keymaps(keymaps)
     " Unmap existing keys, if applicable
-    if has_key(g:vdebug_keymap, "run")
-        exe "silent! nunmap ".g:vdebug_keymap["run"]
+    if has_key(g:vdebug_keymap, 'run')
+        exe 'silent! nunmap '.g:vdebug_keymap['run']
     endif
-    if has_key(g:vdebug_keymap, "set_breakpoint")
-        exe "silent! nunmap ".g:vdebug_keymap["set_breakpoint"]
+    if has_key(g:vdebug_keymap, 'set_breakpoint')
+        exe 'silent! nunmap '.g:vdebug_keymap['set_breakpoint']
     endif
-    if has_key(g:vdebug_keymap, "eval_visual")
-        exe "silent! vunmap ".g:vdebug_keymap["eval_visual"]
+    if has_key(g:vdebug_keymap, 'eval_visual')
+        exe 'silent! vunmap '.g:vdebug_keymap['eval_visual']
     endif
 
     " Merge keymaps with defaults
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
-    exe "noremap ".g:vdebug_keymap["run"]." :python3 debugger.run()<cr>"
-    exe "noremap ".g:vdebug_keymap["close"]." :python3 debugger.close()<cr>"
-    exe "noremap ".g:vdebug_keymap["set_breakpoint"]." :python3 debugger.set_breakpoint()<cr>"
+    exe 'noremap '.g:vdebug_keymap['run'].' :python3 debugger.run()<cr>'
+    exe 'noremap '.g:vdebug_keymap['close'].' :python3 debugger.close()<cr>'
+    exe 'noremap '.g:vdebug_keymap['set_breakpoint'].' :python3 debugger.set_breakpoint()<cr>'
 
     " Exceptional case for visual evaluation
-    exe "vnoremap ".g:vdebug_keymap["eval_visual"]." :python3 debugger.handle_visual_eval()<cr>"
+    exe 'vnoremap '.g:vdebug_keymap['eval_visual'].' :python3 debugger.handle_visual_eval()<cr>'
     python3 debugger.reload_keymappings()
 endfunction
 
@@ -296,7 +296,7 @@ function! Vdebug_edit(filename)
 endfunction
 
 function! Vdebug_statusline()
-    return pyeval("debugger.status_for_statusline()")
+    return pyeval('debugger.status_for_statusline()')
 endfunction
 
 augroup Vdebug

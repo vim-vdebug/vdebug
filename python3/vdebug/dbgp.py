@@ -2,10 +2,7 @@ import base64
 import socket
 import sys
 import time
-if sys.hexversion >= 0x02050000:
-    import xml.etree.ElementTree as ET
-else:
-    import elementtree.ElementTree as ET
+import xml.etree.ElementTree as ET
 
 from . import log
 

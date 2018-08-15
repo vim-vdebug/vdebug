@@ -4,10 +4,7 @@ import socket
 import sys
 import time
 import traceback
-try:
-    import urllib.parse as urllib
-except ImportError:
-    import urllib
+import urllib.parse as urllib
 
 import vim
 
