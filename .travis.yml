@@ -12,8 +12,8 @@ before_install:
   - docker ps
 install:
   - |-
-    docker exec -t vdebug-distro-test bash -c "apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 ruby-dev gcc make automake libtool php-cli php-xdebug locales && gem install bundler && echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/default/locale && useradd -u $(id -u) -M -s /bin/bash -d /travis travis && echo '%travis ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/travis"
+    docker exec -t vdebug-distro-test bash -c "apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip ruby-dev gcc make automake libtool php-cli php-xdebug locales && gem install bundler && pip3 install coverage && echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/default/locale && useradd -u $(id -u) -M -s /bin/bash -d /travis travis && echo '%travis ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/travis"
   - docker exec -t vdebug-distro-test su - travis -c "bundle install"
 script:
-  - docker exec -t vdebug-distro-test su - travis -c "python3 -m unittest discover"
+  - docker exec -t vdebug-distro-test su - travis -c "coverage run -m unittest discover && coverage report -m --include='python3/vdebug/*'"
   - docker exec -t vdebug-distro-test su - travis -c "xvfb-run bundle exec rake spec features"
