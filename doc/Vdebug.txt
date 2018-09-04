@@ -960,7 +960,7 @@ g:vdebug_options.marker_open_tree (default = '▾')
     byte support is not enabled.
 
                                               *VdebugOptions-continuous_mode*
-g:vdebug_options.continuous_mode (default = 0)
+g:vdebug_options.continuous_mode (default = 1)
     If enabled, Vdebug will start listening immediately after a debugging
     session has finished, allowing for constant debugging across separate
     requests. Press <F6> during a debugging session to stop this, or <Ctrl-C>
