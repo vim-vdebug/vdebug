@@ -12,7 +12,7 @@ before_install:
   - docker ps
 install:
   - docker exec -t vdebug-distro-test apt-get update
-  - docker exec -t vdebug-distro-test apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip ruby-dev gcc make automake libtool php-cli php-xdebug locales
+  - docker exec -t vdebug-distro-test apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip php-cli php-xdebug locales
   - docker exec -t vdebug-distro-test gem install bundler
   - docker exec -t vdebug-distro-test pip3 install coverage
   - docker exec -t vdebug-distro-test bash -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
