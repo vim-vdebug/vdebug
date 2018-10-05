@@ -11,9 +11,19 @@ before_install:
   - docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null
   - docker ps
 install:
-  - |-
-    docker exec -t vdebug-distro-test bash -c "apt-get update && apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip ruby-dev gcc make automake libtool php-cli php-xdebug locales && gem install bundler && pip3 install coverage && echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen && echo 'LANG=en_US.UTF-8' > /etc/default/locale && useradd -u $(id -u) -M -s /bin/bash -d /travis travis && echo '%travis ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/travis"
-  - docker exec -t vdebug-distro-test su - travis -c "bundle install"
+  - docker exec -t vdebug-distro-test apt-get update
+  - docker exec -t vdebug-distro-test apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip ruby-dev gcc make automake libtool php-cli php-xdebug locales
+  - docker exec -t vdebug-distro-test gem install bundler
+  - docker exec -t vdebug-distro-test pip3 install coverage
+  - docker exec -t vdebug-distro-test bash -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
+  - docker exec -t vdebug-distro-test locale-gen
+  - docker exec -t vdebug-distro-test bash -c 'echo LANG=en_US.UTF-8 > /etc/default/locale'
+  - docker exec -t vdebug-distro-test useradd -u $(id -u) -M -s /bin/bash -d /travis travis
+    # The colon makes yaml think this is a dict so we have to quote the whole
+    # thing.
+  - "docker exec -t vdebug-distro-test bash -c 'echo \"%travis ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/travis'"
+  - docker exec -t vdebug-distro-test su - travis -c 'bundle install'
 script:
-  - docker exec -t vdebug-distro-test su - travis -c "coverage run -m unittest discover && coverage report -m --include='python3/vdebug/*'"
-  - docker exec -t vdebug-distro-test su - travis -c "xvfb-run bundle exec rake spec features"
+  - docker exec -t vdebug-distro-test su - travis -c 'coverage run -m unittest discover'
+  - docker exec -t vdebug-distro-test su - travis -c 'coverage report -m --include="python3/vdebug/*"'
+  - docker exec -t vdebug-distro-test su - travis -c 'xvfb-run bundle exec rake spec features'
