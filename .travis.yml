@@ -12,9 +12,11 @@ before_install:
   - docker ps
 install:
   - docker exec -t vdebug-distro-test apt-get update
-  - docker exec -t vdebug-distro-test apt-get install -y sudo vim-gtk3 xvfb python3 python3-pip php-cli php-xdebug locales
-  - docker exec -t vdebug-distro-test gem install bundler
-  - docker exec -t vdebug-distro-test pip3 install coverage
+    # Vim, php, xdebug, bundler and coverage are needed to run the tests.
+    # Xvfb is needed to use the server feature of vim without a running X
+    # server (which is needed for some tests).  The locales and sudo packages
+    # are used to set things up inside the container.
+  - docker exec -t vdebug-distro-test apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales sudo
   - docker exec -t vdebug-distro-test bash -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
   - docker exec -t vdebug-distro-test locale-gen
   - docker exec -t vdebug-distro-test bash -c 'echo LANG=en_US.UTF-8 > /etc/default/locale'
@@ -24,6 +26,6 @@ install:
   - "docker exec -t vdebug-distro-test bash -c 'echo \"%travis ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/travis'"
   - docker exec -t vdebug-distro-test su - travis -c 'bundle install'
 script:
-  - docker exec -t vdebug-distro-test su - travis -c 'coverage run -m unittest discover'
-  - docker exec -t vdebug-distro-test su - travis -c 'coverage report -m --include="python3/vdebug/*"'
+  - docker exec -t vdebug-distro-test su - travis -c 'python3-coverage run -m unittest discover'
+  - docker exec -t vdebug-distro-test su - travis -c 'python3-coverage report -m --include="python3/vdebug/*"'
   - docker exec -t vdebug-distro-test su - travis -c 'xvfb-run bundle exec rake spec features'
