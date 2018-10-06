@@ -34,5 +34,7 @@ script:
   - docker exec vdebug-distro-test su - travis -c 'python3-coverage report -m --include="python3/vdebug/*"'
   - docker exec vdebug-distro-test su - travis -c 'xvfb-run bundle exec rake features'
     # The spec/startup_spec.rb test fails randomly on travis so we execute it
-    # last so all other tests will run first.
-  - docker exec vdebug-distro-test su - travis -c 'xvfb-run bundle exec rake spec'
+    # last so all other tests will run first.  It seems that some of the
+    # failures result from the xvfb from above no releasing the display fast
+    # enough: https://stackoverflow.com/a/8880717
+  - docker exec vdebug-distro-test su - travis -c 'xvfb-run --auto-servernum bundle exec rake spec'
