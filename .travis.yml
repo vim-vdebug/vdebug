@@ -17,12 +17,19 @@ install:
     # server (which is needed for some tests).  The locales package is used to
     # set things up inside the container.
   - docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
-  - docker exec vdebug-distro-test bash -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
+    # By default the locale inside the container is latin1.  For consistent
+    # tests we want to use utf8.
+  - docker exec vdebug-distro-test sh -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
+  - docker exec vdebug-distro-test sh -c 'echo LANG=en_US.UTF-8 > /etc/default/locale'
   - docker exec vdebug-distro-test locale-gen
-  - docker exec vdebug-distro-test bash -c 'echo LANG=en_US.UTF-8 > /etc/default/locale'
   - docker exec vdebug-distro-test useradd -u $(id -u) -M -s /bin/bash -d /travis travis
-  - docker exec vdebug-distro-test su - travis -c 'bundle install --path vendor/bundle'
+    # We are currently on docker 17.09 and the --workdir option for exec was
+    # only introduced in 17.12.  Therefore we have to use the shell with cd.
+  - docker exec -u travis vdebug-distro-test sh -c 'cd /travis && bundle install --path vendor/bundle'
 script:
+    # The tests have to be run with su(1) to get the right value for $LANG.
+    # If docker is used to switch the user and just run sh(1) the locale setup
+    # from above is not picked up.
   - docker exec vdebug-distro-test su - travis -c 'python3-coverage run -m unittest discover'
   - docker exec vdebug-distro-test su - travis -c 'python3-coverage report -m --include="python3/vdebug/*"'
   - docker exec vdebug-distro-test su - travis -c 'xvfb-run bundle exec rake features'
