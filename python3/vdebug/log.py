@@ -5,7 +5,7 @@ import time
 from . import error
 
 
-class Logger(object):
+class Logger:
     """ Abstract class for all logger implementations.
 
     Concrete classes will log messages using various methods,

@@ -28,8 +28,7 @@ class Options:
         inst = cls.inst()
         if name in inst.options:
             return as_type(inst.options[name])
-        else:
-            raise OptionsError("No option with key '%s'" % name)
+        raise OptionsError("No option with key '%s'" % name)
 
     @classmethod
     def get_for_print(cls, name):
