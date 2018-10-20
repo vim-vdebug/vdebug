@@ -441,6 +441,15 @@ class Window(interface.Window):
     def getwinnr(self):
         return int(vim.eval("bufwinnr('%s')" % self.name))
 
+    def set_height(self, height):
+        height = int(height)
+        minheight = int(vim.eval("&winminheight"))
+        if height < minheight:
+            height = minheight
+        if height <= 0:
+            height = 1
+        self.command('resize %i' % height)
+
     def write(self, msg, return_focus=True, after="normal G"):
         self._buffer.write(msg, return_focus, lambda: self.command(after))
 
@@ -459,11 +468,11 @@ class Window(interface.Window):
         vim.command('silent %s %s' % (open_cmd, self.name))
         vim.current.buffer.options['buftype'] = 'nofile'
         vim.current.buffer.options['modifiable'] = True
-        vim.current.buffer.window['winfixheight'] = True
-        vim.current.buffer.window['winfixwidth'] = True
-        vim.current.buffer.window['swapfile'] = False
-        vim.current.buffer.window['number'] = False
-        vim.current.buffer.window['relativenumber'] = False
+        vim.current.buffer.options['swapfile'] = False
+        vim.current.window.options['winfixheight'] = True
+        vim.current.window.options['winfixwidth'] = True
+        vim.current.window.options['number'] = False
+        vim.current.window.options['relativenumber'] = False
         existing_content = self._buffer.contents()
         log.Log("Setting buffer for %s: %s" % (self.name, existing_content),
                 log.Logger.DEBUG)
