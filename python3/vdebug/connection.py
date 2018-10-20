@@ -90,7 +90,6 @@ class ConnectionHandler:
         sent = self.sock.send(b'\x00')
 
 
-
 class SocketCreator:
 
     def __init__(self, input_stream=None):

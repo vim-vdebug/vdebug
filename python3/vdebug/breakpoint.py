@@ -73,10 +73,6 @@ class Store:
                     break
         return found
 
-    def get_sorted_list(self):
-        keys = self.breakpoints.keys()
-        keys.sort()
-        return map(self.breakpoints.get, keys)
 
 class Breakpoint:
     """ Abstract factory for creating a breakpoint object.
@@ -119,63 +115,60 @@ class Breakpoint:
             try:
                 file = ui.get_current_file()
                 line = ui.get_current_line()
-                if not line.strip():
-                    raise error.BreakpointError('Cannot set a breakpoint on '
-                                                'an empty line')
             except error.FilePathError:
                 raise error.BreakpointError('No file, cannot set breakpoint')
-            return LineBreakpoint(ui, file, row)
-        else:
-            arg_parts = args.split(' ')
-            type = arg_parts.pop(0)
-            type.lower()
-            if type == 'conditional':
-                row = ui.get_current_row()
-                file = ui.get_current_file()
-                if not arg_parts:
-                    raise error.BreakpointError(
-                        "Conditional breakpoints require a condition to be "
-                        "specified")
-                cond = " ".join(arg_parts)
-                return ConditionalBreakpoint(ui, file, row, cond)
-            elif type == 'watch':
-                if not arg_parts:
-                    raise error.BreakpointError(
-                        "Watch breakpoints require a condition to be "
-                        "specified")
-                expr = " ".join(arg_parts)
-                log.Log("Expression: %s" % expr)
-                return WatchBreakpoint(ui, expr)
-            elif type == 'exception':
-                if not arg_parts:
-                    raise error.BreakpointError(
-                        "Exception breakpoints require an exception name to "
-                        "be specified")
-                return ExceptionBreakpoint(ui, arg_parts[0])
-            elif type == 'return':
-                l = len(arg_parts)
-                if l == 0:
-                    raise error.BreakpointError(
-                        "Return breakpoints require a function name to be "
-                        "specified")
-                return ReturnBreakpoint(ui, arg_parts[0])
-            elif type == 'call':
-                l = len(arg_parts)
-                if l == 0:
-                    raise error.BreakpointError(
-                        "Call breakpoints require a function name to be "
-                        "specified")
-                return CallBreakpoint(ui, arg_parts[0])
-            else:
+            if not line.strip():
                 raise error.BreakpointError(
-                    "Unknown breakpoint type, please choose one of: "
-                    "conditional, exception, call or return")
+                    'Cannot set a breakpoint on an empty line')
+            return LineBreakpoint(ui, file, row)
+        arg_parts = args.split(' ')
+        type = arg_parts.pop(0)
+        type.lower()
+        if type == 'conditional':
+            row = ui.get_current_row()
+            file = ui.get_current_file()
+            if not arg_parts:
+                raise error.BreakpointError(
+                    "Conditional breakpoints require a condition to be "
+                    "specified")
+            cond = " ".join(arg_parts)
+            return ConditionalBreakpoint(ui, file, row, cond)
+        elif type == 'watch':
+            if not arg_parts:
+                raise error.BreakpointError(
+                    "Watch breakpoints require a condition to be specified")
+            expr = " ".join(arg_parts)
+            log.Log("Expression: %s" % expr)
+            return WatchBreakpoint(ui, expr)
+        elif type == 'exception':
+            if not arg_parts:
+                raise error.BreakpointError(
+                    "Exception breakpoints require an exception name to be "
+                    "specified")
+            return ExceptionBreakpoint(ui, arg_parts[0])
+        elif type == 'return':
+            l = len(arg_parts)
+            if l == 0:
+                raise error.BreakpointError(
+                    "Return breakpoints require a function name to be "
+                    "specified")
+            return ReturnBreakpoint(ui, arg_parts[0])
+        elif type == 'call':
+            l = len(arg_parts)
+            if l == 0:
+                raise error.BreakpointError(
+                    "Call breakpoints require a function name to be specified")
+            return CallBreakpoint(ui, arg_parts[0])
+        raise error.BreakpointError(
+            "Unknown breakpoint type, please choose one of: conditional, "
+            "exception, call or return")
 
     def get_cmd(self):
         pass
 
     def __str__(self):
         return "%s breakpoint, id %i" % (self.type, self.id)
+
 
 class LineBreakpoint(Breakpoint):
     type = "line"
@@ -198,6 +191,7 @@ class LineBreakpoint(Breakpoint):
         return '-t {} -f "{}" -n {} -s enabled'.format(
             self.type, self.file.as_remote(), self.line)
 
+
 class TemporaryLineBreakpoint(LineBreakpoint):
     def on_add(self):
         pass
@@ -208,6 +202,7 @@ class TemporaryLineBreakpoint(LineBreakpoint):
     def get_cmd(self):
         cmd = LineBreakpoint.get_cmd(self)
         return cmd + " -r 1"
+
 
 class ConditionalBreakpoint(LineBreakpoint):
     type = "conditional"
@@ -222,6 +217,7 @@ class ConditionalBreakpoint(LineBreakpoint):
             self.condition.encode("UTF-8")).decode("UTF-8")
         return cmd
 
+
 class WatchBreakpoint(Breakpoint):
     type = "watch"
 
@@ -231,7 +227,7 @@ class WatchBreakpoint(Breakpoint):
 
     def get_cmd(self):
         cmd = "-t " + self.type
-        cmd += " -- " + base64.encodestring(self.expr)
+        cmd += " -- " + base64.encodebytes(self.expr)
         return cmd
 
 
@@ -245,6 +241,7 @@ class ExceptionBreakpoint(Breakpoint):
     def get_cmd(self):
         return "-t {} -x {} -s enabled".format(self.type, self.exception)
 
+
 class CallBreakpoint(Breakpoint):
     type = "call"
 
@@ -254,6 +251,7 @@ class CallBreakpoint(Breakpoint):
 
     def get_cmd(self):
         return "-t {} -m {} -s enabled".format(self.type, self.function)
+
 
 class ReturnBreakpoint(CallBreakpoint):
     type = "return"
