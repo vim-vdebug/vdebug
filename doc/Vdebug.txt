@@ -835,21 +835,24 @@ retain option settings by adding them to your vimrc.
 5.2 List of options                                         *VdebugOptionList*
 
 The default options look like this: >
-    let g:vdebug_options= {
-    \    "port" : 9000,
-    \    "server" : '',
-    \    "timeout" : 20,
-    \    "on_close" : 'detach',
-    \    "break_on_open" : 1,
-    \    "ide_key" : '',
-    \    "path_maps" : {},
-    \    "debug_window_level" : 0,
-    \    "debug_file_level" : 0,
-    \    "debug_file" : "",
-    \    "watch_window_style" : 'expanded',
-    \    "marker_default" : '⬦',
-    \    "marker_closed_tree" : '▸',
-    \    "marker_open_tree" : '▾'
+    let g:vdebug_options = {
+    \    'port' : 9000,
+    \    'timeout' : 20,
+    \    'server' : '',
+    \    'on_close' : 'stop',
+    \    'break_on_open' : 1,
+    \    'ide_key' : '',
+    \    'debug_window_level' : 0,
+    \    'debug_file_level' : 0,
+    \    'debug_file' : '',
+    \    'path_maps' : {},
+    \    'watch_window_style' : 'expanded',
+    \    'marker_default' : '⬦',
+    \    'marker_closed_tree' : '▸',
+    \    'marker_open_tree' : '▾',
+    \    'sign_breakpoint' : '▷',
+    \    'sign_current' : '▶',
+    \    'continuous_mode'  : 1
     \}
 <
 You can either use the multi-line notation like above, or set individual keys
@@ -908,7 +911,7 @@ g:vdebug_options.ide_key (default = empty)
     restricts the connections to those that have a matching key. See
     |VdebugIDEKey| for more information.
 
-                                                       *VdebugOptions-path_maps*
+                                                     *VdebugOptions-path_maps*
 g:vdebug_options.path_maps (default = {})
     This is only used for debugging a script on a remote machine. This is used
     to map remote file paths to local file paths, as they are very likely to be
@@ -959,7 +962,14 @@ g:vdebug_options.marker_open_tree (default = '▾')
     children, and the tree is currently open. A "-" symbol is used if multi
     byte support is not enabled.
 
-                                              *VdebugOptions-continuous_mode*
+                                               *VdebugOptions-sign_breakpoint*
+                                                  *VdebugOptions-sign_current*
+g:vdebug_options.sign_breakpoint (default = '▷')
+g:vdebug_options.sign_current (default = '▶')
+    Set the markers used in the left-hand page margin to denote a stored
+    breakpoint line or the current line being debugged, respectively.
+
+                                               *VdebugOptions-continuous_mode*
 g:vdebug_options.continuous_mode (default = 1)
     If enabled, Vdebug will start listening immediately after a debugging
     session has finished, allowing for constant debugging across separate

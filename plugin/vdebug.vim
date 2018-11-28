@@ -88,6 +88,8 @@ let g:vdebug_options_defaults = {
 \    'marker_default' : '⬦',
 \    'marker_closed_tree' : '▸',
 \    'marker_open_tree' : '▾',
+\    'sign_breakpoint' : '▷',
+\    'sign_current' : '▶',
 \    'continuous_mode'  : 1,
 \    'background_listener' : 1,
 \    'auto_start' : 1,
@@ -104,6 +106,8 @@ if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults['marker_default'] = '*'
     let g:vdebug_options_defaults['marker_closed_tree'] = '+'
     let g:vdebug_options_defaults['marker_open_tree'] = '-'
+    let g:vdebug_options_defaults['sign_breakpoint'] = 'B>'
+    let g:vdebug_options_defaults['sign_current'] = '->'
 endif
 
 " Create the top dog
@@ -135,8 +139,10 @@ if hlexists('DbgBreakptSign') == 0
 end
 
 " Signs and highlighted lines for breakpoints, etc.
-sign define current text=-> texthl=DbgCurrentSign linehl=DbgCurrentLine
-sign define breakpt text=B> texthl=DbgBreakptSign linehl=DbgBreakptLine
+function! s:DefineSigns()
+    exe 'sign define breakpt text=' . g:vdebug_options['sign_breakpoint'] . ' texthl=DbgBreakptSign linehl=DbgBreakptLine'
+    exe 'sign define current text=' . g:vdebug_options['sign_current'] . ' texthl=DbgCurrentSign linehl=DbgCurrentLine'
+endfunction
 
 function! s:BreakpointTypes(A,L,P)
     let arg_to_cursor = strpart(a:L,11,a:P)
@@ -170,6 +176,7 @@ function! Vdebug_load_options(options)
     let single_defined_params = s:Vdebug_get_options()
     let g:vdebug_options = extend(g:vdebug_options, single_defined_params)
 
+    call s:DefineSigns()
     python3 debugger.reload_options()
 endfunction
 
@@ -263,6 +270,7 @@ function! Vdebug_set_option(option, ...)
     endif
     echomsg 'Setting vdebug option "' . a:option . '" to: ' . a:1
     let g:vdebug_options[a:option] = a:1
+    call s:DefineSigns()
     python3 debugger.reload_options()
 endfunction
 
