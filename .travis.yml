@@ -25,18 +25,10 @@ before_install: |
 install: |
   set -e
   if [[ $TRAVIS_OS_NAME = osx ]]; then
-  #brew update
+    #brew update
     brew install neovim
     pip3 install coverage
-    #which -a python{,3}{,-coverage{,3}} pip{,3} coverage{,3} bundle bundler rake vim php
-    #    vim --version
-    #    php --version
-    #    python3 --version
     bundle install --path vendor/bundle
-    which -a vim mvim nvim
-    vim --version
-    mvim --version
-    nvim --version
   elif $DOCKER; then
     docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get update
     # Vim, php, xdebug, bundler and coverage are needed to run the tests.
