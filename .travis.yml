@@ -37,7 +37,7 @@ install: |
     # Xvfb is needed to use the server feature of vim without a running X
     # server (which is needed for some tests).  The locales package is used to
     # set things up inside the container.
-    docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
+    docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get install --no-install-recommends￼-y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
     # By default the locale inside the container is latin1.  For consistent
     # tests we want to use utf8.
     docker exec vdebug-distro-test sh -c 'echo en_US.UTF-8 UTF-8 >> /etc/locale.gen'
@@ -49,7 +49,7 @@ install: |
     docker exec -u travis vdebug-distro-test sh -c 'cd /travis && bundle install --path vendor/bundle'
   else
     sudo apt-get update
-    sudo apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
+    sudo apt-get install --no-install-recommends -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb
     bundle install --path vendor/bundle
   fi
 
