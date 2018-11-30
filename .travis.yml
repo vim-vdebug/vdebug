@@ -33,7 +33,7 @@ install: |
     #    php --version
     #    python3 --version
     bundle install --path vendor/bundle
-    which -a vim mvim nvim
+    which -a  mvim nvim
     vim --version
     mvim --version
     nvim --version
