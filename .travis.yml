@@ -42,8 +42,8 @@ install: |
     # only introduced in 17.12.  Therefore we have to use the shell with cd.
     docker exec -u travis vdebug-distro-test sh -c 'cd /travis && bundle install --path vendor/bundle'
   else
-    apt-get update
-    apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
+    sudo apt-get update
+    sudo apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
     bundle install --path vendor/bundle
   fi
 
