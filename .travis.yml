@@ -26,14 +26,14 @@ install: |
   set -e
   if [[ $TRAVIS_OS_NAME = osx ]]; then
   #brew update
-    brew install vim macvim neovim
+    brew install macvim neovim
     pip3 install coverage
     #which -a python{,3}{,-coverage{,3}} pip{,3} coverage{,3} bundle bundler rake vim php
     #    vim --version
     #    php --version
     #    python3 --version
     bundle install --path vendor/bundle
-    which -a  mvim nvim
+    which -a vim mvim nvim
     vim --version
     mvim --version
     nvim --version
