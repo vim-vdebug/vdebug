@@ -20,6 +20,7 @@ before_install: |
     docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null; fi
     docker ps
   fi
+
 install: |
   set -e
   if [[ $TRAVIS_OS_NAME = osx ]]; then
@@ -45,6 +46,7 @@ install: |
     apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
     bundle install --path vendor/bundle
   fi
+
 script: |
   set -e
   if [[ $TRAVIS_OS_NAME = osx ]]; then
