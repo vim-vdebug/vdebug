@@ -56,8 +56,8 @@ install: |
 script: |
   set -e
   if [[ $TRAVIS_OS_NAME = osx ]]; then
-    python3-coverage run -m unittest discover
-    python3-coverage report -m --include="python3/vdebug/*"
+    coverage3 run -m unittest discover
+    coverage3 report -m --include="python3/vdebug/*"
     bundle exec rake features
     bundle exec rake spec
   elif $DOCKER; then
