@@ -27,7 +27,7 @@ install: |
   if [[ $TRAVIS_OS_NAME = osx ]]; then
   #brew update
     pip3 install coverage
-    which -a python{,3}{,-coverage{,3}} pip{,3} coverage{,3} bundle bundler rake vim php
+    #which -a python{,3}{,-coverage{,3}} pip{,3} coverage{,3} bundle bundler rake vim php
     vim --version
     php --version
     python3 --version
