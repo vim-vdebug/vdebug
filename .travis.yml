@@ -17,7 +17,7 @@ matrix:
 before_install: |
   set -e
   if $DOCKER; then
-    docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null; fi
+    docker run --rm -d --name vdebug-distro-test -v $(pwd):/travis $DISTRO tail -f /dev/null
     docker ps
   fi
 
@@ -26,7 +26,7 @@ install: |
   if [[ $TRAVIS_OS_NAME = osx ]]; then
     brew update
   elif $DOCKER; then
-    docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get update; elif
+    docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get update
     # Vim, php, xdebug, bundler and coverage are needed to run the tests.
     # Xvfb is needed to use the server feature of vim without a running X
     # server (which is needed for some tests).  The locales package is used to
