@@ -420,8 +420,11 @@ class ContextProperty:
                 if node.text is None:
                     self.value = ""
                 else:
-                    self.value = base64.decodebytes(
-                        node.text.encode("UTF-8")).decode("utf-8")
+                    try:
+                        self.value = base64.decodebytes(
+                            node.text.encode("UTF-8")).decode("utf-8")
+                    except UnicodeDecodeError:
+                        self.value = node.text
             elif not self.is_uninitialized() and not self.has_children:
                 self.value = node.text
 
