@@ -8,15 +8,11 @@ dist: xenial
 matrix:
   include:
     - os: linux
-      env:
-        DOCKER: false
+      env: DOCKER=false
     - os: linux
-      env:
-        DOCKER: true
-        DISTRO: debian:9
+      env: DOCKER=true DISTRO=debian:9
     - os: osx
-      env:
-        DOCKER: false
+      env: DOCKER=false
 
 before_install: |
   set -e
@@ -26,7 +22,9 @@ before_install: |
   fi
 install: |
   set -e
-  if $DOCKER; then
+  if [[ $TRAVIS_OS_NAME = osx ]]; then
+    brew update
+  elif $DOCKER; then
     docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get update; elif
     # Vim, php, xdebug, bundler and coverage are needed to run the tests.
     # Xvfb is needed to use the server feature of vim without a running X
@@ -42,16 +40,19 @@ install: |
     # We are currently on docker 17.09 and the --workdir option for exec was
     # only introduced in 17.12.  Therefore we have to use the shell with cd.
     docker exec -u travis vdebug-distro-test sh -c 'cd /travis && bundle install --path vendor/bundle'
-  elif [[ $TRAVIS_OS_NAME = linux ]]; then
+  else
     apt-get update
     apt-get install -y vim-gtk3 php-cli php-xdebug bundler python3-coverage xvfb locales
     bundle install --path vendor/bundle
-  else
-    brew update
   fi
 script: |
   set -e
-  if $DOCKER; then
+  if [[ $TRAVIS_OS_NAME = osx ]]; then
+    python3-coverage run -m unittest discover
+    python3-coverage report -m --include="python3/vdebug/*"
+    bundle exec rake features
+    bundle exec rake spec
+  elif $DOCKER; then
     # The tests have to be run with su(1) to get the right value for $LANG.
     # If docker is used to switch the user and just run sh(1) the locale setup
     # from above is not picked up.
@@ -63,14 +64,9 @@ script: |
     # failures result from the xvfb from above no releasing the display fast
     # enough: https://stackoverflow.com/a/8880717
     docker exec vdebug-distro-test su - travis -c 'xvfb-run --auto-servernum bundle exec rake spec'
-  elif [[ $TRAVIS_OS_NAME = linux ]]; then
+  else
     python3-coverage run -m unittest discover
     python3-coverage report -m --include="python3/vdebug/*"
     xvfb-run bundle exec rake features
     xvfb-run --auto-servernum bundle exec rake spec
-  else
-    python3-coverage run -m unittest discover
-    python3-coverage report -m --include="python3/vdebug/*"
-    bundle exec rake features
-    bundle exec rake spec
   fi
