@@ -33,6 +33,8 @@ install: |
     #    php --version
     #    python3 --version
     bundle install --path vendor/bundle
+    which -a vim
+    vim --version
   elif $DOCKER; then
     docker exec --env=DEBIAN_FRONTEND=noninteractive vdebug-distro-test apt-get update
     # Vim, php, xdebug, bundler and coverage are needed to run the tests.
