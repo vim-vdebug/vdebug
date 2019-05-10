@@ -146,7 +146,8 @@ class WatchWindowPropertyGetEvent(Event):
         context_res = self.api.property_get(name)
         rend = vimui.ContextGetResponseRenderer(context_res)
         output = rend.render(pointer_index - 1)
-        self.ui.windows.watch().delete(lineno, lineno+1)
+        if opts.Options.get('watch_window_style') == 'expanded':
+            self.ui.windows.watch().delete(lineno, lineno+1)
         self.ui.windows.watch().insert(output.rstrip(), lineno-1, True)
 
 
