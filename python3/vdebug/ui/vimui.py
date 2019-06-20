@@ -142,6 +142,13 @@ class Ui(interface.Ui):
             statuswin = self.windows.status()
             statuswin.set_status("loading")
 
+            window_sizes = opts.Options.get('window_size', dict)
+            for window_name, settings in window_sizes.items():
+                if 'height' in settings:
+                    self.windows.window(window_name).set_height(settings['height'])
+                if 'width' in settings:
+                    self.windows.window(window_name).set_width(settings['width'])
+
             log.Log.set_logger(log.WindowLogger(
                 opts.Options.get('debug_window_level'), self.windows.log()))
 
@@ -450,6 +457,12 @@ class Window(interface.Window):
             height = 1
         self.command('resize %i' % height)
 
+    def set_width(self, width):
+        width = int(width)
+        if width <= 0:
+            width =1
+        self.command('vertical resize %i' % width)
+
     def write(self, msg, return_focus=True, after="normal G"):
         self._buffer.write(msg, return_focus, lambda: self.command(after))
 
@@ -634,7 +647,24 @@ class StatusWindow(Window):
             self.set_height(6)
 
     def set_status(self, status):
-        self.insert("Status: %s" % str(status), 0, True)
+        if opts.Options.get("simplified_status", int):
+            if str(status) == "stopped":
+                status = "■"
+            if str(status) == "running":
+                status = "▶"
+            if str(status) == "break":
+                status = "▌▌"
+
+            keys = util.Keymapper()
+
+            output = " " + str(status) + " "
+            output += "[%s Start] " % (keys.run_key())
+            output += "[%s Stop] " % (keys.close_key())
+            output += "[:help Vdebug]"
+
+            self.insert(output, 0, True)
+        else:
+            self.insert("Status: %s" % str(status), 0, True)
 
     def mark_as_stopped(self):
         self.set_status("stopped")
