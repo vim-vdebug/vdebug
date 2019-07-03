@@ -68,6 +68,9 @@ let g:vdebug_keymap_defaults = {
 \    'close' : '<F6>',
 \    'detach' : '<F7>',
 \    'set_breakpoint' : '<F10>',
+\    'toggle_breakpoint': '<F13>',
+\    'enable_breakpoint': '<F14>',
+\    'disable_breakpoint': '<F15>',
 \    'get_context' : '<F11>',
 \    'eval_under_cursor' : '<F12>',
 \    'eval_visual' : '<Leader>e'
