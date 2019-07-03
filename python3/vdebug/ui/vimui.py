@@ -197,6 +197,17 @@ class Ui(interface.Ui):
         vim.command('sign place %s name=breakpt line=%s file=%s'
                     % (sign_id, line, file.as_local()))
 
+    def enable_breakpoint(self, breakpoint):
+        self.place_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+
+    def disable_breakpoint(self, breakpoint):
+        self.place_disabled_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+
+    @staticmethod
+    def place_disabled_breakpoint(sign_id, file, line):
+        vim.command('sign place %s name=breakpt_dis line=%s file=%s'
+                    % (sign_id, line, file.as_local()))
+
     def remove_breakpoint(self, breakpoint):
         id = breakpoint.id
         vim.command('sign unplace %i' % id)

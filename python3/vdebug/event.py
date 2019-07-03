@@ -401,6 +401,39 @@ class SetBreakpointEvent(Event):
         self.session_handler.breakpoints().add_breakpoint(bp)
 
 
+class ToggleBreakpointEvent(Event):
+
+    def run(self, args):
+        bp = breakpoint.Breakpoint.parse(self.ui, args)
+        if bp.type == "line":
+            id = self.session_handler.breakpoints().find_breakpoint(
+                bp.get_file(), bp.get_line())
+            if id is not None:
+                self.session_handler.breakpoints().toggle_breakpoint_by_id(id)
+
+
+class EnableBreakpointEvent(Event):
+
+    def run(self, args):
+        bp = breakpoint.Breakpoint.parse(self.ui, args)
+        if bp.type == "line":
+            id = self.session_handler.breakpoints().find_breakpoint(
+                bp.get_file(), bp.get_line())
+            if id is not None:
+                self.session_handler.breakpoints().enable_breakpoint_by_id(id)
+
+
+class DisableBreakpointEvent(Event):
+
+    def run(self, args):
+        bp = breakpoint.Breakpoint.parse(self.ui, args)
+        if bp.type == "line":
+            id = self.session_handler.breakpoints().find_breakpoint(
+                bp.get_file(), bp.get_line())
+            if id is not None:
+                self.session_handler.breakpoints().disable_breakpoint_by_id(id)
+
+
 class RemoveBreakpointEvent(Event):
 
     def run(self, args):
@@ -506,6 +539,9 @@ class Dispatcher:
         "eval": EvalEvent,
         "set_eval_expression": SetEvalExpressionEvent,
         "set_breakpoint": SetBreakpointEvent,
+        "toggle_breakpoint": ToggleBreakpointEvent,
+        "enable_breakpoint": EnableBreakpointEvent,
+        "disable_breakpoint": DisableBreakpointEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
         "remove_breakpoint": RemoveBreakpointEvent,

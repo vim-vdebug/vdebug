@@ -41,6 +41,33 @@ class Store:
             res = self.api.breakpoint_set(breakpoint.get_cmd())
             breakpoint.set_debugger_id(res.get_id())
 
+    def toggle_breakpoint_by_id(self, id):
+        id = str(id)
+        if id not in self.breakpoints:
+            raise error.BreakpointError("No breakpoint matching ID %s" % id)
+        if self.breakpoints[id].enabled:
+            self.disable_breakpoint_by_id(id)
+        else:
+            self.enable_breakpoint_by_id(id)
+
+    def enable_breakpoint_by_id(self, id):
+        id = str(id)
+        if id not in self.breakpoints:
+            raise error.BreakpointError("No breakpoint matching ID %s" % id)
+        dbg_id = self.breakpoints[id].get_debugger_id()
+        if dbg_id is not None:
+            self.api.breakpoint_enable(dbg_id)
+        self.breakpoints[id].on_enable()
+
+    def disable_breakpoint_by_id(self, id):
+        id = str(id)
+        if id not in self.breakpoints:
+            raise error.BreakpointError("No breakpoint matching ID %s" % id)
+        dbg_id = self.breakpoints[id].get_debugger_id()
+        if dbg_id is not None:
+            self.api.breakpoint_disable(dbg_id)
+        self.breakpoints[id].on_disable()
+
     def remove_breakpoint(self, breakpoint):
         self.remove_breakpoint_by_id(breakpoint.get_id())
 
@@ -62,6 +89,9 @@ class Store:
         for id in list(self.breakpoints.keys()):
             self.remove_breakpoint_by_id(id)
         self.breakpoints = {}
+
+    def get_breakpoint_by_id(self, id):
+        return self.breakpoints[id]
 
     def find_breakpoint(self, file, line):
         found = None
@@ -88,6 +118,7 @@ class Breakpoint:
         self.id = Breakpoint.id
         Breakpoint.id += 1
         self.ui = ui
+        self.enabled = True
 
     def get_id(self):
         return self.id
@@ -100,6 +131,14 @@ class Breakpoint:
 
     def on_add(self):
         self.ui.register_breakpoint(self)
+
+    def on_enable(self):
+        self.enabled = True
+        self.ui.enable_breakpoint(self)
+
+    def on_disable(self):
+        self.enabled = False
+        self.ui.disable_breakpoint(self)
 
     def on_remove(self):
         self.ui.remove_breakpoint(self)
@@ -188,8 +227,8 @@ class LineBreakpoint(Breakpoint):
         return self.file
 
     def get_cmd(self):
-        return '-t {} -f "{}" -n {} -s enabled'.format(
-            self.type, self.file.as_remote(), self.line)
+        return '-t {} -f "{}" -n {} -s {}'.format(
+            self.type, self.file.as_remote(), self.line, "enabled" if self.enabled else "disabled")
 
 
 class TemporaryLineBreakpoint(LineBreakpoint):

@@ -90,6 +90,7 @@ let g:vdebug_options_defaults = {
 \    'marker_open_tree' : '▾',
 \    'sign_breakpoint' : '▷',
 \    'sign_current' : '▶',
+\    'sign_disabled': '▌▌',
 \    'continuous_mode'  : 1,
 \    'background_listener' : 1,
 \    'auto_start' : 1,
@@ -142,6 +143,7 @@ end
 function! s:DefineSigns()
     exe 'sign define breakpt text=' . g:vdebug_options['sign_breakpoint'] . ' texthl=DbgBreakptSign linehl=DbgBreakptLine'
     exe 'sign define current text=' . g:vdebug_options['sign_current'] . ' texthl=DbgCurrentSign linehl=DbgCurrentLine'
+    exe 'sign define breakpt_dis text=' . g:vdebug_options['sign_disabled'] . ' texthl=DbgDisabledSign linehl=DbgDisabledLine'
 endfunction
 
 function! s:BreakpointTypes(A,L,P)
@@ -221,6 +223,15 @@ function! Vdebug_load_keymaps(keymaps)
     if has_key(g:vdebug_keymap, 'set_breakpoint')
         exe 'silent! nunmap '.g:vdebug_keymap['set_breakpoint']
     endif
+    if has_key(g:vdebug_keymap, 'toggle_breakpoint')
+        exe 'silent! nunmap '.g:vdebug_keymap['toggle_breakpoint']
+    endif
+    if has_key(g:vdebug_keymap, 'enable_breakpoint')
+        exe 'silent! nunmap '.g:vdebug_keymap['enable_breakpoint']
+    endif
+    if has_key(g:vdebug_keymap, 'disable_breakpoint')
+        exe 'silent! nunmap '.g:vdebug_keymap['disable_breakpoint']
+    endif
     if has_key(g:vdebug_keymap, 'eval_visual')
         exe 'silent! vunmap '.g:vdebug_keymap['eval_visual']
     endif
@@ -232,6 +243,9 @@ function! Vdebug_load_keymaps(keymaps)
     exe 'noremap '.g:vdebug_keymap['run'].' :python3 debugger.run()<cr>'
     exe 'noremap '.g:vdebug_keymap['close'].' :python3 debugger.close()<cr>'
     exe 'noremap '.g:vdebug_keymap['set_breakpoint'].' :python3 debugger.set_breakpoint()<cr>'
+    exe 'noremap '.g:vdebug_keymap['toggle_breakpoint'].' :python3 debugger.toggle_breakpoint()<cr>'
+    exe 'noremap '.g:vdebug_keymap['enable_breakpoint'].' :python3 debugger.enable_breakpoint()<cr>'
+    exe 'noremap '.g:vdebug_keymap['disable_breakpoint'].' :python3 debugger.disable_breakpoint()<cr>'
 
     " Exceptional case for visual evaluation
     exe 'vnoremap '.g:vdebug_keymap['eval_visual'].' :python3 debugger.handle_visual_eval()<cr>'
