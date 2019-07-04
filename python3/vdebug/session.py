@@ -1,5 +1,4 @@
 import socket
-import threading
 
 import vim
 
@@ -41,18 +40,6 @@ class SessionHandler:
             self.__new_session()
         else:
             self.start_listener()
-
-    def heartbeat(self):
-        try:
-            res = self.session().api().status()
-
-            if str(res) in ("stopping", "stopped"):
-                self.dispatch_event("refresh", res)
-                return
-
-            threading.Timer(2.0, self.heartbeat).start()
-        except:
-            self.dispatch_event("refresh", "stopped")
 
     def start_listener(self):
         self.listener = listener.Listener.create()
@@ -131,7 +118,6 @@ class SessionHandler:
         status = self.__session.start(self.listener.create_connection())
         log.Log("refresh event", log.Logger.DEBUG)
         self.dispatch_event("refresh", status)
-        threading.Timer(2.0, self.heartbeat).start()
 
 
 class Session:
