@@ -101,7 +101,7 @@ let g:vdebug_options_defaults = {
 \    },
 \    'window_size' : {
 \       'DebuggerWatch' : { 'height' : 15 },
-\       'DebuggerStatus' : { 'height' : 1, 'width': 60 },
+\       'DebuggerStatus' : { 'height' : 1 },
 \    },
 \    'window_arrangement' : ['DebuggerWatch', 'DebuggerStatus', 'DebuggerStack']
 \}
