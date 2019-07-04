@@ -94,8 +94,23 @@ let g:vdebug_options_defaults = {
 \    'background_listener' : 1,
 \    'auto_start' : 1,
 \    'simplified_status': 1,
+\    'view_preset': 'vertical',
+\}
+
+let g:vdebug_layout_vertical = {
 \    'window_commands' : {
-\        'DebuggerWatch' : 'below new',
+\        'DebuggerWatch' : 'vertical belowright new',
+\        'DebuggerStack' : 'aboveleft 12new',
+\        'DebuggerStatus' : 'aboveleft 1new'
+\    },
+\    'window_size': {
+\    },
+\    'window_arrangement' : ['DebuggerWatch', 'DebuggerStack', 'DebuggerStatus']
+\}
+
+let g:vdebug_layout_horizontal = {
+\    'window_commands' : {
+\        'DebuggerWatch' : 'below 15new',
 \        'DebuggerStack' : 'belowright new',
 \        'DebuggerStatus' : 'vertical leftabove new'
 \    },
@@ -176,6 +191,12 @@ endfunction
 function! Vdebug_load_options(options)
     " Merge options with defaults
     let g:vdebug_options = extend(g:vdebug_options_defaults, a:options)
+
+    if g:vdebug_options['view_preset'] == 'horizontal'
+        let g:vdebug_options = extend(g:vdebug_options, g:vdebug_layout_horizontal)
+    else
+        let g:vdebug_options = extend(g:vdebug_options, g:vdebug_layout_vertical)
+    endif
 
     " Override with single defined params ie. g:vdebug_options_port
     let single_defined_params = s:Vdebug_get_options()
