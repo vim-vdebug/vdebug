@@ -639,12 +639,15 @@ class StatusWindow(Window):
         self.command('setlocal syntax=debugger_status')
         if self._buffer.is_empty():
             keys = util.Keymapper()
-            output = "Status: starting\nListening on port\nNot connected\n\n"
-            output += "Press %s to start debugging, " % (keys.run_key())
-            output += "%s to stop/close. " % (keys.close_key())
-            output += "Type :help Vdebug for more information."
-            self.write(output)
-            self.set_height(6)
+            if opts.Options.get("simplified_status", int):
+                self.set_status("listening")
+            else:
+                output = "Status: starting\nListening on port\nNot connected\n\n"
+                output += "Press %s to start debugging, " % (keys.run_key())
+                output += "%s to stop/close. " % (keys.close_key())
+                output += "Type :help Vdebug for more information."
+                self.write(output)
+                self.set_height(6)
 
     def set_status(self, status):
         if opts.Options.get("simplified_status", int):
@@ -670,16 +673,19 @@ class StatusWindow(Window):
 
     def mark_as_stopped(self):
         self.set_status("stopped")
-        self.insert("Not connected", 2, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            self.insert("Not connected", 2, True)
 
     def set_conn_details(self, addr, port):
-        self.insert("Connected to %s:%s" % (addr, port), 2, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            self.insert("Connected to %s:%s" % (addr, port), 2, True)
 
     def set_listener_details(self, addr, port, idekey):
-        details = "Listening on %s:%s" % (addr, port)
-        if idekey:
-            details += " (IDE key: %s)" % idekey
-        self.insert(details, 1, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            details = "Listening on %s:%s" % (addr, port)
+            if idekey:
+                details += " (IDE key: %s)" % idekey
+            self.insert(details, 1, True)
 
 
 class TraceWindow(WatchWindow):
