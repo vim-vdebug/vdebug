@@ -1,3 +1,4 @@
+import errno
 import queue
 import socket
 import sys
@@ -187,7 +188,15 @@ class BackgroundSocketCreator(threading.Thread):
                 except socket.error:
                     # No connection
                     pass
+        except socket.error as socket_error:
+            self.log("Error: %s" % str(sys.exc_info()))
+            self.log("Stopping server")
+
+            if socket_error.errno == errno.EADDRINUSE:
+                self.log("Address already in use")
+                print("Socket is already in use")
         except Exception:
+            print("Exception caught")
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
         finally:
