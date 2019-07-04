@@ -90,6 +90,7 @@ let g:vdebug_options_defaults = {
 \    'marker_open_tree' : '▾',
 \    'sign_breakpoint' : '▷',
 \    'sign_current' : '▶',
+\    'sign_disabled': '▌▌',
 \    'continuous_mode'  : 1,
 \    'background_listener' : 1,
 \    'auto_start' : 1,
@@ -120,7 +121,8 @@ python3 import vdebug.debugger_interface
 python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands
-command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.set_breakpoint(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.cycle_breakpoint(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes SetBreakpoint python3 debugger.set_breakpoint(<q-args>)
 command! VdebugStart python3 debugger.run()
 command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
@@ -129,6 +131,7 @@ command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt :call Vdebug_set_
 command! -nargs=+ VdebugPathMap :call Vdebug_path_map(<f-args>)
 command! -nargs=+ VdebugAddPathMap :call Vdebug_add_path_map(<f-args>)
 command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
+command! -nargs=? BreakpointStatus python3 debugger.breakpoint_status(<q-args>)
 
 if hlexists('DbgCurrentLine') == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
@@ -147,6 +150,7 @@ end
 function! s:DefineSigns()
     exe 'sign define breakpt text=' . g:vdebug_options['sign_breakpoint'] . ' texthl=DbgBreakptSign linehl=DbgBreakptLine'
     exe 'sign define current text=' . g:vdebug_options['sign_current'] . ' texthl=DbgCurrentSign linehl=DbgCurrentLine'
+    exe 'sign define breakpt_dis text=' . g:vdebug_options['sign_disabled'] . ' texthl=DbgDisabledSign linehl=DbgDisabledLine'
 endfunction
 
 function! s:BreakpointTypes(A,L,P)
