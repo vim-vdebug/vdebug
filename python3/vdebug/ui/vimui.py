@@ -648,6 +648,8 @@ class StatusWindow(Window):
 
     def set_status(self, status):
         if opts.Options.get("simplified_status", int):
+            if str(status) == "listening":
+                status = "●"
             if str(status) == "stopped":
                 status = "■"
             if str(status) == "running":
