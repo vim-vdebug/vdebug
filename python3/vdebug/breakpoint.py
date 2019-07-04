@@ -91,6 +91,10 @@ class Store:
         self.breakpoints = {}
 
     def get_breakpoint_by_id(self, id):
+        id = str(id)
+        if id not in list(self.breakpoints.keys()):
+            return None
+
         return self.breakpoints[id]
 
     def find_breakpoint(self, file, line):

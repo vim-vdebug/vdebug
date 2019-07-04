@@ -68,9 +68,6 @@ let g:vdebug_keymap_defaults = {
 \    'close' : '<F6>',
 \    'detach' : '<F7>',
 \    'set_breakpoint' : '<F10>',
-\    'toggle_breakpoint': '<F13>',
-\    'enable_breakpoint': '<F14>',
-\    'disable_breakpoint': '<F15>',
 \    'get_context' : '<F11>',
 \    'eval_under_cursor' : '<F12>',
 \    'eval_visual' : '<Leader>e'
@@ -119,7 +116,8 @@ python3 import vdebug.debugger_interface
 python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands
-command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.set_breakpoint(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.cycle_breakpoint(<q-args>)
+command! -nargs=? -complete=customlist,s:BreakpointTypes SetBreakpoint python3 debugger.set_breakpoint(<q-args>)
 command! VdebugStart python3 debugger.run()
 command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
 command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
@@ -128,6 +126,7 @@ command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt :call Vdebug_set_
 command! -nargs=+ VdebugPathMap :call Vdebug_path_map(<f-args>)
 command! -nargs=+ VdebugAddPathMap :call Vdebug_add_path_map(<f-args>)
 command! -nargs=? VdebugTrace python3 debugger.handle_trace(<q-args>)
+command! -nargs=? BreakpointStatus python3 debugger.breakpoint_status(<q-args>)
 
 if hlexists('DbgCurrentLine') == 0
     hi default DbgCurrentLine term=reverse ctermfg=White ctermbg=Red guifg=#ffffff guibg=#ff0000
@@ -226,15 +225,6 @@ function! Vdebug_load_keymaps(keymaps)
     if has_key(g:vdebug_keymap, 'set_breakpoint')
         exe 'silent! nunmap '.g:vdebug_keymap['set_breakpoint']
     endif
-    if has_key(g:vdebug_keymap, 'toggle_breakpoint')
-        exe 'silent! nunmap '.g:vdebug_keymap['toggle_breakpoint']
-    endif
-    if has_key(g:vdebug_keymap, 'enable_breakpoint')
-        exe 'silent! nunmap '.g:vdebug_keymap['enable_breakpoint']
-    endif
-    if has_key(g:vdebug_keymap, 'disable_breakpoint')
-        exe 'silent! nunmap '.g:vdebug_keymap['disable_breakpoint']
-    endif
     if has_key(g:vdebug_keymap, 'eval_visual')
         exe 'silent! vunmap '.g:vdebug_keymap['eval_visual']
     endif
@@ -246,9 +236,6 @@ function! Vdebug_load_keymaps(keymaps)
     exe 'noremap '.g:vdebug_keymap['run'].' :python3 debugger.run()<cr>'
     exe 'noremap '.g:vdebug_keymap['close'].' :python3 debugger.close()<cr>'
     exe 'noremap '.g:vdebug_keymap['set_breakpoint'].' :python3 debugger.set_breakpoint()<cr>'
-    exe 'noremap '.g:vdebug_keymap['toggle_breakpoint'].' :python3 debugger.toggle_breakpoint()<cr>'
-    exe 'noremap '.g:vdebug_keymap['enable_breakpoint'].' :python3 debugger.enable_breakpoint()<cr>'
-    exe 'noremap '.g:vdebug_keymap['disable_breakpoint'].' :python3 debugger.disable_breakpoint()<cr>'
 
     " Exceptional case for visual evaluation
     exe 'vnoremap '.g:vdebug_keymap['eval_visual'].' :python3 debugger.handle_visual_eval()<cr>'
