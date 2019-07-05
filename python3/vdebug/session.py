@@ -222,8 +222,10 @@ class Session:
     def detach(self):
         """Detach the debugger engine, and allow it to continue execution.
         """
-        self.__ui.say("Detaching the debugger")
-        self.__api.detach()
+        if self.is_connected():
+            self.__ui.say("Detaching the debugger")
+            self.__api.detach()
+
         self.close_connection(False)
 
     def __set_features(self):
