@@ -147,7 +147,7 @@ class DebuggerInterface:
     def get_context(self):
         """Get all the variables in the default context
         """
-        self.session_handler.dispatch_event("get_context")
+        self.session_handler.dispatch_event("get_context", 0)
 
     def detach(self):
         """Detach the debugger, so the script runs to the end.
