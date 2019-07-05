@@ -643,7 +643,7 @@ class WatchWindow(Window):
 
     def accept_renderer(self, renderer):
         self.clean()
-        self.write(renderer.render(0, 0))
+        self.write(renderer.render(0, opts.Options.get('watch_window_initial_max_depth', int)))
 
 
 class StatusWindow(Window):
