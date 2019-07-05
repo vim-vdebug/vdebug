@@ -119,7 +119,7 @@ let g:vdebug_options_defaults = {
 \           'window_arrangement' : ['DebuggerWatch', 'DebuggerStatus', 'DebuggerStack']
 \        }
 \    },
-\    'default_layout': 'horizontaltest',
+\    'default_layout': 'vertical',
 \}
 
 " Different symbols for non unicode Vims
