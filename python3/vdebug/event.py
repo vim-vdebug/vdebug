@@ -401,6 +401,117 @@ class SetBreakpointEvent(Event):
         self.session_handler.breakpoints().add_breakpoint(bp)
 
 
+class BreakpointStatusEvent(Event):
+    def parseArgs(self, args):
+        if args is None:
+            args = ""
+        args = args.strip()
+
+        arg_parts = args.split(' ')
+        first_param = arg_parts.pop(0)
+        if first_param == "":
+            return { "id": None, "action": None }
+
+        if first_param in ("toggle", "enable", "disable"):
+            return { "id": None, "action": first_param }
+
+        if len(arg_parts) == 0:
+            return { "id": first_param , "action": None }
+
+        second_param = arg_parts.pop(0)
+        return { "id": first_param, "action": second_param }
+
+    def get_breakpoint(self, id):
+        if id is not None:
+            return self.session_handler.breakpoints().get_breakpoint_by_id(id)
+
+        """ Line breakpoint """
+        try:
+            file = self.ui.get_current_file()
+            line = self.ui.get_current_row()
+            id = self.session_handler.breakpoints().find_breakpoint(file, line)
+            if id is None:
+                return None
+
+            return self.session_handler.breakpoints().get_breakpoint_by_id(id)
+        except error.FilePathError:
+            raise error.BreakpointError('No file, cannot set breakpoint')
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        action = parsed_args["action"]
+        bp = self.get_breakpoint(id)
+
+        if bp is None:
+            print("No breakpoint found")
+            return
+
+        if action is None:
+            print("enabled" if bp.enabled else "disabled")
+            return
+
+        if action == "enable":
+            return self.dispatch("enable_breakpoint", str(bp.id))
+
+        if action == "disable":
+            return self.dispatch("disable_breakpoint", str(bp.id))
+
+        if action == "toggle":
+            return self.dispatch("toggle_breakpoint", str(bp.id))
+
+
+class CycleBreakpointStatusEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is None:
+            self.dispatch("set_breakpoint", args)
+            return
+
+        if bp is not None:
+            if bp.enabled:
+                self.session_handler.breakpoints().disable_breakpoint_by_id(bp.id)
+            else:
+                self.session_handler.breakpoints().remove_breakpoint_by_id(bp.id)
+
+
+class ToggleBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().toggle_breakpoint_by_id(bp.id)
+
+
+class EnableBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().enable_breakpoint_by_id(id)
+
+
+class DisableBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().disable_breakpoint_by_id(id)
+
+
 class RemoveBreakpointEvent(Event):
 
     def run(self, args):
@@ -506,6 +617,11 @@ class Dispatcher:
         "eval": EvalEvent,
         "set_eval_expression": SetEvalExpressionEvent,
         "set_breakpoint": SetBreakpointEvent,
+        "cycle_breakpoint": CycleBreakpointStatusEvent,
+        "toggle_breakpoint": ToggleBreakpointEvent,
+        "enable_breakpoint": EnableBreakpointEvent,
+        "disable_breakpoint": DisableBreakpointEvent,
+        "breakpoint_status": BreakpointStatusEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
         "remove_breakpoint": RemoveBreakpointEvent,

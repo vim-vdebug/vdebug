@@ -114,6 +114,31 @@ class DebuggerInterface:
         """
         self.session_handler.dispatch_event("set_breakpoint", args)
 
+    def cycle_breakpoint(self, args=None):
+        """Cycle a breakpoint between Enabled, Disabled and Removed
+        """
+        self.session_handler.dispatch_event("cycle_breakpoint", args)
+
+    def toggle_breakpoint(self, args=None):
+        """Toggle a breakpoint, specified by args
+        """
+        self.session_handler.dispatch_event("toggle_breakpoint", args)
+
+    def enable_breakpoint(self, args=None):
+        """Enable a breakpoint, specified by args
+        """
+        self.session_handler.dispatch_event("enable_breakpoint", args)
+
+    def disable_breakpoint(self, args=None):
+        """Disable a breakpoint, specified by args
+        """
+        self.session_handler.dispatch_event("disable_breakpoint", args)
+
+    def breakpoint_status(self, args=None):
+        """Either gets the status of a breakpoint or changes it
+        """
+        self.session_handler.dispatch_event("breakpoint_status", args)
+
     def remove_breakpoint(self, args=None):
         """Remove one or more breakpoints, specified by args.
         """

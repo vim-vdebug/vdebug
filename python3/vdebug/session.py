@@ -1,5 +1,4 @@
 import socket
-import threading
 
 import vim
 
@@ -146,7 +145,7 @@ class SessionHandler:
         self.__heartbeat_timer.daemon = True
         self.__heartbeat_timer.start()
 
-
+        
 class Session:
 
     def __init__(self, ui, breakpoints, keymapper):
