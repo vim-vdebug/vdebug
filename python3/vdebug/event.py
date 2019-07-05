@@ -391,6 +391,19 @@ class SetEvalExpressionEvent(Event):
 class SetBreakpointEvent(Event):
 
     def run(self, args):
+        # Adding a special case to try a breakpoint on an empty line since the Breakpoint parser throws an error for
+        # that scenario
+        if not args:
+            line = self.ui.get_current_line()
+            if not line.strip():
+                file = self.ui.get_current_file()
+                row = self.ui.get_current_row()
+
+                id = self.session_handler.breakpoints().find_breakpoint(file, row)
+                if id is not None:
+                    self.session_handler.breakpoints().remove_breakpoint_by_id(id)
+                    return
+
         bp = breakpoint.Breakpoint.parse(self.ui, args)
         if bp.type == "line":
             id = self.session_handler.breakpoints().find_breakpoint(
