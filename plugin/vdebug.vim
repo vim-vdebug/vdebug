@@ -223,9 +223,13 @@ endfunction
 " This should be called if you want to update the keymappings after vdebug has
 " been loaded.
 function! Vdebug_load_keymaps(keymaps)
-    " Unmap existing keys, if applicable
+    " Unmap existing keys, if needed
+    " the keys should in theory exist because they are part of the defaults
     if has_key(g:vdebug_keymap, 'run')
         exe 'silent! nunmap '.g:vdebug_keymap['run']
+    endif
+    if has_key(g:vdebug_keymap, 'close')
+        exe 'silent! nunmap '.g:vdebug_keymap['close']
     endif
     if has_key(g:vdebug_keymap, 'set_breakpoint')
         exe 'silent! nunmap '.g:vdebug_keymap['set_breakpoint']
@@ -238,6 +242,7 @@ function! Vdebug_load_keymaps(keymaps)
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
     " Mappings allowed in non-debug mode
+    " XXX: don't use keymaps not found in g:vdebug_keymap_defaults
     exe 'noremap '.g:vdebug_keymap['run'].' :python3 debugger.run()<cr>'
     exe 'noremap '.g:vdebug_keymap['close'].' :python3 debugger.close()<cr>'
     exe 'noremap '.g:vdebug_keymap['set_breakpoint'].' :python3 debugger.set_breakpoint()<cr>'
