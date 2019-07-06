@@ -258,12 +258,18 @@ class WatchWindowContextChangeEvent(Event):
 class RefreshEvent(Event):
 
     def run(self, status):
-        if str(status) == "interactive":
+
+        status_str = str(status)
+
+        if not status_str:
+            return
+
+        if status_str == "interactive":
             self.ui.error("Debugger engine says it is in interactive mode,"
                           "which is not supported: closing connection")
             log.Log("closing connection because of interactive mode")
             self.session.close_connection()
-        elif str(status) in ("stopping", "stopped"):
+        elif status_str in ("stopping", "stopped"):
             self.ui.set_status("stopped")
             self.ui.say("Debugging session has ended")
             log.Log("closing connection because status is stopped")
