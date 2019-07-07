@@ -116,6 +116,11 @@ class StackWindowLineSelectEvent(Event):
         line = self.ui.windows.stack().line_at(lineno - 1)
         if line.find(" @ ") == -1:
             return False
+
+        stack_number_startpos = line.find("[") + 1
+        stack_number_endpos = line[stack_number_startpos:].rfind("]") + 1
+        stack_number = line[stack_number_startpos:stack_number_endpos]
+
         filename_pos = line.find(" @ ") + 3
         file_and_line = line[filename_pos:]
         line_pos = file_and_line.rfind(":")
@@ -123,6 +128,8 @@ class StackWindowLineSelectEvent(Event):
         lineno = file_and_line[line_pos+1:]
         self.ui.sourcewin.set_file(file)
         self.ui.sourcewin.set_line(lineno)
+
+        self.dispatch("change_stack", stack_number)
 
 
 class WatchWindowPropertyGetEvent(Event):
@@ -217,7 +224,13 @@ class WatchWindowContextChangeEvent(Event):
 
         if context_id == -1:
             raise error.EventError("Could not resolve context name")
-        self.dispatch("get_context", context_id)
+
+        self.ui.selected_context = context_id
+
+        if self.ui.selected_stack is None:
+            self.dispatch("get_context", context_id)
+        else:
+            self.dispatch("change_stack", self.ui.selected_stack)
         return True
 
     @staticmethod
@@ -566,6 +579,8 @@ class GetContextEvent(Event):
                                               self.session.cur_lineno),
                 self.session.context_names, context_id)
             self.ui.windows.watch().accept_renderer(rend)
+            self.ui.selected_stack = None
+            self.ui.selected_context = context_id
 
         self.dispatch("trace_refresh")
 
@@ -624,6 +639,34 @@ class DetachEvent(Event):
         self.session.detach()
 
 
+class ChangeStackEvent(Event):
+
+    def run(self, args):
+        if args is None or args == "":
+            args = "0"
+
+        res = self.api.stack_get()
+        ids = list(map(lambda s: s.get('level'), res.get_stack()))
+
+        if args not in ids:
+            print("The selected stack does not exist")
+            return
+
+        stack = next(s for s in res.get_stack() if s.get('level') == args)
+
+        context_id = self.ui.selected_context
+        name = self.session.context_names[context_id]
+        log.Log("Getting %s variables" % name)
+        context_res = self.api.context_get(context_id, args)
+        rend = vimui.ContextGetResponseRenderer(
+            context_res, "%s at %s:%s" % (name, str(util.FilePath(stack.get('filename')).as_local()),
+                                          stack.get('lineno')),
+            self.session.context_names, context_id)
+        self.ui.selected_stack = args
+        self.ui.windows.watch().accept_renderer(rend)
+
+        self.dispatch("trace_refresh")
+
 class Dispatcher:
     events = {
         "run": RunEvent,
@@ -646,7 +689,8 @@ class Dispatcher:
         "remove_breakpoint": RemoveBreakpointEvent,
         "trace": TraceEvent,
         "trace_refresh": TraceRefreshEvent,
-        "detach": DetachEvent
+        "detach": DetachEvent,
+        "change_stack": ChangeStackEvent,
     }
 
     def __init__(self, session_handler):

@@ -121,6 +121,7 @@ python3 import vdebug.debugger_interface
 python3 debugger = vdebug.debugger_interface.DebuggerInterface()
 
 " Commands
+command! -nargs=? VdebugChangeStack python3 debugger.change_stack(<q-args>)
 command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debugger.cycle_breakpoint(<q-args>)
 command! -nargs=? -complete=customlist,s:BreakpointTypes SetBreakpoint python3 debugger.set_breakpoint(<q-args>)
 command! VdebugStart python3 debugger.run()

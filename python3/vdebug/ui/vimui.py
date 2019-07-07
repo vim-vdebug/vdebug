@@ -103,6 +103,8 @@ class Ui(interface.Ui):
         self.tabnr = None
         self._last_error = None
         self.empty_buf_num = None
+        self.selected_stack = None
+        self.selected_context = 0
 
     def mark_window_as_closed(self, name):
         self.windows.window(name).mark_as_closed()

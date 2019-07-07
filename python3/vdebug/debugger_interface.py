@@ -22,6 +22,9 @@ class DebuggerInterface:
         self.session_handler.close()
         self.session_handler = None
 
+    def change_stack(self, args=None):
+        self.session_handler.dispatch_event("change_stack", args)
+
     @staticmethod
     def reload_options():
         util.Environment.reload()
