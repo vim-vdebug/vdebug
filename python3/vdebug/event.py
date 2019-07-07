@@ -316,6 +316,11 @@ class ListenEvent(Event):
 class StepOverEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step over is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping over")
         self.ui.set_status("running")
         res = self.api.step_over()
@@ -325,6 +330,11 @@ class StepOverEvent(Event):
 class StepIntoEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step in is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping into statement")
         self.ui.set_status("running")
         res = self.api.step_into()
@@ -334,6 +344,11 @@ class StepIntoEvent(Event):
 class StepOutEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step out is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping out of statement")
         self.ui.set_status("running")
         res = self.api.step_out()
@@ -343,6 +358,11 @@ class StepOutEvent(Event):
 class RunToCursorEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Run to cursor is only possible when "
+                          "Vdebug is running")
+            return False
+
         row = self.ui.get_current_row()
         file = self.ui.get_current_file()
         if file != self.ui.sourcewin.get_file():
