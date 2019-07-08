@@ -28,7 +28,7 @@ CONTENTS                                                      *Vdebug-contents*
         3.2 Python set up............................|VdebugSetUpPython|
         3.3 Ruby set up..............................|VdebugSetUpRuby|
         3.4 Perl set up..............................|VdebugSetUpPerl|
-        3.5 NodeJS set up............................|VdebugSetUpNodejs|
+        3.5 NodeJS 0.10 set up.......................|VdebugSetUpNodejs|
         3.6 TCL/Wish set up..........................|VdebugSetUpTcl|
     4. Usage.........................................|VdebugUsage|
         4.1 Starting the debugger....................|VdebugStart|
@@ -353,7 +353,7 @@ If you haven't started Vdebug you will get a message saying that it can't
 connect. This means you've set it up correctly.
 
 ------------------------------------------------------------------------------
-3.5 NodeJS set up                                          *VdebugSetUpNodejs*
+3.5 NodeJS 0.10 set up                                     *VdebugSetUpNodejs*
 
 NodeJS is the easiest language to set up for debugging with Vdebug, as
 Activestate have made the debugger engine available through npm. The only catch
