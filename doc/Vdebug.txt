@@ -243,7 +243,7 @@ but to use Vdebug in conjunction with your Python scripts you will have to grab
 the "pydbgp" tool, created by ActiveState (who make the Komodo Edit/IDE
 software).
 
-To do this, go to http://code.activestate.com/komodo/remotedebugging/,
+To do this, go to https://code.activestate.com/komodo/remotedebugging/,
 download the Python client for your OS and extract it.
 
 Inside this package is a binary file called pydbgp that we can include when
@@ -271,6 +271,14 @@ If using unix you can use the `patch` command to apply the changes, e.g: >
     patch dbgp/client.py < client-7.1.0.patch
 <
 If you're still having trouble, drop me an email.
+
+For python3 you can also try to use
+https://github.com/agroszer/komodo-python3-dbgp which is basically a repack of
+the pydbgp from activestate to make it usable with pip
+
+Try installing and using it like this: >
+    pip install komodo-python3-dbgp
+<
 
 ------------------------------------------------------------------------------
 3.3 Ruby set up                                              *VdebugSetUpRuby*
