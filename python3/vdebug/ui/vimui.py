@@ -34,13 +34,26 @@ class WindowManager:
             "DebuggerTrace": 'rightbelow 7new'
         }
         self._commands = self._default_commands.copy()
+        self._default_layout = {
+            'window_commands': {
+                'DebuggerWatch': 'vertical belowright new',
+                'DebuggerStack': 'aboveleft 12new',
+                'DebuggerStatus': 'aboveleft 1new'
+            },
+            'window_size': {
+            },
+            'window_arrangement': [
+                'DebuggerWatch',
+                'DebuggerStack',
+                'DebuggerStatus'
+            ]
+        }
         self._layout = None
 
     def open_all(self):
         self._refresh_commands()
-        arrangement = self._layout["window_arrangement"] \
-            if self._layout is not None and "window_arrangement" in self._layout else \
-            ('DebuggerWatch', 'DebuggerStack', 'DebuggerStatus')
+        layout = self.get_layout()
+        arrangement = layout["window_arrangement"]
 
         for name in arrangement:
             self.window(name).create(self._command(name))
@@ -92,16 +105,18 @@ class WindowManager:
     def set_layout(self, layout):
         self._layout = layout
 
+    def get_layout(self):
+        if self._layout is None \
+                or 'window_commands' not in self._layout \
+                or 'window_arrangement' not in self._layout:
+            self.set_layout(self._default_layout)
+
+        return self._layout
+
     def _refresh_commands(self):
         self._commands = self._default_commands.copy()
 
-        updated_commands = self._layout["window_commands"] \
-            if self._layout is not None and "window_commands" in self._layout else \
-            {
-                'DebuggerWatch': 'vertical belowright new',
-                'DebuggerStack': 'aboveleft 12 new',
-                'DebuggerStatus': 'aboveleft 12 new'
-            }
+        updated_commands = self._layout["window_commands"]
         self._commands.update(updated_commands)
 
 
@@ -120,13 +135,38 @@ class Ui(interface.Ui):
         self.empty_buf_num = None
         self.selected_stack = None
         self.selected_context = 0
-        self.default_layout = {
-            'window_commands': {
-                'DebuggerWatch': 'vertical belowright new',
-                'DebuggerStack': 'aboveleft 12new',
-                'DebuggerStatus': 'aboveleft 1new',
+        self.default_layout = 'vertical'
+        self.layouts = {
+            'vertical': {
+                'window_commands': {
+                    'DebuggerWatch': 'vertical belowright new',
+                    'DebuggerStack': 'aboveleft 12new',
+                    'DebuggerStatus': 'aboveleft 1new'
+                },
+                'window_size': {
+                },
+                'window_arrangement': [
+                    'DebuggerWatch',
+                    'DebuggerStack',
+                    'DebuggerStatus'
+                ]
             },
-            'window_arrangement': ['DebuggerWatch', 'DebuggerStack', 'DebuggerStatus']
+            'horizontal': {
+                'window_commands': {
+                    'DebuggerWatch': 'below new',
+                    'DebuggerStack': 'belowright new',
+                    'DebuggerStatus': 'vertical leftabove new'
+                },
+                'window_size': {
+                    'DebuggerWatch': { 'height' : 15 },
+                    'DebuggerStatus':  { 'height' : 1 }
+                },
+                'window_arrangement': [
+                    'DebuggerWatch',
+                    'DebuggerStatus',
+                    'DebuggerStack'
+                ]
+            }
         }
 
     def mark_window_as_closed(self, name):
@@ -148,10 +188,11 @@ class Ui(interface.Ui):
         self.is_open = True
 
         try:
-            layouts = opts.Options.get('layouts', dict)
-            default_layout = opts.Options.get('default_layout', str)
+            layout_option = opts.Options.get('layout', str)
 
-            layout = layouts[default_layout] if default_layout in layouts else self.default_layout
+            layout = self.layouts[layout_option] \
+                if layout_option in self.layouts \
+                else self.layouts[self.default_layout]
 
             existing_buffer = True
             cur_buf_name = vim.current.buffer.name
