@@ -852,7 +852,9 @@ The default options look like this: >
     \    'marker_open_tree' : '▾',
     \    'sign_breakpoint' : '▷',
     \    'sign_current' : '▶',
-    \    'continuous_mode'  : 1
+    \    'continuous_mode'  : 1,
+    \    'simplified_status': 1,
+    \    'layout': 'vertical',
     \}
 <
 You can either use the multi-line notation like above, or set individual keys
@@ -975,6 +977,51 @@ g:vdebug_options.continuous_mode (default = 1)
     session has finished, allowing for constant debugging across separate
     requests. Press <F6> during a debugging session to stop this, or <Ctrl-C>
     when Vdebug is listening.
+
+g:vdebug_options.simplified_status (default = 1)
+    When enabled the status will be shown in 1 line, if disabled you get a more
+    verbose status output
+
+g:vdebug_options.layout (default = 'vertical')
+    When layout is vertical, the debug session tab will have a vertical split
+    between the source window and the DebuggerStatus, DebuggerStack and
+    DebuggerWatch.
+
+    +------------------------------------+-----------------------------------+
+    |                                    |    DebuggerStatus                 |
+    |                                    +-----------------------------------+
+    |                                    |    DebuggerStack                  |
+    |                                    |                                   |
+    |                                    |                                   |
+    |      SourceWindow                  +-----------------------------------+
+    |                                    |    DebuggerWatch                  |
+    |                                    |                                   |
+    |                                    |                                   |
+    |                                    |                                   |
+    |                                    |                                   |
+    |                                    |                                   |
+    |                                    |                                   |
+    +------------------------------------+-----------------------------------+
+
+    When the layout is horizontal, the debug session tab will have a horizontal
+    split between the source window and the DebuggerStatus and DebuggerStack
+    will be split on the left next to the DebuggerWatch.
+
+    +------------------------------------------------------------------------+
+    |                                                                        |
+    |                                                                        |
+    |                                                                        |
+    |                              SourceWindow                              |
+    |                                                                        |
+    |                                                                        |
+    |                                                                        |
+    |                                                                        |
+    +------------------------------------+-----------------------------------+
+    |    DebuggerStatus                  |                                   |
+    +------------------------------------+    DebuggerWatch                  |
+    |    DebuggerStack                   |                                   |
+    |                                    |                                   |
+    +------------------------------------+-----------------------------------+
 
 ==============================================================================
 6. Key maps                                                       *VdebugKeys*
