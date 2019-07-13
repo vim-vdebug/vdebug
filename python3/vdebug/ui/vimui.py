@@ -34,10 +34,14 @@ class WindowManager:
             "DebuggerTrace": 'rightbelow 7new'
         }
         self._commands = self._default_commands.copy()
+        self._layout = None
 
     def open_all(self):
         self._refresh_commands()
-        arrangement = opts.Options.get('window_arrangement', list)
+        arrangement = self._layout["window_arrangement"] \
+            if self._layout is not None and "window_arrangement" in self._layout else \
+            ('DebuggerWatch', 'DebuggerStack', 'DebuggerStatus')
+
         for name in arrangement:
             self.window(name).create(self._command(name))
 
@@ -85,9 +89,20 @@ class WindowManager:
             raise WindowError("No debugger window named '%s' - check your "
                               "window options" % name)
 
+    def set_layout(self, layout):
+        self._layout = layout
+
     def _refresh_commands(self):
         self._commands = self._default_commands.copy()
-        self._commands.update(opts.Options.get('window_commands', dict))
+
+        updated_commands = self._layout["window_commands"] \
+            if self._layout is not None and "window_commands" in self._layout else \
+            {
+                'DebuggerWatch': 'vertical belowright new',
+                'DebuggerStack': 'aboveleft 12 new',
+                'DebuggerStatus': 'aboveleft 12 new'
+            }
+        self._commands.update(updated_commands)
 
 
 class Ui(interface.Ui):
@@ -105,6 +120,14 @@ class Ui(interface.Ui):
         self.empty_buf_num = None
         self.selected_stack = None
         self.selected_context = 0
+        self.default_layout = {
+            'window_commands': {
+                'DebuggerWatch': 'vertical belowright new',
+                'DebuggerStack': 'aboveleft 12new',
+                'DebuggerStatus': 'aboveleft 1new',
+            },
+            'window_arrangement': ['DebuggerWatch', 'DebuggerStack', 'DebuggerStatus']
+        }
 
     def mark_window_as_closed(self, name):
         self.windows.window(name).mark_as_closed()
@@ -125,6 +148,11 @@ class Ui(interface.Ui):
         self.is_open = True
 
         try:
+            layouts = opts.Options.get('layouts', dict)
+            default_layout = opts.Options.get('default_layout', str)
+
+            layout = layouts[default_layout] if default_layout in layouts else self.default_layout
+
             existing_buffer = True
             cur_buf_name = vim.current.buffer.name
             if cur_buf_name is None:
@@ -140,11 +168,12 @@ class Ui(interface.Ui):
 
             self.tabnr = vim.current.tabpage.number
 
+            self.windows.set_layout(layout)
             self.windows.open_all()
             statuswin = self.windows.status()
             statuswin.set_status("loading")
 
-            window_sizes = opts.Options.get('window_size', dict)
+            window_sizes = layout["window_size"] if "window_size" in layout else {}
             for window_name, settings in window_sizes.items():
                 if 'height' in settings:
                     self.windows.window(window_name).set_height(settings['height'])

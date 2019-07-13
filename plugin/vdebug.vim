@@ -95,16 +95,31 @@ let g:vdebug_options_defaults = {
 \    'background_listener' : 1,
 \    'auto_start' : 1,
 \    'simplified_status': 1,
-\    'window_commands' : {
-\        'DebuggerWatch' : 'below new',
-\        'DebuggerStack' : 'belowright new',
-\        'DebuggerStatus' : 'vertical leftabove new'
+\    'layouts' : {
+\        'vertical': {
+\           'window_commands' : {
+\              'DebuggerWatch' : 'vertical belowright new',
+\              'DebuggerStack' : 'aboveleft 12new',
+\              'DebuggerStatus' : 'aboveleft 1new'
+\           },
+\           'window_size' : {
+\           },
+\           'window_arrangement' : ['DebuggerWatch', 'DebuggerStack', 'DebuggerStatus']
+\        },
+\        'horizontal': {
+\           'window_commands' : {
+\              'DebuggerWatch' : 'below new',
+\              'DebuggerStack' : 'belowright new',
+\              'DebuggerStatus' : 'vertical leftabove new'
+\           },
+\           'window_size' : {
+\              'DebuggerWatch' : { 'height' : 15 },
+\             'DebuggerStatus' :  { 'height' : 1 }
+\           },
+\           'window_arrangement' : ['DebuggerWatch', 'DebuggerStatus', 'DebuggerStack']
+\        }
 \    },
-\    'window_size' : {
-\       'DebuggerWatch' : { 'height' : 15 },
-\       'DebuggerStatus' : { 'height' : 1 },
-\    },
-\    'window_arrangement' : ['DebuggerWatch', 'DebuggerStatus', 'DebuggerStack']
+\    'default_layout': 'vertical',
 \}
 
 " Different symbols for non unicode Vims
