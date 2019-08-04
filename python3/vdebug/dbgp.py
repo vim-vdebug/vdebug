@@ -338,10 +338,10 @@ class Api:
         """
         return self.send_cmd('stack_get', '', StackGetResponse)
 
-    def context_get(self, context=0):
+    def context_get(self, context=0, stack=0):
         """Get the context variables.
         """
-        return self.send_cmd('context_get', '-c %i' % int(context),
+        return self.send_cmd('context_get', '-c %i -d %i' % (int(context), int(stack)),
                              ContextGetResponse)
 
     def context_names(self):
@@ -377,6 +377,12 @@ class Api:
 
     def breakpoint_list(self):
         return self.send_cmd('breakpoint_list')
+
+    def breakpoint_disable(self, id):
+        return self.send_cmd('breakpoint_update', '-d %i -s disabled' % id, Response)
+
+    def breakpoint_enable(self, id):
+        return self.send_cmd('breakpoint_update', '-d %i -s enabled' % id, Response)
 
     def breakpoint_remove(self, id):
         """Remove a breakpoint by ID.

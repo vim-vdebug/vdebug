@@ -116,6 +116,11 @@ class StackWindowLineSelectEvent(Event):
         line = self.ui.windows.stack().line_at(lineno - 1)
         if line.find(" @ ") == -1:
             return False
+
+        stack_number_startpos = line.find("[") + 1
+        stack_number_endpos = line[stack_number_startpos:].rfind("]") + 1
+        stack_number = line[stack_number_startpos:stack_number_endpos]
+
         filename_pos = line.find(" @ ") + 3
         file_and_line = line[filename_pos:]
         line_pos = file_and_line.rfind(":")
@@ -123,6 +128,8 @@ class StackWindowLineSelectEvent(Event):
         lineno = file_and_line[line_pos+1:]
         self.ui.sourcewin.set_file(file)
         self.ui.sourcewin.set_line(lineno)
+
+        self.dispatch("change_stack", stack_number)
 
 
 class WatchWindowPropertyGetEvent(Event):
@@ -217,7 +224,13 @@ class WatchWindowContextChangeEvent(Event):
 
         if context_id == -1:
             raise error.EventError("Could not resolve context name")
-        self.dispatch("get_context", context_id)
+
+        self.ui.selected_context = context_id
+
+        if self.ui.selected_stack is None:
+            self.dispatch("get_context", context_id)
+        else:
+            self.dispatch("change_stack", self.ui.selected_stack)
         return True
 
     @staticmethod
@@ -258,12 +271,18 @@ class WatchWindowContextChangeEvent(Event):
 class RefreshEvent(Event):
 
     def run(self, status):
-        if str(status) == "interactive":
+
+        status_str = str(status)
+
+        if not status_str:
+            return
+
+        if status_str == "interactive":
             self.ui.error("Debugger engine says it is in interactive mode,"
                           "which is not supported: closing connection")
             log.Log("closing connection because of interactive mode")
             self.session.close_connection()
-        elif str(status) in ("stopping", "stopped"):
+        elif status_str in ("stopping", "stopped"):
             self.ui.set_status("stopped")
             self.ui.say("Debugging session has ended")
             log.Log("closing connection because status is stopped")
@@ -316,6 +335,11 @@ class ListenEvent(Event):
 class StepOverEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step over is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping over")
         self.ui.set_status("running")
         res = self.api.step_over()
@@ -325,6 +349,11 @@ class StepOverEvent(Event):
 class StepIntoEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step in is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping into statement")
         self.ui.set_status("running")
         res = self.api.step_into()
@@ -334,6 +363,11 @@ class StepIntoEvent(Event):
 class StepOutEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Step out is only possible when "
+                          "Vdebug is running")
+            return False
+
         log.Log("Stepping out of statement")
         self.ui.set_status("running")
         res = self.api.step_out()
@@ -343,6 +377,11 @@ class StepOutEvent(Event):
 class RunToCursorEvent(Event):
 
     def run(self):
+        if not self.session or not self.session.is_connected():
+            self.ui.say("Run to cursor is only possible when "
+                          "Vdebug is running")
+            return False
+
         row = self.ui.get_current_row()
         file = self.ui.get_current_file()
         if file != self.ui.sourcewin.get_file():
@@ -391,6 +430,19 @@ class SetEvalExpressionEvent(Event):
 class SetBreakpointEvent(Event):
 
     def run(self, args):
+        # Adding a special case to try a breakpoint on an empty line since the Breakpoint parser throws an error for
+        # that scenario
+        if not args:
+            line = self.ui.get_current_line()
+            if not line.strip():
+                file = self.ui.get_current_file()
+                row = self.ui.get_current_row()
+
+                id = self.session_handler.breakpoints().find_breakpoint(file, row)
+                if id is not None:
+                    self.session_handler.breakpoints().remove_breakpoint_by_id(id)
+                    return
+
         bp = breakpoint.Breakpoint.parse(self.ui, args)
         if bp.type == "line":
             id = self.session_handler.breakpoints().find_breakpoint(
@@ -399,6 +451,117 @@ class SetBreakpointEvent(Event):
                 self.session_handler.breakpoints().remove_breakpoint_by_id(id)
                 return
         self.session_handler.breakpoints().add_breakpoint(bp)
+
+
+class BreakpointStatusEvent(Event):
+    def parseArgs(self, args):
+        if args is None:
+            args = ""
+        args = args.strip()
+
+        arg_parts = args.split(' ')
+        first_param = arg_parts.pop(0)
+        if first_param == "":
+            return { "id": None, "action": None }
+
+        if first_param in ("toggle", "enable", "disable"):
+            return { "id": None, "action": first_param }
+
+        if len(arg_parts) == 0:
+            return { "id": first_param , "action": None }
+
+        second_param = arg_parts.pop(0)
+        return { "id": first_param, "action": second_param }
+
+    def get_breakpoint(self, id):
+        if id is not None:
+            return self.session_handler.breakpoints().get_breakpoint_by_id(id)
+
+        """ Line breakpoint """
+        try:
+            file = self.ui.get_current_file()
+            line = self.ui.get_current_row()
+            id = self.session_handler.breakpoints().find_breakpoint(file, line)
+            if id is None:
+                return None
+
+            return self.session_handler.breakpoints().get_breakpoint_by_id(id)
+        except error.FilePathError:
+            raise error.BreakpointError('No file, cannot set breakpoint')
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        action = parsed_args["action"]
+        bp = self.get_breakpoint(id)
+
+        if bp is None:
+            print("No breakpoint found")
+            return
+
+        if action is None:
+            print("enabled" if bp.enabled else "disabled")
+            return
+
+        if action == "enable":
+            return self.dispatch("enable_breakpoint", str(bp.id))
+
+        if action == "disable":
+            return self.dispatch("disable_breakpoint", str(bp.id))
+
+        if action == "toggle":
+            return self.dispatch("toggle_breakpoint", str(bp.id))
+
+
+class CycleBreakpointStatusEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is None:
+            self.dispatch("set_breakpoint", args)
+            return
+
+        if bp is not None:
+            if bp.enabled:
+                self.session_handler.breakpoints().disable_breakpoint_by_id(bp.id)
+            else:
+                self.session_handler.breakpoints().remove_breakpoint_by_id(bp.id)
+
+
+class ToggleBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().toggle_breakpoint_by_id(bp.id)
+
+
+class EnableBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().enable_breakpoint_by_id(id)
+
+
+class DisableBreakpointEvent(BreakpointStatusEvent):
+
+    def run(self, args):
+        parsed_args = self.parseArgs(args)
+        id = parsed_args["id"]
+        bp = self.get_breakpoint(id)
+
+        if bp is not None and bp.type == "line":
+            self.session_handler.breakpoints().disable_breakpoint_by_id(id)
 
 
 class RemoveBreakpointEvent(Event):
@@ -436,6 +599,8 @@ class GetContextEvent(Event):
                                               self.session.cur_lineno),
                 self.session.context_names, context_id)
             self.ui.windows.watch().accept_renderer(rend)
+            self.ui.selected_stack = None
+            self.ui.selected_context = context_id
 
         self.dispatch("trace_refresh")
 
@@ -494,6 +659,34 @@ class DetachEvent(Event):
         self.session.detach()
 
 
+class ChangeStackEvent(Event):
+
+    def run(self, args):
+        if args is None or args == "":
+            args = "0"
+
+        res = self.api.stack_get()
+        ids = list(map(lambda s: s.get('level'), res.get_stack()))
+
+        if args not in ids:
+            print("The selected stack does not exist")
+            return
+
+        stack = next(s for s in res.get_stack() if s.get('level') == args)
+
+        context_id = self.ui.selected_context
+        name = self.session.context_names[context_id]
+        log.Log("Getting %s variables" % name)
+        context_res = self.api.context_get(context_id, args)
+        rend = vimui.ContextGetResponseRenderer(
+            context_res, "%s at %s:%s" % (name, str(util.FilePath(stack.get('filename')).as_local()),
+                                          stack.get('lineno')),
+            self.session.context_names, context_id)
+        self.ui.selected_stack = args
+        self.ui.windows.watch().accept_renderer(rend)
+
+        self.dispatch("trace_refresh")
+
 class Dispatcher:
     events = {
         "run": RunEvent,
@@ -506,12 +699,18 @@ class Dispatcher:
         "eval": EvalEvent,
         "set_eval_expression": SetEvalExpressionEvent,
         "set_breakpoint": SetBreakpointEvent,
+        "cycle_breakpoint": CycleBreakpointStatusEvent,
+        "toggle_breakpoint": ToggleBreakpointEvent,
+        "enable_breakpoint": EnableBreakpointEvent,
+        "disable_breakpoint": DisableBreakpointEvent,
+        "breakpoint_status": BreakpointStatusEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
         "remove_breakpoint": RemoveBreakpointEvent,
         "trace": TraceEvent,
         "trace_refresh": TraceRefreshEvent,
-        "detach": DetachEvent
+        "detach": DetachEvent,
+        "change_stack": ChangeStackEvent,
     }
 
     def __init__(self, session_handler):

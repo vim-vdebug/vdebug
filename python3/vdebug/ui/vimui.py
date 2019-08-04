@@ -34,10 +34,27 @@ class WindowManager:
             "DebuggerTrace": 'rightbelow 7new'
         }
         self._commands = self._default_commands.copy()
+        self._default_layout = {
+            'window_commands': {
+                'DebuggerWatch': 'vertical belowright new',
+                'DebuggerStack': 'aboveleft 12new',
+                'DebuggerStatus': 'aboveleft 1new'
+            },
+            'window_size': {
+            },
+            'window_arrangement': [
+                'DebuggerWatch',
+                'DebuggerStack',
+                'DebuggerStatus'
+            ]
+        }
+        self._layout = None
 
     def open_all(self):
         self._refresh_commands()
-        arrangement = opts.Options.get('window_arrangement', list)
+        layout = self.get_layout()
+        arrangement = layout["window_arrangement"]
+
         for name in arrangement:
             self.window(name).create(self._command(name))
 
@@ -85,9 +102,22 @@ class WindowManager:
             raise WindowError("No debugger window named '%s' - check your "
                               "window options" % name)
 
+    def set_layout(self, layout):
+        self._layout = layout
+
+    def get_layout(self):
+        if self._layout is None \
+                or 'window_commands' not in self._layout \
+                or 'window_arrangement' not in self._layout:
+            self.set_layout(self._default_layout)
+
+        return self._layout
+
     def _refresh_commands(self):
         self._commands = self._default_commands.copy()
-        self._commands.update(opts.Options.get('window_commands', dict))
+
+        updated_commands = self._layout["window_commands"]
+        self._commands.update(updated_commands)
 
 
 class Ui(interface.Ui):
@@ -103,6 +133,41 @@ class Ui(interface.Ui):
         self.tabnr = None
         self._last_error = None
         self.empty_buf_num = None
+        self.selected_stack = None
+        self.selected_context = 0
+        self.default_layout = 'vertical'
+        self.layouts = {
+            'vertical': {
+                'window_commands': {
+                    'DebuggerWatch': 'vertical belowright new',
+                    'DebuggerStack': 'aboveleft 12new',
+                    'DebuggerStatus': 'aboveleft 1new'
+                },
+                'window_size': {
+                },
+                'window_arrangement': [
+                    'DebuggerWatch',
+                    'DebuggerStack',
+                    'DebuggerStatus'
+                ]
+            },
+            'horizontal': {
+                'window_commands': {
+                    'DebuggerWatch': 'below new',
+                    'DebuggerStack': 'belowright new',
+                    'DebuggerStatus': 'vertical leftabove new'
+                },
+                'window_size': {
+                    'DebuggerWatch': { 'height' : 15 },
+                    'DebuggerStatus':  { 'height' : 1 }
+                },
+                'window_arrangement': [
+                    'DebuggerWatch',
+                    'DebuggerStatus',
+                    'DebuggerStack'
+                ]
+            }
+        }
 
     def mark_window_as_closed(self, name):
         self.windows.window(name).mark_as_closed()
@@ -123,6 +188,12 @@ class Ui(interface.Ui):
         self.is_open = True
 
         try:
+            layout_option = opts.Options.get('layout', str)
+
+            layout = self.layouts[layout_option] \
+                if layout_option in self.layouts \
+                else self.layouts[self.default_layout]
+
             existing_buffer = True
             cur_buf_name = vim.current.buffer.name
             if cur_buf_name is None:
@@ -138,9 +209,17 @@ class Ui(interface.Ui):
 
             self.tabnr = vim.current.tabpage.number
 
+            self.windows.set_layout(layout)
             self.windows.open_all()
             statuswin = self.windows.status()
             statuswin.set_status("loading")
+
+            window_sizes = layout["window_size"] if "window_size" in layout else {}
+            for window_name, settings in window_sizes.items():
+                if 'height' in settings:
+                    self.windows.window(window_name).set_height(settings['height'])
+                if 'width' in settings:
+                    self.windows.window(window_name).set_width(settings['width'])
 
             log.Log.set_logger(log.WindowLogger(
                 opts.Options.get('debug_window_level'), self.windows.log()))
@@ -195,6 +274,17 @@ class Ui(interface.Ui):
     @staticmethod
     def place_breakpoint(sign_id, file, line):
         vim.command('sign place %s name=breakpt line=%s file=%s'
+                    % (sign_id, line, file.as_local()))
+
+    def enable_breakpoint(self, breakpoint):
+        self.place_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+
+    def disable_breakpoint(self, breakpoint):
+        self.place_disabled_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+
+    @staticmethod
+    def place_disabled_breakpoint(sign_id, file, line):
+        vim.command('sign place %s name=breakpt_dis line=%s file=%s'
                     % (sign_id, line, file.as_local()))
 
     def remove_breakpoint(self, breakpoint):
@@ -450,6 +540,12 @@ class Window(interface.Window):
             height = 1
         self.command('resize %i' % height)
 
+    def set_width(self, width):
+        width = int(width)
+        if width <= 0:
+            width =1
+        self.command('vertical resize %i' % width)
+
     def write(self, msg, return_focus=True, after="normal G"):
         self._buffer.write(msg, return_focus, lambda: self.command(after))
 
@@ -626,28 +722,53 @@ class StatusWindow(Window):
         self.command('setlocal syntax=debugger_status')
         if self._buffer.is_empty():
             keys = util.Keymapper()
-            output = "Status: starting\nListening on port\nNot connected\n\n"
-            output += "Press %s to start debugging, " % (keys.run_key())
-            output += "%s to stop/close. " % (keys.close_key())
-            output += "Type :help Vdebug for more information."
-            self.write(output)
-            self.set_height(6)
+            if opts.Options.get("simplified_status", int):
+                self.set_status("listening")
+            else:
+                output = "Status: starting\nListening on port\nNot connected\n\n"
+                output += "Press %s to start debugging, " % (keys.run_key())
+                output += "%s to stop/close. " % (keys.close_key())
+                output += "Type :help Vdebug for more information."
+                self.write(output)
+                self.set_height(6)
 
     def set_status(self, status):
-        self.insert("Status: %s" % str(status), 0, True)
+        if opts.Options.get("simplified_status", int):
+            if str(status) == "listening":
+                status = "●"
+            if str(status) == "stopped":
+                status = "■"
+            if str(status) == "running":
+                status = "▶"
+            if str(status) == "break":
+                status = "▌▌"
+
+            keys = util.Keymapper()
+
+            output = " " + str(status) + " "
+            output += "[%s Start] " % (keys.run_key())
+            output += "[%s Stop] " % (keys.close_key())
+            output += "[:help Vdebug]"
+
+            self.insert(output, 0, True)
+        else:
+            self.insert("Status: %s" % str(status), 0, True)
 
     def mark_as_stopped(self):
         self.set_status("stopped")
-        self.insert("Not connected", 2, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            self.insert("Not connected", 2, True)
 
     def set_conn_details(self, addr, port):
-        self.insert("Connected to %s:%s" % (addr, port), 2, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            self.insert("Connected to %s:%s" % (addr, port), 2, True)
 
     def set_listener_details(self, addr, port, idekey):
-        details = "Listening on %s:%s" % (addr, port)
-        if idekey:
-            details += " (IDE key: %s)" % idekey
-        self.insert(details, 1, True)
+        if opts.Options.get("simplified_status", int) != 1:
+            details = "Listening on %s:%s" % (addr, port)
+            if idekey:
+                details += " (IDE key: %s)" % idekey
+            self.insert(details, 1, True)
 
 
 class TraceWindow(WatchWindow):

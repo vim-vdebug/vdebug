@@ -104,7 +104,8 @@ class Keymapper:
     """Map and unmap key commands for the Vim user interface.
     """
 
-    exclude = ["run", "close", "set_breakpoint", "eval_visual"]
+    exclude = ["run", "close", "set_breakpoint", "enable_breakpoint", "disable_breakpoint",
+               "toggle_breakpoint" "eval_visual"]
 
     def __init__(self):
         self.is_mapped = False
