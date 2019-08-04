@@ -1,7 +1,4 @@
 import base64
-import socket
-import sys
-import time
 import xml.etree.ElementTree as ET
 
 from . import log
@@ -159,7 +156,7 @@ class EvalResponse(ContextGetResponse):
         parts = cmd.split('-- ')
         missing_padding = len(parts[1]) % 4
         if missing_padding != 0:
-            parts[1] += '='* (4 - missing_padding)
+            parts[1] += '=' * (4 - missing_padding)
         return base64.b64decode(parts[1].encode('utf-8')).decode('utf-8')
 
 
@@ -251,10 +248,10 @@ class Api:
         send += ' -i ' + str(self.transID)
         if args:
             send += ' ' + args
-        log.Log("Command: "+send, log.Logger.DEBUG)
+        log.Log("Command: " + send, log.Logger.DEBUG)
         self.conn.send_msg(send)
         msg = self.conn.recv_msg()
-        log.Log("Response: "+msg, log.Logger.DEBUG)
+        log.Log("Response: " + msg, log.Logger.DEBUG)
         return res_cls(msg, cmd, args, self)
 
     def status(self):
@@ -273,7 +270,7 @@ class Api:
 
         name -- name of the feature, e.g. encoding
         """
-        return self.send_cmd('feature_get', '-n '+str(name),
+        return self.send_cmd('feature_get', '-n ' + str(name),
                              FeatureGetResponse)
 
     def feature_set(self, name, value):
@@ -486,7 +483,7 @@ class ContextProperty:
                 for c in children:
                     if c.tag == tagname:
                         idx += 1
-                        p = self._create_child(c, self, self.depth+1)
+                        p = self._create_child(c, self, self.depth + 1)
                         self.children.append(p)
                         if idx == self.num_declared_children:
                             p.mark_as_last_child()
@@ -539,7 +536,7 @@ class EvalProperty(ContextProperty):
                             "['%s']" % node.get('name')
                 else:
                     self.display_name = self.parent.display_name + \
-                        "->"+node.get('name')
+                        "->" + node.get('name')
             elif self.language == 'perl':
                 self.display_name = node.get('fullname')
             else:
