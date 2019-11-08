@@ -8,7 +8,7 @@
 "  Description: Multi-language debugger client for Vim (PHP, Ruby, Python,
 "               Perl, NodeJS)
 "   Maintainer: Jon Cairns <jon at joncairns.com>
-"      Version: 1.4.1
+"      Version: 2.0.0
 "               Inspired by the Xdebug plugin, which was originally written by
 "               Seung Woo Shin <segv <at> sayclub.com> and extended by many
 "               others.
