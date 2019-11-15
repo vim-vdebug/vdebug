@@ -314,6 +314,8 @@ function! Vdebug_statusline()
 endfunction
 
 augroup Vdebug
+augroup END
+augroup VdebugOut
 autocmd VimLeavePre * python3 debugger.close()
 augroup END
 
