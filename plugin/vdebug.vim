@@ -105,6 +105,7 @@ if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults['marker_open_tree'] = '-'
     let g:vdebug_options_defaults['sign_breakpoint'] = 'B>'
     let g:vdebug_options_defaults['sign_current'] = '->'
+    let g:vdebug_options_defaults['sign_disabled'] = 'B|'
 endif
 
 " Create the top dog
