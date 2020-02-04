@@ -105,7 +105,7 @@ class Keymapper:
     """
 
     exclude = ["run", "close", "set_breakpoint", "enable_breakpoint", "disable_breakpoint",
-               "toggle_breakpoint" "eval_visual"]
+               "toggle_breakpoint", "eval_visual"]
 
     def __init__(self):
         self.is_mapped = False
