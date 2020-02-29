@@ -81,7 +81,7 @@ class FileLogger(Logger):
 
     def __open(self):
         try:
-            self.f = open(self.filename, 'w')
+            self.f = open(self.filename, 'w', encoding='utf-8')
         except IOError as e:
             raise error.LogError("Invalid file name '%s' for log file: %s"
                                  % (self.filename, e))
@@ -103,6 +103,8 @@ class FileLogger(Logger):
 class Log:
 
     loggers = {}
+
+
 
     def __init__(self, string, level=Logger.INFO):
         Log.log(string, level)
