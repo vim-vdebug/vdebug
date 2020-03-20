@@ -89,7 +89,7 @@ class FileLoggerTest(unittest.TestCase):
     def test_log_opens_file(self):
         with mock.patch(self.open_name, mock.mock_open()) as mocked_open:
             self.logger.log('text', self.level)
-        mocked_open.assert_called_once_with(self.filename, 'w')
+        mocked_open.assert_called_once_with(self.filename, 'w', encoding='utf-8')
         handle = mocked_open()
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 6:
             handle.write.assert_called_once()
@@ -115,6 +115,6 @@ class FileLoggerTest(unittest.TestCase):
         with mock.patch(self.open_name, mock.mock_open()) as mocked_open:
             self.logger.log('text', self.level)
             self.logger.shutdown()
-        mocked_open.assert_called_once_with(self.filename, 'w')
+        mocked_open.assert_called_once_with(self.filename, 'w', encoding='utf-8')
         handle = mocked_open()
         handle.close.assert_called_once_with()
