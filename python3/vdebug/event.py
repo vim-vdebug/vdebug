@@ -512,6 +512,34 @@ class BreakpointStatusEvent(Event):
         if action == "toggle":
             return self.dispatch("toggle_breakpoint", str(bp.id))
 
+class BreakpointJumpEvent(BreakpointStatusEvent):
+
+    """Event used to trigger the source window change to the breakpoint
+
+    The id of the breakpoint under the VIM cursor is retrieved, and the source file
+    and line number are set with the breakpoint data.
+    """
+
+    def run(self):
+        lineno = vim.current.window.cursor[0]
+
+        log.Log("User action in breakpoint window, line %s" % lineno,
+                log.Logger.DEBUG) 
+        line = self.ui.windows.breakpoints().line_at(lineno - 1)
+
+        # Match on ID
+        id = re.findall('^[\s][0-9]*[\s]', line)
+        if not id:
+            return False
+
+        bp = self.get_breakpoint(id[0].strip())
+
+        if  bp is not None and bp.type == "line":
+            file = bp.get_file()
+            lineno = bp.get_line()
+            self.ui.sourcewin.set_file(file)
+            self.ui.sourcewin.set_line(lineno)
+
 
 class CycleBreakpointStatusEvent(BreakpointStatusEvent):
 
@@ -704,6 +732,7 @@ class Dispatcher:
         "enable_breakpoint": EnableBreakpointEvent,
         "disable_breakpoint": DisableBreakpointEvent,
         "breakpoint_status": BreakpointStatusEvent,
+        "breakpoint_jump": BreakpointJumpEvent,
         "get_context": GetContextEvent,
         "reload_keymappings": ReloadKeymappingsEvent,
         "remove_breakpoint": RemoveBreakpointEvent,
@@ -765,3 +794,7 @@ class Dispatcher:
                 return WatchWindowHideEvent(session)
         elif window_name == session.ui().windows.stack().name:
             return StackWindowLineSelectEvent(session)
+        elif window_name == session.ui().windows.breakpoints().name:
+            lineno = vim.current.window.cursor[0]
+            if lineno > 3:
+                return BreakpointJumpEvent(session)
