@@ -624,6 +624,10 @@ class BreakpointWindow(Window):
                      ':python3 debugger.handle_delete_line_keypress()<cr>')
         self.command('nnoremap <buffer> dd '
                      ':python3 debugger.handle_delete_line_keypress()<cr>')
+        self.command('vnoremap <buffer> d <esc>'
+                     ':python3 debugger.handle_delete_visual_keypress()<cr>')
+        self.command('xnoremap <buffer> d '
+                     ':python3 debugger.handle_delete_visual_keypress()<cr>')
         self.command('setlocal syntax=debugger_breakpoint')
 
     def add_breakpoint(self, breakpoint):
