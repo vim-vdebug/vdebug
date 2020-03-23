@@ -74,6 +74,11 @@ class DebuggerInterface:
         """
         return self.event_dispatcher.by_position(self.session_handler)
 
+    def handle_delete_line_keypress(self):
+        """React to a <dd> keypress event.
+        """
+        return self.event_dispatcher.delete_line(self.session_handler)
+
     def handle_double_click(self):
         """React to a mouse double click event.
         """

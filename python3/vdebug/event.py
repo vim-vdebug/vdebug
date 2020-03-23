@@ -743,15 +743,27 @@ class Dispatcher:
                     log.Logger.DEBUG)
             return False
 
+    def delete_line(self, session):
+        window_name = self._get_window_name()
+
+        if window_name == session.ui().windows.breakpoints().name:
+            lineno = vim.current.window.cursor[0]
+            if lineno > 3:
+                line = session.ui().windows.breakpoints().line_at(lineno - 1)
+
+                 # Match on ID
+                id = re.findall('^[\s][0-9]*[\s]', line)
+                if not id:
+                    log.Log("No breakpoint founr at current cursor position",
+                        log.Logger.DEBUG)
+                    return False            
+
+                RemoveBreakpointEvent(session).run(id[0])
+
     @staticmethod
     def _get_event_by_position(session):
-        buf_name = vim.current.buffer.name
-        p = re.compile(r'.*[\\/]([^\\/]+)')
-        m = p.match(buf_name)
-        if m is None:
-            return None
+        window_name = Dispatcher._get_window_name()
 
-        window_name = m.group(1)
         if window_name == session.ui().windows.watch().name:
             lineno = vim.current.window.cursor[0]
             log.Log("User action in watch window, line %s" % lineno,
@@ -765,3 +777,14 @@ class Dispatcher:
                 return WatchWindowHideEvent(session)
         elif window_name == session.ui().windows.stack().name:
             return StackWindowLineSelectEvent(session)
+
+    @staticmethod
+    def _get_window_name():
+        buf_name = vim.current.buffer.name
+        p = re.compile(r'.*[\\/]([^\\/]+)')
+        m = p.match(buf_name)
+        if m is None:
+            return False
+        
+        window_name = m.group(1)
+        return window_name

@@ -620,6 +620,10 @@ class BreakpointWindow(Window):
     def on_create(self):
         if self.creation_count == 1:
             self.insert(self.header, 0)
+        self.command('inoremap <buffer> dd <esc>'
+                     ':python3 debugger.handle_delete_line_keypress()<cr>')
+        self.command('nnoremap <buffer> dd '
+                     ':python3 debugger.handle_delete_line_keypress()<cr>')
         self.command('setlocal syntax=debugger_breakpoint')
 
     def add_breakpoint(self, breakpoint):
