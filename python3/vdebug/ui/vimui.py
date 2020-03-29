@@ -364,11 +364,13 @@ class SourceWindow(interface.Window):
         vim.command(command_str)
 
     def set_file(self, file):
-        if file == self.file:
+        self.focus()
+
+        if file == self.file and self.file == vim.current.buffer.name:
             return
+
         self.file = file
         log.Log("Setting source file: %s" % file, log.Logger.INFO)
-        self.focus()
         vim.command('call Vdebug_edit("%s")' % str(file).replace("\\", "\\\\"))
 
     def set_line(self, lineno):
