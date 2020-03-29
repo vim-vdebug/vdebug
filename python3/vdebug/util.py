@@ -278,7 +278,8 @@ class FilePath:
         return self.local
 
     def as_remote(self):
-        return self.remote
+        # on win os backslash will cost breakpoint miss hit
+        return self.remote.replace('\\', '/') if self.is_win else self.remote
 
     @staticmethod
     def _findSeparator(path):
