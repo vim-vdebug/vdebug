@@ -9,4 +9,3 @@ vendor/
 .bash_history
 Gemfile.lock
 .gem/
-tags
