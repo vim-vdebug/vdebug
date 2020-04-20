@@ -118,6 +118,7 @@ command! -nargs=? -complete=customlist,s:BreakpointTypes Breakpoint python3 debu
 command! -nargs=? -complete=customlist,s:BreakpointTypes SetBreakpoint python3 debugger.set_breakpoint(<q-args>)
 command! VdebugStart python3 debugger.run()
 command! -nargs=? BreakpointRemove python3 debugger.remove_breakpoint(<q-args>)
+command! -nargs=? BreakpointToggle python3 debugger.toggle_breakpoint(<q-args>)
 command! BreakpointWindow python3 debugger.toggle_breakpoint_window()
 command! -nargs=? -bang VdebugEval python3 debugger.handle_eval('<bang>', <q-args>)
 command! -nargs=+ -complete=customlist,s:OptionNames VdebugOpt :call Vdebug_set_option(<f-args>)
