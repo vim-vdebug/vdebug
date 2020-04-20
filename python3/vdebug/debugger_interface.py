@@ -157,6 +157,11 @@ class DebuggerInterface:
         """
         self.session_handler.dispatch_event("remove_breakpoint", args)
 
+    def jump_breakpoint(self, args=None):
+        """Jump to a breakpoint in the source window from the breakpoint window
+        """
+        self.session_handler.dispatch_event("breakpoint_jump", args)
+
     def get_context(self):
         """Get all the variables in the default context
         """
