@@ -32,8 +32,9 @@ The actual installation is no different than for any other Vim plugin, you can
 * install manually: Clone or download a tarball of the plugin and move its
   content in your `~/.vim/` directory.  You should call `:helptags ~/.vim/doc`
   to generate the necessary help tags afterwards.
-* use Pathogen: Clone this repository to your `~/.vim/bundle` directory and
-  `:call pathogen#helptags()` afterwards.
+* use Pathogen: Clone this repository to your `~/.vim/bundle` directory, run
+  `:execute pathogen#infect()` and `:call pathogen#helptags()` afterwards.
+
 * use your favorite plugin manager: Put the respective instruction in your init
   file and update your plugins afterwards.  For Vundle this would be `Plugin
   'vim-vdebug/vdebug'` and `:PluginInstall`.
