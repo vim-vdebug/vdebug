@@ -550,7 +550,7 @@ class BreakpointJumpEvent(BreakpointStatusEvent):
 
         bp = self.get_breakpoint(id[0].strip())
 
-        if  bp is not None and bp.type == "line":
+        if  bp is not None and (bp.type == "line" or bp.type == "conditional"):
             file = bp.get_file()
             lineno = bp.get_line()
             self.ui.sourcewin.set_file(file)
