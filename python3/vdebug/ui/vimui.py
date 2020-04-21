@@ -278,9 +278,11 @@ class Ui(interface.Ui):
 
     def enable_breakpoint(self, breakpoint):
         self.place_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+        self.windows.breakpoints().update_breakpoint(breakpoint)
 
     def disable_breakpoint(self, breakpoint):
         self.place_disabled_breakpoint(breakpoint.id, breakpoint.file, breakpoint.line)
+        self.windows.breakpoints().update_breakpoint(breakpoint)
 
     @staticmethod
     def place_disabled_breakpoint(sign_id, file, line):
@@ -616,26 +618,28 @@ class BreakpointWindow(Window):
 
     name = "DebuggerBreakpoints"
     header = """===========================================================
- ID      | TYPE        | DATA
+ ID      | ACTIVE | TYPE        | DATA
 ==========================================================="""
 
     def on_create(self):
         if self.creation_count == 1:
             self.insert(self.header, 0)
+        self.command('inoremap <buffer> dd <esc>'
+                     ':python3 debugger.handle_delete_line_keypress()<cr>')
+        self.command('nnoremap <buffer> dd '
+                     ':python3 debugger.handle_delete_line_keypress()<cr>')
+        self.command('vnoremap <buffer> d <esc>'
+                     ':python3 debugger.handle_delete_visual_keypress()<cr>')
+        self.command('xnoremap <buffer> d '
+                     ':python3 debugger.handle_delete_visual_keypress()<cr>')
+        self.command('inoremap <buffer> <cr> <esc>'
+                     ':python3 debugger.handle_return_keypress()<cr>')
+        self.command('nnoremap <buffer> <cr> '
+                     ':python3 debugger.handle_return_keypress()<cr>')
         self.command('setlocal syntax=debugger_breakpoint')
 
     def add_breakpoint(self, breakpoint):
-        bp_str = " %-7i | %-11s | " % (breakpoint.id, breakpoint.type)
-        if breakpoint.type == 'line':
-            bp_str += "%s:%s" % (breakpoint.file, str(breakpoint.line))
-        elif breakpoint.type == 'conditional':
-            bp_str += "%s:%s when (%s)" % (
-                breakpoint.file, str(breakpoint.line), breakpoint.condition)
-        elif breakpoint.type == 'exception':
-            bp_str += "Exception: %s" % breakpoint.exception
-        elif breakpoint.type == 'call' or breakpoint.type == 'return':
-            bp_str += "Function: %s" % breakpoint.function
-
+        bp_str = self.breakpoint_str(breakpoint)
         self.write(bp_str)
 
     def remove_breakpoint(self, breakpoint_id):
@@ -646,6 +650,31 @@ class BreakpointWindow(Window):
             if l[:bp_id_len] == bp_str:
                 self._buffer.delete(i)
             i += 1
+
+    def update_breakpoint(self, breakpoint):
+        i = 0
+        for l in self._buffer.contents():
+            bp_str = " %i " % breakpoint.id
+            bp_id_len = len(bp_str)
+            if l[:bp_id_len] == bp_str:
+
+                bp_str = self.breakpoint_str(breakpoint)
+                self.insert(bp_str, i, True, True)
+            i += 1
+
+    def breakpoint_str(self, breakpoint):
+        bp_str = " %-7i | %-6s | %-11s | " % (breakpoint.id, breakpoint.enabled, breakpoint.type)
+        if breakpoint.type == 'line':
+            bp_str += "%s:%s" % (breakpoint.file, str(breakpoint.line))
+        elif breakpoint.type == 'conditional':
+            bp_str += "%s:%s when (%s)" % (
+                breakpoint.file, str(breakpoint.line), breakpoint.condition)
+        elif breakpoint.type == 'exception':
+            bp_str += "Exception: %s" % breakpoint.exception
+        elif breakpoint.type == 'call' or breakpoint.type == 'return':
+            bp_str += "Function: %s" % breakpoint.function
+
+        return bp_str
 
 
 class LogWindow(Window):

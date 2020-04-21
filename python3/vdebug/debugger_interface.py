@@ -74,6 +74,16 @@ class DebuggerInterface:
         """
         return self.event_dispatcher.by_position(self.session_handler)
 
+    def handle_delete_line_keypress(self):
+        """React to a <dd> keypress event.
+        """
+        return self.event_dispatcher.delete_line(self.session_handler)
+
+    def handle_delete_visual_keypress(self):
+        """React to a vunmap<d> keypress event.
+        """
+        return self.event_dispatcher.delete_visual(self.session_handler)
+
     def handle_double_click(self):
         """React to a mouse double click event.
         """
@@ -146,6 +156,11 @@ class DebuggerInterface:
         """Remove one or more breakpoints, specified by args.
         """
         self.session_handler.dispatch_event("remove_breakpoint", args)
+
+    def jump_breakpoint(self, args=None):
+        """Jump to a breakpoint in the source window from the breakpoint window
+        """
+        self.session_handler.dispatch_event("breakpoint_jump", args)
 
     def get_context(self):
         """Get all the variables in the default context
