@@ -139,6 +139,12 @@ end
 if hlexists('DbgBreakptSign') == 0
     hi default DbgBreakptSign term=reverse ctermfg=White ctermbg=Green guifg=#ffffff guibg=#00ff00
 end
+if hlexists('DbgDisabledLine') == 0
+  highlight DbgDisabledLine term=reverse ctermbg=White ctermfg=Cyan guibg=#b4ee9a guifg=#888888
+endif
+if hlexists('DbgDisabledSign') == 0
+  highlight DbgDisabledSign term=reverse ctermbg=White ctermfg=Cyan guibg=#b4ee9a guifg=#888888
+endif
 
 " Signs and highlighted lines for breakpoints, etc.
 function! s:DefineSigns()
