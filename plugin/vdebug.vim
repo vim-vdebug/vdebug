@@ -324,7 +324,7 @@ endfunction
 augroup Vdebug
 augroup END
 augroup VdebugOut
-autocmd VimLeavePre * python3 debugger.close()
+autocmd VimLeavePre * python3 debugger.quit()
 augroup END
 
 call Vdebug_load_options(g:vdebug_options)

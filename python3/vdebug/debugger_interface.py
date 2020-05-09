@@ -179,3 +179,8 @@ class DebuggerInterface:
         """Close the connection, or the UI if already closed.
         """
         self.session_handler.stop()
+
+    def quit(self):
+        """Close the connection, or the UI if already closed. On Exit
+        """
+        self.session_handler.stop(quiet=True)
