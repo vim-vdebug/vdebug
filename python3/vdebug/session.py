@@ -19,6 +19,7 @@ class SessionHandler:
         self.__ex_handler = util.ExceptionHandler(self)
         self.__session = None
         self.listener = None
+        self.__heartbeat_timer = None
 
     def dispatch_event(self, name, *args):
         event.Dispatcher(self).dispatch_event(name, *args)
@@ -40,6 +41,23 @@ class SessionHandler:
             self.__new_session()
         else:
             self.start_listener()
+
+    def heartbeat(self):
+        if not self.is_connected():
+            return
+
+        try:
+            res = self.session().api().status()
+
+            if str(res) in ("stopping", "stopped"):
+                self.dispatch_event("refresh", res)
+                return
+
+            self.__heartbeat_timer = threading.Timer(2.0, self.heartbeat)
+            self.__heartbeat_timer.daemon = True
+            self.__heartbeat_timer.start()
+        except:
+            self.dispatch_event("refresh", "stopped")
 
     def start_listener(self):
         self.listener = listener.Listener.create()
@@ -65,6 +83,8 @@ class SessionHandler:
             self.listen()
 
     def stop(self):
+        if self.__heartbeat_timer is not None:
+            self.__heartbeat_timer.cancel()
         if self.is_connected():
             self.__session.close_connection()
         elif self.is_listening():
@@ -75,6 +95,8 @@ class SessionHandler:
             self.__ui.say("Vdebug is not running")
 
     def close(self):
+        if self.__heartbeat_timer is not None:
+            self.__heartbeat_timer.cancel()
         self.stop_listening()
         if self.is_connected():
             self.__session.close_connection()
@@ -119,7 +141,11 @@ class SessionHandler:
         log.Log("refresh event", log.Logger.DEBUG)
         self.dispatch_event("refresh", status)
 
+        self.__heartbeat_timer = threading.Timer(2.0, self.heartbeat)
+        self.__heartbeat_timer.daemon = True
+        self.__heartbeat_timer.start()
 
+        
 class Session:
 
     def __init__(self, ui, breakpoints, keymapper):
