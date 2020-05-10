@@ -538,6 +538,15 @@ To open the window use the command :BreakpointWindow. It's in a table format,
 so hopefully it won't need any more explanation. To close the window again,
 just re-type :BreakpointWindow or :q.
 
+In this window while on the line of a breakpoint you can:
+ - Jump to a breakpoint by pressing <Enter>
+ - Toggle a breakpoint by pressing <F10> (default)
+ - Delete a breakpoint by pressing <dd>
+
+In this window while visually selecting multiple breakpoints you can:
+ - Delete multiple breakpoints by pressing <d>
+ - Toggle multiple breakpoints by pressing <F10> (default)
+
 To see more about breakpoints see |VdebugBreakpoints|.
 
 ------------------------------------------------------------------------------
@@ -738,6 +747,10 @@ The breakpoint's ID can be found in the breakpoint window (see
 To remove all breakpoints in one go use the command: >
     :BreakpointRemove *
 <
+
+In the breakpoint window a breakpoint can be removed by pressing <dd> while on a
+line with a breakpoint or by creating a visual selection of the breakpoints and
+deleting them at once with <d>.
 
 ------------------------------------------------------------------------------
 4.5 Evaluating code                                               *VdebugEval*

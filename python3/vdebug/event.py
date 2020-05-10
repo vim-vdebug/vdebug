@@ -446,18 +446,28 @@ class SetBreakpointEvent(Event):
         # If in the breakpoint window, toggle breakpoint instead of adding/deleting one
         window_name = Dispatcher._get_window_name()
         if window_name  == self.session_handler.ui().windows.breakpoints().name:
-            lineno = vim.current.window.cursor[0]
-            line = self.session_handler.ui().windows.breakpoints().line_at(lineno - 1)
-            id = Dispatcher._get_breakpoint_id_breakpoint_window(line)
-            if not id:
-                log.Log("No breakpoint founr at current cursor position",
-                    log.Logger.DEBUG)
-                return
+            buf = vim.current.buffer
+            try:
+                (lnum1, col1) = buf.mark('<')
+                (lnum2, col2) = buf.mark('>')
+                lines = vim.eval('getline({}, {})'.format(lnum1, lnum2))
 
-            self.session_handler.dispatch_event("toggle_breakpoint", "{} {}".format(id, "toggle"))
+                # The visual marks do not unset automatically
+                vim.command(':delmarks <>')
+            except TypeError:
+                lineno = vim.current.window.cursor[0]
+                lines = [self.session_handler.ui().windows.breakpoints().line_at(lineno - 1)]
+
+            for line in lines:
+                id = Dispatcher._get_breakpoint_id_breakpoint_window(line)
+                if not id:
+                    log.Log("No breakpoint founr at current cursor position",
+                        log.Logger.DEBUG)
+                    continue
+
+                self.session_handler.dispatch_event("toggle_breakpoint", "{} {}".format(id, "toggle"))
 
             return
-
 
         bp = breakpoint.Breakpoint.parse(self.ui, args)
         if bp.type == "line":
@@ -806,7 +816,7 @@ class Dispatcher:
 
                 RemoveBreakpointEvent(session).run(id)
 
-    def delete_visual(self, session):
+    def event_visual(self, session, event):
         window_name = self._get_window_name()
 
         if window_name == session.ui().windows.breakpoints().name:
@@ -819,11 +829,12 @@ class Dispatcher:
             for line in lines:
                 id = self._get_breakpoint_id_breakpoint_window(line)
                 if not id:
-                    log.Log("No breakpoint founr at current cursor position",
+                    log.Log("No breakpoint found at current cursor position",
                         log.Logger.DEBUG)
                     return False
 
-                RemoveBreakpointEvent(session).run(id)
+                if event == 'delete':
+                    RemoveBreakpointEvent(session).run(id)
 
     @staticmethod
     def _get_event_by_position(session):
