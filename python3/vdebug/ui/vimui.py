@@ -388,7 +388,7 @@ class SourceWindow(interface.Window):
     def place_pointer(self, line):
         log.Log("Placing pointer sign on line "+str(line), log.Logger.INFO)
         self.remove_pointer()
-        vim.command('sign place %s name=current line=%s file=%s'
+        vim.command('sign place %s name=current priority=99 line=%s file=%s'
                     % (self.pointer_sign_id, line, self.file))
 
     def remove_pointer(self):
