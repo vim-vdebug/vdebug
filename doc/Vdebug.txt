@@ -1161,6 +1161,11 @@ direction.
 It is possible to have multiple file path mappings by adding more items in the
 "path_maps" dictionary.
 
+Be careful when you use symlinked paths. Resolving the local path may be
+needed before adding to the "path_maps" dictionary (see |resolve()| for example).
+The remote log may be helpful to inspect the paths that are present
+in requests and responses.
+
 ------------------------------------------------------------------------------
 9.2 Connecting the two machines                       *VdebugRemoteConnection*
 
