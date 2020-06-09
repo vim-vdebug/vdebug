@@ -1163,7 +1163,7 @@ It is possible to have multiple file path mappings by adding more items in the
 
 Be careful when you use symlinked paths. Resolving the local path may be
 needed before adding to the "path_maps" dictionary (see |resolve()| for example).
-The remote log may be helpful to inspect the paths that are present
+The remote log of the debugger may be helpful to inspect the paths that are present
 in requests and responses.
 
 ------------------------------------------------------------------------------
