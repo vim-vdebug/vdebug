@@ -698,6 +698,8 @@ class StackWindow(Window):
 
     name = "DebuggerStack"
 
+    pointer_sign_id = '6147'
+
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'
                      ':python3 debugger.handle_return_keypress()<cr>')
@@ -709,6 +711,15 @@ class StackWindow(Window):
 
     def write(self, msg, return_focus=True):
         Window.write(self, msg, after="normal gg")
+
+    def place_pointer(self, line):
+        log.Log("Stack window: placing pointer sign on line "+str(line), log.Logger.INFO)
+        self.remove_pointer()
+        vim.command('sign place %s name=current_stack_position priority=99 line=%s'
+                    % (self.pointer_sign_id, line))
+
+    def remove_pointer(self):
+        vim.command('sign unplace %s' % self.pointer_sign_id)
 
 
 class WatchWindow(Window):

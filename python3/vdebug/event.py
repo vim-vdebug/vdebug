@@ -116,6 +116,7 @@ class StackWindowLineSelectEvent(Event):
         line = self.ui.windows.stack().line_at(lineno - 1)
         if line.find(" @ ") == -1:
             return False
+        self.ui.windows.stack().place_pointer(lineno)
 
         stack_number_startpos = line.find("[") + 1
         stack_number_endpos = line[stack_number_startpos:].rfind("]") + 1
@@ -128,6 +129,7 @@ class StackWindowLineSelectEvent(Event):
         lineno = file_and_line[line_pos+1:]
         self.ui.sourcewin.set_file(file)
         self.ui.sourcewin.set_line(lineno)
+        self.ui.sourcewin.place_pointer(lineno)
 
         self.dispatch("change_stack", stack_number)
 
