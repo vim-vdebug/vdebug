@@ -90,6 +90,7 @@ let g:vdebug_options_defaults = {
 \    'marker_open_tree' : '▾',
 \    'sign_breakpoint' : '▷',
 \    'sign_current' : '▶',
+\    'sign_current_stack_position' : '▶',
 \    'sign_disabled': '▌▌',
 \    'continuous_mode'  : 1,
 \    'background_listener' : 1,
@@ -105,6 +106,7 @@ if g:vdebug_force_ascii == 1
     let g:vdebug_options_defaults['marker_open_tree'] = '-'
     let g:vdebug_options_defaults['sign_breakpoint'] = 'B>'
     let g:vdebug_options_defaults['sign_current'] = '->'
+    let g:vdebug_options_defaults['sign_current_stack_position'] = '->'
     let g:vdebug_options_defaults['sign_disabled'] = 'B|'
 endif
 
@@ -145,12 +147,19 @@ endif
 if hlexists('DbgDisabledSign') == 0
   highlight DbgDisabledSign term=reverse ctermbg=White ctermfg=Cyan guibg=#b4ee9a guifg=#888888
 endif
+if hlexists('DbgCurrentStackPositionSign') == 0
+  highlight DbgCurrentStackPositionSign term=reverse ctermbg=White ctermfg=Cyan guibg=#e17e67 guifg=#888888
+endif
+if hlexists('DbgCurrentStackPositionLine') == 0
+  highlight DbgCurrentStackPositionLine term=reverse ctermbg=White ctermfg=Cyan guibg=#e17e67 guifg=#888888
+endif
 
 " Signs and highlighted lines for breakpoints, etc.
 function! s:DefineSigns()
     exe 'sign define breakpt text=' . g:vdebug_options['sign_breakpoint'] . ' texthl=DbgBreakptSign linehl=DbgBreakptLine'
     exe 'sign define current text=' . g:vdebug_options['sign_current'] . ' texthl=DbgCurrentSign linehl=DbgCurrentLine'
     exe 'sign define breakpt_dis text=' . g:vdebug_options['sign_disabled'] . ' texthl=DbgDisabledSign linehl=DbgDisabledLine'
+    exe 'sign define current_stack_position text=' . g:vdebug_options['sign_current_stack_position'] . ' texthl=DbgCurrentStackPositionSign linehl=DbgCurrentStackPositionLine'
 endfunction
 
 function! s:BreakpointTypes(A,L,P)
