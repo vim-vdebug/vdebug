@@ -274,7 +274,10 @@ class RefreshEvent(Event):
 
     def run(self, status):
 
-        status_str = str(status)
+        try:
+            status_str = str(status)
+        except TypeError:
+            return
 
         if not status_str:
             return
