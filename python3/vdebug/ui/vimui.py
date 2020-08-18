@@ -351,6 +351,8 @@ class SourceWindow(interface.Window):
     file = None
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
+    has_sign_priority = vim.vvars['version'] > 801 \
+        or vim.funcs.has('nvim-0-4-0')
 
     def focus(self):
         vim.command("1wincmd w")
@@ -388,8 +390,10 @@ class SourceWindow(interface.Window):
     def place_pointer(self, line):
         log.Log("Placing pointer sign on line "+str(line), log.Logger.INFO)
         self.remove_pointer()
-        vim.command('sign place %s name=current priority=99 line=%s file=%s'
-                    % (self.pointer_sign_id, line, self.file))
+        signstr = 'sign place %s name=current line=%s file=%s'
+        if self.has_sign_priority:
+            signstr = 'sign place %s name=current priority=99 line=%s file=%s'
+        vim.command(signstr % (self.pointer_sign_id, line, self.file))
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
@@ -699,6 +703,8 @@ class StackWindow(Window):
     name = "DebuggerStack"
 
     pointer_sign_id = '6147'
+    has_sign_priority = vim.vvars['version'] > 801 \
+        or vim.funcs.has('nvim-0-4-0')
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'
@@ -715,8 +721,11 @@ class StackWindow(Window):
     def place_pointer(self, line):
         log.Log("Stack window: placing pointer sign on line "+str(line), log.Logger.INFO)
         self.remove_pointer()
-        vim.command('sign place %s name=current_stack_position priority=99 line=%s'
-                    % (self.pointer_sign_id, line))
+        signstr = 'sign place %s name=current_stack_position line=%s'
+        if self.has_sign_priority:
+            signstr = \
+                'sign place %s name=current_stack_position priority=99 line=%s'
+        vim.command(signstr % (self.pointer_sign_id, line))
 
     def remove_pointer(self):
         vim.command('sign unplace %s' % self.pointer_sign_id)
