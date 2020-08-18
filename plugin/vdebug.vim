@@ -34,14 +34,16 @@ if !has('python3')
     finish
 endif
 
-" Nice characters get screwed up on windows
-if has('win32') || has('win64')
-    let g:vdebug_force_ascii = 1
-elseif has('multi_byte') == 0
-    let g:vdebug_force_ascii = 1
-else
-    let g:vdebug_force_ascii = 0
-end
+if !exists('g:vdebug_force_ascii')
+    " Nice characters get screwed up on windows
+    if has('win32') || has('win64')
+        let g:vdebug_force_ascii = 1
+    elseif has('multi_byte') == 0
+        let g:vdebug_force_ascii = 1
+    else
+        let g:vdebug_force_ascii = 0
+    end
+endif
 
 if !exists('g:vdebug_options')
     let g:vdebug_options = {}
