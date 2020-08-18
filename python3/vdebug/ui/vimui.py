@@ -352,7 +352,7 @@ class SourceWindow(interface.Window):
     pointer_sign_id = '6145'
     breakpoint_sign_id = '6146'
     has_sign_priority = vim.vvars['version'] > 801 \
-        or vim.funcs.has('nvim-0-4-0')
+        or (hasattr(vim, 'funcs') and vim.funcs.has('nvim-0-4-0'))
 
     def focus(self):
         vim.command("1wincmd w")
@@ -704,7 +704,7 @@ class StackWindow(Window):
 
     pointer_sign_id = '6147'
     has_sign_priority = vim.vvars['version'] > 801 \
-        or vim.funcs.has('nvim-0-4-0')
+        or (hasattr(vim, 'funcs') and vim.funcs.has('nvim-0-4-0'))
 
     def on_create(self):
         self.command('inoremap <buffer> <cr> <esc>'
