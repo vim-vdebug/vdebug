@@ -1220,7 +1220,7 @@ the question is good I might even add it to this list.
         the language you're using and that you're doing what's necessary to
         activate the engine when running the script (e.g. setting environment
         variables/URL variables). If the problem persists, check that the
-        debugger engine is connecting the same port and address that Vdebug is
+        debugger engine is connecting to the same port and address that Vdebug is
         binding to (the 'port' and 'server' options). The server option is blank
         by default, which means that it will connect to all available interfaces.
         Unless you've changed this option, it's unlikely to be the issue. Also
@@ -1280,7 +1280,7 @@ the question is good I might even add it to this list.
         repository and try to implement it yourself! I do accept merges.
 
     Q. Why doesn't Ross, the largest friend, simply eat the other ones?
-    A. Think of the indigestion that would result.
+    A. Think of the indigestion that would result in.
 
     Q. My command line php script seems to stop at the first line, but the
        source code is not loaded in the debugger window, how can that be?
