@@ -194,7 +194,7 @@ able to apply it to your circumstance.
 The most popular DBGP debugger for PHP is Xdebug.
 
 I find that the most effective way to install Xdebug is to use PECL, instead
-of a OS-level package manager such as aptitude or yum. You can also compile it
+of an OS-level package manager such as aptitude or yum. You can also compile it
 from source if you're feeling hardy. To install it via PECL, run this from a
 command line (requires root/admin privileges): >
 
@@ -232,13 +232,13 @@ then use this instead of php when debugging. For instance, instead of "php
 myscript.php", run "php-xdebug myscript.php" to start the debugger session.
 
 You are now officially ready to start debugging with PHP. However, if you've
-become unstuck at any point then there are plenty of Google tutorials on
-setting up Xdebug, or you can email me and I'll do my best to help.
+become stuck at any point then there are plenty of Google tutorials on setting
+up Xdebug, or you can email me and I'll do my best to help.
 
 ------------------------------------------------------------------------------
 3.2 Python set up                                          *VdebugSetUpPython*
 
-Python has an standalone debugging tool that you can use from the command line,
+Python has a standalone debugging tool that you can use from the command line,
 but to use Vdebug in conjunction with your Python scripts you will have to grab
 the "pydbgp" tool, created by ActiveState (who make the Komodo Edit/IDE
 software).
@@ -283,7 +283,7 @@ Try installing and using it like this: >
 ------------------------------------------------------------------------------
 3.3 Ruby set up                                              *VdebugSetUpRuby*
 
-Like Python, Ruby has an standalone debugging tool that you can use from the
+Like Python, Ruby has a standalone debugging tool that you can use from the
 command line, but to use Vdebug in conjunction with your Ruby scripts you will
 have to get the "rdbgp.rb" script that comes bundled with Komodo Edit/IDE by
 Activestate.
@@ -325,7 +325,7 @@ If you're still having trouble, drop me an email.
 Perl is one of the trickier languages to set up, unless you have very specific
 instructions on what to do. Fortunately, that's what I'm going to give you!
 
-Like Python and Ruby, Activestate provide a standalone module that you can use
+Like Python and Ruby, Activestate provides a standalone module that you can use
 to remotely debug Perl applications. What makes this more difficult than Python
 and Ruby is that the debugging script changes and, as far as I can see, breaks
 after a particular version. That means you have to get the right version from
@@ -383,7 +383,7 @@ is the port.
 ------------------------------------------------------------------------------
 3.6 TCL/Wish set up                                           *VdebugSetUpTcl*
 
-Like Python and Ruby, Tcl and Wish have an standalone debugging tool that you
+Like Python and Ruby, Tcl and Wish have a standalone debugging tool that you
 can use from the command line, which has again been made available by
 ActiveState.
 
@@ -1220,7 +1220,7 @@ the question is good I might even add it to this list.
         the language you're using and that you're doing what's necessary to
         activate the engine when running the script (e.g. setting environment
         variables/URL variables). If the problem persists, check that the
-        debugger engine is connecting the same port and address that Vdebug is
+        debugger engine is connecting to the same port and address that Vdebug is
         binding to (the 'port' and 'server' options). The server option is blank
         by default, which means that it will connect to all available interfaces.
         Unless you've changed this option, it's unlikely to be the issue. Also
@@ -1280,7 +1280,7 @@ the question is good I might even add it to this list.
         repository and try to implement it yourself! I do accept merges.
 
     Q. Why doesn't Ross, the largest friend, simply eat the other ones?
-    A. Think of the indigestion that would result.
+    A. Think of the indigestion that would result in.
 
     Q. My command line php script seems to stop at the first line, but the
        source code is not loaded in the debugger window, how can that be?
