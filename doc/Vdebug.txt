@@ -194,7 +194,7 @@ able to apply it to your circumstance.
 The most popular DBGP debugger for PHP is Xdebug.
 
 I find that the most effective way to install Xdebug is to use PECL, instead
-of a OS-level package manager such as aptitude or yum. You can also compile it
+of an OS-level package manager such as aptitude or yum. You can also compile it
 from source if you're feeling hardy. To install it via PECL, run this from a
 command line (requires root/admin privileges): >
 
@@ -238,7 +238,7 @@ setting up Xdebug, or you can email me and I'll do my best to help.
 ------------------------------------------------------------------------------
 3.2 Python set up                                          *VdebugSetUpPython*
 
-Python has an standalone debugging tool that you can use from the command line,
+Python has a standalone debugging tool that you can use from the command line,
 but to use Vdebug in conjunction with your Python scripts you will have to grab
 the "pydbgp" tool, created by ActiveState (who make the Komodo Edit/IDE
 software).
@@ -283,7 +283,7 @@ Try installing and using it like this: >
 ------------------------------------------------------------------------------
 3.3 Ruby set up                                              *VdebugSetUpRuby*
 
-Like Python, Ruby has an standalone debugging tool that you can use from the
+Like Python, Ruby has a standalone debugging tool that you can use from the
 command line, but to use Vdebug in conjunction with your Ruby scripts you will
 have to get the "rdbgp.rb" script that comes bundled with Komodo Edit/IDE by
 Activestate.
@@ -383,7 +383,7 @@ is the port.
 ------------------------------------------------------------------------------
 3.6 TCL/Wish set up                                           *VdebugSetUpTcl*
 
-Like Python and Ruby, Tcl and Wish have an standalone debugging tool that you
+Like Python and Ruby, Tcl and Wish have a standalone debugging tool that you
 can use from the command line, which has again been made available by
 ActiveState.
 
