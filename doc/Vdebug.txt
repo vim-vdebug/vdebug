@@ -325,7 +325,7 @@ If you're still having trouble, drop me an email.
 Perl is one of the trickier languages to set up, unless you have very specific
 instructions on what to do. Fortunately, that's what I'm going to give you!
 
-Like Python and Ruby, Activestate provide a standalone module that you can use
+Like Python and Ruby, Activestate provides a standalone module that you can use
 to remotely debug Perl applications. What makes this more difficult than Python
 and Ruby is that the debugging script changes and, as far as I can see, breaks
 after a particular version. That means you have to get the right version from
