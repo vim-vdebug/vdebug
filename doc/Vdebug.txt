@@ -1167,6 +1167,15 @@ The remote log of the debugger (or the local, see |VdebugOptions-debug_window_le
 or |VdebugOptions-debug_file_level|) may be helpful to inspect the paths that are present
 in requests and responses.
 
+If you happen to be using the same layout for all your remote servers in
+different projects, you may map the same remote directory to the root of your
+project. For instance, if the root of your project is always /app, and you
+always run vim from the root of your projects, you may want to use the
+following configuration: >
+
+    let g:vdebug_options.path_maps = {"/app": getcwd() }
+<
+
 ------------------------------------------------------------------------------
 9.2 Connecting the two machines                       *VdebugRemoteConnection*
 
