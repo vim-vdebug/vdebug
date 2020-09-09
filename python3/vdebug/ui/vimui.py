@@ -586,7 +586,8 @@ class Window(interface.Window):
         self.creation_count += 1
 
         if self.creation_count == 1:
-            cmd = 'autocmd Vdebug BufWinLeave %s' % self.name
+            cmd = 'autocmd Vdebug BufWinLeave %s silent! bdelete %s' \
+                % (self.name, self.name)
             cmd += ' python3 debugger.mark_window_as_closed("%s")' % self.name
             vim.command(cmd)
 
