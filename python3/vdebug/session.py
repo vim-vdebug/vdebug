@@ -37,13 +37,14 @@ class SessionHandler:
             print("Waiting for a connection: none found so far")
         elif self.listener and self.listener.is_ready():
             print("Found connection, starting debugger")
+            log.Log("Got connection, starting", log.Logger.DEBUG)
             self.__new_session()
         else:
             self.start_listener()
 
     def start_listener(self):
         self.listener = listener.Listener.create()
-        print("Vdebug will wait for a connection in the background")
+        print("Vdebug will wait for a connection")
         util.Environment.reload()
         if self.is_open():
             self.ui().set_status("listening")
@@ -103,6 +104,7 @@ class SessionHandler:
         try:
             if self.listener.is_ready():
                 print("Found connection, starting debugger")
+                log.Log("Got connection, starting", log.Logger.DEBUG)
                 self.__new_session()
                 return True
             return False
@@ -206,7 +208,9 @@ class Session:
             self.__ui.set_conn_details(addr[0], addr[1])
 
             self.__collect_context_names()
-            self.__set_features()
+            self.__check_features()  # only for debugging at the moment
+            self.__set_default_features()  # features we try by default
+            self.__set_features()  # user defined features
             self.__initialize_breakpoints()
 
             if opts.Options.get('break_on_open', int) == 1:
@@ -228,6 +232,64 @@ class Session:
             self.__api.detach()
 
         self.close_connection(False)
+
+    def __check_features(self):
+        must_features = [
+            'language_supports_threads',
+            'language_name',
+            'language_version',
+            'encoding',  # has set
+            'protocol_version',
+            'supports_async',
+            'data_encoding',
+            'breakpoint_languages',
+            'breakpoint_types',
+            'resolved_breakpoints',
+            'multiple_sessions',  # has set
+            'max_children',  # has set
+            'max_data',  # has set
+            'max_depth',  # has set
+            'extended_properties',  # has set
+        ]
+        maybe_features = [
+            'supported_encodings',
+            'supports_postmortem',
+            'show_hidden',  # has set
+            'notify_ok',  # has set
+        ]
+        for feature in must_features:
+            try:
+                feature_value = self.__api.feature_get(feature)
+                log.Log(
+                    "Must Feature: %s = %s" % (feature, str(feature_value)),
+                    log.Logger.DEBUG
+                )
+            except dbgp.DBGPError:
+                error_str = "Failed to get feature %s" % feature
+                log.Log(error_str, log.Logger.DEBUG)
+
+        for feature in maybe_features:
+            try:
+                feature_value = self.__api.feature_get(feature)
+                log.Log(
+                    "Maybe Feature: %s = %s" % (feature, str(feature_value)),
+                    log.Logger.DEBUG
+                )
+            except dbgp.DBGPError:
+                error_str = "Failed to get feature %s" % feature
+                log.Log(error_str, log.Logger.DEBUG)
+
+    def __set_default_features(self):
+        features = {
+            'multiple_sessions': 0,  # explicitly disable multiple sessions atm
+            'extended_properties': 1,
+        }
+        for name, value in features.items():
+            try:
+                self.__api.feature_set(name, value)
+            except dbgp.DBGPError as e:
+                error_str = "Failed to set feature %s: %s" % (name, e.args[0])
+                log.Log(error_str, log.Logger.DEBUG)
 
     def __set_features(self):
         """Evaluate vim dictionary of features and pass to debugger.
