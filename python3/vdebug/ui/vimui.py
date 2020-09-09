@@ -597,7 +597,6 @@ class Window(interface.Window):
         if self._buffer is None:
             return
         self.is_open = False
-        self._buffer = HiddenBuffer(self._buffer.contents())
         if wipeout and int(vim.eval('buffer_exists("%s")' % self.name)) == 1:
             vim.command('bwipeout %s' % self.name)
         self.on_destroy()
