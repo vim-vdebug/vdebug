@@ -81,7 +81,7 @@ class ConnectionHandler:
 
         cmd -- command to send
         """
-        #self.sock.send(cmd + '\0')
+        # self.sock.send(cmd + '\0')
         MSGLEN = len(cmd)
         totalsent = 0
         while totalsent < MSGLEN:
