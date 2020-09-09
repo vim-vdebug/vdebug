@@ -158,8 +158,8 @@ class Ui(interface.Ui):
                     'DebuggerStatus': 'vertical leftabove new'
                 },
                 'window_size': {
-                    'DebuggerWatch': { 'height' : 15 },
-                    'DebuggerStatus':  { 'height' : 1 }
+                    'DebuggerWatch': {'height': 15},
+                    'DebuggerStatus':  {'height': 1}
                 },
                 'window_arrangement': [
                     'DebuggerWatch',
@@ -586,7 +586,8 @@ class Window(interface.Window):
         self.creation_count += 1
 
         if self.creation_count == 1:
-            cmd = 'autocmd Vdebug BufWinLeave %s' % self.name
+            cmd = 'autocmd Vdebug BufWinLeave %s silent! bdelete %s' \
+                % (self.name, self.name)
             cmd += ' python3 debugger.mark_window_as_closed("%s")' % self.name
             vim.command(cmd)
 
@@ -597,7 +598,6 @@ class Window(interface.Window):
         if self._buffer is None:
             return
         self.is_open = False
-        self._buffer = HiddenBuffer(self._buffer.contents())
         if wipeout and int(vim.eval('buffer_exists("%s")' % self.name)) == 1:
             vim.command('bwipeout %s' % self.name)
         self.on_destroy()
