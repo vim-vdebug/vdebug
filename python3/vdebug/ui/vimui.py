@@ -158,8 +158,8 @@ class Ui(interface.Ui):
                     'DebuggerStatus': 'vertical leftabove new'
                 },
                 'window_size': {
-                    'DebuggerWatch': { 'height' : 15 },
-                    'DebuggerStatus':  { 'height' : 1 }
+                    'DebuggerWatch': {'height': 15},
+                    'DebuggerStatus':  {'height': 1}
                 },
                 'window_arrangement': [
                     'DebuggerWatch',
