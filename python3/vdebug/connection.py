@@ -4,6 +4,7 @@ import socket
 import sys
 import threading
 import time
+import asyncio
 
 from . import log
 
@@ -157,11 +158,12 @@ class SocketCreator:
 
 class BackgroundSocketCreator(threading.Thread):
 
-    def __init__(self, host, port, message_q, output_q):
-        self.__message_q = message_q
+    def __init__(self, host, port, output_q):
         self.__output_q = output_q
         self.__host = host
         self.__port = port
+        self.__socket_task = None
+        self.__loop = None
         threading.Thread.__init__(self)
 
     @staticmethod
@@ -169,19 +171,29 @@ class BackgroundSocketCreator(threading.Thread):
         log.Log(message, log.Logger.DEBUG)
 
     def run(self):
+        # needed for python 3.5
+        self.__loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.__loop)
+        self.__loop.run_until_complete(self.run_async())
+
+    async def run_async(self):
         self.log("Started")
         self.log("Listening on port %s" % self.__port)
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.setblocking(1)
+            s.setblocking(False)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.__host, self.__port))
-            s.settimeout(5) # timeout after 5 seconds so we can check messages
             s.listen(5)
             while 1:
                 try:
-                    self.__peek_for_exit()
-                    client, address = s.accept()
+                    # using ensure_future here since before 3.7, this is not a coroutine, but returns a future
+                    self.__socket_task = asyncio.ensure_future(self.__loop.sock_accept(s))
+                    client, address = await self.__socket_task
+                    # set resulting socket to blocking
+                    client.setblocking(True)
+                    client.settimeout(5)
+
                     self.log("Found client, %s" % str(address))
                     self.__output_q.put((client, address))
                     break
@@ -195,7 +207,10 @@ class BackgroundSocketCreator(threading.Thread):
             if socket_error.errno == errno.EADDRINUSE:
                 self.log("Address already in use")
                 print("Socket is already in use")
-        except Exception:
+        except asyncio.CancelledError as e:
+            self.log("Stopping server")
+            self.__socket_task = None
+        except Exception as e:
             print("Exception caught")
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
@@ -203,23 +218,19 @@ class BackgroundSocketCreator(threading.Thread):
             self.log("Finishing socket server")
             s.close()
 
-    def __peek_for_exit(self):
-        try:
-            # self.log("Checking for exit")
-            self.__check_exit(self.__message_q.get_nowait())
-        except queue.Empty:
-            pass
+    def _exit(self):
+        if self.__socket_task:
+            # this will raise asyncio.CancelledError
+            self.__socket_task.cancel()
 
-    @staticmethod
-    def __check_exit(message):
-        if message == "exit":
-            raise Exception("Exiting")
+    # called from outside of the thread
+    def exit(self):
+        self.__loop.call_soon_threadsafe(self._exit)
 
 
 class SocketServer:
 
     def __init__(self):
-        self.__message_q = queue.Queue(0)
         self.__socket_q = queue.Queue(1)
         self.__thread = None
 
@@ -229,7 +240,7 @@ class SocketServer:
     def start(self, host, port):
         if not self.is_alive():
             self.__thread = BackgroundSocketCreator(
-                host, port, self.__message_q, self.__socket_q)
+                host, port, self.__socket_q)
             self.__thread.start()
 
     def is_alive(self):
@@ -243,7 +254,7 @@ class SocketServer:
 
     def stop(self):
         if self.is_alive():
-            self.__message_q.put_nowait("exit")
+            self.__thread.exit()
             self.__thread.join(3000)
         if self.has_socket():
             self.socket()[0].close()
