@@ -185,6 +185,7 @@ class BackgroundSocketCreator(threading.Thread):
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.__host, self.__port))
             s.listen(5)
+            s.settimeout(5)
             while 1:
                 try:
                     # using ensure_future here since before 3.7, this is not a coroutine, but returns a future
@@ -192,7 +193,6 @@ class BackgroundSocketCreator(threading.Thread):
                     client, address = await self.__socket_task
                     # set resulting socket to blocking
                     client.setblocking(True)
-                    client.settimeout(5)
 
                     self.log("Found client, %s" % str(address))
                     self.__output_q.put((client, address))
