@@ -185,7 +185,6 @@ class BackgroundSocketCreator(threading.Thread):
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.__host, self.__port))
             s.listen(5)
-            s.settimeout(5)
             while 1:
                 try:
                     # using ensure_future here since before 3.7, this is not a coroutine, but returns a future
