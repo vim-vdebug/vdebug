@@ -79,6 +79,8 @@ let g:vdebug_options_defaults = {
 \    'port' : 9000,
 \    'timeout' : 20,
 \    'server' : '',
+\    "proxy_host" : '',
+\    "proxy_port" : 9001,
 \    'on_close' : 'stop',
 \    'break_on_open' : 1,
 \    'ide_key' : '',

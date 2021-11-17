@@ -22,6 +22,9 @@ class ForegroundListener:
     def start(self):
         self.__server.start(opts.Options.get('server'),
                             opts.Options.get('port', int),
+                            opts.Options.get('proxy_host'),
+                            opts.Options.get('proxy_port', int),
+                            opts.Options.get('ide_key'),
                             opts.Options.get('timeout', int))
 
     def stop(self):
@@ -51,7 +54,10 @@ class BackgroundListener:
         if opts.Options.get("auto_start", int):
             vim.command('autocmd Vdebug CursorHold,CursorHoldI,CursorMoved,CursorMovedI,FocusGained,FocusLost * python3 debugger.start_if_ready()')
         self.__server.start(opts.Options.get('server'),
-                            opts.Options.get('port', int))
+                            opts.Options.get('port', int),
+                            opts.Options.get('proxy_host'),
+                            opts.Options.get('proxy_port', int),
+                            opts.Options.get('ide_key'))
 
     def stop(self):
         if opts.Options.get("auto_start", bool):

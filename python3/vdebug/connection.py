@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import asyncio
+import xml.etree.ElementTree as ET
 
 from . import log
 
@@ -103,13 +104,17 @@ class SocketCreator:
         """
         self.__sock = None
         self.input_stream = input_stream
+        self.proxy_success = False
 
-    def start(self, host='', port=9000, timeout=30):
+    def start(self, host='', proxy_host = '', proxy_port = 9001, idekey = None, port=9000, timeout=30):
         """Listen for a connection from the debugger. Listening for the actual
         connection is handled by self.listen()
 
         host -- host name where debugger is running (default '')
         port -- port number which debugger is listening on (default 9000)
+        proxy_host -- If using a DBGp Proxy, host name where the proxy is running (default None to disable)
+        proxy_port -- If using a DBGp Proxy, port where the proxy is listening for debugger connections (default 9001)
+        idekey -- The idekey that our Api() wrapper is expecting. Only required if using a proxy
         timeout -- time in seconds to wait for a debugger connection before giving up (default 30)
         """
         print('Waiting for a connection (Ctrl-C to cancel, this message will '
@@ -120,13 +125,18 @@ class SocketCreator:
             serv.setblocking(1)
             serv.bind((host, port))
             serv.listen(5)
-            self.__sock = self.listen(serv, timeout)
+            if proxy_host and proxy_port:
+                # Register ourselves with the proxy server
+                self.proxyinit(proxy_host, proxy_port, port, idekey)
+            self.__sock = self.accept(serv, timeout)
         except socket.timeout:
+            self.proxystop()
             raise TimeoutError("Timeout waiting for connection")
         finally:
+            self.proxystop(proxy_host, proxy_port, idekey)
             serv.close()
 
-    def listen(self, serv, timeout):
+    def accept(self, serv, timeout):
         """Non-blocking listener. Provides support for keyboard interrupts from
         the user. Although it's non-blocking, the user interface will still
         block until the timeout is reached.
@@ -155,13 +165,50 @@ class SocketCreator:
     def has_socket(self):
         return self.__sock is not None
 
+    def proxyinit(self, proxy_host, proxy_port, port, idekey):
+        """Register ourselves with the proxy."""
+        if not proxy_host or not proxy_port:
+            return
+
+        self.log("Connecting to DBGp proxy [%s:%d]" % (proxy_host, proxy_port))
+        proxy_conn = socket.create_connection((proxy_host, proxy_port), 30)
+
+        self.log("Sending proxyinit command")
+        msg = 'proxyinit -p %d -k %s -m 0' % (port, idekey)
+        proxy_conn.send(msg.encode())
+        proxy_conn.shutdown(socket.SHUT_WR)
+
+        # Parse proxy response
+        response = proxy_conn.recv(8192)
+        proxy_conn.close()
+        response = ET.fromstring(response)
+        self.proxy_success = bool(response.get("success"))
+
+    def proxystop(self, proxy_host, proxy_port, idekey):
+        """De-register ourselves from the proxy."""
+        if not self.proxy_success:
+            return
+
+        proxy_conn = socket.create_connection((proxy_host, proxy_port), 30)
+
+        self.log("Sending proxystop command")
+        msg = 'proxystop -k %s' % str(idekey)
+        proxy_conn.send(msg.encode())
+        proxy_conn.close()
+        self.proxy_success = False
+
+
 
 class BackgroundSocketCreator(threading.Thread):
 
-    def __init__(self, host, port, output_q):
+    def __init__(self, host, port, proxy_host, proxy_port, idekey, output_q):
         self.__output_q = output_q
         self.__host = host
         self.__port = port
+        self.__proxy_host = proxy_host
+        self.__proxy_port = proxy_port
+        self.__idekey = idekey
+        self.proxy_success = False
         self.__socket_task = None
         self.__loop = None
         threading.Thread.__init__(self)
@@ -189,6 +236,9 @@ class BackgroundSocketCreator(threading.Thread):
                 try:
                     # using ensure_future here since before 3.7, this is not a coroutine, but returns a future
                     self.__socket_task = asyncio.ensure_future(self.__loop.sock_accept(s))
+                    if self.__proxy_host and self.__proxy_port:
+                        # Register ourselves with the proxy server
+                        await self.proxyinit()
                     client, address = await self.__socket_task
                     # set resulting socket to blocking
                     client.setblocking(True)
@@ -197,9 +247,11 @@ class BackgroundSocketCreator(threading.Thread):
                     self.__output_q.put((client, address))
                     break
                 except socket.error:
+                    await self.proxystop()
                     # No connection
                     pass
         except socket.error as socket_error:
+            await self.proxystop()
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
 
@@ -207,15 +259,52 @@ class BackgroundSocketCreator(threading.Thread):
                 self.log("Address already in use")
                 print("Socket is already in use")
         except asyncio.CancelledError as e:
+            await self.proxystop()
             self.log("Stopping server")
             self.__socket_task = None
         except Exception as e:
+            await self.proxystop()
             print("Exception caught")
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
         finally:
+            await self.proxystop()
             self.log("Finishing socket server")
             s.close()
+
+    async def proxyinit(self):
+        """Register ourselves with the proxy."""
+        if not self.__proxy_host or not self.__proxy_port:
+            return
+
+        self.log("Connecting to DBGp proxy [%s:%d]" % (self.__proxy_host, self.__proxy_port))
+        proxy_conn = socket.create_connection((self.__proxy_host, self.__proxy_port), 30)
+
+        self.log("Sending proxyinit command")
+        msg = 'proxyinit -p %d -k %s -m 0' % (self.__port, self.__idekey)
+        proxy_conn.send(msg.encode())
+        proxy_conn.shutdown(socket.SHUT_WR)
+
+        # Parse proxy response
+        response = proxy_conn.recv(8192)
+        proxy_conn.close()
+        response = ET.fromstring(response)
+        self.proxy_success = bool(response.get("success"))
+
+    async def proxystop(self):
+        """De-register ourselves from the proxy."""
+        if not self.proxy_success:
+            return
+
+        proxy_conn = socket.create_connection((self.__proxy_host, self.__proxy_port), 30)
+
+        self.log("Sending proxystop command")
+        msg = 'proxystop -k %s' % str(self.__idekey)
+        proxy_conn.send(msg.encode())
+        proxy_conn.close()
+        self.proxy_success = False
+
+
 
     def _exit(self):
         if self.__socket_task:
@@ -236,10 +325,10 @@ class SocketServer:
     def __del__(self):
         self.stop()
 
-    def start(self, host, port):
+    def start(self, host, port, proxy_host, proxy_port, ide_key):
         if not self.is_alive():
             self.__thread = BackgroundSocketCreator(
-                host, port, self.__socket_q)
+                host, port, proxy_host, proxy_port, ide_key, self.__socket_q)
             self.__thread.start()
 
     def is_alive(self):
