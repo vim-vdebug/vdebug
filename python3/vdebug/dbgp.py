@@ -181,7 +181,7 @@ class FeatureGetResponse(Response):
     def __str__(self):
         if self.is_supported():
             xml = self.as_xml()
-            return xml.text
+            return xml.text if xml.text else ""
         return "* Feature not supported *"
 
 
