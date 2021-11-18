@@ -130,7 +130,6 @@ class SocketCreator:
                 self.proxyinit(proxy_host, proxy_port, port, idekey)
             self.__sock = self.accept(serv, timeout)
         except socket.timeout:
-            self.proxystop()
             raise TimeoutError("Timeout waiting for connection")
         finally:
             self.proxystop(proxy_host, proxy_port, idekey)
@@ -251,7 +250,6 @@ class BackgroundSocketCreator(threading.Thread):
                     # No connection
                     pass
         except socket.error as socket_error:
-            await self.proxystop()
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
 
@@ -259,11 +257,9 @@ class BackgroundSocketCreator(threading.Thread):
                 self.log("Address already in use")
                 print("Socket is already in use")
         except asyncio.CancelledError as e:
-            await self.proxystop()
             self.log("Stopping server")
             self.__socket_task = None
         except Exception as e:
-            await self.proxystop()
             print("Exception caught")
             self.log("Error: %s" % str(sys.exc_info()))
             self.log("Stopping server")
