@@ -127,10 +127,10 @@ class ApiTest(unittest.TestCase):
         assert str(status_res) == "stopping"
 
     def test_detatch_retval(self):
-        """Test that the detatch command receives a message from the api."""
+        """Test that the detach command receives a message from the api."""
         self.p.conn.recv_msg.return_value = """<?xml
             version="1.0" encoding="iso-8859-1"?>\n
-            <response command="detatch"
+            <response command="detach"
                       xmlns="urn:debugger_api_v1"
                       status="stopped"
                       reason="ok"
