@@ -206,7 +206,7 @@ it as a zend extension. This can be done in the PHP INI file, but in Ubuntu
 I can add a new file to /etc/php5/conf.d/ that contains all the configuration
 options and gets loaded automatically by PHP.
 
-Add these options to the INI file: >
+For Xdebug v2, add these options to the INI file: >
 
     zend_extension=/path/to/xdebug.so
     xdebug.remote_enable=on
@@ -214,6 +214,16 @@ Add these options to the INI file: >
     xdebug.remote_host=localhost
     xdebug.remote_port=9000
 <
+
+For Xdebug v3, add tese options to the INI file: >
+
+    zend_extension=/path/to/xdebug.so
+    xdebug.mode=debug
+    xdebug.client_host=localhost
+    xdebug.client_port=9000
+<
+Please refer to https://xdebug.org/docs/upgrade_guide for instructions on how to upgrade from v2 to v3.
+
 If using Apache, restart it to enable the new library. The command line
 interface should be ready to go - type "php -v" and you should see the line >
     with Xdebug v2.2.0, Copyright (c) 2002-2012, by Derick Rethans
