@@ -215,7 +215,7 @@ For Xdebug v2, add these options to the INI file: >
     xdebug.remote_port=9000
 <
 
-For Xdebug v3, add tese options to the INI file: >
+For Xdebug v3, add these options to the INI file: >
 
     zend_extension=/path/to/xdebug.so
     xdebug.mode=debug
