@@ -765,6 +765,10 @@ class WatchWindow(Window):
     def write(self, msg, return_focus=True):
         Window.write(self, msg, after="normal gg")
 
+    def accept_renderer(self, renderer):
+        self.clean()
+        self.write(renderer.render(0, opts.Options.get('watch_window_initial_max_depth', int)))
+
 
 class StatusWindow(Window):
 
@@ -901,7 +905,7 @@ class ContextGetResponseRenderer(ResponseRenderer):
         self.contexts = contexts if contexts is not None else {}
         self.current_context = current_context
 
-    def render(self, indent=0):
+    def render(self, indent=0, max_depth=None):
         res = self.__create_tabs()
 
         if self.title:
@@ -911,14 +915,12 @@ class ContextGetResponseRenderer(ResponseRenderer):
         num_props = len(properties)
         log.Log("Writing %i properties to the window" % num_props,
                 log.Logger.INFO)
-        for idx, prop in enumerate(properties):
-            final = False
-            try:
-                next_prop = properties[idx+1]
-            except IndexError:
-                final = True
-                next_prop = None
-            res += self.__render_property(prop, next_prop, final, indent)
+
+        depth_applied_properties = list(filter(lambda p: max_depth is None or p.depth <= max_depth, properties))
+        for idx, prop in enumerate(depth_applied_properties):
+            final = True if idx + 1 >= len(depth_applied_properties) else False
+            next_prop = None if final else depth_applied_properties[idx+1]
+            res += self.__render_property(prop, next_prop, final, indent, max_depth)
 
         log.Log("Writing to window:\n"+res, log.Logger.DEBUG)
 
@@ -935,11 +937,11 @@ class ContextGetResponseRenderer(ResponseRenderer):
             return " ".join(res) + "\n\n"
         return ""
 
-    def __render_property(self, p, next_p, last=False, indent=0):
+    def __render_property(self, p, next_p, last=False, indent=0, max_depth=None):
         indent_str = "".rjust((p.depth * 2)+indent)
         line = "%(indent)s %(marker)s %(name)s = (%(type)s)%(value)s" % {
             'indent': indent_str,
-            'marker': self.__get_marker(p),
+            'marker': self.__get_marker(p, max_depth),
             'name': p.display_name,
             'type': p.type_and_size(),
             'value': " " + p.value
@@ -971,10 +973,10 @@ class ContextGetResponseRenderer(ResponseRenderer):
                 line += "".rjust((depth * 2) - 1 + indent) + " /" + "\n"
         return line
 
-    def __get_marker(self, property):
+    def __get_marker(self, property, max_depth=None):
         char = opts.Options.get('marker_default')
         if property.has_children:
-            if property.child_count() == 0:
+            if property.child_count() == 0 or (max_depth is not None and property.depth >= max_depth):
                 char = opts.Options.get('marker_closed_tree')
             else:
                 char = opts.Options.get('marker_open_tree')
