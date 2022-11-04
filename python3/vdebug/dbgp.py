@@ -458,8 +458,11 @@ class ContextProperty:
         n = node.find('%s%s' % (self.ns, name))
         if n is not None and n.text is not None:
             if n.get('encoding') == 'base64':
-                val = base64.decodebytes(n.text.encode("UTF-8")).decode(
-                    "UTF-8")
+                try:
+                    val = base64.decodebytes(n.text.encode("UTF-8")).decode(
+                        "UTF-8")
+                except UnicodeDecodeError:
+                    val = n.text
             else:
                 val = n.text
         else:
