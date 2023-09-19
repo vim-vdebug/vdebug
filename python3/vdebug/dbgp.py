@@ -533,16 +533,19 @@ class EvalProperty(ContextProperty):
             self.display_name = self.code
         else:
             if self.language == 'php':
+                name = node.get('name')
+                if not isinstance(name, str):
+                    name = self._get_enc_node_text(node, 'name', "")
                 if self.parent.type == 'array':
-                    if node.get('name').isdigit():
+                    if name.isdigit():
                         self.display_name = self.parent.display_name + \
-                            "[%s]" % node.get('name')
+                            "[%s]" % name
                     else:
                         self.display_name = self.parent.display_name + \
-                            "['%s']" % node.get('name')
+                            "['%s']" % name
                 else:
                     self.display_name = self.parent.display_name + \
-                        "->" + node.get('name')
+                        "->" + name
             elif self.language == 'perl':
                 self.display_name = node.get('fullname')
             else:
