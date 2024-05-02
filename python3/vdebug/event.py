@@ -44,16 +44,16 @@ class CursorEvalEvent(Event):
     """Evaluate the variable currently under the cursor.
     """
     char_regex = {
-        "default": "a-zA-Z0-9_.\[\]'\"",
-        "ruby": "$@a-zA-Z0-9_.\[\]'\"",
+        "default": "a-zA-Z0-9_.\\[\\]'\"",
+        "ruby": "$@a-zA-Z0-9_.\\[\\]'\"",
         "perl": "$a-zA-Z0-9_{}'\"",
-        "php": "$@%a-zA-Z0-9_\[\]'\"\->"
+        "php": "$@%a-zA-Z0-9_\\[\\]'\">-"
     }
 
     var_regex = {
         "default": "^[a-zA-Z_]",
         "ruby": "^[$@a-zA-Z_]",
-        "php": "^[\$A-Z]",
+        "php": r"^[\$A-Z]",
         "perl": "^[$@%]"
     }
 
@@ -559,7 +559,7 @@ class BreakpointJumpEvent(BreakpointStatusEvent):
         line = self.ui.windows.breakpoints().line_at(lineno - 1)
 
         # Match on ID
-        id = re.findall('^[\s][0-9]*[\s]', line)
+        id = re.findall('^[\\s][0-9]*[\\s]', line)
         if not id:
             return False
 
@@ -877,9 +877,9 @@ class Dispatcher:
     @staticmethod
     def _get_breakpoint_id_breakpoint_window(line):
            # Match on ID
-         id = re.findall('^[\s][0-9]*[\s]', line)
+         id = re.findall(r'^[\s][0-9]*[\s]', line)
          if not id:
-             log.Log("No breakpoint founr at current cursor position",
+             log.Log("No breakpoint found at current cursor position",
                  log.Logger.DEBUG)
              return False
 
