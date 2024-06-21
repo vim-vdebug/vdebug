@@ -89,6 +89,7 @@ let g:vdebug_options_defaults = {
 \    'debug_file' : '',
 \    'path_maps' : {},
 \    'watch_window_style' : 'expanded',
+\    'watch_window_initial_max_depth': 0,
 \    'marker_default' : '⬦',
 \    'marker_closed_tree' : '▸',
 \    'marker_open_tree' : '▾',
